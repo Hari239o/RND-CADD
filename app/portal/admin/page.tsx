@@ -292,6 +292,17 @@ function isPlaceholderOrBrokenDriveUrl(url?: string): boolean {
   return false;
 }
 
+function formatYouTubeEmbedUrl(url: string): string {
+  if (!url) return '';
+  const trimmed = url.trim();
+  if (trimmed.includes('youtube.com/embed/')) return trimmed;
+  const match = trimmed.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([\w-]{11})/);
+  if (match && match[1]) {
+    return `https://www.youtube-nocookie.com/embed/${match[1]}`;
+  }
+  return trimmed;
+}
+
 // Clean, useful UI icons strictly related to actions and specifications
 const FolderIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1790,18 +1801,25 @@ export default function AdminPortalPage() {
       return;
     }
 
-    const formattedUrl = newClassForm.videoUrl.trim()
-      ? (newClassForm.videoType === 'drive'
-          ? formatGoogleDriveUrl(newClassForm.videoUrl)
-          : newClassForm.videoUrl.trim())
-      : '';
+    const trimmedUrl = newClassForm.videoUrl.trim();
+    const isDrive = newClassForm.videoType === 'drive' || trimmedUrl.includes('drive.google.com');
+    const isYouTube = trimmedUrl.includes('youtube.com') || trimmedUrl.includes('youtu.be');
+
+    let formattedUrl = trimmedUrl;
+    if (trimmedUrl) {
+      if (isDrive) {
+        formattedUrl = formatGoogleDriveUrl(trimmedUrl);
+      } else if (isYouTube) {
+        formattedUrl = formatYouTubeEmbedUrl(trimmedUrl);
+      }
+    }
 
     const classItem: CourseClass = {
       id: newClassForm.id || `cls-${Date.now()}`,
       classNumber: newClassForm.classNumber.trim() || `Class 0${currentClasses.length + 1}`,
       title: newClassForm.title.trim(),
       duration: newClassForm.duration.trim() || '45 mins',
-      videoType: newClassForm.videoType,
+      videoType: isDrive ? 'drive' : (newClassForm.videoType || 'file'),
       videoUrl: formattedUrl,
       description: newClassForm.description.trim(),
       pdfUrl: newClassForm.pdfUrl.trim(),
@@ -7333,11 +7351,19 @@ export default function AdminPortalPage() {
                     {/* Viewport Screen - Removed All Unwanted Text Clutter as Highlighted in Image 4 */}
                     <div className="relative aspect-video w-full bg-slate-950 rounded-xl overflow-hidden border border-slate-800 shadow-inner flex items-center justify-center">
                       {testingVideoClass && testingVideoClass.videoUrl && !isPlaceholderOrBrokenDriveUrl(testingVideoClass.videoUrl) ? (
-                        testingVideoClass.videoType === 'drive' ? (
+                        (testingVideoClass.videoType === 'drive' || testingVideoClass.videoUrl.includes('drive.google.com')) ? (
                           <iframe
                             src={formatGoogleDriveUrl(testingVideoClass.videoUrl)}
                             className="w-full h-full border-0"
                             allow="autoplay; encrypted-media; fullscreen"
+                            allowFullScreen
+                            title={testingVideoClass.title}
+                          />
+                        ) : (testingVideoClass.videoUrl.includes('youtube.com') || testingVideoClass.videoUrl.includes('youtu.be')) ? (
+                          <iframe
+                            src={formatYouTubeEmbedUrl(testingVideoClass.videoUrl)}
+                            className="w-full h-full border-0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                             allowFullScreen
                             title={testingVideoClass.title}
                           />

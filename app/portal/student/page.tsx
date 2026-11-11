@@ -160,6 +160,17 @@ function isPlaceholderOrBrokenDriveUrl(url?: string): boolean {
   return false;
 }
 
+function formatYouTubeEmbedUrl(url: string): string {
+  if (!url) return '';
+  const trimmed = url.trim();
+  if (trimmed.includes('youtube.com/embed/')) return trimmed;
+  const match = trimmed.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([\w-]{11})/);
+  if (match && match[1]) {
+    return `https://www.youtube-nocookie.com/embed/${match[1]}`;
+  }
+  return trimmed;
+}
+
 function formatVideoTime(seconds: number): string {
   if (isNaN(seconds) || seconds < 0) return '00:00';
   const mins = Math.floor(seconds / 60);
@@ -947,6 +958,38 @@ export default function StudentPortalPage() {
     );
   }, [playerCourse?.classes, playlistSearchQuery]);
 
+  const isDriveVideo = useMemo(() => {
+    if (!activePlayerClass?.videoUrl) return false;
+    return (
+      activePlayerClass.videoType === 'drive' ||
+      activePlayerClass.videoUrl.includes('drive.google.com')
+    );
+  }, [activePlayerClass]);
+
+  const isYouTubeVideo = useMemo(() => {
+    if (!activePlayerClass?.videoUrl) return false;
+    return (
+      activePlayerClass.videoUrl.includes('youtube.com') ||
+      activePlayerClass.videoUrl.includes('youtu.be')
+    );
+  }, [activePlayerClass]);
+
+  const currentClassIndex = useMemo(() => {
+    if (!playerCourse?.classes || !activePlayerClass) return -1;
+    return playerCourse.classes.findIndex((c) => c.id === activePlayerClass.id);
+  }, [playerCourse?.classes, activePlayerClass]);
+
+  // Window focus listener for instant course updates when switching from Admin tab
+  useEffect(() => {
+    const handleWindowFocus = () => {
+      fetchCourses();
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', handleWindowFocus);
+      return () => window.removeEventListener('focus', handleWindowFocus);
+    }
+  }, []);
+
   const showVideoToast = (msg: string) => {
     setVideoToast(msg);
     setTimeout(() => {
@@ -974,6 +1017,7 @@ export default function StudentPortalPage() {
   };
 
   const handleOpenStudio = (course: StoredCourse, targetClass?: CourseClass | null) => {
+    // 1. Immediately launch studio with current course data
     const courseClasses = getClassesForCourse(course.title, course.classes);
     const resolvedCourse: StoredCourse = {
       ...course,
@@ -993,6 +1037,33 @@ export default function StudentPortalPage() {
         window.location.pathname
       );
     }
+
+    // 2. Fetch fresh courses in background so any class newly added by Admin appears immediately
+    fetch('/api/courses')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.courses)) {
+          setAllCourses(data.courses);
+          const fresh = data.courses.find(
+            (c: StoredCourse) =>
+              c.id === course.id ||
+              c.title.toLowerCase().trim() === course.title.toLowerCase().trim() ||
+              c.code.toLowerCase().trim() === course.code.toLowerCase().trim()
+          );
+          if (fresh && Array.isArray(fresh.classes) && fresh.classes.length > 0) {
+            setPlayerCourse(fresh);
+            if (targetClass) {
+              const matchedFresh = fresh.classes.find(
+                (fc: CourseClass) => fc.id === targetClass.id || fc.title === targetClass.title
+              );
+              if (matchedFresh) setActivePlayerClass(matchedFresh);
+            } else if (!defaultClass || !fresh.classes.some((fc: CourseClass) => fc.id === defaultClass.id)) {
+              setActivePlayerClass(fresh.classes[0]);
+            }
+          }
+        }
+      })
+      .catch((e) => console.warn('Background courses sync notice:', e));
   };
 
   const handleCloseStudio = () => {
@@ -1479,9 +1550,22 @@ export default function StudentPortalPage() {
                       Accredited training programs and video lectures active on your student profile
                     </p>
                   </div>
-                  <span className="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold self-start sm:self-auto">
-                    {studentUser.assignedCourses.length} Enrolled {studentUser.assignedCourses.length === 1 ? 'Program' : 'Programs'}
-                  </span>
+                  <div className="flex items-center gap-2 self-start sm:self-auto">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        fetchCourses();
+                        showVideoToast('Syllabus updated from database ↻');
+                      }}
+                      className="px-3 py-1 rounded-full bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer"
+                      title="Sync latest classes added by Admin"
+                    >
+                      <span>↻ Sync Classes</span>
+                    </button>
+                    <span className="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold">
+                      {studentUser.assignedCourses.length} Enrolled {studentUser.assignedCourses.length === 1 ? 'Program' : 'Programs'}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -3543,23 +3627,46 @@ export default function StudentPortalPage() {
               {/* MAIN PLAYER COLUMN (Left / Center) - REDUCED COMFORTABLE CINEMA SCREEN SIZE */}
               <div className="flex-1 flex flex-col min-h-0 overflow-y-auto bg-slate-100/60 p-3 sm:p-5 lg:p-6 space-y-4">
                 {activePlayerClass ? (
-                  <div className="w-full max-w-4xl mx-auto space-y-4">
+                  <div className="w-full max-w-6xl 2xl:max-w-7xl mx-auto space-y-4">
                     {/* MODE 1: CLASS VIDEO STREAM WITH IN-VIDEO OVERLAY CONTROLS (Images 2, 3, 4) */}
                     {studentViewerMode === 'video' && (
-                      <div className="w-full flex flex-col items-center">
-                        {/* Video Viewport Container with In-Video Floating Controls */}
-                        <div
-                          ref={playerContainerRef}
-                          onMouseMove={handleUserActivity}
-                          onMouseEnter={() => setShowControlsOverlay(true)}
-                          onMouseLeave={() => {
-                            if (videoIsPlaying) {
-                              setShowControlsOverlay(false);
-                              setShowSettingsMenu(false);
-                            }
-                          }}
-                          className="relative aspect-video w-full max-h-[70vh] bg-black rounded-2xl overflow-hidden border border-slate-300 shadow-2xl flex items-center justify-center group select-none"
-                        >
+                      <div className="w-full flex flex-col items-center space-y-4">
+                        {isDriveVideo ? (
+                          /* Interactive Google Drive Video Stream */
+                          <div className="relative aspect-video w-full max-h-[78vh] bg-black rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center">
+                            <iframe
+                              src={formatGoogleDriveUrl(activePlayerClass.videoUrl)}
+                              className="w-full h-full border-0 rounded-2xl"
+                              allow="autoplay; encrypted-media; fullscreen"
+                              allowFullScreen
+                              title={activePlayerClass.title}
+                            />
+                          </div>
+                        ) : isYouTubeVideo ? (
+                          /* YouTube Stream */
+                          <div className="relative aspect-video w-full max-h-[78vh] bg-black rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center">
+                            <iframe
+                              src={formatYouTubeEmbedUrl(activePlayerClass.videoUrl)}
+                              className="w-full h-full border-0 rounded-2xl"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                              allowFullScreen
+                              title={activePlayerClass.title}
+                            />
+                          </div>
+                        ) : (
+                          /* Direct MP4 / Video File with In-Video Floating Controls */
+                          <div
+                            ref={playerContainerRef}
+                            onMouseMove={handleUserActivity}
+                            onMouseEnter={() => setShowControlsOverlay(true)}
+                            onMouseLeave={() => {
+                              if (videoIsPlaying) {
+                                setShowControlsOverlay(false);
+                                setShowSettingsMenu(false);
+                              }
+                            }}
+                            className="relative aspect-video w-full max-h-[78vh] bg-black rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center group select-none"
+                          >
                           <video
                             ref={videoRef}
                             src={
@@ -3971,6 +4078,110 @@ export default function StudentPortalPage() {
                                 </button>
                               </div>
                             </div>
+                          </div>
+                        </div>
+                      )}
+
+                        {/* Clean LMS Lesson Header & Quick Navigation Bar */}
+                        <div className="w-full bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+                          <div className="space-y-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="px-2.5 py-0.5 rounded-full bg-slate-900 text-white font-mono font-bold text-[11px] uppercase tracking-wider">
+                                {activePlayerClass.classNumber}
+                              </span>
+                              <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-semibold text-[11px]">
+                                {activePlayerClass.duration}
+                              </span>
+                              {isDriveVideo && (
+                                <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 font-semibold text-[11px] border border-blue-200">
+                                  Google Drive Stream
+                                </span>
+                              )}
+                              {watchedClassIds.includes(activePlayerClass.id) && (
+                                <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold text-[11px] border border-emerald-200 flex items-center gap-1">
+                                  <span>✓</span>
+                                  <span>Completed</span>
+                                </span>
+                              )}
+                            </div>
+                            <h3 className="text-base sm:text-lg font-bold text-slate-900 truncate">
+                              {activePlayerClass.title}
+                            </h3>
+                            {activePlayerClass.description && (
+                              <p className="text-xs text-slate-600 line-clamp-2">
+                                {activePlayerClass.description}
+                              </p>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-2 flex-wrap flex-shrink-0">
+                            {/* Prev / Next navigation */}
+                            <button
+                              type="button"
+                              disabled={currentClassIndex <= 0}
+                              onClick={() => {
+                                if (playerCourse?.classes && currentClassIndex > 0) {
+                                  setActivePlayerClass(playerCourse.classes[currentClassIndex - 1]);
+                                  setVideoCurrentTime(0);
+                                  setVideoIsPlaying(false);
+                                }
+                              }}
+                              className="px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer shadow-2xs"
+                            >
+                              &larr; Prev Lesson
+                            </button>
+                            <button
+                              type="button"
+                              disabled={!playerCourse?.classes || currentClassIndex >= playerCourse.classes.length - 1}
+                              onClick={() => {
+                                if (playerCourse?.classes && currentClassIndex < playerCourse.classes.length - 1) {
+                                  setActivePlayerClass(playerCourse.classes[currentClassIndex + 1]);
+                                  setVideoCurrentTime(0);
+                                  setVideoIsPlaying(false);
+                                }
+                              }}
+                              className="px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer shadow-2xs"
+                            >
+                              Next Lesson &rarr;
+                            </button>
+
+                            {/* Mark Watched Toggle */}
+                            <button
+                              type="button"
+                              onClick={() => handleToggleClassWatched(activePlayerClass.id)}
+                              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs ${
+                                watchedClassIds.includes(activePlayerClass.id)
+                                  ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                                  : 'bg-white hover:bg-slate-50 text-slate-800 border border-slate-300'
+                              }`}
+                            >
+                              <span>{watchedClassIds.includes(activePlayerClass.id) ? '✓ Completed' : '○ Mark Completed'}</span>
+                            </button>
+
+                            {/* PDF Notes if available */}
+                            {activePlayerClass.pdfUrl && (
+                              <button
+                                type="button"
+                                onClick={() => setStudentViewerMode('notes')}
+                                className="px-3.5 py-2 rounded-xl bg-rose-50 text-[#EE2C3C] border border-rose-200 hover:bg-rose-100 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                              >
+                                <span>PDF Notes</span>
+                              </button>
+                            )}
+
+                            {/* Open in Google Drive in new tab */}
+                            {isDriveVideo && (
+                              <a
+                                href={activePlayerClass.videoUrl.replace('/preview', '/view')}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-3 py-2 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer shadow-2xs"
+                                title="Open video in Google Drive"
+                              >
+                                <span>Open in Drive</span>
+                                <span>&nearr;</span>
+                              </a>
+                            )}
                           </div>
                         </div>
                       </div>

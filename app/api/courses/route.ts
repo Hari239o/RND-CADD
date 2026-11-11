@@ -683,9 +683,10 @@ export async function PUT(request: Request) {
   try {
     const body = await request.json();
     const courseId = body.id;
+    const courseTitle = body.title;
 
-    if (!courseId) {
-      return NextResponse.json({ success: false, message: 'Course ID is required' }, { status: 400 });
+    if (!courseId && !courseTitle) {
+      return NextResponse.json({ success: false, message: 'Course ID or Title is required' }, { status: 400 });
     }
 
     const updatedCourse = normalizeCourse({
@@ -694,14 +695,22 @@ export async function PUT(request: Request) {
     });
 
     // Update in-memory store immediately
-    inMemoryCourses = inMemoryCourses.map(c => c.id === courseId ? updatedCourse : c);
+    inMemoryCourses = inMemoryCourses.map(c =>
+      (courseId && c.id === courseId) || (courseTitle && c.title.toLowerCase().trim() === courseTitle.toLowerCase().trim())
+        ? updatedCourse
+        : c
+    );
 
     try {
       const { db, isConnected } = await connectToDatabase();
       if (isConnected && db) {
         const collection = db.collection('courses');
+        const matchFilter: any = courseId && courseTitle
+          ? { $or: [{ id: courseId }, { title: courseTitle }] }
+          : (courseId ? { id: courseId } : { title: courseTitle });
+
         await collection.findOneAndUpdate(
-          { id: courseId },
+          matchFilter,
           { $set: updatedCourse },
           { returnDocument: 'after', upsert: true }
         );
