@@ -1,0 +1,254 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+:root {
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --color-red: #D20A0B;
+  --color-red-hover: #B50809;
+  --color-navy: #15304C;
+  --color-navy-dark: #0F2038;
+  --color-border: #E2E8F0;
+  --color-border-dark: #CBD5E1;
+  --color-text: #0F172A;
+  --color-muted: #64748B;
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  scroll-behavior: smooth;
+  background-color: #F8FAFC;
+  color: #0F172A;
+  font-family: Arial, Verdana, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+@supports (scrollbar-gutter: stable) {
+  html, body {
+    scrollbar-gutter: stable;
+  }
+}
+
+/* Custom engineering scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 0px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #D20A0B;
+}
+
+/* Hide scrollbar universally for clean horizontal carousels/navbars */
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar,
+nav::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+.no-scrollbar,
+.scrollbar-none,
+nav {
+  -ms-overflow-style: none !important;  /* IE and Edge */
+}
+
+@supports (scrollbar-width: none) {
+  .no-scrollbar,
+  .scrollbar-none,
+  nav {
+    scrollbar-width: none !important;  /* Firefox */
+  }
+}
+
+/* Precise geometric engineering container */
+.cad-container {
+  max-width: 1360px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+/* Crisp technical selection */
+::selection {
+  background-color: #D20A0B;
+  color: #FFFFFF;
+}
+
+@keyframes heroLetterUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0%);
+    opacity: 1;
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: inline-flex;
+  animation: marquee 35s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+@keyframes marquee-ltr {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.animate-marquee-ltr {
+  display: inline-flex;
+  animation: marquee-ltr 32s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-ltr:hover {
+  animation-play-state: paused;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ============================================================
+   Orbiting Animations from jobs.unlox.com (Image 3)
+   ============================================================ */
+@keyframes rotate-cw {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes counter-cw {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes rotate-ccw {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(-360deg);
+  }
+}
+
+@keyframes counter-ccw {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-rotate-cw {
+  animation: rotate-cw 22s linear infinite;
+}
+
+.animate-counter-cw {
+  animation: counter-cw 22s linear infinite;
+}
+
+.animate-rotate-ccw {
+  animation: rotate-ccw 30s linear infinite;
+}
+
+.animate-counter-ccw {
+  animation: counter-ccw 30s linear infinite;
+}
+
+
+
+
+
+/* ============================================================
+   upGrad Design System for Admin Dashboard (Images 1, 2 & 3)
+   Reference: https://www.upgrad.com/
+   Brand Red: #EE2C3C | Primary Dark: #131313 | Text: #000000
+   Font: Circular XX / System Geometric Sans-Serif (16px / 24px)
+   ============================================================ */
+.upgrad-admin-theme {
+  font-family: __localCircularXXTTFont_d44498, __localCircularXXTTFont_Fallback_d44498, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif !important;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  font-style: normal;
+  letter-spacing: normal;
+  color: #000000;
+  background-color: #F9FAFB;
+}
+
+.upgrad-admin-theme * {
+  font-family: __localCircularXXTTFont_d44498, __localCircularXXTTFont_Fallback_d44498, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif !important;
+}
+
+.upgrad-admin-theme h1,
+.upgrad-admin-theme h2,
+.upgrad-admin-theme h3,
+.upgrad-admin-theme h4,
+.upgrad-admin-theme h5,
+.upgrad-admin-theme h6 {
+  color: #131313 !important;
+  letter-spacing: -0.015em;
+}
