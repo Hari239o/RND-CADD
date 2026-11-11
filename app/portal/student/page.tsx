@@ -1246,7 +1246,7 @@ export default function StudentPortalPage() {
 
   return (
     <div
-      className="min-h-screen bg-[#F9FAFB] text-[#000000] flex flex-col md:flex-row text-base upgrad-admin-theme"
+      className="min-h-screen md:h-screen md:overflow-hidden bg-[#F9FAFB] text-[#000000] flex flex-col md:flex-row text-base upgrad-admin-theme"
       style={{
         fontFamily: '__localCircularXXTTFont_d44498, __localCircularXXTTFont_Fallback_d44498, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
         fontSize: '16px',
@@ -1257,8 +1257,8 @@ export default function StudentPortalPage() {
         color: '#000000',
       }}
     >
-      {/* LEFT SIDEBAR - FIXED & STICKY */}
-      <aside className="w-full md:w-80 md:sticky md:top-0 md:h-screen bg-[#FFFFFF] border-r border-slate-200 flex flex-col justify-between shadow-xs z-30 flex-shrink-0">
+      {/* LEFT SIDEBAR - FIXED & IMMOBILE (Pointers locked to viewport, does not move when scrolling) */}
+      <aside className="w-full md:w-80 md:fixed md:top-0 md:left-0 md:bottom-0 md:h-screen bg-[#FFFFFF] border-r border-slate-200 flex flex-col justify-between shadow-xs z-30 flex-shrink-0">
         <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
           {/* Student Profile Identity */}
           <div className="px-5 py-4 border-b border-slate-200 bg-white flex-shrink-0">
@@ -1358,8 +1358,8 @@ export default function StudentPortalPage() {
         </div>
       </aside>
 
-      {/* RIGHT MAIN CONTENT AREA */}
-      <main className="flex-1 flex flex-col min-h-screen overflow-y-auto bg-[#F9FAFB]">
+      {/* RIGHT MAIN CONTENT AREA - SCROLLS INDEPENDENTLY */}
+      <main className="flex-1 md:ml-80 flex flex-col min-h-0 md:h-screen overflow-y-auto bg-[#F9FAFB]">
         {/* Top Header Bar */}
         <header className="bg-white border-b border-slate-200 px-6 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs">
           <div>

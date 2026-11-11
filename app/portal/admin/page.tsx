@@ -2417,7 +2417,7 @@ export default function AdminPortalPage() {
 
   return (
     <div
-      className="min-h-screen bg-[#F9FAFB] text-[#000000] flex flex-col md:flex-row text-base upgrad-admin-theme"
+      className="min-h-screen md:h-screen md:overflow-hidden bg-[#F9FAFB] text-[#000000] flex flex-col md:flex-row text-base upgrad-admin-theme"
       style={{
         fontFamily: '__localCircularXXTTFont_d44498, __localCircularXXTTFont_Fallback_d44498, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
         fontSize: '16px',
@@ -2436,8 +2436,8 @@ export default function AdminPortalPage() {
         </div>
       )}
 
-      {/* LEFT SIDEBAR - FIXED & STICKY */}
-      <aside className="w-full md:w-80 md:sticky md:top-0 md:h-screen bg-[#FFFFFF] border-r-2 border-[#E2E8F0] flex flex-col justify-between shadow-md z-30 flex-shrink-0">
+      {/* LEFT SIDEBAR - FIXED & IMMOBILE (Pointers locked to viewport, does not move when scrolling) */}
+      <aside className="w-full md:w-80 md:fixed md:top-0 md:left-0 md:bottom-0 md:h-screen bg-[#FFFFFF] border-r-2 border-[#E2E8F0] flex flex-col justify-between shadow-md z-30 flex-shrink-0">
         <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
           {/* Top Logo Container */}
           <div className="p-4 sm:p-5 border-b-2 border-[#E2E8F0] bg-[#FFFFFF] flex items-center justify-between flex-shrink-0">
@@ -2552,8 +2552,8 @@ export default function AdminPortalPage() {
         </div>
       </aside>
 
-      {/* RIGHT MAIN CONTENT AREA */}
-      <main className="flex-1 flex flex-col min-h-screen overflow-y-auto">
+      {/* RIGHT MAIN CONTENT AREA - SCROLLS INDEPENDENTLY */}
+      <main className="flex-1 md:ml-80 flex flex-col min-h-0 md:h-screen overflow-y-auto">
         {/* Top Header Bar - Clean & Professional */}
         {activeTab !== 'Courses' && (
           <header className="bg-white border-b border-slate-200 px-6 sm:px-8 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
