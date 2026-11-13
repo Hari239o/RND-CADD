@@ -242,7 +242,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
           {/* Tab Content 1: MODULE SYLLABUS */}
           {activeTab === 'syllabus' && (
             <div className="space-y-4">
-              {modulesList.map((module) => (
+              {modulesList.map((module: any) => (
                 <div
                   key={module.number}
                   className="bg-[#F8FAFC] border border-[#E2E8F0] p-5 rounded-xl shadow-sm hover:border-[#CBD5E1] transition-all"
@@ -259,7 +259,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                     {module.title}
                   </h4>
                   <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-[#334155]">
-                    {(module.topics || []).map((topic, index) => (
+                    {(module.topics || []).map((topic: any, index: number) => (
                       <li key={index} className="flex items-start space-x-2">
                         <span className="text-[#D20A0B] font-bold">-</span>
                         <span>{topic}</span>
@@ -289,7 +289,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                   VERIFIED DELIVERABLES TO COMPLETE:
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {(capstoneData.deliverables || []).map((item, idx) => (
+                  {(capstoneData.deliverables || []).map((item: any, idx: number) => (
                     <div
                       key={idx}
                       className="p-3.5 bg-[#FFFFFF] border border-[#CBD5E1] text-xs text-[#0F172A] flex items-center space-x-2.5 shadow-sm rounded-lg"
@@ -310,7 +310,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                 JOB PLACEMENT TITLES
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-                {careerList.map((role, idx) => (
+                {careerList.map((role: any, idx: number) => (
                   <div
                     key={idx}
                     className="p-4 bg-[#FFFFFF] border border-[#CBD5E1] flex items-center justify-between shadow-sm rounded-lg"
