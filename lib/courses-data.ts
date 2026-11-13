@@ -965,7 +965,7 @@ export const COURSES: Course[] = [
         topics: ['Design Rule Checking (DRC) & Manufacturing Audits', 'Gerber X2, ODB++ & IPC-2581 Production Export', 'Drill Drawings, Solder Mask & Silkscreen Layer Verification', 'ActiveBOM Generation with Live Supplier Pricing & Availability']
       }
     ]
-  }
+  },
 
   // ==================== INTERIOR ARCHITECTURE COURSES ====================
   {
