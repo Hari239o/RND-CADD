@@ -642,7 +642,7 @@ export default function StudentPortalPage() {
           paymentReceipts: Array.isArray(p.paymentReceipts) ? p.paymentReceipts : prev.paymentReceipts,
         }));
         if (!isEditingProfile) {
-          setEditName(p.name || prev.name || 'Ram.g');
+          setEditName(p.name || 'Ram.g');
           setEditPhone(p.phone || '');
           setEditCollege(p.college || '');
           setEditNativePlace(p.nativePlace || '');
