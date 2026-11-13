@@ -190,7 +190,7 @@ export const COURSES: Course[] = [
     rating: '4.9/5.0',
     enrolledStudents: '1,150+ Engineers Trained',
     tools: ['Bentley STAAD.Pro CONNECT Edition', 'STAAD Foundation Advanced'],
-    image: 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?auto=format&fit=crop&w=900&q=80',
+    image: 'https://images.unsplash.com/photo-1541888946425-d0fbb186244f?auto=format&fit=crop&w=900&q=80',
     overview: 'Acquire rigorous competence in analyzing concrete buildings, industrial steel sheds, and portal frames under dead, live, wind, and earthquake loads in compliance with standard codes.',
     certification: 'Bentley Certified Structural Modeling Associate',
     careerRoles: ['Structural Engineer', 'RCC Design Engineer', 'Steel Structural Modeler', 'Civil Project Analyst'],

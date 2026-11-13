@@ -85,20 +85,20 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Main Entire Navigation Bar with Box Shadow & Border Radius (Image-2) */}
-      <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 max-w-[1536px] mx-auto py-2.5 sm:py-3.5">
-        <div className="bg-[#FFFFFF] rounded-2xl sm:rounded-3xl border border-[#CBD5E1] shadow-[0_16px_40px_-8px_rgba(15,23,42,0.12),0_4px_16px_rgba(15,23,42,0.04)] px-5 sm:px-8 py-3.5 sm:py-4 flex items-center justify-between gap-4 xl:gap-8 transition-all">
+      <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1340px] mx-auto py-2 sm:py-2.5">
+        <div className="bg-[#FFFFFF] rounded-2xl sm:rounded-3xl border border-[#CBD5E1] shadow-[0_12px_32px_-6px_rgba(15,23,42,0.1),0_4px_12px_rgba(15,23,42,0.03)] px-5 sm:px-7 py-2.5 sm:py-3 flex items-center justify-between gap-3 xl:gap-6 transition-all">
           {/* Prominent Official RND CADD Logo */}
           <a href="#" className="flex items-center shrink-0 group py-0.5">
             <img
               src="/logo.png"
               alt="RND CADD"
-              className="h-11 sm:h-14 lg:h-16 w-auto object-contain transition-transform duration-200 group-hover:scale-105 drop-shadow-sm"
+              className="h-10 sm:h-12 lg:h-14 w-auto object-contain transition-transform duration-200 group-hover:scale-105 drop-shadow-sm"
             />
           </a>
 
           {/* Stream Navigation Switcher - Exact Image 3 Rounded Pills without icons */}
           <nav
-            className="hidden lg:flex items-center justify-center flex-1 mx-2 xl:mx-4 space-x-2 xl:space-x-2.5 overflow-x-auto no-scrollbar scrollbar-none py-1"
+            className="hidden lg:flex items-center justify-center flex-1 mx-2 xl:mx-3 space-x-1.5 xl:space-x-2 overflow-x-auto no-scrollbar scrollbar-none py-0.5"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {[
@@ -115,7 +115,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <button
                   key={item.id}
                   onClick={() => onSelectStream(item.id)}
-                  className={`px-4 py-2 rounded-full text-xs sm:text-[13px] font-bold tracking-tight transition-all duration-200 cursor-pointer select-none whitespace-nowrap ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs sm:text-[12.5px] font-bold tracking-tight transition-all duration-200 cursor-pointer select-none whitespace-nowrap ${
                     isSelected
                       ? 'bg-[#EE2C3C] text-white border border-[#EE2C3C] shadow-md shadow-red-500/25 scale-105'
                       : 'bg-white text-slate-800 border border-[#EE2C3C] hover:bg-red-50/50 hover:scale-105 shadow-sm'
@@ -128,7 +128,7 @@ export const Header: React.FC<HeaderProps> = ({
           </nav>
 
           {/* CTAs */}
-          <div className="flex items-center space-x-2.5 sm:space-x-3.5 shrink-0">
+          <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
             {isStudent ? (
               <>
                 {/* Active Jobs Portal Button (Separate Page: /jobs - Ref: https://jobs.unlox.com/) */}

@@ -253,19 +253,21 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
           })}
         </div>
 
-        {/* Courses Grid with Course Images & Framer Motion Scroll Stagger */}
+        {/* Courses Grid with Course Images & Framer Motion Scroll Stagger (4 per row on desktop) */}
         {filteredCourses.length > 0 ? (
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.5 }}
-            className={`grid gap-6 mx-auto ${
+            className={`grid gap-6 mx-auto w-full ${
               filteredCourses.length === 1
                 ? 'grid-cols-1 max-w-md'
                 : filteredCourses.length === 2
                 ? 'grid-cols-1 sm:grid-cols-2 max-w-3xl'
-                : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl'
+                : filteredCourses.length === 3
+                ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-5xl'
+                : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 max-w-[1720px]'
             }`}
           >
             {filteredCourses.map((course, idx) => (
@@ -274,7 +276,8 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
                 initial={{ opacity: 0, y: 35 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-30px' }}
-                transition={{ duration: 0.5, delay: (idx % 3) * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.45, delay: (idx % 4) * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                className="flex"
               >
                 <CourseCard
                   course={course}
