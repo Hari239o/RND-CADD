@@ -16,7 +16,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
   if (!course) return null;
 
   // Safe Fallback Normalizations to guarantee rendering
-  const toolsList = Array.isArray(course.tools) && course.tools.length > 0
+  const toolsList: string[] = Array.isArray(course.tools) && course.tools.length > 0
     ? course.tools
     : typeof (course as any).software === 'string' && (course as any).software.trim()
     ? (course as any).software.split(',').map((s: string) => s.trim()).filter(Boolean)
@@ -193,7 +193,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
               AUTHORIZED TOOLCHAIN
             </div>
             <div className="flex flex-wrap gap-2">
-              {toolsList.map((tool) => (
+              {toolsList.map((tool: string) => (
                 <div
                   key={tool}
                   className="px-3.5 py-1.5 bg-[#F1F5F9] border border-[#CBD5E1] text-xs text-[#0F172A] font-semibold rounded-md shadow-sm"
