@@ -24,14 +24,6 @@ export default function HomePage() {
       try {
         if (typeof window !== 'undefined') {
           const list: string[] = [];
-          const stored = localStorage.getItem('rnd_cadd_enrolled_courses');
-          if (stored) {
-            const parsed = JSON.parse(stored);
-            if (Array.isArray(parsed)) list.push(...parsed);
-          }
-          const single = localStorage.getItem('rnd_cadd_enrolled_course');
-          if (single && !list.includes(single)) list.push(single);
-
           const userStr = localStorage.getItem('rnd_cadd_user');
           if (userStr) {
             const user = JSON.parse(userStr);
@@ -41,6 +33,19 @@ export default function HomePage() {
                 user.assignedCourses.forEach((c: string) => {
                   if (!list.includes(c)) list.push(c);
                 });
+              }
+              if (user.email) {
+                const userStored = localStorage.getItem(`rnd_cadd_enrolled_${user.email.toLowerCase()}`);
+                if (userStored) {
+                  try {
+                    const parsed = JSON.parse(userStored);
+                    if (Array.isArray(parsed)) {
+                      parsed.forEach((c: string) => {
+                        if (!list.includes(c)) list.push(c);
+                      });
+                    }
+                  } catch {}
+                }
               }
             }
           }

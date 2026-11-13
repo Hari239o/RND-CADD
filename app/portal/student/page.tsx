@@ -358,10 +358,10 @@ export default function StudentPortalPage() {
   const [mounted, setMounted] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('Home');
   const [studentUser, setStudentUser] = useState({
-    name: 'Ram.g',
-    email: 'student1@gmail.com',
+    name: 'Student',
+    email: '',
     role: 'student',
-    stream: 'Civil CADD & Master BIM',
+    stream: 'Engineering CAD',
     id: 'STU-001',
     accessStatus: 'active' as 'active' | 'revoked',
     phone: '',
@@ -376,13 +376,13 @@ export default function StudentPortalPage() {
     labWorkstation: '',
     leadInstructor: '',
     campusLocation: 'R&D CADD Center, Metro Pillar 1042, Ameerpet, Hyderabad',
-    assignedCourses: ['Civil CADD & Master BIM', 'Interior Architecture & 3D Visualization'] as string[],
+    assignedCourses: [] as string[],
     paymentReceipts: [] as PaymentReceipt[],
   });
 
   // Profile Edit & Security States
   const [isEditingProfile, setIsEditingProfile] = useState<boolean>(false);
-  const [editName, setEditName] = useState<string>('Ram.g');
+  const [editName, setEditName] = useState<string>('Student');
   const [editPhone, setEditPhone] = useState<string>('');
   const [editCollege, setEditCollege] = useState<string>('');
   const [editNativePlace, setEditNativePlace] = useState<string>('');
@@ -570,10 +570,27 @@ export default function StudentPortalPage() {
       const data = await res.json();
       if (data.success && Array.isArray(data.students)) {
         const matching = data.students.find(
-          (s: any) => s.email?.toLowerCase() === userEmail?.toLowerCase()
-        ) || data.students.find((s: any) => s.email === 'student1@gmail.com');
+          (s: any) => s.email?.toLowerCase().trim() === userEmail?.toLowerCase().trim()
+        );
 
         if (matching) {
+          // Read this specific student's enrolled courses from student-specific storage
+          let perStudentCourses: string[] = [];
+          if (typeof window !== 'undefined') {
+            const studentKey = `rnd_cadd_enrolled_${userEmail.toLowerCase().trim()}`;
+            const localStored = localStorage.getItem(studentKey);
+            if (localStored) {
+              try {
+                const parsed = JSON.parse(localStored);
+                if (Array.isArray(parsed)) perStudentCourses = parsed;
+              } catch {}
+            }
+          }
+
+          const resolvedCourses = Array.isArray(matching.assignedCourses) && matching.assignedCourses.length > 0
+            ? Array.from(new Set([...matching.assignedCourses, ...perStudentCourses]))
+            : (perStudentCourses.length > 0 ? perStudentCourses : (matching.courseName ? [matching.courseName] : []));
+
           setStudentUser((prev) => ({
             ...prev,
             name: matching.name || prev.name,
@@ -589,20 +606,37 @@ export default function StudentPortalPage() {
             paidFee: matching.paidFee !== undefined ? Number(matching.paidFee) : prev.paidFee,
             balanceFee: matching.balanceFee !== undefined ? Number(matching.balanceFee) : prev.balanceFee,
             accessStatus: matching.accessStatus || 'active',
-            assignedCourses: Array.isArray(matching.assignedCourses) && matching.assignedCourses.length > 0 ? matching.assignedCourses : prev.assignedCourses,
+            assignedCourses: resolvedCourses,
           }));
           // Fetch certificates with verified student ID
           fetchStudentCertificates(matching.email || userEmail, matching.studentId || matching.id);
           // Fetch e-books matching verified student enrollment
-          fetchStudentEbooks(matching.email || userEmail, matching.studentId || matching.id, matching.assignedCourses);
+          fetchStudentEbooks(matching.email || userEmail, matching.studentId || matching.id, resolvedCourses);
           // Fetch real-time support tickets
           fetchStudentTickets(matching.email || userEmail, matching.studentId || matching.id);
           // Fetch assignments for student's enrolled courses silently in background
-          fetchStudentAssignments(matching.assignedCourses || (matching.courseName ? [matching.courseName] : undefined), true);
+          fetchStudentAssignments(resolvedCourses, true);
           // Fetch full student profile details and fee receipts
           fetchStudentProfile(matching.email || userEmail);
           // Fetch student course & trainer reviews
           fetchStudentReviews(matching.email || userEmail);
+        } else {
+          // If this registered student is in local session, load their own per-student enrolled courses
+          if (typeof window !== 'undefined') {
+            const studentKey = `rnd_cadd_enrolled_${userEmail.toLowerCase().trim()}`;
+            const localStored = localStorage.getItem(studentKey);
+            if (localStored) {
+              try {
+                const parsed = JSON.parse(localStored);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                  setStudentUser((prev) => ({
+                    ...prev,
+                    assignedCourses: Array.from(new Set([...prev.assignedCourses, ...parsed])),
+                  }));
+                }
+              } catch {}
+            }
+          }
         }
       }
     } catch (err) {
@@ -1015,16 +1049,32 @@ export default function StudentPortalPage() {
         try {
           const parsed = JSON.parse(saved);
           if (parsed.email) {
-            emailToUse = parsed.email;
+            emailToUse = parsed.email.toLowerCase().trim();
             if (parsed.studentId) idToUse = parsed.studentId;
+
+            // Load this specific student's enrolled courses from per-student storage
+            let studentLocalCourses: string[] = [];
+            const studentKey = `rnd_cadd_enrolled_${emailToUse}`;
+            const localStored = localStorage.getItem(studentKey);
+            if (localStored) {
+              try {
+                const parsedList = JSON.parse(localStored);
+                if (Array.isArray(parsedList)) studentLocalCourses = parsedList;
+              } catch {}
+            }
+
+            const initialCourses = Array.isArray(parsed.assignedCourses) && parsed.assignedCourses.length > 0
+              ? parsed.assignedCourses
+              : (studentLocalCourses.length > 0 ? studentLocalCourses : (parsed.stream ? [parsed.stream] : []));
+
             setStudentUser((prev) => ({
               ...prev,
-              name: parsed.name || prev.name,
-              email: parsed.email,
-              stream: parsed.stream || prev.stream,
+              name: parsed.name || parsed.fullName || prev.name,
+              email: emailToUse,
+              stream: parsed.stream || (initialCourses[0] || prev.stream),
               id: parsed.studentId || parsed.id || prev.id,
               photo: parsed.photo || parsed.image || prev.photo,
-              assignedCourses: Array.isArray(parsed.assignedCourses) && parsed.assignedCourses.length > 0 ? parsed.assignedCourses : prev.assignedCourses,
+              assignedCourses: initialCourses,
             }));
           }
         } catch {
@@ -1491,6 +1541,8 @@ export default function StudentPortalPage() {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('rnd_cadd_user');
       localStorage.removeItem('rnd_cadd_role');
+      localStorage.removeItem('rnd_cadd_enrolled_courses');
+      localStorage.removeItem('rnd_cadd_enrolled_course');
       window.location.href = '/signin';
     }
   };

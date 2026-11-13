@@ -58,10 +58,7 @@ export default function SignInPage() {
       }
     }
 
-    if (
-      normEmail.includes('student') ||
-      normEmail === 'student1@gmail.com'
-    ) {
+    if (normEmail === 'student1@gmail.com') {
       if (trimmedPassword === '9908') {
         const userObj = {
           name: 'Ram.g',

@@ -68,10 +68,11 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Fallback profile without dummy data
+    // Fallback profile without shared/leaked dummy data
+    const isStudent1 = email === 'student1@gmail.com';
     const profile = fallbackProfiles[email] || {
-      studentId: 'STU-001',
-      name: 'Ram.g',
+      studentId: isStudent1 ? 'STU-001' : `STU-${Math.floor(100 + Math.random() * 900)}`,
+      name: isStudent1 ? 'Student 1 (Ram.g)' : email.split('@')[0],
       email: email,
       phone: '',
       college: '',
@@ -79,8 +80,8 @@ export async function GET(request: NextRequest) {
       qualification: '',
       admissionDate: '11 Nov 2026',
       photo: '',
-      stream: 'Civil CADD & Master BIM',
-      assignedCourses: ['Civil CADD & Master BIM'],
+      stream: isStudent1 ? 'Civil CADD & Master BIM' : 'Engineering CAD',
+      assignedCourses: isStudent1 ? ['Civil CADD & Master BIM', 'Interior Architecture & 3D Visualization'] : [],
       courseFee: 0,
       paidFee: 0,
       balanceFee: 0,

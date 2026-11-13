@@ -75,16 +75,33 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
       setSubmittedId(regId);
       setIsSubmitting(false);
 
-      // Persist enrolled course locally to instantly unlock placement portal
+      // Persist enrolled course strictly to this specific student (NOT globally shared)
       try {
         if (typeof window !== 'undefined') {
-          const stored = localStorage.getItem('rnd_cadd_enrolled_courses');
-          const list: string[] = stored ? JSON.parse(stored) : [];
-          if (!list.includes(selectedCourse)) {
-            list.push(selectedCourse);
+          const userStr = localStorage.getItem('rnd_cadd_user');
+          const currentLoggedIn = userStr ? JSON.parse(userStr) : null;
+          const targetEmail = (email || currentLoggedIn?.email || '').toLowerCase().trim();
+
+          if (targetEmail) {
+            const studentKey = `rnd_cadd_enrolled_${targetEmail}`;
+            const studentStored = localStorage.getItem(studentKey);
+            const studentList: string[] = studentStored ? JSON.parse(studentStored) : [];
+            if (!studentList.includes(selectedCourse)) {
+              studentList.push(selectedCourse);
+            }
+            localStorage.setItem(studentKey, JSON.stringify(studentList));
           }
-          localStorage.setItem('rnd_cadd_enrolled_courses', JSON.stringify(list));
-          localStorage.setItem('rnd_cadd_enrolled_course', selectedCourse);
+
+          // If the logged-in student matches this enrollment, update their active profile
+          if (currentLoggedIn && (!targetEmail || currentLoggedIn.email?.toLowerCase() === targetEmail)) {
+            const userCourses = Array.isArray(currentLoggedIn.assignedCourses) ? currentLoggedIn.assignedCourses : [];
+            if (!userCourses.includes(selectedCourse)) {
+              userCourses.push(selectedCourse);
+            }
+            currentLoggedIn.assignedCourses = userCourses;
+            localStorage.setItem('rnd_cadd_user', JSON.stringify(currentLoggedIn));
+            window.dispatchEvent(new Event('storage'));
+          }
         }
       } catch {
         // ignore

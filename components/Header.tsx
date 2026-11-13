@@ -48,8 +48,11 @@ export const Header: React.FC<HeaderProps> = ({
       if (typeof window !== 'undefined') {
         localStorage.removeItem('rnd_cadd_user');
         localStorage.removeItem('rnd_cadd_role');
+        localStorage.removeItem('rnd_cadd_enrolled_courses');
+        localStorage.removeItem('rnd_cadd_enrolled_course');
         setCurrentUser(null);
         window.dispatchEvent(new Event('storage'));
+        window.location.href = '/signin';
       }
     } catch {
       // ignore

@@ -27,20 +27,21 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
         const res = await fetch('/api/courses');
         const data = await res.json();
         if (data.success && Array.isArray(data.courses) && data.courses.length > 0) {
-          const mapped: Course[] = data.courses.map((sc: any) => {
-            const existing = COURSES.find(
+          const merged: Course[] = [...COURSES];
+          data.courses.forEach((sc: any) => {
+            const index = merged.findIndex(
               (c) =>
                 c.id.toLowerCase() === sc.id?.toLowerCase() ||
                 c.title.toLowerCase().trim() === sc.title?.toLowerCase().trim()
             );
 
-            const streamVal = sc.folder === 'electrical' ? 'eee' : sc.folder;
+            const streamVal = sc.folder === 'electrical' ? 'eee' : (sc.stream || sc.folder);
 
             const toolsList = Array.isArray(sc.tools) && sc.tools.length > 0
               ? sc.tools
               : typeof sc.software === 'string' && sc.software.trim()
               ? sc.software.split(',').map((s: string) => s.trim()).filter(Boolean)
-              : existing?.tools || ['CAD Tools'];
+              : ['CAD Tools'];
 
             const modulesList = Array.isArray(sc.modules) && sc.modules.length > 0
               ? sc.modules
@@ -51,7 +52,7 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
                   hours: 20,
                   topics: [s, 'Practical lab drafting & validation'],
                 }))
-              : existing?.modules || [
+              : [
                   {
                     number: '01',
                     title: sc.title || 'Course Fundamentals',
@@ -62,7 +63,7 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
 
             const capstoneObj = sc.capstoneProject && sc.capstoneProject.title
               ? sc.capstoneProject
-              : existing?.capstoneProject || {
+              : {
                   title: `${sc.title} Live Industry Project`,
                   description: 'Real-world industrial drafting, modeling, and validation project.',
                   deliverables: ['Design Drawings', '3D CAD Model', 'Project Dossier'],
@@ -70,38 +71,43 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
 
             const careerList = Array.isArray(sc.careerRoles) && sc.careerRoles.length > 0
               ? sc.careerRoles
-              : existing?.careerRoles || ['Design Engineer', 'CAD Specialist', 'Project Engineer'];
+              : ['Design Engineer', 'CAD Specialist', 'Project Engineer'];
 
-            return {
+            const courseItem: Course = {
               id: sc.id || `course-${sc.code || Math.random().toString(36).substring(7)}`,
               code: sc.code,
               folder: sc.folder,
-              fee: Number(sc.fee || sc.price) || existing?.fee || 35000,
+              fee: Number(sc.fee || sc.price) || 35000,
               stream: streamVal,
               title: sc.title,
-              category: sc.category || existing?.category || sc.domain || 'Engineering CAD',
-              tagline: sc.tagline || existing?.tagline || sc.overview || 'Industrial certified CAD/BIM course',
-              duration: sc.duration || existing?.duration || '90 Days (180 Hours)',
-              totalHours: Number(sc.totalHours) || existing?.totalHours || 120,
-              level: sc.level || existing?.level || 'Professional',
-              rating: sc.rating || existing?.rating || '4.9/5',
-              enrolledStudents: sc.enrolledStudents || existing?.enrolledStudents || '450+ Trainees',
+              category: sc.category || sc.domain || 'Engineering CAD',
+              tagline: sc.tagline || sc.overview || 'Industrial certified CAD/BIM course',
+              duration: sc.duration || '90 Days (180 Hours)',
+              totalHours: Number(sc.totalHours) || 120,
+              level: sc.level || 'Professional',
+              rating: sc.rating || '4.9/5',
+              enrolledStudents: sc.enrolledStudents || '450+ Trainees',
               tools: toolsList,
               image:
                 sc.image ||
-                existing?.image ||
                 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80',
-              overview: sc.overview || existing?.overview || '',
-              certification: sc.certification || existing?.certification || 'Autodesk & Dassault Certificate',
+              overview: sc.overview || '',
+              certification: sc.certification || 'Autodesk & Dassault Certificate',
               careerRoles: careerList,
-              prerequisites: sc.prerequisites || existing?.prerequisites || 'Diploma / B.Tech / Working Professional',
+              prerequisites: sc.prerequisites || 'Diploma / B.Tech / Working Professional',
               capstoneProject: capstoneObj,
               modules: modulesList,
-              classes: sc.classes || existing?.classes || [],
+              classes: sc.classes || [],
             };
+
+            if (index >= 0) {
+              merged[index] = { ...merged[index], ...courseItem };
+            } else {
+              merged.push(courseItem);
+            }
           });
 
-          setCoursesList(mapped);
+          setCoursesList(merged);
         }
       } catch (err) {
         console.error('Failed to load dynamic courses from API:', err);

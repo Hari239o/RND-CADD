@@ -48,47 +48,54 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
         const res = await fetch('/api/courses');
         const data = await res.json();
         if (data.success && Array.isArray(data.courses) && data.courses.length > 0) {
-          const mapped = data.courses.map((sc: any) => {
-            const existing = COURSES.find(
+          // Merge API courses with default COURSES so no domain is ever depleted
+          const merged: Course[] = [...COURSES];
+          data.courses.forEach((sc: any) => {
+            const index = merged.findIndex(
               (c) =>
                 c.id.toLowerCase() === sc.id?.toLowerCase() ||
                 c.title.toLowerCase().trim() === sc.title?.toLowerCase().trim()
             );
-            const streamVal = sc.folder === 'electrical' ? 'eee' : sc.folder;
+            const streamVal = sc.folder === 'electrical' ? 'eee' : (sc.stream || sc.folder);
 
-            return {
+            const courseObj: any = {
               id: sc.id || `course-${sc.code || Math.random().toString(36).substring(7)}`,
               code: sc.code,
               folder: sc.folder,
-              fee: Number(sc.fee || sc.price) || existing?.fee || 35000,
+              fee: Number(sc.fee || sc.price) || 35000,
               stream: streamVal,
               title: sc.title,
-              category: sc.category || existing?.category || sc.domain || 'Engineering CAD',
-              tagline: sc.tagline || existing?.tagline || sc.overview || 'Industrial certified CAD/BIM course',
-              duration: sc.duration || existing?.duration || '90 Days (180 Hours)',
-              totalHours: Number(sc.totalHours) || existing?.totalHours || 120,
-              level: sc.level || existing?.level || 'Professional Diploma',
-              rating: sc.rating || existing?.rating || '4.9/5',
-              enrolledStudents: sc.enrolledStudents || existing?.enrolledStudents || '450+ Trainees',
-              tools: sc.tools || existing?.tools || ['CAD Tools'],
+              category: sc.category || sc.domain || 'Engineering CAD',
+              tagline: sc.tagline || sc.overview || 'Industrial certified CAD/BIM course',
+              duration: sc.duration || '90 Days (180 Hours)',
+              totalHours: Number(sc.totalHours) || 120,
+              level: sc.level || 'Professional Diploma',
+              rating: sc.rating || '4.9/5',
+              enrolledStudents: sc.enrolledStudents || '450+ Trainees',
+              tools: sc.tools || ['CAD Tools'],
               image:
                 sc.image ||
-                existing?.image ||
                 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80',
-              overview: sc.overview || existing?.overview || '',
-              certification: sc.certification || existing?.certification || 'Autodesk & Dassault Certificate',
-              careerRoles: sc.careerRoles || existing?.careerRoles || ['CAD Design Engineer'],
-              prerequisites: sc.prerequisites || existing?.prerequisites || 'Diploma / B.Tech',
-              capstoneProject: sc.capstoneProject || existing?.capstoneProject || {
+              overview: sc.overview || '',
+              certification: sc.certification || 'Autodesk & Dassault Certificate',
+              careerRoles: sc.careerRoles || ['CAD Design Engineer'],
+              prerequisites: sc.prerequisites || 'Diploma / B.Tech',
+              capstoneProject: sc.capstoneProject || {
                 title: `${sc.title} Live Industry Project`,
                 description: 'Real-world industrial drafting, modeling, and validation project.',
                 deliverables: ['Design Drawings', '3D CAD Model', 'Project Dossier'],
               },
-              modules: sc.modules || existing?.modules || [],
-              classes: sc.classes || existing?.classes || [],
-            } as any;
+              modules: sc.modules || [],
+              classes: sc.classes || [],
+            };
+
+            if (index >= 0) {
+              merged[index] = { ...merged[index], ...courseObj };
+            } else {
+              merged.push(courseObj);
+            }
           });
-          setAllCourses(mapped);
+          setAllCourses(merged);
         }
       } catch (e) {
         console.error('Failed to load courses in UpgradProgramsShowcase:', e);

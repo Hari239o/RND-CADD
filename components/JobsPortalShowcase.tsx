@@ -61,14 +61,6 @@ export const JobsPortalShowcase: React.FC<JobsPortalShowcaseProps> = ({
       try {
         if (typeof window !== 'undefined') {
           const list: string[] = [];
-          const stored = localStorage.getItem('rnd_cadd_enrolled_courses');
-          if (stored) {
-            const parsed = JSON.parse(stored);
-            if (Array.isArray(parsed)) list.push(...parsed);
-          }
-          const single = localStorage.getItem('rnd_cadd_enrolled_course');
-          if (single && !list.includes(single)) list.push(single);
-
           const user = localStorage.getItem('rnd_cadd_user');
           if (user) {
             const parsedUser = JSON.parse(user);
@@ -78,6 +70,19 @@ export const JobsPortalShowcase: React.FC<JobsPortalShowcaseProps> = ({
                 parsedUser.assignedCourses.forEach((c: string) => {
                   if (!list.includes(c)) list.push(c);
                 });
+              }
+              if (parsedUser.email) {
+                const userStored = localStorage.getItem(`rnd_cadd_enrolled_${parsedUser.email.toLowerCase()}`);
+                if (userStored) {
+                  try {
+                    const parsed = JSON.parse(userStored);
+                    if (Array.isArray(parsed)) {
+                      parsed.forEach((c: string) => {
+                        if (!list.includes(c)) list.push(c);
+                      });
+                    }
+                  } catch {}
+                }
               }
             }
           }

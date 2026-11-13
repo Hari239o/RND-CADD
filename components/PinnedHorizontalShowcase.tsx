@@ -1,41 +1,10 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 
 export const PinnedHorizontalShowcase: React.FC = () => {
-  const targetRef = useRef<HTMLDivElement>(null);
-  const [scrollProgress, setScrollProgress] = useState(0);
-
-  useEffect(() => {
-    let ticking = false;
-
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          if (targetRef.current) {
-            const rect = targetRef.current.getBoundingClientRect();
-            const totalScrollable = rect.height - window.innerHeight;
-            if (totalScrollable > 0) {
-              const currentProgress = Math.max(0, Math.min(1, -rect.top / totalScrollable));
-              setScrollProgress(currentProgress);
-            }
-          }
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Translate horizontal track smoothly based on scroll progress
-  // At progress = 0 -> 0% translate
-  // At progress = 1 -> -75% translate
-  const translateX = -(scrollProgress * 75);
+  const [activeSlide, setActiveSlide] = useState(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const slides = [
     {
@@ -92,13 +61,19 @@ export const PinnedHorizontalShowcase: React.FC = () => {
     }
   ];
 
+  const handlePrev = () => {
+    setActiveSlide((prev) => (prev > 0 ? prev - 1 : slides.length - 1));
+  };
+
+  const handleNext = () => {
+    setActiveSlide((prev) => (prev < slides.length - 1 ? prev + 1 : 0));
+  };
+
   return (
-    <section ref={targetRef} className="relative h-[220vh] bg-[#F1F5F9]">
-      {/* Sticky Pinned Container */}
-      <div className="sticky top-0 h-screen w-full flex flex-col justify-between overflow-hidden py-16">
-        
-        {/* Sticky Top Heading Bar */}
-        <div className="cad-container w-full flex items-center justify-between pb-6 border-b border-[#CBD5E1]">
+    <section className="py-14 sm:py-20 bg-[#F1F5F9] border-t border-b border-[#CBD5E1] overflow-hidden">
+      <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 max-w-[1480px] mx-auto">
+        {/* Top Heading Bar */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 mb-8 border-b border-[#CBD5E1] gap-4">
           <div>
             <div className="text-xs font-bold text-[#D20A0B] mb-1 tracking-wider uppercase">
               LAB INFRASTRUCTURE &amp; CERTIFICATION PATHWAYS
@@ -108,83 +83,92 @@ export const PinnedHorizontalShowcase: React.FC = () => {
             </h2>
           </div>
 
-          <div className="hidden sm:flex items-center space-x-3 text-xs text-[#64748B]">
-            <span className="w-2 h-2 bg-[#D20A0B]"></span>
-            <span>ADVANCE THROUGH 4 INFRASTRUCTURE PILLARS</span>
-          </div>
-        </div>
-
-        {/* Horizontal Sliding Track */}
-        <div className="w-full my-auto overflow-hidden">
-          <div
-            style={{
-              transform: `translate3d(${translateX}%, 0, 0)`,
-              willChange: 'transform'
-            }}
-            className="flex space-x-8 pl-8 md:pl-24 w-[400vw] transition-transform duration-75 ease-out"
-          >
-            {slides.map((slide) => (
-              <div
-                key={slide.num}
-                className="w-[85vw] max-w-[850px] bg-[#FFFFFF] border border-[#CBD5E1] flex flex-col lg:flex-row overflow-hidden shadow-xl flex-shrink-0"
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-bold text-[#64748B]">
+              STAGE {slides[activeSlide].num} OF 0{slides.length}
+            </span>
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={handlePrev}
+                aria-label="Previous Slide"
+                className="w-9 h-9 rounded-full bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 shadow-sm flex items-center justify-center transition-all cursor-pointer active:scale-90"
               >
-                {/* Visual Half */}
-                <div className="relative w-full lg:w-1/2 h-64 lg:h-auto bg-[#CBD5E1] overflow-hidden">
-                  <img
-                    src={slide.image}
-                    alt={slide.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-4 left-4 bg-[#FFFFFF] border border-[#CBD5E1] px-3 py-1 text-xs font-bold text-[#D20A0B] shadow-sm">
-                    STAGE {slide.num} / 04
-                  </div>
-                </div>
-
-                {/* Information Half */}
-                <div className="p-8 w-full lg:w-1/2 flex flex-col justify-between bg-[#FFFFFF]">
-                  <div>
-                    <div className="text-[11px] font-bold text-[#D20A0B] uppercase mb-2 tracking-wider">
-                      {slide.tag}
-                    </div>
-                    <h3 className="text-xl sm:text-2xl font-black text-[#0F172A] tracking-tight uppercase">
-                      {slide.title}
-                    </h3>
-
-                    {/* Feature Bullets - Zero Icons */}
-                    <div className="mt-6 space-y-3">
-                      {slide.specs.map((spec, idx) => (
-                        <div key={idx} className="flex items-start space-x-3 text-xs text-[#334155]">
-                          <span className="text-[#D20A0B] font-bold text-sm">[+]</span>
-                          <span className="leading-relaxed">{spec}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="mt-8 pt-4 border-t border-[#E2E8F0] flex items-center justify-between text-xs text-[#64748B]">
-                    <span>{slide.note}</span>
-                    <span className="text-[#00873D] font-bold">[VERIFIED]</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Sticky Bottom Progress Bar */}
-        <div className="cad-container w-full pt-4 border-t border-[#CBD5E1] flex items-center justify-between text-xs text-[#64748B]">
-          <div className="flex items-center space-x-4">
-            <span>SLIDE PROGRESS TRACKER</span>
-            <div className="w-32 h-1.5 bg-[#E2E8F0] overflow-hidden">
-              <div
-                style={{ width: `${scrollProgress * 100}%` }}
-                className="h-full bg-[#D20A0B] transition-all duration-75"
-              />
+                ←
+              </button>
+              <button
+                type="button"
+                onClick={handleNext}
+                aria-label="Next Slide"
+                className="w-9 h-9 rounded-full bg-[#D20A0B] hover:bg-[#B50809] text-white shadow-sm flex items-center justify-center transition-all cursor-pointer active:scale-90"
+              >
+                →
+              </button>
             </div>
           </div>
-          <div>SCROLL CONTINUES TO COURSERA CURRICULUM MATRIX -&gt;</div>
         </div>
 
+        {/* Featured Active Stage Card */}
+        <div className="w-full bg-[#FFFFFF] border border-[#CBD5E1] rounded-2xl shadow-xl overflow-hidden flex flex-col lg:flex-row transition-all duration-300">
+          {/* Visual Half */}
+          <div className="relative w-full lg:w-1/2 h-72 sm:h-80 lg:h-auto min-h-[320px] bg-[#CBD5E1] overflow-hidden">
+            <img
+              src={slides[activeSlide].image}
+              alt={slides[activeSlide].title}
+              className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+            />
+            <div className="absolute top-4 left-4 bg-[#FFFFFF]/95 backdrop-blur-sm border border-[#CBD5E1] px-3.5 py-1.5 rounded-full text-xs font-extrabold text-[#D20A0B] shadow-sm">
+              STAGE {slides[activeSlide].num} / 04
+            </div>
+          </div>
+
+          {/* Information Half */}
+          <div className="p-6 sm:p-10 w-full lg:w-1/2 flex flex-col justify-between bg-[#FFFFFF]">
+            <div>
+              <div className="text-[11px] font-bold text-[#D20A0B] uppercase mb-2 tracking-wider">
+                {slides[activeSlide].tag}
+              </div>
+              <h3 className="text-xl sm:text-2xl lg:text-3xl font-black text-[#0F172A] tracking-tight uppercase">
+                {slides[activeSlide].title}
+              </h3>
+
+              {/* Feature Bullets */}
+              <div className="mt-6 space-y-3.5">
+                {slides[activeSlide].specs.map((spec, idx) => (
+                  <div key={idx} className="flex items-start space-x-3 text-xs sm:text-sm text-[#334155]">
+                    <span className="text-[#D20A0B] font-bold text-base leading-none">✓</span>
+                    <span className="leading-relaxed">{spec}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-8 pt-4 border-t border-[#E2E8F0] flex items-center justify-between text-xs text-[#64748B]">
+              <span className="font-semibold">{slides[activeSlide].note}</span>
+              <span className="text-[#00873D] font-extrabold bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                [VERIFIED]
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Slide Indicators */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-6">
+          {slides.map((s, idx) => (
+            <button
+              key={s.num}
+              onClick={() => setActiveSlide(idx)}
+              className={`p-3 sm:p-4 rounded-xl border text-left transition-all cursor-pointer ${
+                activeSlide === idx
+                  ? 'bg-white border-[#D20A0B] shadow-md ring-1 ring-[#D20A0B]'
+                  : 'bg-white/70 border-slate-200 hover:bg-white hover:border-slate-300'
+              }`}
+            >
+              <div className="text-[10px] font-bold text-[#D20A0B] uppercase">Stage {s.num}</div>
+              <div className="text-xs font-bold text-slate-800 truncate mt-0.5">{s.title}</div>
+            </button>
+          ))}
+        </div>
       </div>
     </section>
   );

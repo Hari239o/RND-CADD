@@ -21,6 +21,7 @@ export async function POST(request: NextRequest) {
     }
 
     const normalizedEmail = String(email).trim().toLowerCase();
+    const studentAssignedCourses = stream ? [stream] : [];
 
     // 1. Try to persist into MongoDB
     const { db, isConnected } = await connectToDatabase();
@@ -41,10 +42,13 @@ export async function POST(request: NextRequest) {
         officialMobile: mobile ? String(mobile).trim() : '',
         phone: mobile ? String(mobile).trim() : '',
         stream,
+        courseName: stream,
         role: role === 'admin' ? 'admin' : 'student',
         password, // In production, hash with bcrypt
         createdAt: new Date(),
-        status: 'active'
+        status: 'active',
+        accessStatus: 'active',
+        assignedCourses: studentAssignedCourses,
       };
 
       const result = await db.collection('users').insertOne(newUser);
@@ -56,7 +60,8 @@ export async function POST(request: NextRequest) {
           name: newUser.name,
           email: newUser.email,
           role: newUser.role,
-          stream: newUser.stream
+          stream: newUser.stream,
+          assignedCourses: studentAssignedCourses,
         },
         redirectUrl: newUser.role === 'admin' ? '/portal/admin' : '/portal/student'
       });
@@ -72,7 +77,8 @@ export async function POST(request: NextRequest) {
         name: String(fullName).trim(),
         email: normalizedEmail,
         role: role === 'admin' ? 'admin' : 'student',
-        stream
+        stream,
+        assignedCourses: studentAssignedCourses,
       },
       redirectUrl: role === 'admin' ? '/portal/admin' : '/portal/student'
     });
