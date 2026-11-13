@@ -601,6 +601,8 @@ export default function StudentPortalPage() {
           fetchStudentAssignments(matching.assignedCourses || (matching.courseName ? [matching.courseName] : undefined), true);
           // Fetch full student profile details and fee receipts
           fetchStudentProfile(matching.email || userEmail);
+          // Fetch student course & trainer reviews
+          fetchStudentReviews(matching.email || userEmail);
         }
       }
     } catch (err) {
@@ -1034,6 +1036,7 @@ export default function StudentPortalPage() {
     fetchStudentStatus(emailToUse);
     fetchCourses();
     fetchStudentJobs();
+    fetchStudentReviews(emailToUse);
   }, []);
 
   // Load and persist watched classes for the current student
@@ -3813,30 +3816,208 @@ export default function StudentPortalPage() {
 
           {/* TAB 8: RATE */}
           {activeTab === 'Rate' && (
-            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 sm:p-8 space-y-4">
+            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 sm:p-8 space-y-6">
               <div>
                 <h3 className="text-xl sm:text-2xl font-bold text-[#131313] tracking-tight">
                   Rate Your Training Experience
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
-                  Your feedback helps us continuously improve our lab workstations, curriculum, and placement assistance.
+                  Your feedback helps us continuously improve our lab workstations, curriculum, and placement assistance. All reviews are forwarded directly to R&amp;D CADD Administration.
                 </p>
               </div>
-              <div className="flex space-x-1.5 text-amber-400 cursor-pointer">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-6 h-6 fill-amber-400 text-amber-400" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
+
+              {reviewSuccessMsg && (
+                <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-semibold flex items-center justify-between animate-fadeIn">
+                  <div className="flex items-center space-x-2.5">
+                    <span className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-black">✓</span>
+                    <span>{reviewSuccessMsg}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setReviewSuccessMsg(null)}
+                    className="text-emerald-700 hover:text-emerald-950 text-xs font-bold uppercase tracking-wider ml-3 cursor-pointer"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmitReview} className="space-y-5 bg-slate-50/60 p-5 sm:p-6 rounded-2xl border border-slate-200/80">
+                {/* Course Selector */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                    Select Course to Rate &amp; Review <span className="text-[#EE2C3C]">*</span>
+                  </label>
+                  <select
+                    value={rateCourseName || (studentUser.assignedCourses?.[0] || studentUser.stream || 'Civil CADD & Master BIM')}
+                    onChange={(e) => setRateCourseName(e.target.value)}
+                    className="w-full sm:w-96 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-[#131313] bg-white focus:outline-none focus:border-[#EE2C3C] shadow-2xs transition-all"
+                  >
+                    {studentUser.assignedCourses && studentUser.assignedCourses.length > 0 ? (
+                      studentUser.assignedCourses.map((cName) => (
+                        <option key={cName} value={cName}>
+                          {cName}
+                        </option>
+                      ))
+                    ) : (
+                      <option value={studentUser.stream || 'Civil CADD & Master BIM'}>
+                        {studentUser.stream || 'Civil CADD & Master BIM'}
+                      </option>
+                    )}
+                  </select>
+                </div>
+
+                {/* Star Rating Selector */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                      Course Rating Score
+                    </label>
+                    <span className="text-xs font-extrabold text-amber-600 font-mono bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-200/80">
+                      ★ {rateHoverScore || rateScore}.0 / 5.0 Rating
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="flex space-x-1.5 text-amber-400">
+                      {[1, 2, 3, 4, 5].map((star) => {
+                        const isFilled = (rateHoverScore || rateScore) >= star;
+                        return (
+                          <button
+                            key={star}
+                            type="button"
+                            onClick={() => setRateScore(star)}
+                            onMouseEnter={() => setRateHoverScore(star)}
+                            onMouseLeave={() => setRateHoverScore(0)}
+                            className="p-1 hover:scale-110 active:scale-95 transition-transform focus:outline-none cursor-pointer"
+                            title={`Rate ${star} Star${star > 1 ? 's' : ''}`}
+                          >
+                            <svg
+                              className={`w-8 h-8 transition-colors ${
+                                isFilled ? 'fill-amber-400 text-amber-400' : 'fill-slate-200 text-slate-200'
+                              }`}
+                              viewBox="0 0 20 20"
+                            >
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <span className="text-sm font-bold text-slate-700 ml-2">
+                      {(rateHoverScore || rateScore) === 5 && 'Outstanding Experience'}
+                      {(rateHoverScore || rateScore) === 4 && 'Very Good Quality'}
+                      {(rateHoverScore || rateScore) === 3 && 'Good & Informative'}
+                      {(rateHoverScore || rateScore) === 2 && 'Average / Needs Improvement'}
+                      {(rateHoverScore || rateScore) === 1 && 'Poor Experience'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Review Textarea */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                    Detailed Review &amp; Lab Workstation Experience <span className="text-[#EE2C3C]">*</span>
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={rateReviewText}
+                    onChange={(e) => setRateReviewText(e.target.value)}
+                    placeholder="Write your review about the syllabus, hands-on CAD exercises, speed of workstations, and support..."
+                    className="w-full p-4 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#EE2C3C] bg-white transition-all shadow-2xs"
+                    required
+                  />
+                </div>
+
+                {/* Trainer / Faculty Feedback */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                    Trainer &amp; Faculty Feedback (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={rateTrainerFeedback}
+                    onChange={(e) => setRateTrainerFeedback(e.target.value)}
+                    placeholder="e.g. Er. Swamy Naidu explained BIM coordinates and multi-storey structural layout clearly"
+                    className="w-full p-3.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#EE2C3C] bg-white transition-all shadow-2xs"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmittingReview}
+                  className="px-6 py-3 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-sm font-bold shadow-xs transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                >
+                  {isSubmittingReview ? (
+                    <span>Submitting Review to Admin...</span>
+                  ) : (
+                    <>
+                      <span>Submit Review to Admin</span>
+                      <span>&rarr;</span>
+                    </>
+                  )}
+                </button>
+              </form>
+
+              {/* Submitted Reviews History for this Student */}
+              <div className="pt-6 border-t border-slate-200/80 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-base font-bold text-[#131313]">Your Submitted Ratings &amp; Reviews</h4>
+                    <p className="text-xs text-slate-500">Live feedback synced with R&amp;D CADD Administration</p>
+                  </div>
+                  <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                    {mySubmittedReviews.length} Recorded
+                  </span>
+                </div>
+
+                {isLoadingReviews ? (
+                  <div className="p-6 text-center text-xs text-slate-400">Loading your reviews...</div>
+                ) : mySubmittedReviews.length === 0 ? (
+                  <div className="p-6 rounded-xl bg-slate-50 border border-dashed border-slate-200 text-center text-xs text-slate-500">
+                    You haven't submitted any course reviews yet. Select your course above and submit your rating!
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-3">
+                    {mySubmittedReviews.map((rev) => (
+                      <div key={rev.id} className="p-4 rounded-xl border border-slate-200 bg-white space-y-2 shadow-2xs">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                          <div className="flex items-center space-x-3">
+                            <span className="text-xs font-bold px-2.5 py-0.5 rounded-md bg-[#131313] text-white font-mono">
+                              {rev.courseName}
+                            </span>
+                            <div className="flex items-center space-x-1 text-amber-500">
+                              {[...Array(5)].map((_, i) => (
+                                <svg
+                                  key={i}
+                                  className={`w-4 h-4 ${
+                                    i < rev.rating ? 'fill-amber-400 text-amber-400' : 'fill-slate-200 text-slate-200'
+                                  }`}
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                              ))}
+                              <span className="text-xs font-bold text-slate-700 ml-1">{rev.rating}.0</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2 text-[11px] text-slate-400">
+                            <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">
+                              {rev.status}
+                            </span>
+                            <span>{new Date(rev.createdAt).toLocaleDateString()}</span>
+                          </div>
+                        </div>
+                        <p className="text-xs text-slate-700 leading-relaxed font-medium">{rev.review}</p>
+                        {rev.trainerFeedback && (
+                          <div className="text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                            <strong className="text-slate-700">Trainer Feedback:</strong> {rev.trainerFeedback}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-              <textarea
-                rows={4}
-                placeholder="Write your review about the trainers and lab workstations..."
-                className="w-full p-4 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#EE2C3C]"
-              />
-              <button className="px-6 py-2.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-sm font-bold shadow-xs transition-all cursor-pointer">
-                Submit Review &rarr;
-              </button>
             </div>
           )}
 

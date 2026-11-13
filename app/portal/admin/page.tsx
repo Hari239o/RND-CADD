@@ -46,6 +46,20 @@ export interface StudentCertificate {
   createdAt: string;
 }
 
+export interface CourseReview {
+  id: string;
+  studentId: string;
+  studentName: string;
+  studentEmail: string;
+  studentPhoto?: string;
+  courseName: string;
+  rating: number;
+  review: string;
+  trainerFeedback?: string;
+  status: 'Verified' | 'Pending';
+  createdAt: string;
+}
+
 export interface SupportTicket {
   id: string;
   ticketNumber: string;
@@ -791,6 +805,14 @@ export default function AdminPortalPage() {
   const [isSubmittingAssignment, setIsSubmittingAssignment] = useState<boolean>(false);
   const [isUploadingAssignmentPdf, setIsUploadingAssignmentPdf] = useState<boolean>(false);
 
+  // Course Ratings & Student Reviews State (Live Synced with /api/reviews)
+  const [adminReviews, setAdminReviews] = useState<CourseReview[]>([]);
+  const [isLoadingAdminReviews, setIsLoadingAdminReviews] = useState<boolean>(true);
+  const [reviewSearchQuery, setReviewSearchQuery] = useState<string>('');
+  const [reviewCourseFilter, setReviewCourseFilter] = useState<string>('all');
+  const [reviewRatingFilter, setReviewRatingFilter] = useState<string>('all');
+  const [isDeletingReviewId, setIsDeletingReviewId] = useState<string | null>(null);
+
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => {
@@ -979,6 +1001,45 @@ export default function AdminPortalPage() {
       console.error('Failed to load assignments in admin:', err);
     } finally {
       if (!silent) setIsLoadingAssignments(false);
+    }
+  };
+
+  // Fetch course reviews from API (Live DB synced)
+  const fetchAdminReviews = async (silent = false) => {
+    if (!silent) setIsLoadingAdminReviews(true);
+    try {
+      const res = await fetch('/api/reviews');
+      const data = await res.json();
+      if (data.success && Array.isArray(data.reviews)) {
+        setAdminReviews(data.reviews);
+      }
+    } catch (err) {
+      console.error('Failed to load reviews in admin:', err);
+    } finally {
+      if (!silent) setIsLoadingAdminReviews(false);
+    }
+  };
+
+  // Delete review by ID
+  const handleDeleteReview = async (reviewId: string) => {
+    if (!confirm('Are you sure you want to delete this course review?')) return;
+    setIsDeletingReviewId(reviewId);
+    try {
+      const res = await fetch(`/api/reviews?id=${encodeURIComponent(reviewId)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAdminReviews((prev) => prev.filter((r) => r.id !== reviewId));
+        showToast('Review deleted successfully');
+      } else {
+        alert(data.message || 'Failed to delete review');
+      }
+    } catch (err) {
+      console.error('Error deleting review:', err);
+      alert('Network error deleting review');
+    } finally {
+      setIsDeletingReviewId(null);
     }
   };
 
@@ -1245,6 +1306,7 @@ export default function AdminPortalPage() {
     fetchJobs();
     fetchAdminTickets();
     fetchAdminAssignments();
+    fetchAdminReviews();
 
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('rnd_cadd_user');
@@ -2379,7 +2441,7 @@ export default function AdminPortalPage() {
     }
   };
 
-  // Navigation Items - Clean 8 Core Management Modules
+  // Navigation Items - Clean 9 Core Management Modules
   const adminNavItems = [
     { id: 'Student', label: 'Student', tag: '01' },
     { id: 'Courses', label: 'Courses', tag: '02' },
@@ -2389,6 +2451,7 @@ export default function AdminPortalPage() {
     { id: 'Jobs', label: 'Jobs', tag: '06' },
     { id: 'Support', label: 'Support', tag: '07' },
     { id: 'Assignments', label: 'Assignments', tag: '08' },
+    { id: 'Reviews', label: 'Course Ratings', tag: '09' },
   ];
 
   // Filter students dynamically
@@ -2533,6 +2596,13 @@ export default function AdminPortalPage() {
                       isActive ? 'bg-[#FFFFFF]/20 text-[#FFFFFF]' : 'bg-[#DCFCE7] text-[#166534]'
                     }`}>
                       {adminAssignments.length}
+                    </span>
+                  )}
+                  {item.id === 'Reviews' && (
+                    <span className={`text-xs font-mono px-2 py-0.5 rounded-md font-black ${
+                      isActive ? 'bg-[#FFFFFF]/20 text-[#FFFFFF]' : 'bg-[#FEF3C7] text-[#92400E]'
+                    }`}>
+                      {adminReviews.length}
                     </span>
                   )}
                 </button>
@@ -5328,6 +5398,261 @@ export default function AdminPortalPage() {
             </div>
           )}
 
+          {/* TAB 09: COURSE RATINGS & STUDENT REVIEWS */}
+          {activeTab === 'Reviews' && (
+            <div className="space-y-6">
+              {/* TOP METRIC CARDS */}
+              {(() => {
+                const total = adminReviews.length;
+                const avgRating = total > 0 ? (adminReviews.reduce((sum, r) => sum + r.rating, 0) / total).toFixed(1) : '5.0';
+                const fiveStars = adminReviews.filter((r) => r.rating === 5).length;
+                const positiveCount = adminReviews.filter((r) => r.rating >= 4).length;
+                const positivePct = total > 0 ? Math.round((positiveCount / total) * 100) : 100;
+
+                return (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs">
+                      <div className="flex items-center justify-between text-slate-500 mb-2">
+                        <span className="text-xs font-bold uppercase tracking-wider">Average Rating</span>
+                        <span className="text-amber-500 text-lg">★</span>
+                      </div>
+                      <div className="flex items-baseline space-x-2">
+                        <span className="text-3xl font-black text-[#131313] tracking-tight">{avgRating}</span>
+                        <span className="text-sm font-semibold text-slate-400">/ 5.0</span>
+                      </div>
+                      <p className="text-xs text-slate-500 mt-1 font-medium">Aggregated across all courses</p>
+                    </div>
+
+                    <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs">
+                      <div className="flex items-center justify-between text-slate-500 mb-2">
+                        <span className="text-xs font-bold uppercase tracking-wider">Total Submissions</span>
+                        <span className="text-slate-400 text-sm font-mono font-bold">#</span>
+                      </div>
+                      <div className="flex items-baseline space-x-2">
+                        <span className="text-3xl font-black text-[#131313] tracking-tight">{total}</span>
+                        <span className="text-xs font-semibold text-slate-500">Reviews</span>
+                      </div>
+                      <p className="text-xs text-slate-500 mt-1 font-medium">Verified student feedback</p>
+                    </div>
+
+                    <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs">
+                      <div className="flex items-center justify-between text-slate-500 mb-2">
+                        <span className="text-xs font-bold uppercase tracking-wider">5-Star Excellence</span>
+                        <span className="text-amber-500 text-sm font-bold">★★★★★</span>
+                      </div>
+                      <div className="flex items-baseline space-x-2">
+                        <span className="text-3xl font-black text-amber-600 tracking-tight">{fiveStars}</span>
+                        <span className="text-xs font-semibold text-slate-500">Perfect scores</span>
+                      </div>
+                      <p className="text-xs text-slate-500 mt-1 font-medium">Top tier training satisfaction</p>
+                    </div>
+
+                    <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs">
+                      <div className="flex items-center justify-between text-slate-500 mb-2">
+                        <span className="text-xs font-bold uppercase tracking-wider">Positive Satisfaction</span>
+                        <span className="text-emerald-600 text-sm font-bold">✓</span>
+                      </div>
+                      <div className="flex items-baseline space-x-2">
+                        <span className="text-3xl font-black text-emerald-600 tracking-tight">{positivePct}%</span>
+                        <span className="text-xs font-semibold text-slate-500">Rate 4★ &amp; 5★</span>
+                      </div>
+                      <p className="text-xs text-slate-500 mt-1 font-medium">Curriculum &amp; mentor rating</p>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* CONTROLS: SEARCH & FILTERS */}
+              <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      placeholder="Search reviews by student name, ID, or feedback..."
+                      value={reviewSearchQuery}
+                      onChange={(e) => setReviewSearchQuery(e.target.value)}
+                      className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#EE2C3C] transition-all bg-slate-50/50"
+                    />
+                    <span className="absolute left-3 top-3 text-slate-400 text-xs">🔍</span>
+                  </div>
+
+                  <select
+                    value={reviewCourseFilter}
+                    onChange={(e) => setReviewCourseFilter(e.target.value)}
+                    className="px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-white focus:outline-none focus:border-[#EE2C3C]"
+                  >
+                    <option value="all">All Courses</option>
+                    {Array.from(new Set(adminReviews.map((r) => r.courseName))).map((cName) => (
+                      <option key={cName} value={cName}>
+                        {cName}
+                      </option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={reviewRatingFilter}
+                    onChange={(e) => setReviewRatingFilter(e.target.value)}
+                    className="px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-white focus:outline-none focus:border-[#EE2C3C]"
+                  >
+                    <option value="all">All Star Ratings</option>
+                    <option value="5">5 Stars Only</option>
+                    <option value="4">4 Stars Only</option>
+                    <option value="3">3 Stars Only</option>
+                    <option value="2">2 Stars Only</option>
+                    <option value="1">1 Star Only</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => fetchAdminReviews()}
+                    className="px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-all cursor-pointer flex items-center space-x-1.5"
+                  >
+                    <span>↻</span>
+                    <span>Refresh</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* REVIEWS LIST */}
+              {(() => {
+                const filtered = adminReviews.filter((r) => {
+                  const q = reviewSearchQuery.toLowerCase();
+                  const matchesQuery =
+                    !q ||
+                    r.studentName.toLowerCase().includes(q) ||
+                    r.studentId.toLowerCase().includes(q) ||
+                    r.studentEmail.toLowerCase().includes(q) ||
+                    r.courseName.toLowerCase().includes(q) ||
+                    r.review.toLowerCase().includes(q) ||
+                    (r.trainerFeedback && r.trainerFeedback.toLowerCase().includes(q));
+
+                  const matchesCourse = reviewCourseFilter === 'all' || r.courseName === reviewCourseFilter;
+                  const matchesRating = reviewRatingFilter === 'all' || r.rating === Number(reviewRatingFilter);
+
+                  return matchesQuery && matchesCourse && matchesRating;
+                });
+
+                if (isLoadingAdminReviews) {
+                  return (
+                    <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center text-sm text-slate-500">
+                      Loading student course reviews...
+                    </div>
+                  );
+                }
+
+                if (filtered.length === 0) {
+                  return (
+                    <div className="bg-white rounded-2xl border border-dashed border-slate-200 p-12 text-center space-y-2">
+                      <p className="text-base font-bold text-slate-700">No course reviews match your filter</p>
+                      <p className="text-xs text-slate-400">When students submit ratings in their portal, they will appear here in real-time.</p>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="grid grid-cols-1 gap-4">
+                    {filtered.map((rev) => (
+                      <div
+                        key={rev.id}
+                        className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-5 sm:p-6 space-y-4 hover:border-slate-300 transition-all"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                          <div className="flex items-center space-x-3.5">
+                            {rev.studentPhoto ? (
+                              <img
+                                src={rev.studentPhoto}
+                                alt={rev.studentName}
+                                className="w-11 h-11 rounded-xl object-cover border border-slate-200 shadow-2xs"
+                              />
+                            ) : (
+                              <div className="w-11 h-11 rounded-xl bg-[#131313] text-white flex items-center justify-center font-bold text-sm shadow-2xs">
+                                {rev.studentName.charAt(0).toUpperCase()}
+                              </div>
+                            )}
+                            <div>
+                              <div className="flex items-center space-x-2">
+                                <h4 className="text-base font-bold text-[#131313]">{rev.studentName}</h4>
+                                <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">
+                                  {rev.studentId}
+                                </span>
+                              </div>
+                              <span className="text-xs text-slate-500 font-medium block">{rev.studentEmail}</span>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+                            <span className="text-xs font-bold px-3 py-1 rounded-lg bg-[#131313] text-white font-mono">
+                              {rev.courseName}
+                            </span>
+                            <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800">
+                              {rev.status || 'Verified'}
+                            </span>
+                            <span className="text-xs text-slate-400 font-mono">
+                              {new Date(rev.createdAt).toLocaleDateString(undefined, {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                              })}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Star Rating Display */}
+                        <div className="flex items-center space-x-2">
+                          <div className="flex space-x-1 text-amber-400">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <svg
+                                key={star}
+                                className={`w-5 h-5 ${
+                                  star <= rev.rating ? 'fill-amber-400 text-amber-400' : 'fill-slate-200 text-slate-200'
+                                }`}
+                                viewBox="0 0 20 20"
+                              >
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                            ))}
+                          </div>
+                          <span className="text-xs font-bold text-slate-800 font-mono">
+                            {rev.rating}.0 / 5.0
+                          </span>
+                        </div>
+
+                        {/* Written Review */}
+                        <div className="p-4 rounded-xl bg-slate-50/80 border border-slate-200/80 text-sm text-slate-700 leading-relaxed font-medium">
+                          {rev.review}
+                        </div>
+
+                        {/* Trainer Feedback (if provided) */}
+                        {rev.trainerFeedback && (
+                          <div className="p-3 rounded-xl bg-amber-50/60 border border-amber-200/70 text-xs text-amber-900 flex items-start space-x-2">
+                            <span className="font-bold text-amber-800 flex-shrink-0">Mentor Guidance:</span>
+                            <span className="font-medium">{rev.trainerFeedback}</span>
+                          </div>
+                        )}
+
+                        {/* Footer Actions */}
+                        <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+                          <span className="text-slate-400 font-mono text-[11px]">
+                            Review Ref ID: {rev.id}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteReview(rev.id)}
+                            disabled={isDeletingReviewId === rev.id}
+                            className="px-3 py-1.5 rounded-lg text-rose-600 hover:bg-rose-50 font-semibold border border-transparent hover:border-rose-200 transition-all cursor-pointer disabled:opacity-50"
+                          >
+                            {isDeletingReviewId === rev.id ? 'Deleting...' : 'Delete Review'}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+
         </div>
       </main>
 
@@ -5587,7 +5912,19 @@ export default function AdminPortalPage() {
                           <div className="p-4">
                             <div className="flex items-center justify-between text-[11px] text-slate-500 mb-1.5">
                               <span>LEVEL: {(course.level || 'PROFESSIONAL').toUpperCase()}</span>
-                              <span className="text-emerald-700 font-bold">RATING: {course.rating || '4.9/5.0'}</span>
+                              {(() => {
+                                const revs = adminReviews.filter((r) => r.courseName.toLowerCase().trim() === course.title.toLowerCase().trim());
+                                if (revs.length > 0) {
+                                  const avg = (revs.reduce((acc, r) => acc + r.rating, 0) / revs.length).toFixed(1);
+                                  return (
+                                    <span className="text-amber-600 font-bold flex items-center space-x-1">
+                                      <span>★ {avg}</span>
+                                      <span className="text-slate-400 font-normal">({revs.length})</span>
+                                    </span>
+                                  );
+                                }
+                                return <span className="text-emerald-700 font-bold">RATING: {course.rating || '4.9/5.0'}</span>;
+                              })()}
                             </div>
 
                             <h4 className="text-sm font-bold text-[#131313] line-clamp-2 leading-snug group-hover:text-[#EE2C3C] transition-colors">
@@ -6083,7 +6420,19 @@ export default function AdminPortalPage() {
                             <div className="p-3.5">
                               <div className="flex items-center justify-between text-[10px] text-slate-500 mb-1">
                                 <span>LEVEL: {(c.level || 'PROFESSIONAL').toUpperCase()}</span>
-                                <span className="text-emerald-700 font-bold">RATING: {c.rating || '4.9/5.0'}</span>
+                                {(() => {
+                                  const revs = adminReviews.filter((r) => r.courseName.toLowerCase().trim() === c.title.toLowerCase().trim());
+                                  if (revs.length > 0) {
+                                    const avg = (revs.reduce((acc, r) => acc + r.rating, 0) / revs.length).toFixed(1);
+                                    return (
+                                      <span className="text-amber-600 font-bold flex items-center space-x-1">
+                                        <span>★ {avg}</span>
+                                        <span className="text-slate-400 font-normal">({revs.length})</span>
+                                      </span>
+                                    );
+                                  }
+                                  return <span className="text-emerald-700 font-bold">RATING: {c.rating || '4.9/5.0'}</span>;
+                                })()}
                               </div>
 
                               <h5 className="text-xs sm:text-sm font-bold text-[#131313] line-clamp-1 leading-snug group-hover:text-[#EE2C3C] transition-colors">

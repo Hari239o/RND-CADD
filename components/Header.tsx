@@ -43,6 +43,19 @@ export const Header: React.FC<HeaderProps> = ({
   const isStudent = currentUser?.role === 'student';
   const isAdmin = currentUser?.role === 'admin';
 
+  const handleSignOut = () => {
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('rnd_cadd_user');
+        localStorage.removeItem('rnd_cadd_role');
+        setCurrentUser(null);
+        window.dispatchEvent(new Event('storage'));
+      }
+    } catch {
+      // ignore
+    }
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 transition-all">
       {/* Top Technical Notice Bar in Logo Navy */}
@@ -54,13 +67,13 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="text-[#CBD5E1]">AUTODESK &amp; DASSAULT AUTHORIZED TRAINING CENTER</span>
         </div>
         <div className="hidden md:flex items-center space-x-3">
-          <a
-            href="#jobs-portal"
+          <Link
+            href="/jobs"
             className="text-emerald-300 font-black px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 hover:bg-emerald-500/25 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
             <span>{isStudent ? '[MY COURSE PLACEMENTS ACTIVE]' : '[PLACEMENTS OPEN]'}</span>
-          </a>
+          </Link>
           <span className="text-[#FF4D4F] font-bold px-2 py-0.5 rounded-full bg-[#FF4D4F]/10 border border-[#FF4D4F]/20">[BATCH 2026 OPEN]</span>
           <span>100% PLACEMENT SUPPORT</span>
           <span className="text-[#64748B]">|</span>
@@ -115,9 +128,9 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
             {isStudent ? (
               <>
-                {/* Jobs Portal Button (Ref: https://jobs.unlox.com/) */}
-                <a
-                  href="#jobs-portal"
+                {/* Active Jobs Portal Button (Separate Page: /jobs - Ref: https://jobs.unlox.com/) */}
+                <Link
+                  href="/jobs"
                   className="relative group inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-[#0F172A] hover:bg-[#EE2C3C] text-[#FFFFFF] border border-slate-700 hover:border-[#EE2C3C] text-xs font-black tracking-wide uppercase transition-all duration-200 shadow-md hover:shadow-red-500/25 cursor-pointer active:scale-95"
                 >
                   <span className="relative flex h-2 w-2">
@@ -128,16 +141,26 @@ export const Header: React.FC<HeaderProps> = ({
                   <span className="text-[10px] font-black px-1.5 py-0.2 rounded-full bg-red-500/20 group-hover:bg-white/20 text-red-300 group-hover:text-white border border-red-500/30">
                     LIVE
                   </span>
-                </a>
+                </Link>
 
                 {/* Logged-in Student Portal Link */}
                 <Link
                   href="/portal/student"
-                  className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl text-xs font-bold text-[#15304C] hover:text-[#D20A0B] border border-[#CBD5E1] hover:border-[#D20A0B] bg-[#FFFFFF] transition-all shadow-sm hover:shadow"
+                  className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl text-xs font-bold text-[#15304C] hover:text-[#EE2C3C] border border-[#CBD5E1] hover:border-[#EE2C3C] bg-[#FFFFFF] transition-all shadow-xs hover:shadow"
                 >
                   <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                   <span>{currentUser?.name ? currentUser.name.split(' ')[0] : 'STUDENT'} (PORTAL)</span>
                 </Link>
+
+                {/* Quick Sign Out Button */}
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  className="px-3 py-2 sm:py-2.5 rounded-xl text-xs font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 transition-all cursor-pointer"
+                  title="Sign Out"
+                >
+                  Sign Out
+                </button>
               </>
             ) : isAdmin ? (
               <>
@@ -148,22 +171,31 @@ export const Header: React.FC<HeaderProps> = ({
                   <span className="w-2 h-2 rounded-full bg-blue-400"></span>
                   <span>ADMIN DASHBOARD</span>
                 </Link>
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  className="px-3 py-2 sm:py-2.5 rounded-xl text-xs font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 transition-all cursor-pointer"
+                >
+                  Sign Out
+                </button>
               </>
             ) : (
-              <Link
-                href="/signin"
-                className="inline-block px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs font-bold text-[#15304C] hover:text-[#D20A0B] border border-[#CBD5E1] hover:border-[#D20A0B] bg-[#FFFFFF] transition-all shadow-sm hover:shadow"
-              >
-                PORTAL SIGN IN
-              </Link>
+              <>
+                {/* Guest State: Sign In & Sign Up buttons (In place of ENROLL NOW) */}
+                <Link
+                  href="/signin"
+                  className="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs font-bold text-[#15304C] hover:text-[#EE2C3C] border border-[#CBD5E1] hover:border-[#EE2C3C] bg-[#FFFFFF] transition-all shadow-xs hover:shadow"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/signup"
+                  className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs font-bold tracking-wide uppercase bg-[#EE2C3C] hover:bg-[#D71E2E] text-[#FFFFFF] border border-[#EE2C3C] transition-all shadow-md hover:shadow-red-500/25 hover:-translate-y-0.5 active:translate-y-0"
+                >
+                  Sign Up
+                </Link>
+              </>
             )}
-
-            <button
-              onClick={onOpenEnrollModal}
-              className="px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs font-bold tracking-wider uppercase bg-[#D20A0B] hover:bg-[#B50809] text-[#FFFFFF] border border-[#D20A0B] transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
-            >
-              ENROLL NOW -&gt;
-            </button>
           </div>
         </div>
       </div>

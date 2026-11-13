@@ -7,7 +7,6 @@ import { UnloxHero } from '@/components/UnloxHero';
 import { UpgradProgramsShowcase } from '@/components/UpgradProgramsShowcase';
 import { DisciplineCourseHub } from '@/components/DisciplineCourseHub';
 import { PartnerTicker } from '@/components/PartnerTicker';
-import { JobsPortalShowcase } from '@/components/JobsPortalShowcase';
 import { PinnedHorizontalShowcase } from '@/components/PinnedHorizontalShowcase';
 import { EnrollmentSection } from '@/components/EnrollmentSection';
 import { CourseModal } from '@/components/CourseModal';
@@ -132,14 +131,6 @@ export default function HomePage() {
           preselectedCourse={enrollCourseTitle}
           onEnrollSuccess={handleEnrollSuccess}
         />
-
-        {/* Stage 7: Live Engineering Job Portal & Industry Recruitment Board - ONLY visible once students enrolled courses! */}
-        {enrolledCourses.length > 0 && (
-          <JobsPortalShowcase
-            enrolledCourses={enrolledCourses}
-            studentStream={studentStream}
-          />
-        )}
       </main>
 
       {/* Course Detail Interactive Modal */}
