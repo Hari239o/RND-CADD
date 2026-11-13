@@ -55,7 +55,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
   const certificationText = course.certification || 'Autodesk & Dassault Certificate';
   const prerequisitesText = course.prerequisites || 'Diploma / B.Tech / Working Professional';
   const courseLevel = course.level || 'Professional';
-  const totalHours = course.totalHours || (modulesList.reduce((acc, m) => acc + (m.hours || 0), 0) || 120);
+  const totalHours = course.totalHours || (modulesList.reduce((acc: number, m: any) => acc + (m.hours || 0), 0) || 120);
   const streamText = course.stream || course.folder || 'ENGINEERING';
   const categoryText = course.category || 'PROFESSIONAL DIPLOMA';
   const feeAmount = Number(course.fee) || 32000;

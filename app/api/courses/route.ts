@@ -512,7 +512,7 @@ function normalizeCourse(raw: any): StoredCourse {
     ? raw.careerRoles
     : ['CAD Design Engineer', 'Product Specialist', 'Project Engineer', 'Drafting Specialist'];
 
-  const totalHours = Number(raw.totalHours) || (modules.reduce((sum, m) => sum + (m.hours || 0), 0) || 120);
+  const totalHours = Number(raw.totalHours) || (modules.reduce((sum: number, m: any) => sum + (m.hours || 0), 0) || 120);
 
   return {
     id: raw.id || `CRS-${Date.now().toString().slice(-6)}`,
