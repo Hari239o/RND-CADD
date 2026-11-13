@@ -254,7 +254,13 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
             whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.5 }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto"
+            className={`grid gap-6 mx-auto ${
+              filteredCourses.length === 1
+                ? 'grid-cols-1 max-w-md'
+                : filteredCourses.length === 2
+                ? 'grid-cols-1 sm:grid-cols-2 max-w-3xl'
+                : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl'
+            }`}
           >
             {filteredCourses.map((course, idx) => (
               <motion.div

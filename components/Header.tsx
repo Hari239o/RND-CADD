@@ -82,7 +82,7 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Main Entire Navigation Bar with Box Shadow & Border Radius (Image-2) */}
-      <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 max-w-[1920px] mx-auto py-2.5 sm:py-3.5">
+      <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 max-w-[1536px] mx-auto py-2.5 sm:py-3.5">
         <div className="bg-[#FFFFFF] rounded-2xl sm:rounded-3xl border border-[#CBD5E1] shadow-[0_16px_40px_-8px_rgba(15,23,42,0.12),0_4px_16px_rgba(15,23,42,0.04)] px-5 sm:px-8 py-3.5 sm:py-4 flex items-center justify-between gap-4 xl:gap-8 transition-all">
           {/* Prominent Official RND CADD Logo */}
           <a href="#" className="flex items-center shrink-0 group py-0.5">

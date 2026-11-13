@@ -966,4 +966,408 @@ export const COURSES: Course[] = [
       }
     ]
   }
+
+  // ==================== INTERIOR ARCHITECTURE COURSES ====================
+  {
+    id: 'int-sketchup-joinery',
+    folder: 'interior',
+    stream: 'interior',
+    title: 'SketchUp & Modular Casework Joinery',
+    category: 'INTERIOR 3D VIS',
+    tagline: 'Modular Kitchens, Wardrobe Carcass, Joinery Millwork & Hardware Detailing',
+    duration: '6 Weeks',
+    totalHours: 60,
+    level: 'Beginner to Intermediate',
+    rating: '4.9/5.0',
+    enrolledStudents: '840+ Designers Trained',
+    tools: ['Trimble SketchUp Pro', 'LayOut', 'V-Ray for SketchUp'],
+    image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=900&q=80',
+    overview: 'Design production-ready modular kitchens, residential casework, and custom wardrobes with precision joinery drawings and CNC cut-list generation.',
+    certification: 'Trimble Certified SketchUp Professional',
+    careerRoles: ['Modular Kitchen Designer', 'Interior CAD Specialist', 'Casework Draftsperson'],
+    prerequisites: 'Basic knowledge of residential interiors or drafting fundamentals.',
+    capstoneProject: {
+      title: 'Luxury 3BHK Modular Kitchen & Wardrobe Fabrication Package',
+      description: 'Produce complete 3D SketchUp cabinetry models with drawer systems, carcass assemblies, hardware schedules, and LayOut 2D shop drawings.',
+      deliverables: ['SketchUp 3D Model (.skp)', 'LayOut Shop Drawing Book (.layout)', 'Hardware BOM & Cutlist']
+    },
+    modules: [
+      {
+        number: '01',
+        title: 'Space Planning & Modular Standards',
+        hours: 15,
+        topics: ['Kitchen Work Triangle', 'Standard Modular Dimensions (300/450/600/900mm)', 'Carcass vs Shutter Materials', 'Appliance Clearance Guidelines']
+      },
+      {
+        number: '02',
+        title: 'SketchUp 3D Cabinetry Modeling',
+        hours: 20,
+        topics: ['Parametric Components', 'Tandem Drawer Boxes', 'Lift-up Flap Fittings', 'Edge-banding & Material Mapping']
+      },
+      {
+        number: '03',
+        title: 'LayOut Shop Drawings & CNC Cutlist',
+        hours: 25,
+        topics: ['Floor Plans & Internal Elevations', 'Sectional Details & Exploded Axonometrics', 'Hardware Fittings Schedule', 'Exporting PDF Fabrication Dossiers']
+      }
+    ]
+  },
+  {
+    id: 'int-3dsmax-vray',
+    folder: 'interior',
+    stream: 'interior',
+    title: '3ds Max & V-Ray Photorealistic Rendering',
+    category: 'INTERIOR 3D VIS',
+    tagline: 'Physically Based Lighting, IES Photometrics, PBR Shading & Cinematic Post-Production',
+    duration: '8 Weeks',
+    totalHours: 80,
+    level: 'Intermediate to Advanced',
+    rating: '5.0/5.0',
+    enrolledStudents: '1,120+ Visualizers Trained',
+    tools: ['Autodesk 3ds Max 2026', 'Chaos V-Ray 6', 'Adobe Photoshop'],
+    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=80',
+    overview: 'Create high-end photorealistic 4K architectural interior renders. Master HDRI environments, IES luminaire profiles, realistic fabric/wood textures, and frame-buffer color grading.',
+    certification: 'Autodesk Certified Professional: 3ds Max / Chaos V-Ray Certified',
+    careerRoles: ['3D Architectural Visualizer', 'Lighting Artist', 'Interior CGI Lead'],
+    prerequisites: 'Basic 3D modeling fundamentals.',
+    capstoneProject: {
+      title: 'Five-Star Hotel Suite Photorealistic Portfolio Showcase',
+      description: 'Model and render an ultra-luxury suite with custom fabrics, velvet drapery, IES downlights, daylight sun study, and Photoshop post-compositing.',
+      deliverables: ['High-Res 4K Renders', 'Render Elements Breakdown (Lighting, GI, Reflection)', 'Camera Animation Walkthrough']
+    },
+    modules: [
+      {
+        number: '01',
+        title: 'Asset Import & Architectural Modeling',
+        hours: 20,
+        topics: ['DWG CAD Floorplan Import', 'Wall Openings & Crown Moldings', 'Subdivision Surface Furniture Detailing', 'Cloth Simulation for Cushions']
+      },
+      {
+        number: '02',
+        title: 'Lighting & Environment Setup',
+        hours: 25,
+        topics: ['Dome Light with HDRIs', 'V-Ray Sun & Sky Daylight Systems', 'Photometric IES Spotlights', 'Color Temperature & Exposure Control']
+      },
+      {
+        number: '03',
+        title: 'PBR Textures & Frame-Buffer Post-Production',
+        hours: 35,
+        topics: ['Complex V-Ray Shaders (Marble, Brushed Brass, Velvet)', 'Roughness & Normal Map Baking', 'Cryptomatte & Render Elements', 'Photoshop Camera Raw Grading']
+      }
+    ]
+  },
+  {
+    id: 'int-autocad-space-planning',
+    folder: 'interior',
+    stream: 'interior',
+    title: 'AutoCAD Interior Space Planning & Layouts',
+    category: 'INTERIOR 3D VIS',
+    tagline: '2D Interior Floor Plans, Electrical RCP, Plumbing & Elevation Working Drawings',
+    duration: '6 Weeks',
+    totalHours: 60,
+    level: 'Beginner to Intermediate',
+    rating: '4.8/5.0',
+    enrolledStudents: '950+ Trainees',
+    tools: ['AutoCAD 2026', 'Design Center', 'Sheet Set Manager'],
+    image: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=900&q=80',
+    overview: 'Comprehensive training in drafting accurate interior architectural working drawings, Reflected Ceiling Plans (RCP), electrical switch layouts, flooring patterns, and wall elevations.',
+    certification: 'Autodesk Certified User: AutoCAD for Interior Architecture',
+    careerRoles: ['Interior Draftsperson', 'Architectural CAD Technician', 'Fitout Coordinator'],
+    prerequisites: 'Basic computer literacy.',
+    capstoneProject: {
+      title: 'Commercial Executive Office Interior Working Drawing Set',
+      description: 'Complete 15-sheet working drawing set containing demolition plan, furniture layout, false ceiling grid, electrical circuitry, and joinery details.',
+      deliverables: ['DWG CAD Project Files', 'Consolidated Sheet Set PDF', 'BOQ Material Estimation']
+    },
+    modules: [
+      {
+        number: '01',
+        title: 'Architectural Base Plan & Furniture Layout',
+        hours: 20,
+        topics: ['Layer Architecture & Lineweights', 'Standard Dynamic Furniture Blocks', 'Anthropometrics & Clearances', 'Partition Wall Types']
+      },
+      {
+        number: '02',
+        title: 'Reflected Ceiling & Electrical Circuits',
+        hours: 20,
+        topics: ['False Ceiling Gypsum Levels', 'Cove Lighting & Downlight Fixtures', 'Switch-to-Light Looping', 'HVAC Diffuser Coordinates']
+      },
+      {
+        number: '03',
+        title: 'Flooring, Elevations & Sheet Sets',
+        hours: 20,
+        topics: ['Flooring Tile Setting Out & Inlays', 'Wall Paneling Elevations', 'Callouts & Detail Cross-Sections', 'Batch Plotting via Sheet Set Manager']
+      }
+    ]
+  },
+
+  // ==================== PROJECT MANAGEMENT (PPM) COURSES ====================
+  {
+    id: 'ppm-primavera-enterprise',
+    folder: 'ppm',
+    stream: 'ppm',
+    title: 'Oracle Primavera P6 Professional Enterprise',
+    category: 'PROJECT MANAGEMENT',
+    tagline: 'Enterprise EPS, Multi-Level WBS, Critical Path Method (CPM) & Earned Value S-Curves',
+    duration: '8 Weeks',
+    totalHours: 80,
+    level: 'Intermediate to Advanced',
+    rating: '4.9/5.0',
+    enrolledStudents: '1,560+ Project Planners',
+    tools: ['Oracle Primavera P6 Pro 24', 'Primavera Visualizer', 'Excel PM Models'],
+    image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=900&q=80',
+    overview: 'Master enterprise-level project planning with Primavera P6. Build robust Work Breakdown Structures, define logic ties, optimize critical path float, level labor/machinery, and report earned value performance.',
+    certification: 'Oracle Certified Specialist: Primavera P6 Enterprise Project Portfolio Management',
+    careerRoles: ['Planning Engineer', 'Project Controls Specialist', 'PPM Consultant', 'Scheduler'],
+    prerequisites: 'Basic knowledge of civil, mechanical, or industrial projects.',
+    capstoneProject: {
+      title: 'Metro Rail Viaduct 24-Month EPC Baseline Master Schedule',
+      description: 'Develop a fully resourced 1,200-activity master schedule in Primavera P6 with resource allocation, monthly cost curves, cash flows, and delay claims analysis.',
+      deliverables: ['Primavera P6 XER Export', 'Baseline S-Curve Analysis Report', 'Critical Path Risk Matrix']
+    },
+    modules: [
+      {
+        number: '01',
+        title: 'Enterprise Portfolio & Calendar Setup',
+        hours: 20,
+        topics: ['Enterprise Project Structure (EPS)', 'Organizational Breakdown Structure (OBS)', 'Global vs Project Calendars', 'Work Breakdown Structure (WBS) Nodes']
+      },
+      {
+        number: '02',
+        title: 'Scheduling Logic & Critical Path Method',
+        hours: 30,
+        topics: ['Activity Types & Durations', 'Relationship Types (FS, SS, FF, SF) & Lags', 'Total Float & Free Float Computation', 'Schedule Compression (Crashing & Fast-Tracking)']
+      },
+      {
+        number: '03',
+        title: 'Resource Optimization & Earned Value Tracking',
+        hours: 30,
+        topics: ['Labor & Equipment Resource Codes', 'Resource Leveling Without Delaying Milestones', 'Earned Value Management (BAC, PV, EV, AC, CPI, SPI)', 'Variance Reporting & S-Curve Graphing']
+      }
+    ]
+  },
+  {
+    id: 'ppm-ms-project',
+    folder: 'ppm',
+    stream: 'ppm',
+    title: 'Microsoft Project (MSP) Professional',
+    category: 'PROJECT MANAGEMENT',
+    tagline: 'Interactive Gantt Charts, Resource Pool Sharing, Task Dependencies & Baseline Audits',
+    duration: '6 Weeks',
+    totalHours: 60,
+    level: 'Beginner to Intermediate',
+    rating: '4.8/5.0',
+    enrolledStudents: '1,320+ Managers Trained',
+    tools: ['Microsoft Project 2026 Pro', 'Excel PowerPivot', 'Power BI'],
+    image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=900&q=80',
+    overview: 'Learn Microsoft Project from fundamentals to executive dashboards. Structure task hierarchies, assign work/material resources, manage multiple projects with a shared resource pool, and track progress against baseline.',
+    certification: 'Microsoft Certified Professional: Managing Projects with Microsoft Project',
+    careerRoles: ['Assistant Project Manager', 'Construction Scheduler', 'Project Coordinator'],
+    prerequisites: 'Basic computer literacy.',
+    capstoneProject: {
+      title: 'Multi-Story Residential Tower 18-Month Construction Project',
+      description: 'Create end-to-end MSP project plan featuring sub-tasks, recurring milestones, material cost tracking, custom graphical indicator fields, and executive dashboards.',
+      deliverables: ['MS Project File (.mpp)', 'Executive Status Dashboard', 'Variance & Earned Value Report']
+    },
+    modules: [
+      {
+        number: '01',
+        title: 'Task Sequencing & Hierarchy',
+        hours: 15,
+        topics: ['Manual vs Auto-Scheduled Tasks', 'Work Breakdown Indentation', 'Milestone Setting & Predecessors', 'Calendar Exceptions & Working Hours']
+      },
+      {
+        number: '02',
+        title: 'Resource Pools & Cost Modeling',
+        hours: 20,
+        topics: ['Work, Material & Cost Resources', 'Centralized Resource Pool Sharing', 'Over-allocation Alerts & Leveling Options', 'Fixed vs Variable Cost Assignment']
+      },
+      {
+        number: '03',
+        title: 'Tracking, Baselines & Executive Dashboards',
+        hours: 25,
+        topics: ['Setting Up to 11 Baselines', 'Updating Actual Work & Remaining Duration', 'Cost & Schedule Variance Tables', 'Visual Reports Export to Excel & Power BI']
+      }
+    ]
+  },
+  {
+    id: 'ppm-cost-estimation',
+    folder: 'ppm',
+    stream: 'ppm',
+    title: 'EPC Quantity Surveying & Cost Estimation',
+    category: 'PROJECT MANAGEMENT',
+    tagline: 'Bill of Quantities (BOQ), Rate Analysis, Tender Preparation & FIDIC Contracts',
+    duration: '6 Weeks',
+    totalHours: 60,
+    level: 'Intermediate',
+    rating: '4.9/5.0',
+    enrolledStudents: '980+ Engineers Trained',
+    tools: ['PlanSwift', 'Excel Advanced PM', 'AutoCAD Takeoff'],
+    image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=900&q=80',
+    overview: 'Learn professional quantity takeoff and project cost engineering. Extract quantities from architectural/structural drawings, perform rate analysis for concrete/steel/masonry, and build dynamic tenders.',
+    certification: 'RICS Aligned Certificate in Quantity Surveying & Estimating',
+    careerRoles: ['Quantity Surveyor', 'Cost Estimator', 'Contracts & Billing Engineer'],
+    prerequisites: 'Civil or Mechanical engineering background.',
+    capstoneProject: {
+      title: 'Commercial IT Park ₹45 Crore Turnkey Cost Estimate & BOQ',
+      description: 'Perform digital quantity takeoff from 20 structural sheets, calculate unit rate analysis including machinery and labor, and deliver a comprehensive item-rate tender package.',
+      deliverables: ['Detailed Measurement Sheet (DMS)', 'Rate Analysis Dossier', 'Tender Submission BOQ']
+    },
+    modules: [
+      {
+        number: '01',
+        title: 'Digital Quantity Takeoff Fundamentals',
+        hours: 20,
+        topics: ['Earthwork & Substructure Quantities', 'RCC Footings, Columns, Beams & Slabs', 'Steel Reinforcement Bar Bending Schedules (BBS)', 'Masonry & Plaster Area Computations']
+      },
+      {
+        number: '02',
+        title: 'Rate Analysis & Cost Modeling',
+        hours: 20,
+        topics: ['Standard Data Book Rates (CPWD / MoRTH)', 'Material Lead & Conveyance Charges', 'Machinery Output & Hire Rates', 'Contractor Profit & Contingencies']
+      },
+      {
+        number: '03',
+        title: 'Tendering, Contracts & Interim Billing',
+        hours: 20,
+        topics: ['Item-Rate vs EPC Lump-Sum Tenders', 'FIDIC Contract Conditions & Clauses', 'Running Account (RA) Bill Verification', 'Price Escalation Formulas']
+      }
+    ]
+  },
+
+  // ==================== PIPING & PLANT ENGINEERING COURSES ====================
+  {
+    id: 'pip-plant-3d',
+    folder: 'piping',
+    stream: 'piping',
+    title: 'AutoCAD Plant 3D Modeling & P&ID',
+    category: 'PROCESS PIPING',
+    tagline: 'Intelligent P&ID, 3D Equipment Layout, Spec-Driven Piping & Automated Isometrics',
+    duration: '8 Weeks',
+    totalHours: 80,
+    level: 'Intermediate',
+    rating: '4.9/5.0',
+    enrolledStudents: '1,040+ Piping Engineers',
+    tools: ['AutoCAD Plant 3D 2026', 'Plant 3D Spec Editor', 'Navisworks'],
+    image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=900&q=80',
+    overview: 'Master plant design workflows using AutoCAD Plant 3D. Create intelligent P&IDs with tag validation, build custom piping specifications, route spec-driven 3D pipe lines, and extract automated isometrics with complete BOM.',
+    certification: 'Autodesk Certified Professional: AutoCAD Plant 3D',
+    careerRoles: ['Plant Layout Engineer', 'Piping Draftsperson', '3D Plant Modeler'],
+    prerequisites: 'Basic AutoCAD knowledge and familiarity with industrial piping.',
+    capstoneProject: {
+      title: 'Chemical Refinery Hydro-Desulfurization (HDS) Unit 3D Layout',
+      description: 'Route high-pressure hydrogen lines connecting reactors, heat exchangers, and pumps with ASME B31.3 piping specs and generate full fabrication isometrics.',
+      deliverables: ['Plant 3D Central Project', 'Automated Fabrication Isometric Sheets', 'Equipment Nozzle Schedule & BOM']
+    },
+    modules: [
+      {
+        number: '01',
+        title: 'Intelligent P&ID Drafting & Data Validation',
+        hours: 20,
+        topics: ['ISA-5.1 Symbology Standards', 'Equipment & Instrument Bubbles', 'Pipe Line Numbering (Diameter-Fluid-Spec-Insulation)', 'P&ID to 3D Plant Model Line List Verification']
+      },
+      {
+        number: '02',
+        title: '3D Equipment & Piping Routing',
+        hours: 30,
+        topics: ['Modeling Horizontal/Vertical Vessels & Centrifugal Pumps', 'Spec-Driven Routing with ASME B16.5 Flanges', 'Branch Connections (Tees, Weldolets, Threadolets)', 'Valve Placement & Pipe Support Library']
+      },
+      {
+        number: '03',
+        title: 'Automated Isometrics & Orthographic Production',
+        hours: 30,
+        topics: ['Iso Break Points & Spool Numbering', 'Configuring Isometric Title Blocks', 'Cut Pipe Length Schedules & Welds Count', '2D Orthographic Section Views with Dimensions']
+      }
+    ]
+  },
+  {
+    id: 'pip-sp3d-master',
+    folder: 'piping',
+    stream: 'piping',
+    title: 'Intergraph SmartPlant 3D (SP3D) Master',
+    category: 'PROCESS PIPING',
+    tagline: 'Enterprise Multi-Disciplinary Plant Modeling, Equipment, Structural Grids & Piping',
+    duration: '10 Weeks',
+    totalHours: 100,
+    level: 'Advanced',
+    rating: '5.0/5.0',
+    enrolledStudents: '890+ EPC Engineers',
+    tools: ['Intergraph SP3D', 'SmartPlant Review', 'SmartPlant P&ID'],
+    image: 'https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?auto=format&fit=crop&w=900&q=80',
+    overview: 'Train in the world standard for mega-scale offshore and petrochemical plant engineering: Intergraph SmartPlant 3D. Master coordinate systems, structural steel frames, multi-tier pipe racks, and multi-user database collaboration.',
+    certification: 'Hexagon Intergraph SP3D Certified Specialist',
+    careerRoles: ['SP3D Administrator / Lead Modeler', 'Piping Design Engineer', 'Offshore Plant Designer'],
+    prerequisites: 'Piping engineering fundamentals and CAD proficiency.',
+    capstoneProject: {
+      title: 'Offshore Wellhead Platform 3-Deck Plant Model in SP3D',
+      description: 'Coordinate structural steel truss beams, separator vessels, and multi-tier interconnecting pipe racks inside SP3D with zero clash matrix report.',
+      deliverables: ['SP3D Backup Session File', 'Clash Matrix Clearance Report', 'Material Take-off (MTO) Export']
+    },
+    modules: [
+      {
+        number: '01',
+        title: 'SP3D Coordinate Architecture & Common Tasks',
+        hours: 25,
+        topics: ['Coordinate Systems & Workspaces', 'Space Management & Coordinate Grids', 'Query Filtering & Surface Styles', 'Reference 3D DWG/DGN Attachments']
+      },
+      {
+        number: '02',
+        title: 'Equipment & Structural Modeling',
+        hours: 35,
+        topics: ['Primitive Shapes & Solid Geometry', 'Nozzle Orientation & Elevation Placement', 'Structural Column Grids, Standard Beams & Bracing', 'Stairs, Handrails, Ladders & Grating Slabs']
+      },
+      {
+        number: '03',
+        title: 'Piping Discipline & Isometric Extraction',
+        hours: 40,
+        topics: ['Piping Systems & Run Hierarchy', 'Spec Selection & In-line Instrument Insertion', 'Piping Support Modeling & Hanger Assemblies', 'SmartPlant Isometric Drawing Generation (PCFs)']
+      }
+    ]
+  },
+  {
+    id: 'pip-caesar-stress',
+    folder: 'piping',
+    stream: 'piping',
+    title: 'Caesar II Pipe Stress Analysis & Flexibility',
+    category: 'PROCESS PIPING',
+    tagline: 'ASME B31.3 Flexibility, Sustained Loads, Thermal Expansion & Nozzle Loads',
+    duration: '8 Weeks',
+    totalHours: 80,
+    level: 'Advanced',
+    rating: '4.9/5.0',
+    enrolledStudents: '920+ Stress Engineers',
+    tools: ['Hexagon Caesar II 14', 'ASME B31.3 Calculator', 'FE Pipe'],
+    image: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=900&q=80',
+    overview: 'Evaluate structural integrity of industrial piping systems under operational temperature, pressure, wind, and seismic loads. Verify allowable stress limits according to ASME B31.3 and evaluate pump/compressor nozzle loads.',
+    certification: 'Hexagon Caesar II Certified Pipe Stress Analyst',
+    careerRoles: ['Pipe Stress Engineer', 'Flexibility Analyst', 'Mechanical Static Equipment Specialist'],
+    prerequisites: 'Degree/Diploma in Mechanical/Chemical Engineering with Strength of Materials knowledge.',
+    capstoneProject: {
+      title: 'High-Temperature Boiler Steam Line (540°C, 100 Bar) Stress Analysis',
+      description: 'Build complete Caesar II model with thermal expansion loops, select spring hanger supports, check allowable stress ranges, and verify turbine nozzle loads per NEMA SM-23.',
+      deliverables: ['Caesar II (.CII) Model', 'Spring Hanger Selection Table', 'Code Compliance & Nozzle Load Report']
+    },
+    modules: [
+      {
+        number: '01',
+        title: 'Piping Mechanics & ASME B31 Codes',
+        hours: 20,
+        topics: ['Thermal Expansion & Stress Range Concepts', 'Primary vs Secondary Stress Categories', 'ASME B31.1 (Power) vs ASME B31.3 (Process)', 'Sustained, Expansion & Occasional Load Cases']
+      },
+      {
+        number: '02',
+        title: 'Caesar II Geometry Modeling & Boundary Conditions',
+        hours: 30,
+        topics: ['Element Definition (DX, DY, DZ)', 'Bend Radius & Stress Intensification Factors (SIF)', 'Restraints: Anchors, Guides, Line Stops & Gaps', 'Modeling Temperature (T1, T2) & Internal Pressure']
+      },
+      {
+        number: '03',
+        title: 'Spring Hanger Sizing & Nozzle Evaluation',
+        hours: 30,
+        topics: ['Variable vs Constant Spring Hanger Selection', 'Thermal Movement & Hot Load vs Cold Load', 'Equipment Nozzle Compliance (API 610 / NEMA SM-23)', 'Expansion Loops & Routing Optimization Strategies']
+      }
+    ]
+  }
+
 ];
+

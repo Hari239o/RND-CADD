@@ -450,7 +450,463 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         description: 'Extracting isometric sheets, cut pipe lengths, fitting counts, and pipe thermal expansion stress verification.'
       }
     ]
+  }  ,
+  // Additional Civil Courses
+  {
+    id: 'CRS-CIV-02',
+    code: 'REV-BIM-12',
+    title: 'Revit Architecture & BIM Specialist',
+    folder: 'civil',
+    domain: 'Civil & Architectural Engineering',
+    stream: 'civil',
+    category: 'PARAMETRIC BIM',
+    software: 'Autodesk Revit 2026, Navisworks Manage, BIM 360',
+    tools: ['Autodesk Revit 2026', 'Navisworks Manage', 'BIM 360', 'Enscape'],
+    duration: '12 Weeks (120 Hours)',
+    totalHours: 120,
+    fee: 32000,
+    price: 32000,
+    mode: 'Classroom & Dedicated CAD Workstation Lab',
+    status: 'Active',
+    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+    overview: 'Comprehensive Building Information Modeling with 4D Scheduling and Clash Detection across architectural and structural trades.',
+    tagline: 'Autodesk Authorized Revit BIM Professional Certification',
+    syllabus: [
+      'Core BIM Dimensions (3D, 4D, 5D) & Revit User Interface',
+      'Parametric Family Creation & Advanced Glazing Curtain Systems',
+      'Multi-Disciplinary Clash Detection in Navisworks Manage',
+      'Automated Schedules, Material Take-off & Construction Documentation'
+    ],
+    classes: [
+      {
+        id: 'cls-civ2-1',
+        classNumber: 'Class 01',
+        title: 'Core BIM Concepts & Family Editor',
+        duration: '50 mins',
+        videoType: 'drive',
+        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        description: 'BIM dimensions, UI setup, datum levels, grids, and parametric family creation.'
+      }
+    ]
+  },
+  {
+    id: 'CRS-CIV-03',
+    code: 'CAD-CIV-2D',
+    title: 'AutoCAD Civil 2D Drafting & 3D Planning',
+    folder: 'civil',
+    domain: 'Civil & Architectural Engineering',
+    stream: 'civil',
+    category: 'PARAMETRIC BIM',
+    software: 'AutoCAD 2026, AutoCAD Civil 3D',
+    tools: ['AutoCAD 2026', 'AutoCAD Civil 3D', 'Autodesk Design Review'],
+    duration: '8 Weeks (80 Hours)',
+    totalHours: 80,
+    fee: 22000,
+    price: 22000,
+    mode: 'Classroom & Dedicated CAD Workstation Lab',
+    status: 'Active',
+    image: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80',
+    overview: 'Municipal plan approvals, structural reinforcement drafting, road alignments, and topographical surface contours.',
+    tagline: 'Standard Building Regulations, Survey CAD & Municipal Sanction Drawings',
+    syllabus: [
+      'Precision Coordinate Systems, Drafting Settings & Layer Standardization',
+      'Architectural Floor Plans, Cross-Sections & Elevation Drafting',
+      'RCC Reinforcement Detailing per IS 456 Standards',
+      'Municipal Approval Drawings & Layout Plotting'
+    ],
+    classes: [
+      {
+        id: 'cls-civ3-1',
+        classNumber: 'Class 01',
+        title: 'Municipal Sanction Standards & Plan Detailing',
+        duration: '45 mins',
+        videoType: 'drive',
+        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        description: 'FAR computations, setback rules, and municipal submission sheets.'
+      }
+    ]
+  },
+
+  // Additional Mechanical Courses
+  {
+    id: 'CRS-MEC-01',
+    code: 'SLD-MEC-60',
+    title: 'SOLIDWORKS Master Professional',
+    folder: 'mechanical',
+    domain: 'Mechanical & Automotive Design',
+    stream: 'mechanical',
+    category: 'MECHANICAL CAE',
+    software: 'SolidWorks 2026, CSWP, Sheet Metal',
+    tools: ['SolidWorks 2026', 'PhotoView 360', 'SOLIDWORKS Simulation'],
+    duration: '10 Weeks (100 Hours)',
+    totalHours: 100,
+    fee: 30000,
+    price: 30000,
+    mode: 'Classroom & Dedicated CAD Workstation Lab',
+    status: 'Active',
+    image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80',
+    overview: 'Certified SolidWorks Professional curriculum covering complex parametric assemblies, sheet metal unfolding, structural weldments, and GD&T production drawings.',
+    tagline: 'Dassault Certified SolidWorks Professional (CSWP) Training Track',
+    syllabus: [
+      'Advanced 3D Parametric Part Sketching & Feature Trees',
+      'Sheet Metal Forming, Bend Deductions & Flat Patterns',
+      'Structural Weldments, Cut Lists & Frame Analysis',
+      'Top-Down Assembly Design & Mechanism Kinematics'
+    ],
+    classes: [
+      {
+        id: 'cls-mec1-1',
+        classNumber: 'Class 01',
+        title: 'Parametric Part Feature Trees & Constraints',
+        duration: '50 mins',
+        videoType: 'drive',
+        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        description: 'Advanced geometric constraints, sweeps, lofts, and multi-body dynamics.'
+      }
+    ]
+  },
+  {
+    id: 'CRS-MEC-03',
+    code: 'CAT-AER-60',
+    title: 'CATIA V5 Aerospace & Automotive Surfacing',
+    folder: 'mechanical',
+    domain: 'Mechanical & Automotive Design',
+    stream: 'mechanical',
+    category: 'MECHANICAL CAE',
+    software: 'Dassault CATIA V5, Generative Shape Design',
+    tools: ['CATIA V5-6R2026', 'Generative Shape Design', 'DMU Kinematics'],
+    duration: '10 Weeks (100 Hours)',
+    totalHours: 100,
+    fee: 34000,
+    price: 34000,
+    mode: 'Classroom & Dedicated CAD Workstation Lab',
+    status: 'Active',
+    image: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1200&q=80',
+    overview: 'Industrial surface modeling for vehicle exteriors and aerospace aerodynamics using CATIA V5 Generative Shape Design (GSD).',
+    tagline: 'Class-A Surface Modeling, Aerodynamic Profiles & DMU Kinematics',
+    syllabus: [
+      'Wireframe Geometry, Splines & Boundary Curves',
+      'Generative Shape Design Surfaces & Curvature Continuity',
+      'Automotive Body-in-White (BIW) Sheet Metal Architecture',
+      'DMU Kinematic Mechanism Simulation & Clash Checks'
+    ],
+    classes: [
+      {
+        id: 'cls-mec3-1',
+        classNumber: 'Class 01',
+        title: 'Class-A Surfacing Fundamentals in CATIA',
+        duration: '55 mins',
+        videoType: 'drive',
+        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        description: 'Surface curvature continuity (G0, G1, G2), blends, and styling fillets.'
+      }
+    ]
+  },
+
+  // Additional Electrical Courses
+  {
+    id: 'CRS-ELE-01',
+    code: 'ELE-AUT-45',
+    title: 'AutoCAD Electrical Industrial Systems',
+    folder: 'electrical',
+    domain: 'Electrical & Automation Engineering',
+    stream: 'eee',
+    category: 'ELECTRICAL CADD',
+    software: 'AutoCAD Electrical 2026, PLC Schematics',
+    tools: ['AutoCAD Electrical 2026', 'JIC/IEC Symbol Libraries'],
+    duration: '8 Weeks (80 Hours)',
+    totalHours: 80,
+    fee: 26000,
+    price: 26000,
+    mode: 'Classroom & Dedicated CAD Workstation Lab',
+    status: 'Active',
+    image: 'https://images.unsplash.com/photo-1517420704952-d9f39e95b43e?auto=format&fit=crop&w=1200&q=80',
+    overview: 'Industrial control panel wiring schematics, automatic wire numbering, PLC I/O module parametric generation, and bill of materials export.',
+    tagline: 'Autodesk Certified Electrical CAD Specialist Curriculum',
+    syllabus: [
+      'JIC & IEC Electrical Drafting Standards & Symbology',
+      'Ladder Schematics, Relay Logic & Motor Control Circuits',
+      'Parametric PLC I/O Module Generation & Point-to-Point Wiring',
+      'Panel Footprint Layouts & Automated Terminal Strips'
+    ],
+    classes: [
+      {
+        id: 'cls-ele1-1',
+        classNumber: 'Class 01',
+        title: 'Ladder Schematics & Wire Numbering',
+        duration: '45 mins',
+        videoType: 'drive',
+        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        description: 'Drawing ladder circuits, assigning component tags, and cross-reference contacts.'
+      }
+    ]
+  },
+  {
+    id: 'CRS-ELE-02',
+    code: 'EPL-IND-60',
+    title: 'EPLAN Electric P8 Automation Engineering',
+    folder: 'electrical',
+    domain: 'Electrical & Automation Engineering',
+    stream: 'eee',
+    category: 'ELECTRICAL CADD',
+    software: 'EPLAN Electric P8, Multi-Line Diagrams, Macros',
+    tools: ['EPLAN Electric P8 2026', 'EPLAN Data Portal', 'Pro Panel'],
+    duration: '8 Weeks (80 Hours)',
+    totalHours: 80,
+    fee: 32000,
+    price: 32000,
+    mode: 'Classroom & Dedicated CAD Workstation Lab',
+    status: 'Active',
+    image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80',
+    overview: 'European & international automation standard engineering. Master multi-line diagrams, intelligent macros, terminal connection diagrams, and enclosure 3D layout.',
+    tagline: 'Industrial Automation & Switchboard Engineering with EPLAN Pro',
+    syllabus: [
+      'Project Structure per IEC 81346 High-Level Architecture',
+      'Multi-Line Schematics with Intelligent Device Macros',
+      'PLC Hardware Configuration & Addressing Tables',
+      'Automated Reports: Cable Schedules, Parts Lists & Terminal Plans'
+    ],
+    classes: [
+      {
+        id: 'cls-ele2-1',
+        classNumber: 'Class 01',
+        title: 'Project Setup & Macro Creation in EPLAN',
+        duration: '50 mins',
+        videoType: 'drive',
+        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        description: 'IEC 81346 designation, device tags, and creating reusable smart macros.'
+      }
+    ]
+  },
+
+  // Additional Interior Courses
+  {
+    id: 'CRS-INT-01',
+    code: 'SKP-MOD-45',
+    title: 'SketchUp & Modular Casework Joinery',
+    folder: 'interior',
+    domain: 'Interior Architecture & Space Planning',
+    stream: 'interior',
+    category: 'INTERIOR 3D VIS',
+    software: 'Trimble SketchUp Pro, LayOut, V-Ray for SketchUp',
+    tools: ['Trimble SketchUp Pro', 'LayOut', 'V-Ray'],
+    duration: '6 Weeks (60 Hours)',
+    totalHours: 60,
+    fee: 26000,
+    price: 26000,
+    mode: 'Classroom & Dedicated CAD Workstation Lab',
+    status: 'Active',
+    image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80',
+    overview: 'Design production-ready modular kitchens, residential casework, and custom wardrobes with precision joinery drawings and CNC cut-list generation.',
+    tagline: 'Modular Kitchens, Wardrobe Carcass, Joinery Millwork & Hardware Detailing',
+    syllabus: [
+      'Kitchen Work Triangle & Standard Modular Dimensions (300/450/600/900mm)',
+      'Parametric Cabinet Components & Hardware Fittings Schedule',
+      'LayOut 2D Shop Drawings, Elevations & Exploded Axonometrics',
+      'Material Mapping, Edge-banding & CNC Cutlist Optimization'
+    ],
+    classes: [
+      {
+        id: 'cls-int1-1',
+        classNumber: 'Class 01',
+        title: 'Modular Kitchen Ergonomics & Carcass Sizing',
+        duration: '45 mins',
+        videoType: 'drive',
+        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        description: 'Standard carcass dimensions, tandem drawer clearances, and shutter fitting.'
+      }
+    ]
+  },
+  {
+    id: 'CRS-INT-02',
+    code: '3DS-VRY-45',
+    title: '3ds Max & V-Ray Photorealistic Rendering',
+    folder: 'interior',
+    domain: 'Interior Architecture & Space Planning',
+    stream: 'interior',
+    category: 'INTERIOR 3D VIS',
+    software: 'Autodesk 3ds Max 2026, Chaos V-Ray 6, Photoshop',
+    tools: ['Autodesk 3ds Max 2026', 'Chaos V-Ray 6', 'Photoshop'],
+    duration: '8 Weeks (80 Hours)',
+    totalHours: 80,
+    fee: 28000,
+    price: 28000,
+    mode: 'Classroom & Dedicated CAD Workstation Lab',
+    status: 'Active',
+    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+    overview: 'Create high-end photorealistic 4K architectural interior renders. Master HDRI environments, IES luminaire profiles, realistic fabric/wood textures, and frame-buffer color grading.',
+    tagline: 'Physically Based Lighting, IES Photometrics, PBR Shading & Post-Production',
+    syllabus: [
+      'DWG CAD Floorplan Import & Precision Architectural Modeling',
+      'Dome Light HDRIs, V-Ray Sun & IES Photometric Spotlights',
+      'Physically Based V-Ray Shaders (Marble, Brushed Metals, Fabrics)',
+      'Render Elements Breakdown & Photoshop Post-Compositing'
+    ],
+    classes: [
+      {
+        id: 'cls-int2-1',
+        classNumber: 'Class 01',
+        title: 'IES Photometric Spotlights & Daylight Setup',
+        duration: '50 mins',
+        videoType: 'drive',
+        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        description: 'Placing manufacturer IES luminaire profiles and balancing interior daylight exposure.'
+      }
+    ]
+  },
+
+  // Additional PPM Courses
+  {
+    id: 'CRS-PPM-01',
+    code: 'P6-ENT-60',
+    title: 'Oracle Primavera P6 Professional Enterprise',
+    folder: 'ppm',
+    domain: 'Construction & EPC Project Management (PPM)',
+    stream: 'ppm',
+    category: 'PROJECT MANAGEMENT',
+    software: 'Oracle Primavera P6 Professional 24, EVM, Visualizer',
+    tools: ['Oracle Primavera P6 Pro 24', 'Primavera Visualizer', 'Excel PM Models'],
+    duration: '8 Weeks (80 Hours)',
+    totalHours: 80,
+    fee: 28000,
+    price: 28000,
+    mode: 'Classroom & Dedicated CAD Workstation Lab',
+    status: 'Active',
+    image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80',
+    overview: 'Master enterprise-level project planning with Primavera P6. Build robust Work Breakdown Structures, define logic ties, optimize critical path float, level labor/machinery, and report earned value performance.',
+    tagline: 'Enterprise EPS, Multi-Level WBS, Critical Path Method & Earned Value S-Curves',
+    syllabus: [
+      'Enterprise Project Structure (EPS) & Work Breakdown Structure (WBS)',
+      'Precedence Diagramming (FS, SS, FF, SF) & Critical Path Computation',
+      'Resource Loading, Over-Allocation Leveling & S-Curve Graphing',
+      'Earned Value Analysis (EVM): CPI, SPI, BAC, EAC & Variance Tracking'
+    ],
+    classes: [
+      {
+        id: 'cls-ppm1-1',
+        classNumber: 'Class 01',
+        title: 'EPS, WBS Architecture & Calendars in P6',
+        duration: '50 mins',
+        videoType: 'drive',
+        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        description: 'Creating enterprise breakdown structure, defining calendars, and setting up WBS codes.'
+      }
+    ]
+  },
+  {
+    id: 'CRS-PPM-02',
+    code: 'MSP-EPC-45',
+    title: 'Microsoft Project (MSP) Professional',
+    folder: 'ppm',
+    domain: 'Construction & EPC Project Management (PPM)',
+    stream: 'ppm',
+    category: 'PROJECT MANAGEMENT',
+    software: 'Microsoft Project 2026 Pro, Power BI, Excel',
+    tools: ['Microsoft Project 2026 Pro', 'Excel PowerPivot', 'Power BI'],
+    duration: '6 Weeks (60 Hours)',
+    totalHours: 60,
+    fee: 22000,
+    price: 22000,
+    mode: 'Classroom & Dedicated CAD Workstation Lab',
+    status: 'Active',
+    image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1200&q=80',
+    overview: 'Learn Microsoft Project from fundamentals to executive dashboards. Structure task hierarchies, assign work/material resources, manage multiple projects with a shared resource pool, and track progress against baseline.',
+    tagline: 'Interactive Gantt Charts, Resource Pool Sharing, Task Dependencies & Baselines',
+    syllabus: [
+      'Work Breakdown Indentation, Milestones & Predecessors',
+      'Resource Pool Sharing (Work, Material, Cost) & Leveling',
+      'Setting Multiple Baselines & Schedule Variance Analysis',
+      'Executive Visual Reports Export to Excel & Power BI'
+    ],
+    classes: [
+      {
+        id: 'cls-ppm2-1',
+        classNumber: 'Class 01',
+        title: 'Task Hierarchies & Predecessor Ties in MSP',
+        duration: '45 mins',
+        videoType: 'drive',
+        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        description: 'Building auto-scheduled tasks, milestones, finish-to-start logic, and lag durations.'
+      }
+    ]
+  },
+
+  // Additional Piping Courses
+  {
+    id: 'CRS-PIP-01',
+    code: 'PLT-3D-45',
+    title: 'AutoCAD Plant 3D Modeling & P&ID',
+    folder: 'piping',
+    domain: 'Process Plant & Piping Engineering',
+    stream: 'piping',
+    category: 'PROCESS PIPING',
+    software: 'AutoCAD Plant 3D 2026, Plant Spec Editor',
+    tools: ['AutoCAD Plant 3D 2026', 'Plant 3D Spec Editor', 'Navisworks'],
+    duration: '8 Weeks (80 Hours)',
+    totalHours: 80,
+    fee: 30000,
+    price: 30000,
+    mode: 'Classroom & Dedicated CAD Workstation Lab',
+    status: 'Active',
+    image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80',
+    overview: 'Master plant design workflows using AutoCAD Plant 3D. Create intelligent P&IDs with tag validation, build custom piping specifications, route spec-driven 3D pipe lines, and extract automated isometrics with complete BOM.',
+    tagline: 'Intelligent P&ID, 3D Equipment Layout, Spec-Driven Piping & Automated Isometrics',
+    syllabus: [
+      'Intelligent P&ID Drafting with ISA-5.1 Symbology & Line Lists',
+      '3D Parametric Equipment (Vessels, Heat Exchangers, Pumps)',
+      'Spec-Driven Piping Routing per ASME B16.5 & B16.9 Standards',
+      'Automated Isometric Extraction with Cut Pipe Lists & MTO'
+    ],
+    classes: [
+      {
+        id: 'cls-pip1-1',
+        classNumber: 'Class 01',
+        title: 'P&ID Drafting & Intelligent Equipment Tags',
+        duration: '50 mins',
+        videoType: 'drive',
+        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        description: 'Drawing ISA compliant P&IDs, tagging pumps, and validating pipeline continuity.'
+      }
+    ]
+  },
+  {
+    id: 'CRS-PIP-02',
+    code: 'SP3-IND-60',
+    title: 'Intergraph SmartPlant 3D (SP3D) Master',
+    folder: 'piping',
+    domain: 'Process Plant & Piping Engineering',
+    stream: 'piping',
+    category: 'PROCESS PIPING',
+    software: 'Intergraph SP3D, SmartPlant Review',
+    tools: ['Intergraph SP3D', 'SmartPlant Review', 'SmartPlant P&ID'],
+    duration: '10 Weeks (100 Hours)',
+    totalHours: 100,
+    fee: 35000,
+    price: 35000,
+    mode: 'Classroom & Dedicated CAD Workstation Lab',
+    status: 'Active',
+    image: 'https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?auto=format&fit=crop&w=1200&q=80',
+    overview: 'Train in the world standard for mega-scale offshore and petrochemical plant engineering: Intergraph SmartPlant 3D. Master coordinate systems, structural steel frames, multi-tier pipe racks, and multi-user database collaboration.',
+    tagline: 'Enterprise Multi-Disciplinary Plant Modeling, Equipment, Structural Grids & Piping',
+    syllabus: [
+      'SP3D Space Management, Grids & Workspace Filtering',
+      'Structural Steel Column Grids, Standard Beams & Pipe Racks',
+      'Piping Systems Hierarchy, In-line Valves & Pipe Supports',
+      'SmartPlant Isometric Drawing Generation & PCF Export'
+    ],
+    classes: [
+      {
+        id: 'cls-pip2-1',
+        classNumber: 'Class 01',
+        title: 'Coordinate Architecture & Equipment in SP3D',
+        duration: '55 mins',
+        videoType: 'drive',
+        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        description: 'SP3D coordinate grids, placing vertical drums, and nozzle radial orientations.'
+      }
+    ]
   }
+
 ];
 
 // Helper to normalize course fields

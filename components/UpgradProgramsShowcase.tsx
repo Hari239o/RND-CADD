@@ -493,7 +493,11 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
                 {folderCourses.map((course, idx) => (
                   <div
                     key={`${course.id}-${idx}`}
-                    className="w-[230px] sm:w-[245px] xl:w-[255px] flex-shrink-0 bg-white rounded-2xl border border-white/90 shadow-xl flex flex-col justify-between overflow-hidden group hover:-translate-y-1 transition-all duration-300 animate-fadeIn"
+                    className={`${
+                      folderCourses.length === 1
+                        ? 'w-full max-w-[340px] sm:max-w-[380px]'
+                        : 'w-[230px] sm:w-[245px] xl:w-[255px]'
+                    } flex-shrink-0 bg-white rounded-2xl border border-white/90 shadow-xl flex flex-col justify-between overflow-hidden group hover:-translate-y-1 transition-all duration-300 animate-fadeIn`}
                   >
                     {/* Top Image + Circular Partner Monogram Badge */}
                     <div className="relative w-full h-28 sm:h-32 overflow-hidden bg-slate-100 flex-shrink-0">
