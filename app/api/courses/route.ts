@@ -3,7 +3,7 @@ import { connectToDatabase } from '@/lib/mongodb';
 
 export const dynamic = 'force-dynamic';
 
-export interface CourseClass {
+interface CourseClass {
   id: string;
   classNumber: string;
   title: string;
@@ -17,20 +17,20 @@ export interface CourseClass {
   pdfSize?: string;
 }
 
-export interface CourseModule {
+interface CourseModule {
   number: string;
   title: string;
   hours: number;
   topics: string[];
 }
 
-export interface CourseCapstone {
+interface CourseCapstone {
   title: string;
   description: string;
   deliverables: string[];
 }
 
-export interface StoredCourse {
+interface StoredCourse {
   id: string;
   code: string;
   title: string;
@@ -63,7 +63,7 @@ export interface StoredCourse {
   updatedAt?: string;
 }
 
-export const MAIN_FOLDERS = [
+const MAIN_FOLDERS = [
   {
     id: 'civil',
     name: 'Civil & Architectural Engineering',
@@ -108,7 +108,7 @@ export const MAIN_FOLDERS = [
   },
 ] as const;
 
-export const INITIAL_SEEDED_COURSES: StoredCourse[] = [
+const INITIAL_SEEDED_COURSES: StoredCourse[] = [
   {
     id: 'CRS-CIV-01',
     code: 'BIM-CIV-90',

@@ -4,35 +4,25 @@ import { connectToDatabase } from '@/lib/mongodb';
 // In-memory fallback cache to persist student profile edits across requests in development/fallback mode
 let fallbackProfiles: Record<string, any> = {
   'student1@gmail.com': {
-    studentId: 'STU-HYD-8492',
+    studentId: 'STU-001',
     name: 'Ram.g',
     email: 'student1@gmail.com',
     password: '9908',
-    phone: '+91 99080 12345',
-    college: 'JNTU Hyderabad (College of Engineering)',
-    nativePlace: 'Ameerpet, Hyderabad',
-    qualification: 'B.Tech in Civil Engineering',
-    admissionDate: '12 Jan 2026',
-    photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+    phone: '',
+    college: '',
+    nativePlace: '',
+    qualification: '',
+    admissionDate: '11 Nov 2026',
+    photo: '',
     stream: 'Civil CADD & Master BIM',
     assignedCourses: ['Civil CADD & Master BIM', 'Interior Architecture & 3D Visualization'],
-    courseFee: 35000,
-    paidFee: 20000,
-    balanceFee: 15000,
-    labWorkstation: 'Seat #04 - BIM Modeling Lab 2',
-    leadInstructor: 'Er. Swamy Naidu (Senior BIM Architect)',
+    courseFee: 0,
+    paidFee: 0,
+    balanceFee: 0,
+    labWorkstation: '',
+    leadInstructor: '',
     campusLocation: 'R&D CADD Center, Metro Pillar 1042, Ameerpet, Hyderabad',
-    paymentReceipts: [
-      {
-        receiptId: 'REC-RND-2026-081',
-        date: '12 Jan 2026',
-        amount: 20000,
-        paymentMode: 'UPI / Net Banking',
-        refNumber: 'UTR-99081238472',
-        status: 'Verified & Credited',
-        remarks: 'First Installment - Admission & Courseware Pack',
-      },
-    ],
+    paymentReceipts: [],
   },
 };
 
@@ -45,51 +35,60 @@ export async function GET(request: NextRequest) {
     if (isConnected && db) {
       const dbUser = await db.collection('users').findOne({ email });
       if (dbUser) {
-        const courseFee = Number(dbUser.courseFee) || fallbackProfiles[email]?.courseFee || 35000;
-        const paidFee = Number(dbUser.paidFee) || fallbackProfiles[email]?.paidFee || 20000;
-        const balanceFee = courseFee - paidFee > 0 ? courseFee - paidFee : 0;
+        const courseFee = Number(dbUser.courseFee) || 0;
+        const paidFee = Number(dbUser.paidFee) || 0;
+        const balanceFee = Math.max(0, courseFee - paidFee);
 
         const profileData = {
-          studentId: dbUser.studentId || fallbackProfiles[email]?.studentId || 'STU-HYD-8492',
-          name: dbUser.name || dbUser.fullName || fallbackProfiles[email]?.name || 'Ram.g',
+          studentId: dbUser.studentId || 'STU-001',
+          name: dbUser.name || dbUser.fullName || 'Student',
           email: dbUser.email,
-          phone: dbUser.officialMobile || dbUser.mobile || dbUser.phone || fallbackProfiles[email]?.phone || '+91 99080 12345',
-          college: dbUser.college && dbUser.college !== '-' ? dbUser.college : (fallbackProfiles[email]?.college || 'JNTU Hyderabad (College of Engineering)'),
-          nativePlace: dbUser.residence && dbUser.residence !== '-' ? dbUser.residence : (fallbackProfiles[email]?.nativePlace || 'Ameerpet, Hyderabad'),
-          qualification: dbUser.qualification && dbUser.qualification !== '-' ? dbUser.qualification : (fallbackProfiles[email]?.qualification || 'B.Tech in Civil Engineering'),
-          admissionDate: dbUser.admissionDate || fallbackProfiles[email]?.admissionDate || '12 Jan 2026',
-          photo: dbUser.photo || fallbackProfiles[email]?.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
-          stream: dbUser.courseName || dbUser.stream || fallbackProfiles[email]?.stream || 'Civil CADD & Master BIM',
+          phone: dbUser.officialMobile && dbUser.officialMobile !== '-' ? dbUser.officialMobile : (dbUser.mobile && dbUser.mobile !== '-' ? dbUser.mobile : (dbUser.phone && dbUser.phone !== '-' ? dbUser.phone : '')),
+          college: dbUser.college && dbUser.college !== '-' ? dbUser.college : '',
+          nativePlace: dbUser.residence && dbUser.residence !== '-' ? dbUser.residence : '',
+          qualification: dbUser.qualification && dbUser.qualification !== '-' ? dbUser.qualification : '',
+          admissionDate: dbUser.admissionDate || (dbUser.createdAt
+            ? new Date(dbUser.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+            : '11 Nov 2026'),
+          photo: dbUser.photo || '',
+          stream: dbUser.courseName || dbUser.stream || 'Civil CADD & Master BIM',
           assignedCourses: Array.isArray(dbUser.assignedCourses) && dbUser.assignedCourses.length > 0
             ? dbUser.assignedCourses
-            : (fallbackProfiles[email]?.assignedCourses || ['Civil CADD & Master BIM', 'Interior Architecture & 3D Visualization']),
+            : [dbUser.courseName || dbUser.stream || 'Civil CADD & Master BIM'],
           courseFee,
           paidFee,
           balanceFee,
-          labWorkstation: dbUser.labWorkstation || fallbackProfiles[email]?.labWorkstation || 'Seat #04 - BIM Modeling Lab 2',
-          leadInstructor: dbUser.leadInstructor || fallbackProfiles[email]?.leadInstructor || 'Er. Swamy Naidu (Senior BIM Architect)',
+          labWorkstation: dbUser.labWorkstation || '',
+          leadInstructor: dbUser.leadInstructor || '',
           campusLocation: 'R&D CADD Center, Metro Pillar 1042, Ameerpet, Hyderabad',
-          paymentReceipts: Array.isArray(dbUser.paymentReceipts) && dbUser.paymentReceipts.length > 0
-            ? dbUser.paymentReceipts
-            : (fallbackProfiles[email]?.paymentReceipts || [
-                {
-                  receiptId: 'REC-RND-2026-081',
-                  date: '12 Jan 2026',
-                  amount: 20000,
-                  paymentMode: 'UPI / Net Banking',
-                  refNumber: 'UTR-99081238472',
-                  status: 'Verified & Credited',
-                  remarks: 'First Installment - Admission & Courseware Pack',
-                },
-              ]),
+          paymentReceipts: Array.isArray(dbUser.paymentReceipts) ? dbUser.paymentReceipts : [],
         };
 
         return NextResponse.json({ success: true, profile: profileData });
       }
     }
 
-    // Fallback profile
-    const profile = fallbackProfiles[email] || fallbackProfiles['student1@gmail.com'];
+    // Fallback profile without dummy data
+    const profile = fallbackProfiles[email] || {
+      studentId: 'STU-001',
+      name: 'Ram.g',
+      email: email,
+      phone: '',
+      college: '',
+      nativePlace: '',
+      qualification: '',
+      admissionDate: '11 Nov 2026',
+      photo: '',
+      stream: 'Civil CADD & Master BIM',
+      assignedCourses: ['Civil CADD & Master BIM'],
+      courseFee: 0,
+      paidFee: 0,
+      balanceFee: 0,
+      labWorkstation: '',
+      leadInstructor: '',
+      campusLocation: 'R&D CADD Center, Metro Pillar 1042, Ameerpet, Hyderabad',
+      paymentReceipts: [],
+    };
     return NextResponse.json({ success: true, profile });
   } catch (error: any) {
     console.error('[Student Profile GET Error]:', error);
@@ -149,20 +148,22 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (action === 'update_profile') {
-      const { name, phone, college, nativePlace, qualification, photo } = data;
+      const { name, phone, college, nativePlace, qualification, photo, labWorkstation, leadInstructor } = data;
 
       const { db, isConnected } = await connectToDatabase();
       if (isConnected && db) {
         const updatePayload: Record<string, any> = { updatedAt: new Date() };
-        if (name) updatePayload.name = name.trim();
-        if (phone) {
+        if (name !== undefined) updatePayload.name = name.trim();
+        if (phone !== undefined) {
           updatePayload.mobile = phone.trim();
           updatePayload.officialMobile = phone.trim();
         }
-        if (college) updatePayload.college = college.trim();
-        if (nativePlace) updatePayload.residence = nativePlace.trim();
-        if (qualification) updatePayload.qualification = qualification.trim();
-        if (photo) updatePayload.photo = photo.trim();
+        if (college !== undefined) updatePayload.college = college.trim();
+        if (nativePlace !== undefined) updatePayload.residence = nativePlace.trim();
+        if (qualification !== undefined) updatePayload.qualification = qualification.trim();
+        if (photo !== undefined) updatePayload.photo = photo.trim();
+        if (labWorkstation !== undefined) updatePayload.labWorkstation = labWorkstation.trim();
+        if (leadInstructor !== undefined) updatePayload.leadInstructor = leadInstructor.trim();
 
         await db.collection('users').updateOne(
           { email: studentEmail },
@@ -174,12 +175,14 @@ export async function PATCH(request: NextRequest) {
       if (!fallbackProfiles[studentEmail]) {
         fallbackProfiles[studentEmail] = { ...fallbackProfiles['student1@gmail.com'], email: studentEmail };
       }
-      if (name) fallbackProfiles[studentEmail].name = name.trim();
-      if (phone) fallbackProfiles[studentEmail].phone = phone.trim();
-      if (college) fallbackProfiles[studentEmail].college = college.trim();
-      if (nativePlace) fallbackProfiles[studentEmail].nativePlace = nativePlace.trim();
-      if (qualification) fallbackProfiles[studentEmail].qualification = qualification.trim();
-      if (photo) fallbackProfiles[studentEmail].photo = photo.trim();
+      if (name !== undefined) fallbackProfiles[studentEmail].name = name.trim();
+      if (phone !== undefined) fallbackProfiles[studentEmail].phone = phone.trim();
+      if (college !== undefined) fallbackProfiles[studentEmail].college = college.trim();
+      if (nativePlace !== undefined) fallbackProfiles[studentEmail].nativePlace = nativePlace.trim();
+      if (qualification !== undefined) fallbackProfiles[studentEmail].qualification = qualification.trim();
+      if (photo !== undefined) fallbackProfiles[studentEmail].photo = photo.trim();
+      if (labWorkstation !== undefined) fallbackProfiles[studentEmail].labWorkstation = labWorkstation.trim();
+      if (leadInstructor !== undefined) fallbackProfiles[studentEmail].leadInstructor = leadInstructor.trim();
 
       return NextResponse.json({
         success: true,

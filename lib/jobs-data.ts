@@ -7,6 +7,7 @@ export interface JobApplicant {
   stream: string;
   studentId?: string;
   qualification: string;
+  college?: string;
   portfolioUrl?: string;
   coverNote?: string;
   appliedAt: string;
@@ -19,7 +20,7 @@ export interface JobPost {
   company: string;
   companyLogo?: string;
   discipline: 'civil' | 'mechanical' | 'electrical' | 'piping' | 'interior' | 'ppm' | 'all';
-  jobType: 'Full-Time' | 'Internship' | 'Apprenticeship' | 'Contract';
+  jobType: 'Full-Time' | 'Full-time' | 'Internship' | 'Apprenticeship' | 'Contract' | 'Fresher Drive';
   workMode: 'On-site' | 'Hybrid' | 'Remote';
   location: string;
   salary: string;

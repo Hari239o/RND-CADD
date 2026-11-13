@@ -117,6 +117,20 @@ export interface EbookItem {
   isUnlocked?: boolean;
 }
 
+export interface CourseReview {
+  id: string;
+  studentId: string;
+  studentName: string;
+  studentEmail: string;
+  studentPhoto?: string;
+  courseName: string;
+  rating: number;
+  review: string;
+  trainerFeedback?: string;
+  status: 'Verified' | 'Pending';
+  createdAt: string;
+}
+
 const RedCrossCloseButton = ({ onClick, title = 'Close' }: { onClick: () => void; title?: string }) => (
   <button
     type="button"
@@ -130,9 +144,13 @@ const RedCrossCloseButton = ({ onClick, title = 'Close' }: { onClick: () => void
   </button>
 );
 
-function formatGoogleDriveUrl(url: string): string {
-  if (!url) return '';
+function formatGoogleDriveUrl(url?: string): string {
+  const FALLBACK_DRIVE_RECORDING = 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview';
+  if (!url) return FALLBACK_DRIVE_RECORDING;
   const trimmed = url.trim();
+  if (isPlaceholderOrBrokenDriveUrl(trimmed)) {
+    return FALLBACK_DRIVE_RECORDING;
+  }
   if (trimmed.includes('/preview')) return trimmed;
   const fileMatch = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
   if (fileMatch && fileMatch[1]) {
@@ -151,10 +169,14 @@ function formatGoogleDriveUrl(url: string): string {
 function isPlaceholderOrBrokenDriveUrl(url?: string): boolean {
   if (!url) return true;
   const trimmed = url.trim();
-  if (trimmed === '' || trimmed === 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview') {
-    return true;
-  }
-  if (trimmed.includes('1w8o19vH1M9hP2nE5G4aBcDef') || trimmed.includes('placeholder') || trimmed.includes('sample.mp4')) {
+  if (
+    trimmed === '' ||
+    trimmed === 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview' ||
+    trimmed.includes('1w8o19vH1M9hP2nE5G4aBcDef') ||
+    trimmed.includes('placeholder') ||
+    trimmed.includes('sample.mp4') ||
+    trimmed.includes('commondatastorage.googleapis.com')
+  ) {
     return true;
   }
   return false;
@@ -183,26 +205,26 @@ function formatVideoTime(seconds: number): string {
 const DEFAULT_COURSE_CLASSES: Record<string, CourseClass[]> = {
   'civil cadd & master bim': [
     {
-      id: 'cls-civ-1',
+      id: 'cls-auto-1',
       classNumber: 'Class 01',
-      title: 'AutoCAD 2D Drafting Standards & Project Setup',
+      title: 'Civil CADD & Master BIM - Fundamentals & CAD Standards',
       duration: '45 mins',
-      videoType: 'file',
-      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-      description: 'Industry-standard DWG setup, BIS title block standards, layer architecture, and precision snap tools.',
-      pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
-      pdfName: 'AutoCAD 2D Drafting Standards Handbook.pdf',
-      pdfSize: '3.4 MB',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
+      description: 'Introduction to standard user interface, navigation shortcuts, template configurations, and BIS/ISO standards.',
+      pdfUrl: '/uploads/sample-lecture-notes.pdf',
+      pdfName: 'BIM-CIV-90-Class-01-Notes.pdf',
+      pdfSize: '2.4 MB',
     },
     {
       id: 'cls-civ-2',
       classNumber: 'Class 02',
       title: 'Parametric Wall Assemblies, Slabs & Grids in Revit',
       duration: '55 mins',
-      videoType: 'file',
-      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
       description: 'Modeling structural compound walls, core layers, elevation datum levels, and structural grid alignments.',
-      pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+      pdfUrl: '/uploads/sample-lecture-notes.pdf',
       pdfName: 'Revit Architectural Modeling Guide.pdf',
       pdfSize: '5.1 MB',
     },
@@ -210,11 +232,11 @@ const DEFAULT_COURSE_CLASSES: Record<string, CourseClass[]> = {
       id: 'cls-civ-3',
       classNumber: 'Class 03',
       title: 'Custom Family Creation & Curtain Glazing Systems',
-      duration: '60 mins',
-      videoType: 'file',
-      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+      duration: '50 mins',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
       description: 'Creating parametric window/door families, curtain wall mullion layout, and reference planes.',
-      pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+      pdfUrl: '/uploads/sample-lecture-notes.pdf',
       pdfName: 'Parametric BIM Families & Curtain Walls.pdf',
       pdfSize: '4.2 MB',
     },
@@ -222,11 +244,11 @@ const DEFAULT_COURSE_CLASSES: Record<string, CourseClass[]> = {
       id: 'cls-civ-4',
       classNumber: 'Class 04',
       title: 'Navisworks Clash Matrix & Enscape 4K Walkthrough',
-      duration: '50 mins',
-      videoType: 'file',
-      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+      duration: '60 mins',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
       description: 'Multi-trade hard clash detection, 4D construction schedule simulation, and GPU real-time daylight rendering.',
-      pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+      pdfUrl: '/uploads/sample-lecture-notes.pdf',
       pdfName: 'Clash Coordination & 4K Visualization.pdf',
       pdfSize: '6.8 MB',
     },
@@ -237,10 +259,10 @@ const DEFAULT_COURSE_CLASSES: Record<string, CourseClass[]> = {
       classNumber: 'Class 01',
       title: 'Ergonomic Space Planning & CAD Interior Layouts',
       duration: '45 mins',
-      videoType: 'file',
-      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
       description: 'Anthropometric dimensions, circulation corridors, furniture clearance standards, and false ceiling grids.',
-      pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+      pdfUrl: '/uploads/sample-lecture-notes.pdf',
       pdfName: 'Interior Space Planning Standards.pdf',
       pdfSize: '3.8 MB',
     },
@@ -249,10 +271,10 @@ const DEFAULT_COURSE_CLASSES: Record<string, CourseClass[]> = {
       classNumber: 'Class 02',
       title: 'SketchUp Modular Cabinetry & Hardware Fitting Details',
       duration: '50 mins',
-      videoType: 'file',
-      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
       description: 'Tandem drawer mechanisms, carcass panels, shutter finishes, edge-banding, and hardware specifications.',
-      pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+      pdfUrl: '/uploads/sample-lecture-notes.pdf',
       pdfName: 'Modular Kitchen & Millwork Joinery.pdf',
       pdfSize: '4.6 MB',
     },
@@ -260,11 +282,11 @@ const DEFAULT_COURSE_CLASSES: Record<string, CourseClass[]> = {
       id: 'cls-int-3',
       classNumber: 'Class 03',
       title: '3ds Max Physically-Based Lighting & V-Ray 6 Materials',
-      duration: '65 mins',
-      videoType: 'file',
-      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+      duration: '60 mins',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
       description: 'IES photometric spotlights, dome HDRI environment lighting, PBR reflection glossiness, and normal bump maps.',
-      pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+      pdfUrl: '/uploads/sample-lecture-notes.pdf',
       pdfName: 'V-Ray 6 Photorealistic Interior Rendering.pdf',
       pdfSize: '7.2 MB',
     },
@@ -333,48 +355,39 @@ const BookCoverGraphic = ({ book, onClick }: { book: EbookItem; onClick?: () => 
 };
 
 export default function StudentPortalPage() {
+  const [mounted, setMounted] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('Home');
   const [studentUser, setStudentUser] = useState({
     name: 'Ram.g',
     email: 'student1@gmail.com',
     role: 'student',
-    stream: 'Civil & Architectural BIM',
-    id: 'STU-HYD-8492',
+    stream: 'Civil CADD & Master BIM',
+    id: 'STU-001',
     accessStatus: 'active' as 'active' | 'revoked',
-    phone: '+91 99080 12345',
-    college: 'JNTU Hyderabad (College of Engineering)',
-    nativePlace: 'Ameerpet, Hyderabad',
-    qualification: 'B.Tech in Civil Engineering',
-    admissionDate: '12 Jan 2026',
-    photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
-    courseFee: 35000,
-    paidFee: 20000,
-    balanceFee: 15000,
-    labWorkstation: 'Seat #04 - BIM Modeling Lab 2',
-    leadInstructor: 'Er. Swamy Naidu (Senior BIM Architect)',
+    phone: '',
+    college: '',
+    nativePlace: '',
+    qualification: '',
+    admissionDate: '11 Nov 2026',
+    photo: '',
+    courseFee: 0,
+    paidFee: 0,
+    balanceFee: 0,
+    labWorkstation: '',
+    leadInstructor: '',
     campusLocation: 'R&D CADD Center, Metro Pillar 1042, Ameerpet, Hyderabad',
     assignedCourses: ['Civil CADD & Master BIM', 'Interior Architecture & 3D Visualization'] as string[],
-    paymentReceipts: [
-      {
-        receiptId: 'REC-RND-2026-081',
-        date: '12 Jan 2026',
-        amount: 20000,
-        paymentMode: 'UPI / Net Banking',
-        refNumber: 'UTR-99081238472',
-        status: 'Verified & Credited',
-        remarks: 'First Installment - Admission & Courseware Pack',
-      },
-    ] as PaymentReceipt[],
+    paymentReceipts: [] as PaymentReceipt[],
   });
 
   // Profile Edit & Security States
   const [isEditingProfile, setIsEditingProfile] = useState<boolean>(false);
   const [editName, setEditName] = useState<string>('Ram.g');
-  const [editPhone, setEditPhone] = useState<string>('+91 99080 12345');
-  const [editCollege, setEditCollege] = useState<string>('JNTU Hyderabad (College of Engineering)');
-  const [editNativePlace, setEditNativePlace] = useState<string>('Ameerpet, Hyderabad');
-  const [editQualification, setEditQualification] = useState<string>('B.Tech in Civil Engineering');
-  const [editPhoto, setEditPhoto] = useState<string>('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80');
+  const [editPhone, setEditPhone] = useState<string>('');
+  const [editCollege, setEditCollege] = useState<string>('');
+  const [editNativePlace, setEditNativePlace] = useState<string>('');
+  const [editQualification, setEditQualification] = useState<string>('');
+  const [editPhoto, setEditPhoto] = useState<string>('');
   const [isSavingProfile, setIsSavingProfile] = useState<boolean>(false);
   const [profileSaveMsg, setProfileSaveMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -395,7 +408,18 @@ export default function StudentPortalPage() {
   const [studentViewerMode, setStudentViewerMode] = useState<'video' | 'notes'>('video');
 
   // Dynamic Course Progress & Video Player Functional States
-  const [watchedClassIds, setWatchedClassIds] = useState<string[]>(['cls-auto-1']);
+  const [watchedClassIds, setWatchedClassIds] = useState<string[]>([
+    'cls-civ-1',
+    'cls-auto-1',
+    'Class 01',
+    'Class 1',
+    'Class - 1',
+    'Civil CADD & Master BIM_Class 01',
+    'Civil CADD & Master BIM_Class 1',
+    'Civil CADD & Master BIM_0',
+    'Civil CADD & Master BIM_Class - 1',
+  ]);
+  const [classDurations, setClassDurations] = useState<Record<string, number>>({});
   const [videoIsPlaying, setVideoIsPlaying] = useState<boolean>(false);
   const [videoCurrentTime, setVideoCurrentTime] = useState<number>(0);
   const [videoDuration, setVideoDuration] = useState<number>(0);
@@ -438,7 +462,7 @@ export default function StudentPortalPage() {
   const [jobStreamFilter, setJobStreamFilter] = useState<string>('all');
   const [jobModeFilter, setJobModeFilter] = useState<string>('all');
   const [applyingJob, setApplyingJob] = useState<JobPost | null>(null);
-  const [applyStudentPhone, setApplyStudentPhone] = useState<string>('9908123456');
+  const [applyStudentPhone, setApplyStudentPhone] = useState<string>('');
   const [applyPortfolioUrl, setApplyPortfolioUrl] = useState<string>('');
   const [applyCoverNote, setApplyCoverNote] = useState<string>('');
   const [isSubmittingApplication, setIsSubmittingApplication] = useState<boolean>(false);
@@ -461,6 +485,83 @@ export default function StudentPortalPage() {
   const [studentAssignments, setStudentAssignments] = useState<AssignmentItem[]>([]);
   const [isLoadingAssignments, setIsLoadingAssignments] = useState<boolean>(true);
 
+  // Course Rating & Trainer Review State (Synced with Admin Course Ratings)
+  const [rateCourseName, setRateCourseName] = useState<string>('');
+  const [rateScore, setRateScore] = useState<number>(5);
+  const [rateHoverScore, setRateHoverScore] = useState<number>(0);
+  const [rateReviewText, setRateReviewText] = useState<string>('');
+  const [rateTrainerFeedback, setRateTrainerFeedback] = useState<string>('');
+  const [isSubmittingReview, setIsSubmittingReview] = useState<boolean>(false);
+  const [reviewSuccessMsg, setReviewSuccessMsg] = useState<string | null>(null);
+  const [mySubmittedReviews, setMySubmittedReviews] = useState<CourseReview[]>([]);
+  const [isLoadingReviews, setIsLoadingReviews] = useState<boolean>(false);
+
+  // Fetch reviews submitted by this student
+  const fetchStudentReviews = async (userEmail?: string) => {
+    setIsLoadingReviews(true);
+    try {
+      const email = userEmail || studentUser.email;
+      const res = await fetch(`/api/reviews?email=${encodeURIComponent(email)}`);
+      const data = await res.json();
+      if (data.success && Array.isArray(data.reviews)) {
+        setMySubmittedReviews(data.reviews);
+      }
+    } catch (err) {
+      console.error('Failed to load student reviews:', err);
+    } finally {
+      setIsLoadingReviews(false);
+    }
+  };
+
+  // Submit new course rating and trainer review directly to Administration
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const courseToSubmit =
+      rateCourseName ||
+      studentUser.assignedCourses?.[0] ||
+      studentUser.stream ||
+      'Civil CADD & Master BIM';
+
+    if (!rateReviewText.trim()) {
+      alert('Please enter your written review about the course and trainers.');
+      return;
+    }
+
+    setIsSubmittingReview(true);
+    setReviewSuccessMsg(null);
+    try {
+      const res = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentId: studentUser.id,
+          studentName: studentUser.name,
+          studentEmail: studentUser.email,
+          studentPhoto: studentUser.photo,
+          courseName: courseToSubmit,
+          rating: rateScore,
+          review: rateReviewText,
+          trainerFeedback: rateTrainerFeedback,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setReviewSuccessMsg('Your course rating and review have been submitted successfully to Administration!');
+        setRateReviewText('');
+        setRateTrainerFeedback('');
+        fetchStudentReviews(studentUser.email);
+        setTimeout(() => setReviewSuccessMsg(null), 5000);
+      } else {
+        alert(data.message || 'Failed to submit review');
+      }
+    } catch (err: any) {
+      console.error('Submit review error:', err);
+      alert('Network error submitting review.');
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
+
   // Fetch live student details from API to reflect give/revoke access and course assignments
   const fetchStudentStatus = async (userEmail: string, silent = false) => {
     if (!silent) setIsLoadingStatus(true);
@@ -477,7 +578,8 @@ export default function StudentPortalPage() {
             ...prev,
             name: matching.name || prev.name,
             email: matching.email || prev.email,
-            id: matching.studentId || prev.id,
+            id: matching.studentId || matching.id || prev.id,
+            photo: matching.photo || matching.image || prev.photo,
             stream: matching.courseName || prev.stream,
             phone: matching.officialMobile && matching.officialMobile !== '-' ? matching.officialMobile : (matching.mobile && matching.mobile !== '-' ? matching.mobile : prev.phone),
             college: matching.college && matching.college !== '-' ? matching.college : prev.college,
@@ -538,12 +640,12 @@ export default function StudentPortalPage() {
           paymentReceipts: Array.isArray(p.paymentReceipts) ? p.paymentReceipts : prev.paymentReceipts,
         }));
         if (!isEditingProfile) {
-          setEditName(p.name || 'Ram.g');
-          setEditPhone(p.phone || '+91 99080 12345');
-          setEditCollege(p.college || 'JNTU Hyderabad (College of Engineering)');
-          setEditNativePlace(p.nativePlace || 'Ameerpet, Hyderabad');
-          setEditQualification(p.qualification || 'B.Tech in Civil Engineering');
-          setEditPhoto(p.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80');
+          setEditName(p.name || prev.name || 'Ram.g');
+          setEditPhone(p.phone || '');
+          setEditCollege(p.college || '');
+          setEditNativePlace(p.nativePlace || '');
+          setEditQualification(p.qualification || '');
+          setEditPhoto(p.photo || '');
         }
       }
     } catch (err) {
@@ -573,15 +675,40 @@ export default function StudentPortalPage() {
       });
       const data = await res.json();
       if (data.success) {
+        const updatedName = editName.trim() || studentUser.name;
+        const updatedPhone = editPhone.trim();
+        const updatedCollege = editCollege.trim();
+        const updatedNativePlace = editNativePlace.trim();
+        const updatedQualification = editQualification.trim();
+        const updatedPhoto = editPhoto.trim();
+
         setStudentUser((prev) => ({
           ...prev,
-          name: editName.trim() || prev.name,
-          phone: editPhone.trim() || prev.phone,
-          college: editCollege.trim() || prev.college,
-          nativePlace: editNativePlace.trim() || prev.nativePlace,
-          qualification: editQualification.trim() || prev.qualification,
-          photo: editPhoto.trim() || prev.photo,
+          name: updatedName,
+          phone: updatedPhone,
+          college: updatedCollege,
+          nativePlace: updatedNativePlace,
+          qualification: updatedQualification,
+          photo: updatedPhoto,
         }));
+
+        // Persist to localStorage so student name and photo update globally across header, sidebar & portal
+        if (typeof window !== 'undefined') {
+          try {
+            const saved = localStorage.getItem('rnd_cadd_user');
+            const parsed = saved ? JSON.parse(saved) : {};
+            parsed.name = updatedName;
+            parsed.photo = updatedPhoto;
+            parsed.phone = updatedPhone;
+            parsed.college = updatedCollege;
+            parsed.residence = updatedNativePlace;
+            parsed.qualification = updatedQualification;
+            localStorage.setItem('rnd_cadd_user', JSON.stringify(parsed));
+          } catch {
+            // ignore
+          }
+        }
+
         setProfileSaveMsg({ type: 'success', text: 'Student details updated and saved successfully.' });
         setIsEditingProfile(false);
         setTimeout(() => setProfileSaveMsg(null), 4000);
@@ -699,6 +826,11 @@ export default function StudentPortalPage() {
       const data = await res.json();
       if (data.success && Array.isArray(data.courses)) {
         setAllCourses(data.courses);
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem('rnd_cadd_cached_courses', JSON.stringify(data.courses));
+          } catch (e) {}
+        }
       }
     } catch (err) {
       console.error('Failed to load courses in student portal:', err);
@@ -862,9 +994,20 @@ export default function StudentPortalPage() {
   };
 
   useEffect(() => {
+    setMounted(true);
     let emailToUse = 'student1@gmail.com';
-    let idToUse = 'STU-HYD-8492';
+    let idToUse = 'STU-001';
     if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('rnd_cadd_cached_courses');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) setAllCourses(parsed);
+        }
+      } catch (e) {
+        // ignore
+      }
+
       const saved = localStorage.getItem('rnd_cadd_user');
       if (saved) {
         try {
@@ -877,7 +1020,8 @@ export default function StudentPortalPage() {
               name: parsed.name || prev.name,
               email: parsed.email,
               stream: parsed.stream || prev.stream,
-              id: parsed.studentId || prev.id,
+              id: parsed.studentId || parsed.id || prev.id,
+              photo: parsed.photo || parsed.image || prev.photo,
               assignedCourses: Array.isArray(parsed.assignedCourses) && parsed.assignedCourses.length > 0 ? parsed.assignedCourses : prev.assignedCourses,
             }));
           }
@@ -899,8 +1043,8 @@ export default function StudentPortalPage() {
         const saved = localStorage.getItem(`rnd_cadd_watched_${studentUser.email}`);
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed)) {
-            setWatchedClassIds(parsed);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setWatchedClassIds((prev) => Array.from(new Set([...prev, ...parsed])));
           }
         }
       } catch (e) {
@@ -918,7 +1062,34 @@ export default function StudentPortalPage() {
           c.code.toLowerCase().trim() === cName.toLowerCase().trim()
       );
       const classes: CourseClass[] = getClassesForCourse(cName, matched?.classes);
-      const watchedCount = classes.filter((cls) => watchedClassIds.includes(cls.id)).length;
+      const watchedCount = classes.filter((cls, cIdx) => {
+        const numMatch = (cls.classNumber || '').match(/\d+/);
+        const num = numMatch ? parseInt(numMatch[0], 10) : cIdx + 1;
+        const normalizedKeys = [
+          cls.id,
+          cls.classNumber,
+          cls.title,
+          `Class ${num}`,
+          `Class 0${num}`,
+          `Class - ${num}`,
+          `Class - 0${num}`,
+          `${cName}_${cls.id}`,
+          `${cName}_${cls.classNumber}`,
+          `${cName}_Class ${num}`,
+          `${cName}_Class 0${num}`,
+          `${cName}_Class - ${num}`,
+          `${cName}_0`,
+          `${cName}_${cIdx}`,
+          matched?.title ? `${matched.title}_${cls.id}` : '',
+          matched?.title ? `${matched.title}_${cls.classNumber}` : '',
+          matched?.title ? `${matched.title}_Class ${num}` : '',
+          matched?.title ? `${matched.title}_Class 0${num}` : '',
+          matched?.title ? `${matched.title}_Class - ${num}` : '',
+          matched?.title ? `${matched.title}_0` : '',
+          matched?.title ? `${matched.title}_${cIdx}` : '',
+        ].filter(Boolean);
+        return normalizedKeys.some((k) => watchedClassIds.includes(k));
+      }).length;
       const progressPercent =
         classes.length > 0 ? Math.round((watchedCount / classes.length) * 100) : 0;
       return {
@@ -997,11 +1168,54 @@ export default function StudentPortalPage() {
     }, 1500);
   };
 
-  const handleToggleClassWatched = (classId: string) => {
+  const markClassAsWatched = (classId: string, courseTitle?: string, classNumber?: string) => {
     setWatchedClassIds((prev) => {
-      const updated = prev.includes(classId)
-        ? prev.filter((id) => id !== classId)
-        : [...prev, classId];
+      const idsToAdd = [classId];
+      if (classNumber) {
+        idsToAdd.push(classNumber);
+        const numMatch = classNumber.match(/\d+/);
+        if (numMatch) {
+          const num = parseInt(numMatch[0], 10);
+          idsToAdd.push(`Class ${num}`);
+          idsToAdd.push(`Class 0${num}`);
+          idsToAdd.push(`Class - ${num}`);
+          idsToAdd.push(`Class - 0${num}`);
+          if (courseTitle) {
+            idsToAdd.push(`${courseTitle}_Class ${num}`);
+            idsToAdd.push(`${courseTitle}_Class 0${num}`);
+            idsToAdd.push(`${courseTitle}_Class - ${num}`);
+            idsToAdd.push(`${courseTitle}_0`);
+            idsToAdd.push(`${courseTitle}_${num - 1}`);
+          }
+        }
+      }
+      if (courseTitle) {
+        idsToAdd.push(`${courseTitle}_${classId}`);
+        if (classNumber) {
+          idsToAdd.push(`${courseTitle}_${classNumber}`);
+        }
+      }
+      const newIds = idsToAdd.filter((id) => !prev.includes(id));
+      if (newIds.length === 0) return prev;
+      const updated = [...prev, ...newIds];
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(`rnd_cadd_watched_${studentUser.email}`, JSON.stringify(updated));
+        } catch (e) {
+          console.error(e);
+        }
+      }
+      return updated;
+    });
+  };
+
+  const handleToggleClassWatched = (classId: string, courseTitle?: string, classNumber?: string) => {
+    setWatchedClassIds((prev) => {
+      const isAlready = prev.includes(classId) || (classNumber ? prev.includes(classNumber) : false);
+      const keysToRemove = [classId, classNumber || '', courseTitle && classNumber ? `${courseTitle}_${classNumber}` : ''].filter(Boolean);
+      const updated = isAlready
+        ? prev.filter((id) => !keysToRemove.includes(id))
+        : [...prev, classId, ...(classNumber ? [classNumber] : []), ...(courseTitle && classNumber ? [`${courseTitle}_${classNumber}`] : [])];
       if (typeof window !== 'undefined') {
         try {
           localStorage.setItem(
@@ -1017,10 +1231,21 @@ export default function StudentPortalPage() {
   };
 
   const handleOpenStudio = (course: StoredCourse, targetClass?: CourseClass | null) => {
-    // 1. Immediately launch studio with current course data
-    const courseClasses = getClassesForCourse(course.title, course.classes);
+    // 1. Immediately match existing course data from allCourses or fallback
+    const catalogMatch = allCourses.find(
+      (c) =>
+        c.id === course.id ||
+        c.title.toLowerCase().trim() === course.title.toLowerCase().trim() ||
+        c.code.toLowerCase().trim() === course.code.toLowerCase().trim()
+    );
+    const candidateClasses =
+      (catalogMatch?.classes && catalogMatch.classes.length > 0)
+        ? catalogMatch.classes
+        : (course.classes && course.classes.length > 0 ? course.classes : undefined);
+
+    const courseClasses = getClassesForCourse(course.title, candidateClasses);
     const resolvedCourse: StoredCourse = {
-      ...course,
+      ...(catalogMatch || course),
       classes: courseClasses,
     };
     const defaultClass =
@@ -1030,6 +1255,13 @@ export default function StudentPortalPage() {
     setVideoCurrentTime(0);
     setVideoIsPlaying(false);
     setPlaylistSearchQuery('');
+    setStudentViewerMode('video');
+
+    // Auto-mark the opened class as watched so progress is instantly reflected
+    if (defaultClass) {
+      markClassAsWatched(defaultClass.id, course.title, defaultClass.classNumber);
+    }
+
     if (typeof window !== 'undefined') {
       window.history.pushState(
         { rndStudio: true, courseId: course.id },
@@ -1065,6 +1297,38 @@ export default function StudentPortalPage() {
       })
       .catch((e) => console.warn('Background courses sync notice:', e));
   };
+
+  // Auto-mark active class as watched when opened or watched in the studio
+  useEffect(() => {
+    if (activePlayerClass && playerCourse) {
+      const timer = setTimeout(() => {
+        markClassAsWatched(activePlayerClass.id, playerCourse.title, activePlayerClass.classNumber);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [activePlayerClass?.id, playerCourse?.title]);
+
+  // Preload video durations dynamically for all playlist classes
+  useEffect(() => {
+    if (playerCourse?.classes && typeof window !== 'undefined') {
+      playerCourse.classes.forEach((cls) => {
+        if (cls.videoUrl && !classDurations[cls.id]) {
+          try {
+            const probe = document.createElement('video');
+            probe.src = cls.videoUrl;
+            probe.preload = 'metadata';
+            probe.onloadedmetadata = () => {
+              if (probe.duration && !isNaN(probe.duration) && isFinite(probe.duration)) {
+                setClassDurations((prev) => ({ ...prev, [cls.id]: probe.duration }));
+              }
+            };
+          } catch (e) {
+            // ignore
+          }
+        }
+      });
+    }
+  }, [playerCourse?.classes]);
 
   const handleCloseStudio = () => {
     if (videoRef.current) {
@@ -1261,16 +1525,23 @@ export default function StudentPortalPage() {
       <aside className="w-full md:w-80 md:fixed md:top-0 md:left-0 md:bottom-0 md:h-screen bg-[#FFFFFF] border-r border-slate-200 flex flex-col justify-between shadow-xs z-30 flex-shrink-0">
         <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
           {/* Student Profile Identity */}
-          <div className="px-5 py-4 border-b border-slate-200 bg-white flex-shrink-0">
-            <div className="flex items-center space-x-3">
-              <div className="w-11 h-11 rounded-xl bg-[#131313] text-[#FFFFFF] font-bold flex items-center justify-center text-base shadow-xs flex-shrink-0">
-                {studentUser.name.charAt(0).toUpperCase()}
+          <div className="px-5 pt-7 pb-5 sm:pt-8 sm:pb-5 border-b border-slate-200 bg-white flex-shrink-0">
+            <div className="flex items-center space-x-3.5">
+              <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl overflow-hidden bg-slate-100 border-2 border-slate-200 shadow-sm flex items-center justify-center flex-shrink-0 relative">
+                <img
+                  src={studentUser.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}
+                  alt={studentUser.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';
+                  }}
+                />
               </div>
-              <div className="overflow-hidden">
-                <h2 className="text-base font-bold text-[#131313] truncate">
+              <div className="overflow-hidden min-w-0">
+                <h2 className="text-lg sm:text-xl font-extrabold text-[#131313] truncate tracking-tight">
                   {studentUser.name}
                 </h2>
-                <span className="text-xs font-mono font-medium text-slate-500 block truncate">
+                <span className="text-xs sm:text-sm font-mono font-bold text-slate-500 block truncate mt-0.5">
                   ID: {studentUser.id}
                 </span>
               </div>
@@ -1285,57 +1556,57 @@ export default function StudentPortalPage() {
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-left cursor-pointer ${
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-base font-bold transition-all text-left cursor-pointer ${
                     isActive
-                      ? 'bg-[#131313] text-[#FFFFFF] shadow-xs font-bold'
+                      ? 'bg-[#131313] text-[#FFFFFF] shadow-sm font-extrabold'
                       : 'text-[#334155] hover:bg-slate-100 hover:text-[#0F172A]'
                   }`}
                 >
-                  <span className="flex items-center space-x-3">
+                  <span className="flex items-center space-x-3.5">
                     <span
-                      className={`text-xs font-mono font-bold px-2 py-0.5 rounded-md ${
+                      className={`text-xs sm:text-sm font-mono font-bold px-2.5 py-1 rounded-lg ${
                         isActive
                           ? 'bg-white/20 text-white'
-                          : 'bg-slate-100 text-slate-600'
+                          : 'bg-slate-100 text-slate-700'
                       }`}
                     >
                       {item.tag}
                     </span>
-                    <span>{item.label}</span>
+                    <span className="text-base tracking-tight font-bold">{item.label}</span>
                   </span>
                   {item.id === 'Jobs' && (
-                    <span className={`text-xs font-mono px-2 py-0.5 rounded-full font-bold ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-700'
+                    <span suppressHydrationWarning className={`text-xs sm:text-sm font-mono px-2.5 py-0.5 rounded-full font-bold ${
+                      isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-800'
                     }`}>
                       {studentJobs.filter((j) => j.status === 'Active').length}
                     </span>
                   )}
                   {item.id === 'Certificates' && (
-                    <span className={`text-xs font-mono px-2 py-0.5 rounded-full font-bold ${
+                    <span suppressHydrationWarning className={`text-xs sm:text-sm font-mono px-2.5 py-0.5 rounded-full font-bold ${
                       isActive ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-900'
                     }`}>
                       {studentCertificates.length}
                     </span>
                   )}
                   {item.id === 'Assignments' && (
-                    <span className={`text-xs font-mono px-2 py-0.5 rounded-full font-bold ${
+                    <span suppressHydrationWarning className={`text-xs sm:text-sm font-mono px-2.5 py-0.5 rounded-full font-bold ${
                       isActive ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-900'
                     }`}>
                       {studentAssignments.length}
                     </span>
                   )}
                   {item.id === 'E-Books' && (
-                    <span className={`text-xs font-mono px-2 py-0.5 rounded-full font-bold ${
+                    <span suppressHydrationWarning className={`text-xs sm:text-sm font-mono px-2.5 py-0.5 rounded-full font-bold ${
                       isActive ? 'bg-white/20 text-white' : 'bg-rose-100 text-rose-900'
                     }`}>
                       {studentEbooks.length}
                     </span>
                   )}
                   {item.id === 'Live' && (
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 flex-shrink-0 animate-pulse" />
                   )}
                   {item.id === 'Chat' && studentTickets.filter((t) => t.status === 'Resolved').length > 0 && (
-                    <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-full font-bold ${
+                    <span className={`text-xs font-mono px-2 py-0.5 rounded-full font-bold ${
                       isActive ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-800'
                     }`}>
                       {studentTickets.filter((t) => t.status === 'Resolved').length} Solved
@@ -1361,37 +1632,54 @@ export default function StudentPortalPage() {
       {/* RIGHT MAIN CONTENT AREA - SCROLLS INDEPENDENTLY */}
       <main className="flex-1 md:ml-80 flex flex-col min-h-0 md:h-screen overflow-y-auto bg-[#F9FAFB]">
         {/* Top Header Bar */}
-        <header className="bg-white border-b border-slate-200 px-6 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs">
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-[#131313] tracking-tight">
-              {activeTab === 'Home' && `Welcome back, ${studentUser.name}`}
-              {activeTab === 'Profile' && 'Student Academic Profile'}
-              {activeTab === 'Jobs' && 'Core Engineering Placement & Job Board'}
-              {activeTab === 'Certificates' && 'Autodesk & Dassault Verified Academic Certificates'}
-              {activeTab === 'Assignments' && 'Course Project & CAD Drafting Assignments'}
-              {activeTab === 'Live' && 'Active Virtual CAD Lab & Live Sessions'}
-              {activeTab === 'Chat' && 'Helpdesk Support & Faculty Resolution Tickets'}
-              {activeTab === 'Refer & Earn' && 'Refer Engineering Colleagues'}
-              {activeTab === 'Rate' && 'Rate Course & Trainer Review'}
-              {activeTab === 'Share' && 'Share Academic Certification'}
-            </h1>
-            <p className="text-xs text-slate-500 font-medium mt-0.5">
-              RND CADD Student Workstation &bull; Industrial Engineering Portal
-            </p>
+        <header className="bg-white border-b border-slate-200 px-6 sm:px-8 pt-7 pb-5 sm:pt-8 sm:pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs">
+          <div className="flex items-center space-x-4">
+            <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl overflow-hidden bg-slate-100 border-2 border-slate-200 shadow-sm flex items-center justify-center flex-shrink-0">
+              <img
+                src={studentUser.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}
+                alt={studentUser.name}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';
+                }}
+              />
+            </div>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-[#131313] tracking-tight">
+                {activeTab === 'Home' && `Welcome back, ${studentUser.name}`}
+                {activeTab === 'Profile' && 'Student Academic Profile'}
+                {activeTab === 'Jobs' && 'Core Engineering Placement & Job Board'}
+                {activeTab === 'Certificates' && 'Autodesk & Dassault Verified Academic Certificates'}
+                {activeTab === 'Assignments' && 'Course Project & CAD Drafting Assignments'}
+                {activeTab === 'Live' && 'Active Virtual CAD Lab & Live Sessions'}
+                {activeTab === 'Chat' && 'Helpdesk Support & Faculty Resolution Tickets'}
+                {activeTab === 'Refer & Earn' && 'Refer Engineering Colleagues'}
+                {activeTab === 'Rate' && 'Rate Course & Trainer Review'}
+                {activeTab === 'Share' && 'Share Academic Certification'}
+              </h1>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="text-xs sm:text-sm font-mono font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200">
+                  ID: {studentUser.id}
+                </span>
+                <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                  RND CADD Student Workstation &bull; Industrial Engineering Portal
+                </p>
+              </div>
+            </div>
           </div>
 
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3.5">
             {activeTab === 'Chat' && (
               <button
                 onClick={() => setIsRaiseTicketModalOpen(true)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#EE2C3C] hover:bg-[#D71E2E] text-white shadow-sm hover:shadow-md transition-all cursor-pointer"
+                className="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#EE2C3C] hover:bg-[#D71E2E] text-white shadow-sm hover:shadow-md transition-all cursor-pointer"
               >
                 Raise Support Ticket
               </button>
             )}
             <Link
               href="/"
-              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-[#131313] border border-slate-300 hover:bg-slate-50 transition-all flex items-center gap-1.5 cursor-pointer"
+              className="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-[#131313] border border-slate-300 hover:bg-slate-50 transition-all flex items-center gap-2 cursor-pointer shadow-2xs"
             >
               <span>Main Website</span>
               <span>&rarr;</span>
@@ -1418,7 +1706,7 @@ export default function StudentPortalPage() {
                       New Placement Opening
                     </span>
                     <span className="text-xs text-slate-500 font-mono font-medium">
-                      {latest.time}
+                      {latest.timestamp}
                     </span>
                   </div>
                   <span className="text-sm font-bold text-[#131313] block mt-0.5">
@@ -1470,7 +1758,7 @@ export default function StudentPortalPage() {
         )}
 
         {/* Dynamic Body Content */}
-        <div className="p-6 sm:p-8 flex-1 space-y-6">
+        <div className="px-6 pb-6 pt-7 sm:px-8 sm:pb-8 sm:pt-8 flex-1 space-y-6">
           {/* TAB 1: HOME */}
           {activeTab === 'Home' && (
             <div className="space-y-6">
@@ -1481,12 +1769,12 @@ export default function StudentPortalPage() {
                     <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                       Syllabus Progress
                     </span>
-                    <span className="text-[11px] font-bold text-slate-500">
+                    <span suppressHydrationWarning className="text-[11px] font-bold text-slate-500">
                       {watchedClassesCount}/{totalClassesCount} Classes
                     </span>
                   </div>
                   <div className="flex items-baseline space-x-2">
-                    <span className="text-3xl font-extrabold text-[#EE2C3C]">
+                    <span suppressHydrationWarning className="text-3xl font-extrabold text-[#EE2C3C]">
                       {overallSyllabusProgress}%
                     </span>
                     <span className="text-xs text-emerald-600 font-semibold">
@@ -1530,7 +1818,7 @@ export default function StudentPortalPage() {
                   <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
                     Verified Credentials
                   </span>
-                  <span className="text-2xl font-extrabold text-emerald-600">
+                  <span suppressHydrationWarning className="text-2xl font-extrabold text-emerald-600">
                     {studentCertificates.length > 0 ? `Issued (${studentCertificates.length})` : 'Eligible'}
                   </span>
                   <span className="text-xs text-slate-600 font-medium block mt-1.5 flex items-center gap-1">
@@ -1825,8 +2113,7 @@ export default function StudentPortalPage() {
                             type="text"
                             value={editPhone}
                             onChange={(e) => setEditPhone(e.target.value)}
-                            required
-                            placeholder="+91 99080 12345"
+                            placeholder="e.g. +91 98765 43210"
                             className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm text-[#131313] focus:border-[#EE2C3C] focus:outline-none shadow-2xs"
                           />
                         </div>
@@ -1839,8 +2126,7 @@ export default function StudentPortalPage() {
                             type="text"
                             value={editCollege}
                             onChange={(e) => setEditCollege(e.target.value)}
-                            required
-                            placeholder="e.g. JNTU Hyderabad / Osmania University"
+                            placeholder="e.g. Osmania University / JNTU / GITAM"
                             className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm text-[#131313] focus:border-[#EE2C3C] focus:outline-none shadow-2xs"
                           />
                         </div>
@@ -1853,7 +2139,6 @@ export default function StudentPortalPage() {
                             type="text"
                             value={editNativePlace}
                             onChange={(e) => setEditNativePlace(e.target.value)}
-                            required
                             placeholder="e.g. Ameerpet, Hyderabad / Vijayawada"
                             className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm text-[#131313] focus:border-[#EE2C3C] focus:outline-none shadow-2xs"
                           />
@@ -1867,8 +2152,7 @@ export default function StudentPortalPage() {
                             type="text"
                             value={editQualification}
                             onChange={(e) => setEditQualification(e.target.value)}
-                            required
-                            placeholder="e.g. B.Tech Civil Engineering / Diploma Mech"
+                            placeholder="e.g. B.Tech Mechanical / Diploma Civil / B.Arch"
                             className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm text-[#131313] focus:border-[#EE2C3C] focus:outline-none shadow-2xs"
                           />
                         </div>
@@ -1928,7 +2212,11 @@ export default function StudentPortalPage() {
                             Contact Phone / Mobile
                           </span>
                           <span className="text-sm font-bold text-[#131313] mt-1">
-                            {studentUser.phone || '+91 99080 12345'}
+                            {studentUser.phone ? (
+                              studentUser.phone
+                            ) : (
+                              <span className="text-slate-400 font-normal italic">Not provided</span>
+                            )}
                           </span>
                           <span className="text-[11px] text-slate-400 mt-0.5">
                             Verified Student Contact
@@ -1940,7 +2228,11 @@ export default function StudentPortalPage() {
                             College / University
                           </span>
                           <span className="text-sm font-bold text-[#131313] mt-1">
-                            {studentUser.college || 'JNTU Hyderabad'}
+                            {studentUser.college ? (
+                              studentUser.college
+                            ) : (
+                              <span className="text-slate-400 font-normal italic">Not specified</span>
+                            )}
                           </span>
                           <span className="text-[11px] text-slate-400 mt-0.5">
                             Academic Institution
@@ -1952,7 +2244,11 @@ export default function StudentPortalPage() {
                             Native Place / Hometown
                           </span>
                           <span className="text-sm font-bold text-[#131313] mt-1">
-                            {studentUser.nativePlace || 'Hyderabad'}
+                            {studentUser.nativePlace ? (
+                              studentUser.nativePlace
+                            ) : (
+                              <span className="text-slate-400 font-normal italic">Not specified</span>
+                            )}
                           </span>
                           <span className="text-[11px] text-slate-400 mt-0.5">
                             Permanent Residence
@@ -1964,7 +2260,11 @@ export default function StudentPortalPage() {
                             Highest Qualification
                           </span>
                           <span className="text-sm font-bold text-[#131313] mt-1">
-                            {studentUser.qualification || 'B.Tech Civil Engineering'}
+                            {studentUser.qualification ? (
+                              studentUser.qualification
+                            ) : (
+                              <span className="text-slate-400 font-normal italic">Not specified</span>
+                            )}
                           </span>
                           <span className="text-[11px] text-slate-400 mt-0.5">
                             Degree / Specialization
@@ -1976,7 +2276,7 @@ export default function StudentPortalPage() {
                             Campus Main Location
                           </span>
                           <span className="text-sm font-bold text-[#131313] mt-1">
-                            {studentUser.campusLocation || 'Ameerpet Main Center, Hyderabad'}
+                            {studentUser.campusLocation || 'R&D CADD Center, Metro Pillar 1042, Ameerpet, Hyderabad'}
                           </span>
                           <span className="text-[11px] text-slate-400 mt-0.5">
                             Hyderabad Headquarters
@@ -1999,12 +2299,18 @@ export default function StudentPortalPage() {
                     <div className="flex items-center space-x-2">
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-                          studentUser.balanceFee === 0
+                          studentUser.courseFee > 0 && studentUser.balanceFee === 0
                             ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                            : 'bg-amber-100 text-amber-800 border border-amber-300'
+                            : studentUser.courseFee > 0
+                            ? 'bg-amber-100 text-amber-800 border border-amber-300'
+                            : 'bg-slate-100 text-slate-800 border border-slate-300'
                         }`}
                       >
-                        {studentUser.balanceFee === 0 ? 'STATUS: FULLY PAID' : 'STATUS: PARTIAL PAYMENT (BALANCE DUE)'}
+                        {studentUser.courseFee > 0
+                          ? studentUser.balanceFee === 0
+                            ? 'STATUS: FULLY PAID'
+                            : 'STATUS: PARTIAL PAYMENT (BALANCE DUE)'
+                          : 'STATUS: ENROLLED'}
                       </span>
                     </div>
                   </div>
@@ -2090,46 +2396,58 @@ export default function StudentPortalPage() {
                       </span>
                     </div>
 
-                    <div className="overflow-x-auto border border-slate-200 rounded-2xl shadow-2xs">
-                      <table className="w-full text-left text-xs">
-                        <thead className="bg-slate-50/90 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider text-[11px]">
-                          <tr>
-                            <th className="px-4 py-3">Receipt No</th>
-                            <th className="px-4 py-3">Date</th>
-                            <th className="px-4 py-3">Amount Paid</th>
-                            <th className="px-4 py-3">Payment Mode</th>
-                            <th className="px-4 py-3">Ref / UTR Number</th>
-                            <th className="px-4 py-3">Verification</th>
-                            <th className="px-4 py-3 text-right">Action</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100 bg-white">
-                          {studentUser.paymentReceipts.map((r, idx) => (
-                            <tr key={r.receiptId || idx} className="hover:bg-slate-50/70 transition-colors">
-                              <td className="px-4 py-3 font-mono font-bold text-[#131313]">{r.receiptId}</td>
-                              <td className="px-4 py-3 text-slate-700">{r.date}</td>
-                              <td className="px-4 py-3 font-mono font-bold text-emerald-700">₹{r.amount.toLocaleString('en-IN')}</td>
-                              <td className="px-4 py-3 text-slate-700">{r.paymentMode}</td>
-                              <td className="px-4 py-3 font-mono text-slate-600">{r.refNumber}</td>
-                              <td className="px-4 py-3">
-                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">
-                                  {r.status}
-                                </span>
-                              </td>
-                              <td className="px-4 py-3 text-right">
-                                <button
-                                  type="button"
-                                  onClick={() => setSelectedReceiptForModal(r)}
-                                  className="px-3.5 py-1.5 rounded-lg bg-[#131313] hover:bg-slate-800 text-white text-[11px] font-semibold cursor-pointer shadow-xs hover:shadow-sm transition-all"
-                                >
-                                  View Receipt
-                                </button>
-                              </td>
+                    {studentUser.paymentReceipts && studentUser.paymentReceipts.length > 0 ? (
+                      <div className="overflow-x-auto border border-slate-200 rounded-2xl shadow-2xs">
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-slate-50/90 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider text-[11px]">
+                            <tr>
+                              <th className="px-4 py-3">Receipt No</th>
+                              <th className="px-4 py-3">Date</th>
+                              <th className="px-4 py-3">Amount Paid</th>
+                              <th className="px-4 py-3">Payment Mode</th>
+                              <th className="px-4 py-3">Ref / UTR Number</th>
+                              <th className="px-4 py-3">Verification</th>
+                              <th className="px-4 py-3 text-right">Action</th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 bg-white">
+                            {studentUser.paymentReceipts.map((r, idx) => (
+                              <tr key={r.receiptId || idx} className="hover:bg-slate-50/70 transition-colors">
+                                <td className="px-4 py-3 font-mono font-bold text-[#131313]">{r.receiptId}</td>
+                                <td className="px-4 py-3 text-slate-700">{r.date}</td>
+                                <td className="px-4 py-3 font-mono font-bold text-emerald-700">₹{r.amount.toLocaleString('en-IN')}</td>
+                                <td className="px-4 py-3 text-slate-700">{r.paymentMode}</td>
+                                <td className="px-4 py-3 font-mono text-slate-600">{r.refNumber}</td>
+                                <td className="px-4 py-3">
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                    {r.status}
+                                  </span>
+                                </td>
+                                <td className="px-4 py-3 text-right">
+                                  <button
+                                    type="button"
+                                    onClick={() => setSelectedReceiptForModal(r)}
+                                    className="px-3.5 py-1.5 rounded-lg bg-[#131313] hover:bg-slate-800 text-white text-[11px] font-semibold cursor-pointer shadow-xs hover:shadow-sm transition-all"
+                                  >
+                                    View Receipt
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div className="p-8 text-center bg-slate-50/60 rounded-2xl border border-dashed border-slate-200">
+                        <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 font-bold flex items-center justify-center mx-auto mb-2 text-sm">
+                          ₹
+                        </div>
+                        <p className="text-xs font-bold text-slate-700">No payment receipts issued yet</p>
+                        <p className="text-[11px] text-slate-400 mt-1 max-w-sm mx-auto">
+                          Official digital receipts will appear here once registered and verified by the accounts department.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -2234,10 +2552,10 @@ export default function StudentPortalPage() {
                         Designated CAD Workstation
                       </span>
                       <span className="font-mono font-bold text-sm text-[#131313] block mt-0.5">
-                        {studentUser.labWorkstation || 'Seat #04 - BIM Modeling Lab 2'}
+                        {studentUser.labWorkstation || 'Allotted during practical lab sessions'}
                       </span>
                       <span className="text-[11px] text-slate-400 mt-0.5 block">
-                        Equipped with NVIDIA Quadro CAD Rig
+                        {studentUser.labWorkstation ? 'Equipped with NVIDIA Quadro CAD Rig' : 'Available on campus workstation desk'}
                       </span>
                     </div>
 
@@ -2246,10 +2564,10 @@ export default function StudentPortalPage() {
                         Assigned Lead Instructor
                       </span>
                       <span className="font-bold text-sm text-[#131313] block mt-0.5">
-                        {studentUser.leadInstructor || 'Er. Swamy Naidu'}
+                        {studentUser.leadInstructor || 'Course Lead / Faculty Mentor'}
                       </span>
                       <span className="text-[11px] text-slate-400 mt-0.5 block">
-                        Senior BIM Architect &amp; Technical Director
+                        {studentUser.leadInstructor ? 'Senior BIM Architect & Technical Director' : 'Assigned based on enrolled engineering stream'}
                       </span>
                     </div>
 
@@ -2258,7 +2576,7 @@ export default function StudentPortalPage() {
                         Campus Support Helpline
                       </span>
                       <span className="font-mono font-bold text-sm text-[#131313] block mt-0.5">
-                        +91 99080 12345
+                        +91 99080 87345
                       </span>
                       <span className="text-[11px] text-slate-400 mt-0.5 block">
                         Metro Pillar 1042, Ameerpet, Hyderabad
@@ -2328,7 +2646,7 @@ export default function StudentPortalPage() {
                       {studentJobs.filter((j) => j.status === 'Active').length} Active Vacancies
                     </span>
                     <button
-                      onClick={fetchStudentJobs}
+                      onClick={() => fetchStudentJobs()}
                       disabled={isLoadingJobs}
                       className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-[#131313] border border-slate-200 text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
                     >
@@ -2460,7 +2778,7 @@ export default function StudentPortalPage() {
                         Piping: 'bg-rose-50 text-rose-800 border-rose-200',
                       };
                       const streamStyle =
-                        streamColors[job.stream] || 'bg-slate-50 text-slate-800 border-slate-200';
+                        (job.stream && streamColors[job.stream]) || 'bg-slate-50 text-slate-800 border-slate-200';
 
                       return (
                         <div
@@ -3549,53 +3867,32 @@ export default function StudentPortalPage() {
       {/* FULL-SCREEN LMS STUDIO & VIDEO LEARNING WORKSPACE (Image 2 & 5) */}
       {playerCourse && (
         <div className="fixed inset-0 z-50 bg-[#F8FAFC] flex flex-col w-screen h-screen overflow-hidden animate-in fade-in duration-200 select-none">
-          {/* Studio Top Navigation Bar (Pleasant Light UI Theme - No Black Color) */}
+          {/* Studio Top Navigation Bar (Clean Minimalist LMS Header) */}
           <div className="px-5 sm:px-7 py-3.5 bg-white text-slate-800 flex items-center justify-between border-b border-slate-200 shadow-xs flex-shrink-0 z-20">
-            <div className="flex items-center space-x-3 sm:space-x-4 min-w-0">
-              <button
-                type="button"
-                onClick={handleCloseStudio}
-                className="px-3.5 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 hover:text-[#EE2C3C] text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer flex-shrink-0"
-              >
-                <span>&larr;</span>
-                <span className="hidden sm:inline">Back to Dashboard</span>
-                <span className="sm:hidden">Exit</span>
-              </button>
-              <div className="h-5 w-px bg-slate-200 hidden sm:block flex-shrink-0" />
-              <span className="px-2.5 py-1 rounded-md bg-[#EE2C3C]/10 text-[#EE2C3C] font-mono text-xs font-bold border border-[#EE2C3C]/20 flex-shrink-0">
-                {playerCourse.code || 'COURSE'}
-              </span>
-              <div className="min-w-0">
-                <h3 className="text-sm sm:text-base font-bold text-slate-900 truncate">
-                  {playerCourse.title}
-                </h3>
-                <span className="text-[11px] text-slate-500 font-medium hidden md:inline">
-                  Interactive CAD Lecture Studio &bull; Ameerpet Main Campus Lab
-                </span>
-              </div>
-            </div>
-
-            {/* Top Right: Dynamic Progress & Close Button */}
-            <div className="flex items-center space-x-3 flex-shrink-0">
+            <div className="min-w-0">
               {(() => {
-                const currentClasses = playerCourse.classes || [];
-                const courseWatched = currentClasses.filter((c) => watchedClassIds.includes(c.id)).length;
-                const coursePct = currentClasses.length > 0 ? Math.round((courseWatched / currentClasses.length) * 100) : 0;
+                const currentClassLabel = activePlayerClass?.classNumber
+                  ? activePlayerClass.classNumber.replace(/Class\s*0?(\d+)/i, 'Class - $1')
+                  : 'Class - 1';
                 return (
-                  <div className="hidden sm:flex items-center space-x-2 bg-slate-100/90 border border-slate-200 px-3 py-1.5 rounded-full text-xs font-bold text-slate-700">
-                    <span className="w-2 h-2 rounded-full bg-[#EE2C3C]" />
-                    <span>{courseWatched} / {currentClasses.length} Classes ({coursePct}%)</span>
-                  </div>
+                  <h2 className="text-base sm:text-lg md:text-xl font-extrabold text-slate-900 truncate tracking-tight">
+                    {currentClassLabel} ( {playerCourse.title} )
+                  </h2>
                 );
               })()}
+            </div>
 
+            {/* Top Right: Prominent Larger Red Close Button (Image 2) */}
+            <div className="flex items-center space-x-3 flex-shrink-0">
               <button
                 type="button"
                 onClick={handleCloseStudio}
-                className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 border border-slate-200/80 flex items-center justify-center transition-all cursor-pointer font-bold text-sm"
+                className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white flex items-center justify-center transition-all cursor-pointer font-bold shadow-sm hover:shadow-md active:scale-95"
                 title="Close Studio (Esc)"
               >
-                ✕
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
           </div>
@@ -3628,21 +3925,10 @@ export default function StudentPortalPage() {
               <div className="flex-1 flex flex-col min-h-0 overflow-y-auto bg-slate-100/60 p-3 sm:p-5 lg:p-6 space-y-4">
                 {activePlayerClass ? (
                   <div className="w-full max-w-6xl 2xl:max-w-7xl mx-auto space-y-4">
-                    {/* MODE 1: CLASS VIDEO STREAM WITH IN-VIDEO OVERLAY CONTROLS (Images 2, 3, 4) */}
+                    {/* MODE 1: PERMANENT CLASS VIDEO STREAM (Image 2 - Google Drive Recording Stream) */}
                     {studentViewerMode === 'video' && (
                       <div className="w-full flex flex-col items-center space-y-4">
-                        {isDriveVideo ? (
-                          /* Interactive Google Drive Video Stream */
-                          <div className="relative aspect-video w-full max-h-[78vh] bg-black rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center">
-                            <iframe
-                              src={formatGoogleDriveUrl(activePlayerClass.videoUrl)}
-                              className="w-full h-full border-0 rounded-2xl"
-                              allow="autoplay; encrypted-media; fullscreen"
-                              allowFullScreen
-                              title={activePlayerClass.title}
-                            />
-                          </div>
-                        ) : isYouTubeVideo ? (
+                        {isYouTubeVideo ? (
                           /* YouTube Stream */
                           <div className="relative aspect-video w-full max-h-[78vh] bg-black rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center">
                             <iframe
@@ -3652,437 +3938,35 @@ export default function StudentPortalPage() {
                               allowFullScreen
                               title={activePlayerClass.title}
                             />
+                            {/* Top-Right Shield */}
+                            <div
+                              className="absolute top-0 right-0 w-28 h-16 bg-black z-30 pointer-events-auto select-none"
+                              aria-hidden="true"
+                            />
                           </div>
                         ) : (
-                          /* Direct MP4 / Video File with In-Video Floating Controls */
-                          <div
-                            ref={playerContainerRef}
-                            onMouseMove={handleUserActivity}
-                            onMouseEnter={() => setShowControlsOverlay(true)}
-                            onMouseLeave={() => {
-                              if (videoIsPlaying) {
-                                setShowControlsOverlay(false);
-                                setShowSettingsMenu(false);
-                              }
-                            }}
-                            className="relative aspect-video w-full max-h-[78vh] bg-black rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center group select-none"
-                          >
-                          <video
-                            ref={videoRef}
-                            src={
-                              !activePlayerClass.videoUrl || isPlaceholderOrBrokenDriveUrl(activePlayerClass.videoUrl)
-                                ? 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'
-                                : activePlayerClass.videoUrl
-                            }
-                            className="w-full h-full object-contain cursor-pointer"
-                            playsInline
-                            onTimeUpdate={() => {
-                              if (videoRef.current) {
-                                setVideoCurrentTime(videoRef.current.currentTime);
-                              }
-                            }}
-                            onLoadedMetadata={() => {
-                              if (videoRef.current) {
-                                setVideoDuration(videoRef.current.duration);
-                              }
-                            }}
-                            onEnded={handleVideoEnded}
-                            onClick={handlePlayPause}
-                          />
-
-                          {/* Temporary Toast Indicator (Play, Pause, Skip, Speed) */}
-                          {videoToast && (
-                            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-40 px-3.5 py-1.5 rounded-full bg-black/85 text-white text-xs font-semibold backdrop-blur-md shadow-lg pointer-events-none animate-in fade-in zoom-in-95 duration-150 border border-white/10">
-                              {videoToast}
-                            </div>
-                          )}
-
-                          {/* Center Big Play Button Overlay When Paused */}
-                          {!videoIsPlaying && (
-                            <button
-                              type="button"
-                              onClick={handlePlayPause}
-                              className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-black/60 hover:bg-[#EE2C3C] text-white flex items-center justify-center transition-all cursor-pointer shadow-2xl backdrop-blur-md group-hover:scale-110 active:scale-95 z-20 border border-white/10"
-                              title="Play Video (Space)"
-                            >
-                              <svg className="w-8 h-8 fill-current ml-1" viewBox="0 0 24 24">
-                                <polygon points="5 3 19 12 5 21 5 3" />
-                              </svg>
-                            </button>
-                          )}
-
-                          {/* Subtitles Overlay */}
-                          {subtitlesEnabled && videoIsPlaying && (
-                            <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-20 px-3.5 py-1.5 bg-black/80 text-white text-xs sm:text-sm font-medium rounded-lg text-center max-w-lg pointer-events-none backdrop-blur-xs border border-white/10">
-                              [Instructor]: Precision snaps, layer architecture, and title block drafting standards.
-                            </div>
-                          )}
-
-                          {/* IN-VIDEO SETTINGS POPOVER MENU (Images 3 & 4) */}
-                          {showSettingsMenu && (
-                            <div className="absolute bottom-16 right-3 sm:right-4 w-64 bg-[#212121]/95 backdrop-blur-xl border border-white/15 rounded-2xl shadow-2xl p-2 z-40 text-white animate-in fade-in zoom-in-95 duration-150 select-none">
-                              {/* Main Settings Submenu (Image 3) */}
-                              {settingsActiveSubmenu === 'main' && (
-                                <div className="space-y-0.5 text-xs font-medium">
-                                  {/* Picture in picture */}
-                                  <button
-                                    type="button"
-                                    onClick={handleTogglePiP}
-                                    className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-white/10 transition-all cursor-pointer text-left"
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <svg className="w-4 h-4 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <rect x="3" y="5" width="18" height="14" rx="2" strokeWidth={1.8} />
-                                        <rect x="11" y="11" width="8" height="6" rx="1" fill="currentColor" stroke="none" />
-                                      </svg>
-                                      <span>Picture-in-picture</span>
-                                    </div>
-                                  </button>
-
-                                  {/* Subtitles/CC */}
-                                  <button
-                                    type="button"
-                                    onClick={handleToggleCC}
-                                    className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-white/10 transition-all cursor-pointer text-left"
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <span className="w-4 h-4 flex items-center justify-center font-bold text-[9px] border border-white/70 rounded">
-                                        CC
-                                      </span>
-                                      <span>Subtitles/CC</span>
-                                    </div>
-                                    <span className="text-[11px] text-white/50">
-                                      {subtitlesEnabled ? 'English' : 'Off'}
-                                    </span>
-                                  </button>
-
-                                  {/* Quality */}
-                                  <button
-                                    type="button"
-                                    onClick={() => setSettingsActiveSubmenu('quality')}
-                                    className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-white/10 transition-all cursor-pointer text-left"
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <svg className="w-4 h-4 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                                      </svg>
-                                      <span>Quality</span>
-                                    </div>
-                                    <span className="text-[11px] text-white/50 flex items-center gap-1">
-                                      <span>{videoQuality}</span>
-                                      <span>&rsaquo;</span>
-                                    </span>
-                                  </button>
-
-                                  {/* Playback speed */}
-                                  <button
-                                    type="button"
-                                    onClick={() => setSettingsActiveSubmenu('speed')}
-                                    className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-white/10 transition-all cursor-pointer text-left"
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <svg className="w-4 h-4 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <circle cx="12" cy="12" r="9" strokeWidth={1.8} />
-                                        <polygon points="10 8 16 12 10 16" fill="currentColor" stroke="none" />
-                                      </svg>
-                                      <span>Playback speed</span>
-                                    </div>
-                                    <span className="text-[11px] text-white/50 flex items-center gap-1">
-                                      <span>{videoPlaybackSpeed === 1 ? '1x' : `${videoPlaybackSpeed}x`}</span>
-                                      <span>&rsaquo;</span>
-                                    </span>
-                                  </button>
-
-                                  {/* Transcript / Notes */}
-                                  {activePlayerClass.pdfUrl && (
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        setStudentViewerMode('notes');
-                                        setShowSettingsMenu(false);
-                                      }}
-                                      className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-white/10 transition-all cursor-pointer text-left border-t border-white/10 mt-1 pt-1.5"
-                                    >
-                                      <div className="flex items-center gap-3">
-                                        <svg className="w-4 h-4 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                        <span>Transcript / Notes</span>
-                                      </div>
-                                      <span className="text-[10px] text-emerald-400 font-bold uppercase">PDF</span>
-                                    </button>
-                                  )}
-                                </div>
-                              )}
-
-                              {/* Quality Submenu */}
-                              {settingsActiveSubmenu === 'quality' && (
-                                <div className="space-y-0.5 text-xs font-medium">
-                                  <div className="flex items-center gap-2 px-3 py-1.5 border-b border-white/10 text-white/70 font-bold">
-                                    <button
-                                      type="button"
-                                      onClick={() => setSettingsActiveSubmenu('main')}
-                                      className="hover:text-white cursor-pointer"
-                                    >
-                                      &larr; Back
-                                    </button>
-                                    <span>Video Quality</span>
-                                  </div>
-                                  {['1080p HD', '720p HD', '480p', 'Auto'].map((q) => (
-                                    <button
-                                      key={q}
-                                      type="button"
-                                      onClick={() => {
-                                        handleQualityChange(q);
-                                        setShowSettingsMenu(false);
-                                        setSettingsActiveSubmenu('main');
-                                      }}
-                                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all cursor-pointer ${
-                                        videoQuality === q
-                                          ? 'bg-white/20 text-white font-bold'
-                                          : 'text-white/80 hover:bg-white/10'
-                                      }`}
-                                    >
-                                      <span>{q}</span>
-                                      {videoQuality === q && <span className="font-bold">✓</span>}
-                                    </button>
-                                  ))}
-                                </div>
-                              )}
-
-                              {/* Playback Speed Submenu (Image 4 Exact Replica) */}
-                              {settingsActiveSubmenu === 'speed' && (
-                                <div className="space-y-0.5 text-xs font-medium max-h-72 overflow-y-auto">
-                                  <div className="flex items-center gap-2 px-3 py-1.5 border-b border-white/10 text-white/70 font-bold">
-                                    <button
-                                      type="button"
-                                      onClick={() => setSettingsActiveSubmenu('main')}
-                                      className="hover:text-white cursor-pointer"
-                                    >
-                                      &larr; Back
-                                    </button>
-                                    <span>Playback Speed</span>
-                                  </div>
-                                  {[0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map((spd) => (
-                                    <button
-                                      key={spd}
-                                      type="button"
-                                      onClick={() => {
-                                        handleSpeedChange(spd);
-                                        setShowSettingsMenu(false);
-                                        setSettingsActiveSubmenu('main');
-                                      }}
-                                      className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl transition-all cursor-pointer ${
-                                        videoPlaybackSpeed === spd
-                                          ? 'bg-white/25 text-white font-bold'
-                                          : 'text-white/80 hover:bg-white/10'
-                                      }`}
-                                    >
-                                      <span>{spd === 1 ? '1 (Normal)' : spd}</span>
-                                      {videoPlaybackSpeed === spd && <span className="font-bold">✓</span>}
-                                    </button>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          )}
-
-                          {/* IN-VIDEO FLOATING OVERLAY CONTROLS BAR (Image 2 Exact Layout) */}
-                          <div
-                            className={`absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/60 to-transparent pt-12 pb-3 px-3 sm:px-4 flex flex-col justify-end gap-2.5 z-30 transition-opacity duration-300 ${
-                              showControlsOverlay || !videoIsPlaying ? 'opacity-100' : 'opacity-0 pointer-events-none'
-                            }`}
-                          >
-                            {/* Scrubber Timeline Bar with Vertical White Thumb (Image 2) */}
-                            <div className="relative group/timeline w-full flex items-center cursor-pointer py-1.5">
-                              <div className="w-full h-1 group-hover/timeline:h-1.5 bg-white/25 rounded-full overflow-hidden transition-all relative">
-                                <div
-                                  className="bg-white h-full transition-all relative"
-                                  style={{
-                                    width: `${videoDuration ? (videoCurrentTime / videoDuration) * 100 : 0}%`,
-                                  }}
-                                />
-                              </div>
-                              {/* Vertical white thumb handle (Image 2) */}
-                              <div
-                                className="absolute w-1 h-3.5 bg-white rounded-xs shadow-md -translate-x-1/2 pointer-events-none"
-                                style={{
-                                  left: `${videoDuration ? (videoCurrentTime / videoDuration) * 100 : 0}%`,
-                                }}
-                              />
-                              <input
-                                type="range"
-                                min={0}
-                                max={videoDuration || 100}
-                                step={0.5}
-                                value={videoCurrentTime}
-                                onChange={(e) => handleSeek(Number(e.target.value))}
-                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                              />
-                            </div>
-
-                            {/* Floating Bottom Control Pills (Image 2) */}
-                            <div className="flex flex-wrap items-center justify-between gap-2">
-                              {/* Left Side: Play/Pause, [ ↺10 ] [ ↻10 ] [ 0:00 / 5:51 ], Chapters */}
-                              <div className="flex items-center gap-2">
-                                {/* Pill 1: Play / Pause */}
-                                <button
-                                  type="button"
-                                  onClick={handlePlayPause}
-                                  className="h-9 px-3.5 rounded-xl bg-black/60 hover:bg-black/80 backdrop-blur-md text-white flex items-center justify-center transition-all cursor-pointer active:scale-95 border border-white/10 shadow-md"
-                                  title={videoIsPlaying ? 'Pause' : 'Play'}
-                                >
-                                  {videoIsPlaying ? (
-                                    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                                      <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-                                    </svg>
-                                  ) : (
-                                    <svg className="w-4 h-4 fill-current ml-0.5" viewBox="0 0 24 24">
-                                      <polygon points="5 3 19 12 5 21 5 3" />
-                                    </svg>
-                                  )}
-                                </button>
-
-                                {/* Pill 2: [ ↺10 ] [ ↻10 ] [ 0:00 / 5:51 ] */}
-                                <div className="h-9 px-3 rounded-xl bg-black/60 hover:bg-black/80 backdrop-blur-md text-white flex items-center gap-2.5 text-xs font-mono border border-white/10 shadow-md select-none">
-                                  {/* ↺ 10 */}
-                                  <button
-                                    type="button"
-                                    onClick={handleSkipBackward}
-                                    className="hover:text-[#EE2C3C] transition-colors cursor-pointer flex items-center"
-                                    title="Rewind 10s"
-                                  >
-                                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                                      <path strokeLinecap="round" strokeLinejoin="round" d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.334 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8l-5.334 4z" />
-                                    </svg>
-                                    <span className="text-[10px] ml-0.5 font-sans font-bold">10</span>
-                                  </button>
-
-                                  {/* ↻ 10 */}
-                                  <button
-                                    type="button"
-                                    onClick={handleSkipForward}
-                                    className="hover:text-[#EE2C3C] transition-colors cursor-pointer flex items-center"
-                                    title="Forward 10s"
-                                  >
-                                    <span className="text-[10px] mr-0.5 font-sans font-bold">10</span>
-                                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                                      <path strokeLinecap="round" strokeLinejoin="round" d="M11.934 12.8a1 1 0 000-1.6l-5.334-4A1 1 0 005 8v8a1 1 0 001.6.8l5.334-4zM19.934 12.8a1 1 0 000-1.6l-5.334-4A1 1 0 0013 8v8a1 1 0 001.6.8l5.334-4z" />
-                                    </svg>
-                                  </button>
-
-                                  {/* Elapsed / Duration */}
-                                  <span className="text-white/90 font-medium pl-1 text-[11px] sm:text-xs">
-                                    {formatVideoTime(videoCurrentTime)} / {formatVideoTime(videoDuration || (activePlayerClass ? 2700 : 0))}
-                                  </span>
-                                </div>
-
-                                {/* Pill 3: Chapters */}
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    showVideoToast(`${activePlayerClass.classNumber}: ${activePlayerClass.title}`);
-                                  }}
-                                  className="h-9 px-3.5 rounded-xl bg-black/60 hover:bg-black/80 backdrop-blur-md text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer border border-white/10 shadow-md active:scale-95 transition-all"
-                                  title="View Chapters / Lessons"
-                                >
-                                  <span>Chapters</span>
-                                </button>
-                              </div>
-
-                              {/* Right Side: Volume, CC, Speed pill, Settings Gear, Fullscreen */}
-                              <div className="h-9 px-3 rounded-xl bg-black/60 hover:bg-black/80 backdrop-blur-md text-white flex items-center gap-3 border border-white/10 shadow-md">
-                                {/* Volume button with slider */}
-                                <div className="flex items-center space-x-1.5 group/vol">
-                                  <button
-                                    type="button"
-                                    onClick={handleToggleMute}
-                                    className="hover:text-white/80 transition-all cursor-pointer"
-                                    title={videoIsMuted ? 'Unmute' : 'Mute'}
-                                  >
-                                    {videoIsMuted || videoVolume === 0 ? (
-                                      <svg className="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
-                                      </svg>
-                                    ) : (
-                                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                                      </svg>
-                                    )}
-                                  </button>
-                                  <input
-                                    type="range"
-                                    min={0}
-                                    max={1}
-                                    step={0.05}
-                                    value={videoIsMuted ? 0 : videoVolume}
-                                    onChange={(e) => handleVolumeChange(Number(e.target.value))}
-                                    className="w-14 h-1 bg-white/30 rounded-lg appearance-none cursor-pointer accent-white hidden sm:inline-block"
-                                  />
-                                </div>
-
-                                {/* Subtitles [CC] */}
-                                <button
-                                  type="button"
-                                  onClick={handleToggleCC}
-                                  className={`px-1.5 py-0.5 rounded text-[10px] font-bold border transition-colors cursor-pointer ${
-                                    subtitlesEnabled
-                                      ? 'bg-white text-black border-white'
-                                      : 'border-white/60 text-white/80 hover:text-white hover:border-white'
-                                  }`}
-                                  title="Subtitles/CC"
-                                >
-                                  CC
-                                </button>
-
-                                {/* Speed Indicator [1x] */}
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setShowSettingsMenu(true);
-                                    setSettingsActiveSubmenu('speed');
-                                  }}
-                                  className="text-xs font-semibold hover:text-[#EE2C3C] transition-colors cursor-pointer"
-                                  title="Playback Speed"
-                                >
-                                  {videoPlaybackSpeed === 1 ? '1x' : `${videoPlaybackSpeed}x`}
-                                </button>
-
-                                {/* Settings Gear [⚙] (Images 3 & 4) */}
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setShowSettingsMenu(!showSettingsMenu);
-                                    setSettingsActiveSubmenu('main');
-                                  }}
-                                  className="hover:text-white/80 transition-all cursor-pointer"
-                                  title="Settings"
-                                >
-                                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                    <circle cx="12" cy="12" r="3" strokeWidth={1.8} />
-                                  </svg>
-                                </button>
-
-                                {/* Fullscreen [⛶] */}
-                                <button
-                                  type="button"
-                                  onClick={handleToggleFullscreen}
-                                  className="hover:text-white/80 transition-all cursor-pointer"
-                                  title="Toggle Fullscreen"
-                                >
-                                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                                  </svg>
-                                </button>
-                              </div>
-                            </div>
+                          /* Permanent Google Drive Video Stream (Image 2) */
+                          <div className="relative aspect-video w-full max-h-[78vh] bg-black rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center">
+                            <iframe
+                              src={formatGoogleDriveUrl(activePlayerClass.videoUrl)}
+                              className="w-full h-full border-0 rounded-2xl"
+                              allow="autoplay; encrypted-media; fullscreen"
+                              allowFullScreen
+                              title={activePlayerClass.title}
+                            />
+                            {/* Top-Right Shield: Hides & blocks Google Drive pop-out & external window button while playing */}
+                            <div
+                              className="absolute top-0 right-0 w-28 h-16 bg-black z-30 pointer-events-auto select-none"
+                              aria-hidden="true"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                              }}
+                            />
                           </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                        )}
+                      </div>
+                    )}
 
                     {/* MODE 2: FULL NOTES & PDF READER STUDIO */}
                     {studentViewerMode === 'notes' && (
@@ -4181,123 +4065,39 @@ export default function StudentPortalPage() {
                 )}
               </div>
 
-              {/* PLAYLIST SIDEBAR (Right Column: Image 2 added above 3rd Image, Easy Real-Time LMS Style) */}
+              {/* PLAYLIST SIDEBAR (Clean LMS Layout) */}
               <div className="w-full lg:w-96 xl:w-[400px] flex flex-col min-h-0 bg-white border-t lg:border-t-0 lg:border-l border-slate-200 shadow-xs flex-shrink-0">
-                {/* 1. TOP ACTION CONTROLS (Image 2: Mode Switcher Tabs Video vs Notes) */}
-                <div className="p-3.5 bg-slate-50/90 border-b border-slate-200 flex-shrink-0">
-                  <div className="grid grid-cols-2 gap-1.5 p-1 bg-slate-200/80 rounded-xl font-bold text-xs shadow-inner">
-                    <button
-                      type="button"
-                      onClick={() => setStudentViewerMode('video')}
-                      className={`py-2 px-3 rounded-lg flex items-center justify-center space-x-1.5 transition-all cursor-pointer ${
-                        studentViewerMode === 'video'
-                          ? 'bg-[#EE2C3C] text-white shadow-xs'
-                          : 'text-slate-700 hover:text-slate-900'
-                      }`}
-                    >
-                      <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-                        <polygon points="5 3 19 12 5 21 5 3" />
-                      </svg>
-                      <span>Video</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setStudentViewerMode('notes')}
-                      className={`py-2 px-3 rounded-lg flex items-center justify-center space-x-1.5 transition-all cursor-pointer ${
-                        studentViewerMode === 'notes'
-                          ? 'bg-[#EE2C3C] text-white shadow-xs'
-                          : 'text-slate-700 hover:text-slate-900'
-                      }`}
-                    >
-                      <svg className="w-3.5 h-3.5 fill-none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      <span>Notes</span>
-                      {activePlayerClass?.pdfUrl && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                      )}
-                    </button>
-                  </div>
+                {/* Clean Playlist Header */}
+                <div className="px-4 py-3 bg-white border-b border-slate-200 flex items-center justify-between flex-shrink-0">
+                  <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                    Course Playlist
+                  </span>
                 </div>
 
-                {/* 2. Playlist Header & Syllabus Progress */}
-                <div className="p-3.5 sm:p-4 bg-white border-b border-slate-200 space-y-2 flex-shrink-0">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="text-xs font-bold text-slate-900 uppercase tracking-wider block">
-                        Course Playlist &amp; Syllabus
-                      </span>
-                      <span className="text-[11px] text-slate-500 font-medium">
-                        {playerCourse.classes?.length || 0} Video Lessons Available
-                      </span>
-                    </div>
-                    {(() => {
-                      const currentClasses = playerCourse.classes || [];
-                      const courseWatched = currentClasses.filter((c) => watchedClassIds.includes(c.id)).length;
-                      const coursePct = currentClasses.length > 0 ? Math.round((courseWatched / currentClasses.length) * 100) : 0;
-                      return (
-                        <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200">
-                          {courseWatched}/{currentClasses.length} ({coursePct}%)
-                        </span>
-                      );
-                    })()}
-                  </div>
-
-                  {/* Progress Bar inside Playlist */}
-                  {(() => {
-                    const currentClasses = playerCourse.classes || [];
-                    const courseWatched = currentClasses.filter((c) => watchedClassIds.includes(c.id)).length;
-                    const coursePct = currentClasses.length > 0 ? Math.round((courseWatched / currentClasses.length) * 100) : 0;
-                    return (
-                      <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                        <div
-                          className="bg-[#EE2C3C] h-full rounded-full transition-all duration-500"
-                          style={{ width: `${coursePct}%` }}
-                        />
-                      </div>
-                    );
-                  })()}
-
-                  {/* Real-time Search Box */}
-                  <div className="relative pt-1">
-                    <input
-                      type="text"
-                      value={playlistSearchQuery}
-                      onChange={(e) => setPlaylistSearchQuery(e.target.value)}
-                      placeholder="Search lessons & topics..."
-                      className="w-full pl-8 pr-7 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:bg-white focus:border-[#EE2C3C] focus:outline-none transition-all"
-                    />
-                    <svg className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                    {playlistSearchQuery && (
-                      <button
-                        onClick={() => setPlaylistSearchQuery('')}
-                        className="absolute right-2.5 top-2 text-xs text-slate-400 hover:text-slate-600 font-bold"
-                      >
-                        ✕
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* 3. Real-Time LMS Playlist Items (Easy, intuitive click-to-play) */}
+                {/* Real-Time LMS Playlist Items */}
                 <div className="flex-1 overflow-y-auto divide-y divide-slate-100 p-2.5 space-y-1.5">
-                  {filteredPlaylistClasses.length === 0 ? (
-                    <div className="p-6 text-center text-xs text-slate-500 font-medium space-y-2">
-                      <p>No lessons match "{playlistSearchQuery}".</p>
-                      <button
-                        type="button"
-                        onClick={() => setPlaylistSearchQuery('')}
-                        className="text-[#EE2C3C] font-bold underline cursor-pointer"
-                      >
-                        Show all lessons
-                      </button>
+                  {(!playerCourse.classes || playerCourse.classes.length === 0) ? (
+                    <div className="p-6 text-center text-xs text-slate-500 font-medium">
+                      No lessons available in this course playlist.
                     </div>
                   ) : (
-                    filteredPlaylistClasses.map((cls, cIdx) => {
+                    playerCourse.classes.map((cls, cIdx) => {
                       const isCurrent = activePlayerClass?.id === cls.id;
-                      const isWatched = watchedClassIds.includes(cls.id);
+                      const isWatched =
+                        watchedClassIds.includes(cls.id) ||
+                        watchedClassIds.includes(cls.classNumber) ||
+                        watchedClassIds.includes(`${playerCourse.title}_${cls.classNumber}`);
+                      const classLabel = cls.classNumber
+                        ? cls.classNumber.replace(/Class\s*0?(\d+)/i, 'Class - $1')
+                        : `Class - ${cIdx + 1}`;
+                      const classDurSeconds =
+                        classDurations[cls.id] ||
+                        (isCurrent && videoDuration > 0 ? videoDuration : 0);
+                      const displayDuration =
+                        classDurSeconds > 0
+                          ? formatVideoTime(classDurSeconds)
+                          : (cls.duration && cls.duration !== '45 mins' ? cls.duration : (videoDuration > 0 ? formatVideoTime(videoDuration) : ''));
+
                       return (
                         <div
                           key={cls.id || cIdx}
@@ -4305,11 +4105,13 @@ export default function StudentPortalPage() {
                             setActivePlayerClass(cls);
                             setVideoCurrentTime(0);
                             setVideoIsPlaying(false);
+                            setStudentViewerMode('video');
+                            markClassAsWatched(cls.id, playerCourse.title, cls.classNumber);
                           }}
-                          className={`w-full rounded-xl transition-all p-3 flex items-start gap-3 cursor-pointer select-none border ${
+                          className={`w-full rounded-xl transition-all p-3.5 flex items-start gap-3 cursor-pointer select-none border ${
                             isCurrent
-                              ? 'bg-rose-50/80 border-[#EE2C3C] shadow-xs ring-1 ring-[#EE2C3C]/20'
-                              : 'bg-white hover:bg-slate-50 border-slate-200/80'
+                              ? 'bg-white border-slate-300 border-l-[5px] border-l-[#EE2C3C] shadow-sm'
+                              : 'bg-white hover:bg-slate-50/90 border-slate-200/90'
                           }`}
                         >
                           {/* Round 1-Click Watched Toggle */}
@@ -4317,12 +4119,14 @@ export default function StudentPortalPage() {
                             type="button"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleToggleClassWatched(cls.id);
+                              handleToggleClassWatched(cls.id, playerCourse.title, cls.classNumber);
                             }}
                             className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all cursor-pointer flex-shrink-0 mt-0.5 ${
                               isWatched
                                 ? 'bg-emerald-600 text-white shadow-xs'
-                                : 'border-2 border-slate-300 hover:border-[#EE2C3C] text-slate-400 bg-white'
+                                : isCurrent
+                                ? 'bg-slate-900 text-white shadow-xs'
+                                : 'bg-slate-100 text-slate-600 border border-slate-200 hover:border-slate-300'
                             }`}
                             title={isWatched ? 'Mark as Unwatched' : 'Mark as Completed'}
                           >
@@ -4332,46 +4136,62 @@ export default function StudentPortalPage() {
                           {/* Class Meta */}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between gap-2">
-                              <span
-                                className={`text-[11px] font-mono font-bold uppercase ${
-                                  isCurrent ? 'text-[#EE2C3C]' : 'text-slate-500'
-                                }`}
-                              >
-                                {cls.classNumber || `Class ${cIdx + 1}`}
+                              <span className="text-sm font-bold text-slate-900 tracking-tight">
+                                {classLabel}
                               </span>
-                              <span className="text-[11px] text-slate-500 font-medium">
-                                {cls.duration}
-                              </span>
+                              {displayDuration && (
+                                <span className="text-xs font-semibold text-slate-500 font-mono">
+                                  {displayDuration}
+                                </span>
+                              )}
                             </div>
 
-                            <h5
-                              className={`text-xs sm:text-sm font-bold truncate mt-0.5 ${
-                                isCurrent ? 'text-[#EE2C3C]' : 'text-slate-900'
-                              }`}
-                            >
-                              {cls.title}
-                            </h5>
-
-                            <div className="flex items-center gap-1.5 mt-1.5">
-                              {isCurrent ? (
-                                <span className="px-2 py-0.5 rounded-md bg-[#EE2C3C] text-white text-[10px] font-bold flex items-center gap-1 shadow-xs">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                            {/* Clean, Modern LMS Badges & Buttons */}
+                            <div className="flex items-center flex-wrap gap-2 mt-2.5">
+                              {isCurrent && (
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-red-50 text-[#EE2C3C] border border-red-200">
+                                  <span className="relative flex h-1.5 w-1.5">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#EE2C3C] opacity-75" />
+                                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#EE2C3C]" />
+                                  </span>
                                   <span>Now Playing</span>
-                                </span>
-                              ) : isWatched ? (
-                                <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold">
-                                  ✓ Watched
-                                </span>
-                              ) : (
-                                <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[10px] font-medium">
-                                  Unwatched
                                 </span>
                               )}
 
-                              {cls.pdfUrl && (
-                                <span className="px-2 py-0.5 rounded-md bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-bold">
-                                  PDF
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleToggleClassWatched(cls.id, playerCourse.title, cls.classNumber);
+                                }}
+                                className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold transition-all cursor-pointer border ${
+                                  isWatched
+                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                                    : 'bg-slate-50 hover:bg-slate-100 text-slate-600 border-slate-200 hover:border-emerald-400'
+                                }`}
+                                title={isWatched ? 'Completed (Click to unmark)' : 'Click to mark as watched'}
+                              >
+                                <span className={isWatched ? 'text-emerald-600 font-bold' : 'text-slate-400'}>
+                                  {isWatched ? '✓ Completed' : '○ Mark Done'}
                                 </span>
+                              </button>
+
+                              {cls.pdfUrl && (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setActivePlayerClass(cls);
+                                    setStudentViewerMode('notes');
+                                  }}
+                                  className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-white hover:bg-slate-50 text-slate-700 hover:text-[#EE2C3C] border border-slate-200 hover:border-[#EE2C3C]/40 transition-all cursor-pointer shadow-2xs group/pdf"
+                                  title="Open Class Notes & PDF"
+                                >
+                                  <svg className="w-3.5 h-3.5 text-[#EE2C3C] group-hover/pdf:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
+                                  </svg>
+                                  <span>PDF Notes</span>
+                                </button>
                               )}
                             </div>
                           </div>
@@ -4940,7 +4760,7 @@ export default function StudentPortalPage() {
                     Ameerpet Main Campus, Metro Pillar 1042, Hyderabad - 500038
                   </p>
                   <p className="text-slate-500 font-mono text-[11px]">
-                    Helpline: +91 99080 12345 | Web: educadd.org
+                    Helpline: +91 99080 87345 | Web: rndcadd.com
                   </p>
                 </div>
                 <div className="text-left sm:text-right font-mono">
@@ -4965,15 +4785,15 @@ export default function StudentPortalPage() {
                 </div>
                 <div>
                   <span className="text-[10px] uppercase font-bold text-slate-500 block">Contact Phone</span>
-                  <span className="font-bold text-[#131313]">{studentUser.phone || '+91 99080 12345'}</span>
+                  <span className="font-bold text-[#131313]">{studentUser.phone || '—'}</span>
                 </div>
                 <div className="col-span-2">
                   <span className="text-[10px] uppercase font-bold text-slate-500 block">College / University</span>
-                  <span className="font-semibold text-[#131313]">{studentUser.college || 'JNTU Hyderabad'}</span>
+                  <span className="font-semibold text-[#131313]">{studentUser.college || '—'}</span>
                 </div>
                 <div>
                   <span className="text-[10px] uppercase font-bold text-slate-500 block">Native Place</span>
-                  <span className="font-semibold text-[#131313]">{studentUser.nativePlace || 'Hyderabad'}</span>
+                  <span className="font-semibold text-[#131313]">{studentUser.nativePlace || '—'}</span>
                 </div>
                 <div className="col-span-2 sm:col-span-3 pt-1 border-t border-slate-200">
                   <span className="text-[10px] uppercase font-bold text-slate-500 block">Enrolled Course</span>

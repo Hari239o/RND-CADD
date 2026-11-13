@@ -23,6 +23,11 @@ dist-ssr
 *.sln
 *.sw?
 
+# Environment Variables
+.env
+.env*.local
+!.env.example
+
 # Next.js
 .next/
 out/
@@ -33,4 +38,8 @@ next-env.d.ts
 npm_out.txt
 0.26.0
 scratch/
+
+# Uploads
+public/uploads/*
+!public/uploads/.gitkeep
 

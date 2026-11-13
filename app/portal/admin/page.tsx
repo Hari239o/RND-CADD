@@ -3784,7 +3784,7 @@ export default function AdminPortalPage() {
 
                     <button
                       type="button"
-                      onClick={fetchEbooks}
+                      onClick={() => fetchEbooks()}
                       className="px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-medium text-[#2B2B2B] hover:bg-slate-50 cursor-pointer"
                     >
                       {isLoadingEbooks ? '...' : 'Refresh'}
@@ -3910,7 +3910,7 @@ export default function AdminPortalPage() {
 
                 <div className="flex items-center gap-3 flex-wrap">
                   <button
-                    onClick={fetchJobs}
+                    onClick={() => fetchJobs()}
                     disabled={isLoadingJobs}
                     className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold transition-colors cursor-pointer flex items-center gap-2 shadow-2xs"
                     title="Refresh Job Vacancies"
@@ -7352,21 +7352,35 @@ export default function AdminPortalPage() {
                     <div className="relative aspect-video w-full bg-slate-950 rounded-xl overflow-hidden border border-slate-800 shadow-inner flex items-center justify-center">
                       {testingVideoClass && testingVideoClass.videoUrl && !isPlaceholderOrBrokenDriveUrl(testingVideoClass.videoUrl) ? (
                         (testingVideoClass.videoType === 'drive' || testingVideoClass.videoUrl.includes('drive.google.com')) ? (
-                          <iframe
-                            src={formatGoogleDriveUrl(testingVideoClass.videoUrl)}
-                            className="w-full h-full border-0"
-                            allow="autoplay; encrypted-media; fullscreen"
-                            allowFullScreen
-                            title={testingVideoClass.title}
-                          />
+                          <>
+                            <iframe
+                              src={formatGoogleDriveUrl(testingVideoClass.videoUrl)}
+                              className="w-full h-full border-0"
+                              allow="autoplay; encrypted-media; fullscreen"
+                              allowFullScreen
+                              title={testingVideoClass.title}
+                            />
+                            {/* Top-Right Shield: Hides Google Drive pop-out & external window button */}
+                            <div
+                              className="absolute top-0 right-0 w-28 h-16 bg-black z-30 pointer-events-auto select-none"
+                              aria-hidden="true"
+                            />
+                          </>
                         ) : (testingVideoClass.videoUrl.includes('youtube.com') || testingVideoClass.videoUrl.includes('youtu.be')) ? (
-                          <iframe
-                            src={formatYouTubeEmbedUrl(testingVideoClass.videoUrl)}
-                            className="w-full h-full border-0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            allowFullScreen
-                            title={testingVideoClass.title}
-                          />
+                          <>
+                            <iframe
+                              src={formatYouTubeEmbedUrl(testingVideoClass.videoUrl)}
+                              className="w-full h-full border-0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                              allowFullScreen
+                              title={testingVideoClass.title}
+                            />
+                            {/* Top-Right Shield */}
+                            <div
+                              className="absolute top-0 right-0 w-28 h-16 bg-black z-30 pointer-events-auto select-none"
+                              aria-hidden="true"
+                            />
+                          </>
                         ) : (
                           <video
                             controls
