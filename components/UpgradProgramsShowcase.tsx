@@ -285,21 +285,21 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
   };
 
   return (
-    <section id="upgrad-showcase" className="py-14 sm:py-18 bg-[#F8FAFC] border-t border-b border-[#E2E8F0]">
-      {/* Full width container using the left and right spaces */}
-      <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 max-w-[1880px] mx-auto">
+    <section id="upgrad-showcase" className="py-8 sm:py-10 bg-[#F8FAFC] border-t border-b border-[#E2E8F0]">
+      {/* Container with compact balanced width */}
+      <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 max-w-[1560px] mx-auto">
         
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-4 border-b border-slate-200 gap-4">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-5 pb-3 border-b border-slate-200 gap-3">
           <div>
-            <span className="text-xs font-bold text-[#EE2C3C] tracking-wider uppercase">
+            <span className="text-[11px] font-bold text-[#EE2C3C] tracking-wider uppercase">
               Global Certified Programs
             </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight mt-1">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight mt-0.5">
               Explore Programs By Engineering Domain
             </h2>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 max-w-md leading-relaxed">
+          <p className="text-xs text-slate-500 max-w-md leading-relaxed">
             Move mouse over any discipline strip on the left to immediately switch domains and explore all accredited courses in that folder.
           </p>
         </div>
@@ -307,10 +307,10 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
         {/* ========================================================================= */}
         {/* EXACT IMAGE 2 LAYOUT: PERSISTENT STRIPS + ACTIVE SHOWCASE + BUTTONS       */}
         {/* ========================================================================= */}
-        <div className="flex flex-row gap-3 sm:gap-4 items-stretch w-full min-h-[550px] sm:min-h-[590px] overflow-hidden">
+        <div className="flex flex-row gap-2.5 sm:gap-3.5 items-stretch w-full min-h-[440px] sm:min-h-[470px] overflow-hidden">
           
           {/* LEFT SIDE: Discipline Strips (All 6 Folders: Civil, Mechanical, Electrical, Interior, Piping, PPM) */}
-          <div className="flex flex-row gap-2 sm:gap-2.5 flex-shrink-0">
+          <div className="flex flex-row gap-1.5 sm:gap-2 flex-shrink-0">
             {folders.map((folder) => {
               const isSelected = folder.id === selectedFolderId;
               const countInFolder = allCourses.filter((c) => {
@@ -334,10 +334,10 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
                   style={{
                     transition: 'width 0.35s cubic-bezier(0.25, 1, 0.5, 1), transform 0.25s ease, box-shadow 0.25s ease',
                   }}
-                  className={`relative h-full rounded-3xl overflow-hidden cursor-pointer flex flex-col justify-between p-3 sm:p-4 group shadow-md hover:shadow-2xl focus:outline-none select-none flex-shrink-0 text-left transition-all ${
+                  className={`relative h-full rounded-2xl overflow-hidden cursor-pointer flex flex-col justify-between p-2.5 sm:p-3 group shadow-md hover:shadow-xl focus:outline-none select-none flex-shrink-0 text-left transition-all ${
                     isSelected
-                      ? 'w-[80px] sm:w-[95px] xl:w-[110px] ring-2 ring-[#EE2C3C] shadow-xl'
-                      : 'w-[58px] sm:w-[70px] xl:w-[80px] hover:w-[140px] sm:hover:w-[170px] xl:hover:w-[190px]'
+                      ? 'w-[68px] sm:w-[82px] xl:w-[94px] ring-2 ring-[#EE2C3C] shadow-lg'
+                      : 'w-[48px] sm:w-[58px] xl:w-[68px] hover:w-[120px] sm:hover:w-[145px] xl:hover:w-[160px]'
                   }`}
                   title={`Open ${countInFolder} courses in ${folder.name}`}
                 >
@@ -361,13 +361,13 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
                   {/* Top: Active indicator or count badge */}
                   <div className="relative z-10">
                     {isSelected ? (
-                      <span className="text-[10px] font-extrabold text-white bg-[#EE2C3C] px-2.5 py-1 rounded-full uppercase tracking-wider shadow-md flex items-center gap-1 w-fit">
+                      <span className="text-[9px] font-extrabold text-white bg-[#EE2C3C] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-md flex items-center gap-1 w-fit">
                         <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
                         Active
                       </span>
                     ) : (
                       <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <span className="text-[10px] font-bold text-white bg-white/20 backdrop-blur-md px-2.5 py-1 rounded-full uppercase tracking-wider border border-white/20 whitespace-nowrap">
+                        <span className="text-[9px] font-bold text-white bg-white/20 backdrop-blur-md px-2 py-0.5 rounded-full uppercase tracking-wider border border-white/20 whitespace-nowrap">
                           {countInFolder} COURSES
                         </span>
                       </div>
@@ -382,7 +382,7 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
                         writingMode: 'vertical-rl',
                         transform: 'rotate(180deg)',
                       }}
-                      className={`text-xs sm:text-sm font-black tracking-widest uppercase text-white/95 drop-shadow-md py-4 whitespace-nowrap block transition-all ${
+                      className={`text-[11px] sm:text-xs font-black tracking-widest uppercase text-white/95 drop-shadow-md py-3 whitespace-nowrap block transition-all ${
                         isSelected ? 'hidden' : 'group-hover:hidden'
                       }`}
                     >
@@ -390,12 +390,12 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
                     </span>
 
                     {/* Spread State / Active State: Horizontal Title */}
-                    <div className={`flex flex-col gap-1 transition-all ${isSelected ? 'flex' : 'hidden group-hover:flex'}`}>
-                      <span className="text-xs sm:text-sm font-black uppercase text-white drop-shadow-md leading-tight">
+                    <div className={`flex flex-col gap-0.5 transition-all ${isSelected ? 'flex' : 'hidden group-hover:flex'}`}>
+                      <span className="text-xs sm:text-[13px] font-black uppercase text-white drop-shadow-md leading-tight">
                         {folder.name}
                       </span>
-                      <span className="text-[10px] font-extrabold text-[#EE2C3C] bg-white px-2.5 py-0.5 rounded-full w-fit shadow-md whitespace-nowrap">
-                        {isSelected ? 'Viewing →' : 'Open Folder →'}
+                      <span className="text-[9px] font-extrabold text-[#EE2C3C] bg-white px-2 py-0.5 rounded-full w-fit shadow-md whitespace-nowrap">
+                        {isSelected ? 'Viewing →' : 'Open →'}
                       </span>
                     </div>
                   </div>
@@ -406,7 +406,7 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
 
           {/* RIGHT SIDE: Main Active Showcase with Vibrant Landmark Background & Total Folder Courses */}
           <div
-            className="flex-1 rounded-3xl overflow-hidden relative shadow-2xl min-h-[550px] sm:min-h-[590px] flex flex-col justify-between p-6 sm:p-8 lg:p-10 bg-cover bg-center transition-all duration-700 ease-out min-w-0"
+            className="flex-1 rounded-2xl overflow-hidden relative shadow-xl min-h-[440px] sm:min-h-[470px] flex flex-col justify-between p-4 sm:p-6 lg:p-7 bg-cover bg-center transition-all duration-700 ease-out min-w-0"
             style={{
               backgroundImage: `url('${currentFolder.bgImage}')`,
             }}
@@ -426,32 +426,31 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
             </div>
 
             {/* Bottom Content Area: Counter & Arrows on Left, Total Courses in Folder on Right */}
-            <div className="relative z-10 flex flex-col md:flex-row items-end justify-between gap-6 pt-8 w-full min-w-0">
+            <div className="relative z-10 flex flex-col md:flex-row items-end justify-between gap-5 pt-4 w-full min-w-0">
               
               {/* Left: Counter 01/04 and Working Navigation Arrows (Exact Image 2 & 3) */}
-              <div className="text-white mb-2 md:mb-4 select-none flex-shrink-0">
-                <div className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] leading-none">
+              <div className="text-white mb-2 select-none flex-shrink-0">
+                <div className="text-4xl sm:text-5xl font-black tracking-tight drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] leading-none">
                   0{totalFolderCourses > 0 ? activeCourseIndex + 1 : 0}
-                  <span className="text-2xl sm:text-3xl lg:text-4xl font-light opacity-90 ml-1">
+                  <span className="text-xl sm:text-2xl font-light opacity-90 ml-1">
                     /{totalFolderCourses < 10 ? `0${totalFolderCourses}` : totalFolderCourses}
                   </span>
                 </div>
-                <p className="text-xs font-bold text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] mt-2">
+                <p className="text-[11px] font-bold text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] mt-1.5">
                   Total {totalFolderCourses} courses in this folder
                 </p>
 
                 {/* Navigation Circular Arrows with Reliable Click State */}
-                {/* Navigation Circular Arrows with Reliable Click State (Image 3) */}
-                <div className="flex items-center gap-3 mt-4">
+                <div className="flex items-center gap-2.5 mt-3">
                   <button
                     type="button"
                     onClick={handlePrev}
                     aria-label="Previous course"
-                    className="w-12 h-12 rounded-full bg-white hover:bg-slate-50 text-slate-800 shadow-2xl flex items-center justify-center transition-all active:scale-90 hover:scale-105 cursor-pointer select-none group border border-slate-100"
+                    className="w-9 h-9 rounded-full bg-white hover:bg-slate-50 text-slate-800 shadow-xl flex items-center justify-center transition-all active:scale-90 hover:scale-105 cursor-pointer select-none group border border-slate-100"
                     title="Previous course"
                   >
                     <svg
-                      className="w-5 h-5 text-slate-800 transition-transform group-hover:-translate-x-0.5"
+                      className="w-4 h-4 text-slate-800 transition-transform group-hover:-translate-x-0.5"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="2.2"
@@ -464,11 +463,11 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
                     type="button"
                     onClick={handleNext}
                     aria-label="Next course"
-                    className="w-12 h-12 rounded-full bg-white hover:bg-slate-50 text-slate-800 shadow-2xl flex items-center justify-center transition-all active:scale-90 hover:scale-105 cursor-pointer select-none group border border-slate-100"
+                    className="w-9 h-9 rounded-full bg-white hover:bg-slate-50 text-slate-800 shadow-xl flex items-center justify-center transition-all active:scale-90 hover:scale-105 cursor-pointer select-none group border border-slate-100"
                     title="Next course"
                   >
                     <svg
-                      className="w-5 h-5 text-slate-800 transition-transform group-hover:translate-x-0.5"
+                      className="w-4 h-4 text-slate-800 transition-transform group-hover:translate-x-0.5"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="2.2"
@@ -481,7 +480,7 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
               </div>
 
               {/* Right: TOTAL COURSES IN FOLDER + Progress Indicator Track (Exact Image 2) */}
-              <div className="flex flex-col gap-2.5 max-w-full md:max-w-[calc(100%-220px)] w-full min-w-0">
+              <div className="flex flex-col gap-2 max-w-full md:max-w-[calc(100%-180px)] w-full min-w-0">
                 <div
                   ref={cardsScrollRef}
                   onScroll={handleScroll}
@@ -489,44 +488,44 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
                     scrollbarWidth: 'none',
                     msOverflowStyle: 'none',
                   }}
-                  className="flex flex-row gap-4 items-stretch overflow-x-auto py-2 px-1 scroll-smooth min-w-0 [&::-webkit-scrollbar]:hidden"
+                  className="flex flex-row gap-3 items-stretch overflow-x-auto py-1.5 px-0.5 scroll-smooth min-w-0 [&::-webkit-scrollbar]:hidden"
                 >
                 {folderCourses.map((course, idx) => (
                   <div
                     key={`${course.id}-${idx}`}
-                    className="w-[265px] sm:w-[280px] xl:w-[290px] flex-shrink-0 bg-white rounded-3xl border border-white/90 shadow-2xl flex flex-col justify-between overflow-hidden group hover:-translate-y-1.5 transition-all duration-300 animate-fadeIn"
+                    className="w-[230px] sm:w-[245px] xl:w-[255px] flex-shrink-0 bg-white rounded-2xl border border-white/90 shadow-xl flex flex-col justify-between overflow-hidden group hover:-translate-y-1 transition-all duration-300 animate-fadeIn"
                   >
                     {/* Top Image + Circular Partner Monogram Badge */}
-                    <div className="relative w-full h-36 sm:h-40 overflow-hidden bg-slate-100 flex-shrink-0">
+                    <div className="relative w-full h-28 sm:h-32 overflow-hidden bg-slate-100 flex-shrink-0">
                       <img
                         src={course.image}
                         alt={course.title}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
-                      {/* Floating Overlapping Circular Partner Monogram Badge (like Image 2 college crest badge) */}
-                      <div className="absolute bottom-2.5 right-3 w-10 h-10 rounded-full bg-white shadow-xl border border-slate-100 flex items-center justify-center p-1 text-[11px] font-black text-[#EE2C3C] tracking-wider">
+                      {/* Floating Overlapping Circular Partner Monogram Badge */}
+                      <div className="absolute bottom-2 right-2.5 w-8 h-8 rounded-full bg-white shadow-lg border border-slate-100 flex items-center justify-center p-0.5 text-[10px] font-black text-[#EE2C3C] tracking-wider">
                         {currentFolder.partnerMonogram}
                       </div>
                     </div>
 
                     {/* Card Content */}
-                    <div className="p-4 flex flex-col flex-1 justify-between">
+                    <div className="p-3 sm:p-3.5 flex flex-col flex-1 justify-between">
                       <div>
-                        {/* Partner / Institution (Image 2 style with icon) */}
-                        <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 uppercase tracking-wide truncate mb-1.5">
-                          <svg className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        {/* Partner / Institution */}
+                        <div className="flex items-center gap-1 text-[10px] font-semibold text-slate-500 uppercase tracking-wide truncate mb-1">
+                          <svg className="w-3 h-3 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                           </svg>
                           <span className="truncate">{course.certification || 'Autodesk & Dassault Partner'}</span>
                         </div>
 
                         {/* Title */}
-                        <h4 className="text-[14px] sm:text-[15px] font-bold text-slate-900 group-hover:text-[#EE2C3C] transition-colors line-clamp-2 leading-snug mb-2.5 min-h-[42px]">
+                        <h4 className="text-xs sm:text-[13px] font-bold text-slate-900 group-hover:text-[#EE2C3C] transition-colors line-clamp-2 leading-snug mb-1.5 min-h-[34px]">
                           {course.title}
                         </h4>
 
-                        {/* Cyan Pill Tag (Image 2 style) */}
-                        <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#00838F] bg-[#E6F7F8] px-2.5 py-1 rounded-full mb-3 max-w-full">
+                        {/* Cyan Pill Tag */}
+                        <div className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#00838F] bg-[#E6F7F8] px-2 py-0.5 rounded-full mb-2 max-w-full">
                           <span className="truncate">
                             {course.tagline || `#1 Rated ${currentFolder.name} Program`}
                           </span>
@@ -535,25 +534,25 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
 
                       <div>
                         {/* Specs Row: Credential & Duration */}
-                        <div className="flex items-center gap-4 pt-2.5 border-t border-slate-100 text-[11px] text-slate-600 mb-3.5">
-                          <div className="flex items-center gap-1.5 font-medium">
-                            <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="flex items-center gap-3 pt-2 border-t border-slate-100 text-[10px] text-slate-600 mb-2.5">
+                          <div className="flex items-center gap-1 font-medium">
+                            <svg className="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5" />
                             </svg>
                             <span>{course.level || 'Diploma'}</span>
                           </div>
-                          <div className="flex items-center gap-1.5 font-medium">
-                            <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <div className="flex items-center gap-1 font-medium">
+                            <svg className="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                             <span>{course.duration}</span>
                           </div>
                         </div>
 
-                        {/* Red Pill Button (Image 2 style View Program) */}
+                        {/* Red Pill Button */}
                         <button
                           onClick={() => handleViewCourse(course)}
-                          className="w-full py-2.5 px-4 rounded-full bg-[#EE2C3C] hover:bg-[#D20A0B] text-white font-bold text-xs uppercase tracking-wider text-center shadow-md hover:shadow-lg active:scale-95 transition-all cursor-pointer"
+                          className="w-full py-2 px-3 rounded-full bg-[#EE2C3C] hover:bg-[#D20A0B] text-white font-bold text-xs uppercase tracking-wider text-center shadow-md hover:shadow-lg active:scale-95 transition-all cursor-pointer"
                         >
                           View Program
                         </button>
