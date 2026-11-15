@@ -63,7 +63,7 @@ export const UnloxHero: React.FC<UnloxHeroProps> = ({
   return (
     <div
       ref={containerRef}
-      className="relative w-full bg-[#F8FAFC] flex flex-col justify-between pt-32 sm:pt-36 lg:pt-40 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden border-b border-[#CBD5E1]"
+      className="relative w-full bg-[#F8FAFC] flex flex-col justify-between pt-28 sm:pt-32 lg:pt-36 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden border-b border-[#CBD5E1]"
     >
       {/* Clean CAD Architectural Blueprint Coordinate Grid with Parallax Scrubbing */}
       <motion.div

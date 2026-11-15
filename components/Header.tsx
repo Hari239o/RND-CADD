@@ -60,34 +60,9 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 transition-all">
-      {/* Top Technical Notice Bar in Logo Navy */}
-      <div className="bg-[#15304C] border-b border-[#0F2038] text-[11px] py-1.5 px-4 sm:px-6 lg:px-8 text-[#E2E8F0]">
-        <div className="max-w-[1320px] mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#D20A0B] animate-pulse"></span>
-            <span className="font-semibold text-[#FFFFFF]">AMEERPET HYDERABAD CAMPUS</span>
-            <span className="text-[#64748B]">|</span>
-            <span className="text-[#CBD5E1]">AUTODESK &amp; DASSAULT AUTHORIZED TRAINING CENTER</span>
-          </div>
-          <div className="hidden md:flex items-center space-x-3">
-            <Link
-              href="/jobs"
-              className="text-emerald-300 font-black px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 hover:bg-emerald-500/25 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-              <span>{isStudent ? '[MY COURSE PLACEMENTS ACTIVE]' : '[PLACEMENTS OPEN]'}</span>
-            </Link>
-            <span className="text-[#FF4D4F] font-bold px-2 py-0.5 rounded-full bg-[#FF4D4F]/10 border border-[#FF4D4F]/20">[BATCH 2026 OPEN]</span>
-            <span>100% PLACEMENT SUPPORT</span>
-            <span className="text-[#64748B]">|</span>
-            <span className="text-[#FFFFFF] font-semibold">+91 98490 12345</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Entire Navigation Bar with Box Shadow & Border Radius */}
-      <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1320px] mx-auto py-2 sm:py-2.5">
+    <header className="fixed top-0 left-0 right-0 z-50 transition-all pointer-events-none">
+      {/* Main Floating Navigation Bar with Box Shadow & Border Radius */}
+      <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1320px] mx-auto pt-3 sm:pt-4 pointer-events-auto">
         <div className="bg-[#FFFFFF] rounded-2xl sm:rounded-3xl border border-[#CBD5E1] shadow-[0_12px_32px_-6px_rgba(15,23,42,0.1),0_4px_12px_rgba(15,23,42,0.03)] px-5 sm:px-7 py-2.5 sm:py-3 flex items-center justify-between gap-3 xl:gap-6 transition-all">
           {/* Prominent Official RND CADD Logo */}
           <a href="#" className="flex items-center shrink-0 group py-0.5">

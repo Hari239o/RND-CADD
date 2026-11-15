@@ -7,7 +7,6 @@ import { UnloxHero } from '@/components/UnloxHero';
 import { UpgradProgramsShowcase } from '@/components/UpgradProgramsShowcase';
 import { DisciplineCourseHub } from '@/components/DisciplineCourseHub';
 import { PartnerTicker } from '@/components/PartnerTicker';
-import { PinnedHorizontalShowcase } from '@/components/PinnedHorizontalShowcase';
 import { EnrollmentSection } from '@/components/EnrollmentSection';
 import { CourseModal } from '@/components/CourseModal';
 import { Footer } from '@/components/Footer';
@@ -127,9 +126,6 @@ export default function HomePage() {
 
         {/* Top Hiring EPC Partners Infinite Marquee */}
         <PartnerTicker />
-
-        {/* Stage 5: Enterprise Training & Capstone Showcase (Pinned Horizontal Track) */}
-        <PinnedHorizontalShowcase />
 
         {/* Stage 6: Admissions & Workstation Reservation (Students Enroll in Course) */}
         <EnrollmentSection

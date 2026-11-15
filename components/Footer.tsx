@@ -175,7 +175,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectStream, onOpenEnrollModa
 
       {/* Bottom Legal & Copyright Bar */}
       <div className="border-t border-slate-200 py-5 bg-slate-50 text-[11px] text-slate-500">
-        <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1320px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <div>
             &copy; {new Date().getFullYear()} RND CADD Training Institute. All rights reserved.
           </div>
