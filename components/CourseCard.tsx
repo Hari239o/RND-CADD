@@ -24,26 +24,26 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onOpenDetails })
         return {
           partner: 'Dassault Systèmes & PTC',
           logoText: 'CAD',
-          fallbackImg: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80',
+          fallbackImg: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1200&q=80',
         };
       case 'eee':
       case 'electrical':
         return {
           partner: 'Siemens & EPLAN Automation',
           logoText: 'E-CAD',
-          fallbackImg: 'https://images.unsplash.com/photo-1517420704952-d9f39e95b43e?auto=format&fit=crop&w=1200&q=80',
+          fallbackImg: 'https://images.unsplash.com/photo-1581092162384-8987c1d64718?auto=format&fit=crop&w=1200&q=80',
         };
       case 'interior':
         return {
           partner: 'Chaos Group & Trimble',
           logoText: '3D-VIS',
-          fallbackImg: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80',
+          fallbackImg: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
         };
       case 'ppm':
         return {
           partner: 'Oracle Primavera & Microsoft',
           logoText: 'PPM',
-          fallbackImg: 'https://images.unsplash.com/photo-1541888946425-d0fbb186244f?auto=format&fit=crop&w=1200&q=80',
+          fallbackImg: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80',
         };
       case 'piping':
         return {

@@ -180,10 +180,10 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
   ];
 
   return (
-    <section id="revealed-courses" className="py-24 bg-[#F8FAFC] border-t border-b border-[#CBD5E1]">
-      <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 max-w-[1920px] mx-auto">
+    <section id="revealed-courses" className="py-14 sm:py-16 bg-[#F8FAFC] border-t border-b border-[#CBD5E1]">
+      <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1320px] mx-auto">
         {/* Section Header with Dynamic Domain Title */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-12 pb-6 border-b border-[#CBD5E1] gap-6">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-8 pb-5 border-b border-[#CBD5E1] gap-6">
           <div>
             <div className="text-xs font-bold text-[#D20A0B] mb-2 tracking-wider uppercase">
               INDUSTRY-CERTIFIED COURSE CATALOG
@@ -260,15 +260,7 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
             whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.5 }}
-            className={`grid gap-6 mx-auto w-full ${
-              filteredCourses.length === 1
-                ? 'grid-cols-1 max-w-md'
-                : filteredCourses.length === 2
-                ? 'grid-cols-1 sm:grid-cols-2 max-w-3xl'
-                : filteredCourses.length === 3
-                ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-5xl'
-                : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 max-w-[1720px]'
-            }`}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mx-auto w-full"
           >
             {filteredCourses.map((course, idx) => (
               <motion.div

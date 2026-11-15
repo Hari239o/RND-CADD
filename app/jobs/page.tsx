@@ -210,81 +210,83 @@ export default function JobsPortalPage() {
       )}
 
       {/* FLOATING TOP NAVIGATION BAR (Exact unlox.com / RND CADD aesthetic) */}
-      <nav className="fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs px-4 sm:px-8 py-3.5 flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Link href="/" className="flex items-center group">
-            <img
-              src="/logo.png"
-              alt="RND CADD"
-              className="h-9 sm:h-11 w-auto object-contain transition-transform group-hover:scale-105"
-            />
-          </Link>
-          <span className="hidden sm:inline-block text-slate-300 font-light">|</span>
-          <span className="hidden sm:inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-slate-700 bg-slate-100 px-3 py-1 rounded-full border border-slate-200">
-            <span className="w-2 h-2 rounded-full bg-[#EE2C3C] animate-pulse"></span>
-            Career Portal
-          </span>
-        </div>
+      <nav className="fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs py-3.5">
+        <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Link href="/" className="flex items-center group">
+              <img
+                src="/logo.png"
+                alt="RND CADD"
+                className="h-9 sm:h-11 w-auto object-contain transition-transform group-hover:scale-105"
+              />
+            </Link>
+            <span className="hidden sm:inline-block text-slate-300 font-light">|</span>
+            <span className="hidden sm:inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-slate-700 bg-slate-100 px-3 py-1 rounded-full border border-slate-200">
+              <span className="w-2 h-2 rounded-full bg-[#EE2C3C] animate-pulse"></span>
+              Career Portal
+            </span>
+          </div>
 
-        {/* Right Navigation & Auth Buttons */}
-        <div className="flex items-center space-x-3">
-          <Link
-            href="/"
-            className="text-xs font-bold text-slate-600 hover:text-[#EE2C3C] px-3 py-2 rounded-xl hover:bg-slate-50 transition-all hidden md:inline-block"
-          >
-            &larr; Back to Main Site
-          </Link>
+          {/* Right Navigation & Auth Buttons */}
+          <div className="flex items-center space-x-3">
+            <Link
+              href="/"
+              className="text-xs font-bold text-slate-600 hover:text-[#EE2C3C] px-3 py-2 rounded-xl hover:bg-slate-50 transition-all hidden md:inline-block"
+            >
+              &larr; Back to Main Site
+            </Link>
 
-          {isStudent ? (
-            <>
-              <Link
-                href="/portal/student"
-                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-[#15304C] hover:text-[#EE2C3C] border border-slate-200 hover:border-[#EE2C3C] bg-white transition-all shadow-2xs"
-              >
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>{currentUser?.name || 'Ram.g'} (Portal)</span>
-              </Link>
-              <button
-                type="button"
-                onClick={handleSignOut}
-                className="px-3 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 transition-all cursor-pointer"
-              >
-                Sign Out
-              </button>
-            </>
-          ) : isAdmin ? (
-            <>
-              <Link
-                href="/portal/admin"
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-[#15304C] hover:bg-[#0F2038] transition-all shadow-2xs"
-              >
-                <span className="w-2 h-2 rounded-full bg-blue-400"></span>
-                <span>Admin Dashboard</span>
-              </Link>
-              <button
-                type="button"
-                onClick={handleSignOut}
-                className="px-3 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 transition-all cursor-pointer"
-              >
-                Sign Out
-              </button>
-            </>
-          ) : (
-            <>
-              <Link
-                href="/signin?redirect=/jobs"
-                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-[#EE2C3C] border border-slate-200 hover:border-[#EE2C3C] bg-white transition-all shadow-2xs"
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/signup"
-                className="px-4 sm:px-5 py-2 rounded-xl text-xs font-bold tracking-wide uppercase bg-[#EE2C3C] hover:bg-[#D71E2E] text-white border border-[#EE2C3C] transition-all shadow-md hover:shadow-red-500/25"
-              >
-                Sign Up
-              </Link>
-            </>
-          )}
+            {isStudent ? (
+              <>
+                <Link
+                  href="/portal/student"
+                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-[#15304C] hover:text-[#EE2C3C] border border-slate-200 hover:border-[#EE2C3C] bg-white transition-all shadow-2xs"
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>{currentUser?.name || 'Ram.g'} (Portal)</span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  className="px-3 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 transition-all cursor-pointer"
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : isAdmin ? (
+              <>
+                <Link
+                  href="/portal/admin"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-[#15304C] hover:bg-[#0F2038] transition-all shadow-2xs"
+                >
+                  <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+                  <span>Admin Dashboard</span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  className="px-3 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 transition-all cursor-pointer"
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/signin?redirect=/jobs"
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-[#EE2C3C] border border-slate-200 hover:border-[#EE2C3C] bg-white transition-all shadow-2xs"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/signup"
+                  className="px-4 sm:px-5 py-2 rounded-xl text-xs font-bold tracking-wide uppercase bg-[#EE2C3C] hover:bg-[#D71E2E] text-white border border-[#EE2C3C] transition-all shadow-md hover:shadow-red-500/25"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </nav>
 
@@ -301,7 +303,7 @@ export default function JobsPortalPage() {
         <div className="absolute -top-24 right-1/4 w-[500px] h-[500px] rounded-full bg-red-400/10 blur-[120px] pointer-events-none" />
         <div className="absolute top-40 -left-20 w-[450px] h-[450px] rounded-full bg-blue-400/10 blur-[130px] pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+        <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
           {/* Live Top Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-50 border border-red-200/80 mb-6 shadow-2xs">
             <span className="relative flex h-2 w-2">
@@ -390,7 +392,7 @@ export default function JobsPortalPage() {
 
       {/* WHY HIRE FROM US / UNLOX INTERACTIVE FEATURE SECTION (Exact from jobs.unlox.com) */}
       <section className="py-16 sm:py-20 bg-white border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-14">
             <span className="text-xs font-bold text-[#EE2C3C] uppercase tracking-widest font-mono">
               Hiring, Made Easy
@@ -488,7 +490,7 @@ export default function JobsPortalPage() {
 
       {/* RECRUITER PARTNER BRANDS TICKER */}
       <section className="py-8 bg-slate-50 border-b border-slate-200 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 text-center">
+        <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono block mb-4">
             Authorized Recruitment Drives with Fortune 500 EPC Partners
           </span>
@@ -505,7 +507,7 @@ export default function JobsPortalPage() {
       </section>
 
       {/* DISCIPLINE FILTER TABS & VACANCIES LISTING */}
-      <section className="py-16 sm:py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-16 sm:py-20 max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <h2 className="text-2xl sm:text-3xl font-black text-[#131313] tracking-tight">
@@ -675,7 +677,7 @@ export default function JobsPortalPage() {
       {/* UNLOX-STYLE MEMBERSHIP ACCELERATION BANNER */}
       <section className="py-16 sm:py-20 bg-[#0F172A] text-white relative overflow-hidden">
         <div className="absolute -top-32 right-10 w-96 h-96 rounded-full bg-red-600/10 blur-3xl pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+        <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
           <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#FF4D4F] px-3.5 py-1 rounded-full bg-white/5 border border-white/10 mb-4 inline-block">
             Student Placement Support
           </span>
@@ -942,7 +944,7 @@ export default function JobsPortalPage() {
 
       {/* FOOTER */}
       <footer className="py-12 bg-white border-t border-slate-200 text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center space-x-3">
             <img src="/logo.png" alt="RND CADD" className="h-7 w-auto object-contain" />
             <span>&bull; Industrial Engineering Placement Portal</span>

@@ -115,7 +115,7 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
 
   return (
     <section id="enrollment" className="py-16 sm:py-20 bg-gradient-to-b from-[#F8FAFC] to-[#F1F5F9] border-t border-slate-200">
-      <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 max-w-6xl mx-auto">
+      <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1320px] mx-auto">
         
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-12">

@@ -84,13 +84,27 @@ nav {
   }
 }
 
-/* Precise geometric engineering container */
+/* Precise geometric engineering container - unified across entire site */
 .cad-container {
-  max-width: 1360px;
+  max-width: 1320px;
   margin-left: auto;
   margin-right: auto;
-  padding-left: 24px;
-  padding-right: 24px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .cad-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .cad-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
 }
 
 /* Crisp technical selection */

@@ -70,8 +70,8 @@ export const PinnedHorizontalShowcase: React.FC = () => {
   };
 
   return (
-    <section className="py-14 sm:py-20 bg-[#F1F5F9] border-t border-b border-[#CBD5E1] overflow-hidden">
-      <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 max-w-[1480px] mx-auto">
+    <section className="py-12 sm:py-16 bg-[#F1F5F9] border-t border-b border-[#CBD5E1] overflow-hidden">
+      <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1320px] mx-auto">
         {/* Top Heading Bar */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 mb-8 border-b border-[#CBD5E1] gap-4">
           <div>

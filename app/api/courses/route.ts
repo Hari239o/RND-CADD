@@ -187,7 +187,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
     fee: 32000,
     price: 32000,
     status: 'Active',
-    image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80',
+    image: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1200&q=80',
     overview: 'Comprehensive mechanical product engineering program encompassing parametric part sketching, Class-A surfacing, mechanism kinematics, and finite element stress analysis.',
     tagline: 'Parametric Solid Modeling, Generative Surfacing, and Multi-Physics Simulation',
     syllabus: [
@@ -250,7 +250,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
     fee: 28000,
     price: 28000,
     status: 'Active',
-    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80',
+    image: 'https://images.unsplash.com/photo-1581092162384-8987c1d64718?auto=format&fit=crop&w=1200&q=80',
     overview: 'Industrial electrical system design covering single-line diagrams, substation equipment layouts, control panel schematics, and load flow transient calculations.',
     tagline: 'Industrial Power Distribution, Substation Drafting, and Control Circuit Design',
     syllabus: [
@@ -544,7 +544,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
     price: 30000,
     mode: 'Classroom & Dedicated CAD Workstation Lab',
     status: 'Active',
-    image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80',
+    image: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1200&q=80',
     overview: 'Certified SolidWorks Professional curriculum covering complex parametric assemblies, sheet metal unfolding, structural weldments, and GD&T production drawings.',
     tagline: 'Dassault Certified SolidWorks Professional (CSWP) Training Track',
     syllabus: [
@@ -581,7 +581,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
     price: 34000,
     mode: 'Classroom & Dedicated CAD Workstation Lab',
     status: 'Active',
-    image: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1200&q=80',
+    image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80',
     overview: 'Industrial surface modeling for vehicle exteriors and aerospace aerodynamics using CATIA V5 Generative Shape Design (GSD).',
     tagline: 'Class-A Surface Modeling, Aerodynamic Profiles & DMU Kinematics',
     syllabus: [
@@ -620,7 +620,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
     price: 26000,
     mode: 'Classroom & Dedicated CAD Workstation Lab',
     status: 'Active',
-    image: 'https://images.unsplash.com/photo-1517420704952-d9f39e95b43e?auto=format&fit=crop&w=1200&q=80',
+    image: 'https://images.unsplash.com/photo-1581092162384-8987c1d64718?auto=format&fit=crop&w=1200&q=80',
     overview: 'Industrial control panel wiring schematics, automatic wire numbering, PLC I/O module parametric generation, and bill of materials export.',
     tagline: 'Autodesk Certified Electrical CAD Specialist Curriculum',
     syllabus: [
@@ -657,7 +657,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
     price: 32000,
     mode: 'Classroom & Dedicated CAD Workstation Lab',
     status: 'Active',
-    image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80',
+    image: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1200&q=80',
     overview: 'European & international automation standard engineering. Master multi-line diagrams, intelligent macros, terminal connection diagrams, and enclosure 3D layout.',
     tagline: 'Industrial Automation & Switchboard Engineering with EPLAN Pro',
     syllabus: [
@@ -696,7 +696,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
     price: 26000,
     mode: 'Classroom & Dedicated CAD Workstation Lab',
     status: 'Active',
-    image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80',
+    image: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=80',
     overview: 'Design production-ready modular kitchens, residential casework, and custom wardrobes with precision joinery drawings and CNC cut-list generation.',
     tagline: 'Modular Kitchens, Wardrobe Carcass, Joinery Millwork & Hardware Detailing',
     syllabus: [

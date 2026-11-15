@@ -13,7 +13,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectStream, onOpenEnrollModa
     <footer className="bg-white border-t border-slate-200 text-xs text-slate-600">
       
       {/* Pre-Footer Action Banner with Elegant Clean Gradient */}
-      <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 max-w-6xl mx-auto pt-14 pb-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1320px] mx-auto pt-14 pb-8">
         <div className="bg-gradient-to-br from-[#0F172A] via-[#15304C] to-[#0A192F] rounded-2xl sm:rounded-3xl p-8 sm:p-10 text-white shadow-xl border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-center md:text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-red-500/15 border border-red-500/30 text-red-300 mb-3">
@@ -43,7 +43,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectStream, onOpenEnrollModa
       </div>
 
       {/* Main Footer Directory */}
-      <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 max-w-6xl mx-auto py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
+      <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1320px] mx-auto py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
         
         {/* Col 1: Institute Brand & Accreditations */}
         <div className="space-y-4">
