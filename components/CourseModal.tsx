@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import type { Course } from '@/lib/courses-data';
+import { CareerInfographic } from './CareerInfographic';
 
 interface CourseModalProps {
   course: Course | null;
@@ -680,7 +681,10 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                 </div>
               </section>
 
-              {/* SECTION E: DUAL CERTIFICATION & CAPSTONE PROJECT */}
+              {/* SECTION E: PLACEMENT CELL & CAREER OPPORTUNITIES INFOGRAPHIC (FAN INFOGRAPHIC MATCHING USER IMAGE 1 & 2) */}
+              <CareerInfographic course={course} />
+
+              {/* SECTION F: DUAL CERTIFICATION & CAPSTONE PROJECT */}
               <section className="bg-white border border-[#CBD5E1] rounded-2xl p-6 sm:p-7 shadow-xs space-y-4">
                 <div className="border-b border-slate-100 pb-3">
                   <h2 className="text-xl sm:text-2xl font-black text-[#15304C]">
