@@ -162,6 +162,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
   const courseLevel = course.level || 'Professional Diploma';
   const totalHours = course.totalHours || (modulesList.reduce((acc: number, m: any) => acc + (m.hours || 0), 0) || 80);
   const streamText = (course.folder || course.stream || 'engineering').toUpperCase();
+  const categoryText = course.category || `${streamText} CERTIFIED PROGRAM`;
   const feeAmount = Number(course.fee) || 32000;
   const trainingMode = course.mode || 'Classroom & Dedicated CAD Workstation Lab';
 
