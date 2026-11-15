@@ -10,22 +10,26 @@ interface CourseModalProps {
 }
 
 export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnroll }) => {
-  const [expandedModules, setExpandedModules] = useState<{ [key: string]: boolean }>({ '01': true, '02': true });
+  const [expandedModules, setExpandedModules] = useState<{ [key: string]: boolean }>({ '01': true });
   const [expandedFaq, setExpandedFaq] = useState<number | null>(0);
-  const [consultName, setConsultName] = useState('');
-  const [consultPhone, setConsultPhone] = useState('');
-  const [consultBatch, setConsultBatch] = useState('Weekday Morning (08:00 AM)');
-  const [isConsultSubmitted, setIsConsultSubmitted] = useState(false);
+  const [activeTab, setActiveTab] = useState<'overview' | 'curriculum' | 'capstone' | 'career' | 'faq'>('overview');
+  
+  // Quick Apply / Consultation form state
+  const [candidateName, setCandidateName] = useState('');
+  const [candidatePhone, setCandidatePhone] = useState('');
+  const [selectedBatch, setSelectedBatch] = useState('Weekday Morning (08:00 AM - 10:30 AM)');
+  const [isApplicationSubmitted, setIsApplicationSubmitted] = useState(false);
 
   if (!course) return null;
 
-  // Safe Fallback Normalizations to guarantee rich rendering matching Admin Dashboard
+  // Tools & Software normalizer
   const toolsList: string[] = typeof (course as any).software === 'string' && (course as any).software.trim()
     ? (course as any).software.split(',').map((s: string) => s.trim()).filter(Boolean)
     : Array.isArray(course.tools) && course.tools.length > 0
     ? course.tools
     : ['AutoCAD 2026', 'Industry CAD Workstation', 'Parametric 3D Suite'];
 
+  // Modules normalizer
   const rawModules = Array.isArray(course.modules) && course.modules.length > 0
     ? course.modules
     : Array.isArray((course as any).syllabus) && (course as any).syllabus.length > 0
@@ -34,16 +38,16 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
         title: s,
         hours: 20,
         topics: [
-          `${s} - Industry specifications & ISO/ASME drawing standards`,
-          'Parametric modeling, constraint validation & geometric relations',
-          'Practical lab exercises with live 1:1 mentor assistance',
+          `${s} - Industry specifications & ISO/ASME standards`,
+          'Parametric modeling, geometric constraints & relations',
+          'Practical drafting lab exercises with live 1:1 mentor assistance',
           'Production drawing sheets generation & automated BOM'
         ],
       }))
     : [
         {
           number: '01',
-          title: 'Introduction to CAD & Software User Interface',
+          title: `${course.title} - Fundamentals & Drawing Standards`,
           hours: 20,
           topics: [
             'User Interface navigation, workspace templates & engineering drafting standards',
@@ -54,46 +58,35 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
         },
         {
           number: '02',
-          title: '2D Sketching, Relations & Dimensional Constraints',
+          title: 'Advanced 3D Modeling, Surfacing & Part Assemblies',
           hours: 25,
           topics: [
-            'Line, Circle, Arc, Spline, Ellipse, Polygon & Slot geometry creation',
-            'Horizontal, Vertical, Collinear, Coradial, Tangent, Concentric relations',
-            'Smart Dimensioning, baseline dimensions, ordinate dimensions & autotrace',
-            'Sketch tools: Mirror, Offset, Trim, Extend, Pattern & Dynamic Mirror'
+            'Complex solid feature creation: Sweeps, Lofts, Ribs & Thin Shells',
+            'Surface modeling: Splines, boundary curves & curvature continuity (G0, G1, G2)',
+            'Top-down and bottom-up assembly architecture with kinematic constraints',
+            'Hardware fastener insertion, smart components & interference detection'
           ],
         },
         {
           number: '03',
-          title: '3D Part Modeling, Features & Advanced Surfacing',
-          hours: 30,
+          title: 'Kinematics, Load Simulation & Clash Resolution',
+          hours: 25,
           topics: [
-            'Extruded Boss/Base, Revolved Boss/Base, Swept Boss/Base & Lofted Features',
-            'Extruded Cut, Hole Wizard (Counterbore, Countersink, Tapped) & Thread Tool',
-            'Fillet, Chamfer, Shell, Rib, Dome, Flex, Wrap & Deform features',
-            'Reference Geometry: Planes, Axes, Coordinate Systems, Points & Mate References'
+            'Kinematic mechanism joints, motion simulation & sweep envelope generation',
+            'Dynamic collision detection, clearance verification & tolerance stack-up',
+            'FEA finite element boundary conditions, meshing & Von-Mises stress',
+            'Coordination matrix documentation & multi-disciplinary engineering reviews'
           ],
         },
         {
           number: '04',
-          title: 'Assembly Design, Kinematic Mates & Interference Checks',
-          hours: 30,
-          topics: [
-            'Bottom-Up and Top-Down assembly architecture & sub-assembly creation',
-            'Standard Mates: Coincident, Concentric, Distance, Angle, Parallel, Perpendicular',
-            'Advanced & Mechanical Mates: Cam-Follower, Gear, Rack-Pinion, Screw, Width, Path',
-            'Collision detection, physical dynamics, clearance audit & exploded views'
-          ],
-        },
-        {
-          number: '05',
-          title: 'Production Drafting, GD&T & Automated Bill of Materials (BOM)',
+          title: 'Industry Capstone Portfolio & Production Documentation',
           hours: 25,
           topics: [
-            'Generating standard 3-view orthographic drawings, section views & detail views',
-            'Geometric Dimensioning & Tolerancing (GD&T) conforming to ASME Y14.5M',
-            'Automated Bill of Materials (BOM), balloons, cut lists & revision tables',
-            'Exporting to DXF, DWG, STEP, IGES, PDF & high-resolution presentation sheets'
+            'End-to-end live client industrial modeling & drawing generation',
+            'Automated Bill of Quantities / Materials (BOM) with supplier part numbers',
+            'GD&T Geometric Dimensioning and Tolerancing conforming to ASME Y14.5',
+            'Portfolio dossier packaging & mock technical interview defense'
           ],
         },
       ];
@@ -117,6 +110,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
     };
   });
 
+  // Capstone Project normalizer
   const capstoneData = course.capstoneProject && course.capstoneProject.title
     ? {
         title: course.capstoneProject.title,
@@ -128,11 +122,12 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
           : ['Production 2D Drawings (.dwg)', '3D Parametric Master Assembly', 'Automated Bill of Materials (BOM)', 'Engineering Verification Dossier'],
       }
     : {
-        title: `${course.title} Comprehensive Industrial Capstone Project`,
+        title: `${course.title} Comprehensive Live Industry Project`,
         description: 'Complete real-world industrial modeling, drafting, and multi-disciplinary validation project conforming to international engineering standards.',
         deliverables: ['Production 2D Drawings (.dwg)', '3D Parametric Master Assembly', 'Automated Bill of Materials (BOM)', 'Engineering Verification Dossier'],
       };
 
+  // Career Roles normalizer
   const careerList: string[] = Array.isArray(course.careerRoles) && course.careerRoles.length > 0
     ? course.careerRoles
     : typeof (course as any).careerRoles === 'string' && (course as any).careerRoles.trim()
@@ -140,700 +135,653 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
     : ['CAD Design Engineer', 'Product Specialist', 'Senior Design Modeler', 'Project Engineering Associate', 'BIM / CAD Coordinator'];
 
   const certificationText = course.certification || 'Autodesk & Dassault Systèmes Certificate';
-  const prerequisitesText = course.prerequisites || 'Diploma / B.Tech / Working Professional / Engineering Graduate';
-  const courseLevel = course.level || 'Professional';
-  const totalHours = course.totalHours || (modulesList.reduce((acc: number, m: any) => acc + (m.hours || 0), 0) || 120);
+  const prerequisitesText = course.prerequisites || 'Diploma / B.Tech / Working Professional / Mechanical / Civil / Electrical Graduate';
+  const courseLevel = course.level || 'Professional Diploma';
+  const totalHours = course.totalHours || (modulesList.reduce((acc: number, m: any) => acc + (m.hours || 0), 0) || 90);
   const streamText = (course.folder || course.stream || 'engineering').toUpperCase();
   const categoryText = course.category || `${streamText} CERTIFIED PROGRAM`;
   const feeAmount = Number(course.fee) || 32000;
-  const cleanDuration = (course.duration || '60 Days (120 Hours)').replace(/\s*\(\d+\s*Hours?\)/gi, '').trim();
+  const trainingMode = course.mode || 'Classroom & Dedicated CAD Workstation Lab';
 
-  // FAQs modeled directly on CADDESK Hyderabad
-  const faqs = [
+  // CAD DESK style 6 Training Highlights
+  const trainingHighlights = [
+    { title: 'Instructor Led Training', desc: 'Expert corporate faculties with 10+ years engineering experience' },
+    { title: 'Weekly Doubt Clearing', desc: '1:1 individual mentor doubt resolution & assignment reviews' },
+    { title: 'Lifetime Revision Support', desc: 'Free repeat batch attendances & unlimited practice lab access' },
+    { title: 'Student Portal Access', desc: 'Lifetime LMS login for class recordings, notes & software files' },
+    { title: 'Worldwide Valid Certificate', desc: 'Accredited certificate recognized across global EPC multinationals' },
+    { title: 'Industry Live Projects', desc: 'Mandatory portfolio capstone project with verified BOM sheets' }
+  ];
+
+  // Frequently Asked Questions (CAD DESK Style)
+  const faqList = [
     {
-      q: `What is ${course.title} and why is it important for engineers?`,
-      a: `${course.title} is an industry-standard engineering program that provides comprehensive training on commercial 3D modeling, parametric assembly, kinematic simulation, and production drafting. Mastering this enables mechanical, civil, and electrical engineers to design real-world industrial components with high precision.`
+      q: `What are the prerequisites for this ${course.title} course?`,
+      a: `${prerequisitesText}. Basic computer fundamentals and fundamental engineering or diploma background is helpful. Our mentors start from user interface basics to advanced industrial modeling.`
     },
     {
-      q: 'What are the prerequisites to enroll in this course?',
-      a: 'This course is open to Diploma holders, B.E / B.Tech students and graduates in Mechanical, Civil, Electrical, Automotive, or Production Engineering, as well as working professionals looking to upgrade their 3D CAD design and simulation skills.'
+      q: 'Will I get practical hands-on workstation practice during the course?',
+      a: 'Yes, every student is guaranteed a 1:1 dedicated high-performance RTX GPU rig during instruction hours and open lab practice. Our lab is open 7 days a week from 07:00 AM to 09:30 PM.'
     },
     {
-      q: 'Does RND CADD provide 100% placement assistance in Hyderabad?',
-      a: 'Yes. Our dedicated Ameerpet placement cell arranges 3 rounds of technical mock interviews, resume and portfolio optimization, and schedules direct campus interviews with top multinationals like Tata Technologies, L&T, Schneider Electric, Cyient, and MEIL.'
+      q: 'How does the direct placement assistance work?',
+      a: 'Upon successful submission and lead faculty evaluation of your Capstone Project Blueprint, the Ameerpet placement cell arranges 3 rounds of technical mock interviews, optimizes your CAD resume, and schedules direct interviews with top EPC and MNC hiring partners.'
     },
     {
-      q: 'Are both classroom and online training modes available with 1:1 workstation practice?',
-      a: 'Yes. Classroom students train at our state-of-the-art Ameerpet campus with 1:1 unshared high-performance RTX GPU computer workstations and 7-day lab access. Online students receive interactive live instructor-led sessions with recorded backups and cloud assistance.'
+      q: 'How will I receive my course completion certificate?',
+      a: `You will receive a world-wide verifiable certificate accredited with official QR code verification and ${certificationText} authorization, accepted across top engineering enterprises in India and abroad.`
     },
     {
-      q: 'What certification will I receive upon completing the course?',
-      a: 'You will receive an industry-recognized Master Diploma Certificate from RND CADD Training Institute along with international authorization certificate credentials from Autodesk / Dassault Systèmes / Bentley with dual certificate benefits.'
+      q: 'Can I attend missed classes or access lecture recordings?',
+      a: 'Yes, all enrolled candidates receive lifetime student portal login credentials where recorded classes, practice datasets, family libraries, and PDF manuals are accessible 24/7.'
     }
   ];
 
-  const handleConsultSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!consultName || !consultPhone) return;
-    setIsConsultSubmitted(true);
-    setTimeout(() => {
-      setIsConsultSubmitted(false);
-      setConsultName('');
-      setConsultPhone('');
-    }, 4000);
-  };
+  // Top hiring MNC conglomerates
+  const hiringPartners = [
+    'Tata Technologies',
+    'Larsen & Toubro (L&T)',
+    'Schneider Electric',
+    'Cyient Limited',
+    'MEIL Infrastructure',
+    'Boeing & Airbus Tier-1',
+    'AtkinsRéalis',
+    'Jacobs Engineering',
+    'Alstom Transport'
+  ];
 
   const toggleModule = (num: string) => {
     setExpandedModules((prev) => ({ ...prev, [num]: !prev[num] }));
   };
 
-  const expandAll = () => {
-    const all: { [key: string]: boolean } = {};
-    modulesList.forEach((m) => { all[m.number] = true; });
-    setExpandedModules(all);
+  const expandAllModules = () => {
+    const allExp: { [key: string]: boolean } = {};
+    modulesList.forEach((m) => { allExp[m.number] = true; });
+    setExpandedModules(allExp);
   };
 
-  const collapseAll = () => {
+  const collapseAllModules = () => {
     setExpandedModules({});
   };
 
+  const handleApplyForm = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!candidateName.trim() || !candidatePhone.trim()) return;
+    setIsApplicationSubmitted(true);
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 backdrop-blur-sm p-3 sm:p-5 md:p-6 overflow-hidden animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#070D18]/80 backdrop-blur-sm p-2 sm:p-4 md:p-6 overflow-hidden">
       
-      {/* Centered Pleasant Modal Container (Balanced Width, NOT Over-Zoomed) */}
-      <div className="w-full max-w-5xl xl:max-w-6xl max-h-[92vh] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
+      {/* CAD DESK Style Pleasant & Proportioned Container (Max-Width 1180px - NOT over-zoomed) */}
+      <div className="bg-[#FFFFFF] rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden text-slate-800">
         
-        {/* ========================================================================= */}
-        {/* MODAL TOP HEADER BAR                                                      */}
-        {/* ========================================================================= */}
-        <div className="px-5 sm:px-7 py-3 bg-white border-b border-slate-200 flex items-center justify-between flex-shrink-0 z-20">
-          <div className="flex items-center space-x-3 truncate">
-            <img src="/logo.png" alt="RND CADD" className="h-6 sm:h-7 w-auto object-contain flex-shrink-0" />
-            <div className="h-4 w-px bg-slate-200 hidden sm:block"></div>
-            <div className="truncate">
-              <span className="text-[11px] font-extrabold text-[#D20A0B] uppercase tracking-wider block">
-                INDUSTRY FOCUSED CAD TRAINING &bull; HYDERABAD
+        {/* Compact Modal Header Bar */}
+        <div className="bg-[#FFFFFF] border-b border-slate-200 px-5 sm:px-7 py-3 flex items-center justify-between flex-shrink-0 z-20">
+          <div className="flex items-center space-x-3 overflow-hidden">
+            <img
+              src="/logo.png"
+              alt="RND CADD"
+              className="h-6 w-auto object-contain flex-shrink-0"
+            />
+            <div className="h-4 w-px bg-slate-200"></div>
+            <div className="flex items-center space-x-2 text-xs truncate">
+              <span className="font-extrabold text-[#15304C] uppercase tracking-wider text-[11px] sm:text-xs">
+                PROGRAM BLUEPRINT
               </span>
-              <span className="text-xs font-bold text-slate-800 truncate block">
-                {course.title}
+              <span className="text-slate-300">&bull;</span>
+              <span className="text-blue-600 font-mono font-bold text-[11px]">
+                {(course.code || course.id).toUpperCase()}
+              </span>
+              <span className="text-slate-300 hidden sm:inline">&bull;</span>
+              <span className="text-emerald-600 font-bold hidden sm:inline-flex items-center gap-1 text-[11px]">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                ACTIVE BATCH
               </span>
             </div>
           </div>
 
-          <div className="flex items-center space-x-2 flex-shrink-0">
-            <span className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-bold">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              Live Synced
-            </span>
-            <button
-              onClick={onClose}
-              className="w-8 h-8 rounded-full bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-[#D20A0B] flex items-center justify-center transition-all cursor-pointer active:scale-95 border border-slate-200 hover:border-red-200"
-              title="Close"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full bg-slate-100 hover:bg-red-50 hover:text-red-600 text-slate-500 flex items-center justify-center transition-all cursor-pointer"
+            title="Close"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
-        {/* ========================================================================= */}
-        {/* MODAL SCROLLABLE BODY (2-COLUMN BALANCED PLEASANT LAYOUT)                  */}
-        {/* ========================================================================= */}
-        <div className="flex-1 overflow-y-auto bg-slate-50">
+        {/* Modal Scrollable Body */}
+        <div className="overflow-y-auto flex-1 bg-[#F8FAFC]">
           
-          {/* Hero Section Banner (Clean, Pleasant, Non-Over-Zoomed) */}
-          <div className="bg-[#101E33] text-white px-5 sm:px-8 py-6 sm:py-8 border-b border-slate-800 relative">
-            <div className="max-w-4xl space-y-3">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-full bg-[#D20A0B] text-white text-[10px] font-black uppercase tracking-wider">
-                  {streamText} DISCIPLINE
+          {/* Pleasant Top Hero Banner (CAD DESK Style) */}
+          <div className="bg-[#15304C] text-white px-5 sm:px-8 py-6 sm:py-7 border-b border-slate-700">
+            <div className="max-w-5xl mx-auto space-y-3">
+              {/* Badges */}
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                <span className="px-2.5 py-0.5 rounded-full bg-[#D20A0B] text-white font-extrabold uppercase text-[10px] tracking-wider">
+                  {streamText}
                 </span>
-                <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-slate-300 text-[10px] font-bold uppercase tracking-wider border border-white/10">
+                <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-slate-200 font-bold uppercase text-[10px]">
                   {categoryText}
                 </span>
-                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-400/30">
-                  ✓ DUAL CERTIFICATION BENEFIT
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-bold">
+                  ★ ISO 9001:2015 CERTIFIED TRAINING
                 </span>
               </div>
 
-              <h1 className="text-xl sm:text-3xl font-black text-white tracking-tight leading-tight">
-                {course.title} Training Institute In Hyderabad
+              {/* Course Title */}
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight uppercase leading-snug">
+                {course.title}
               </h1>
 
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-3xl font-normal">
+              {/* Tagline / Subtitle */}
+              <p className="text-xs sm:text-sm text-slate-300 font-normal leading-relaxed max-w-3xl">
                 {course.tagline || course.overview}
               </p>
 
-              {/* Key Highlights Metrics (Exact CADDESK Style: 10000+, 97%, 100%) */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2">
-                <div className="bg-white/5 border border-white/10 rounded-xl p-2.5">
-                  <span className="text-base sm:text-lg font-black text-[#EF4444] block">10,000+</span>
-                  <span className="text-[10px] text-slate-300 font-medium">Students Trained</span>
+              {/* Social Proof & Quick Facts Bar */}
+              <div className="flex flex-wrap items-center gap-4 pt-2 text-xs text-slate-300 border-t border-white/10">
+                <div className="flex items-center gap-1 font-bold text-amber-400">
+                  <span>★</span>
+                  <span className="text-white font-black">4.9</span>
+                  <span className="text-slate-400 font-normal">(1,840+ Ratings)</span>
                 </div>
-                <div className="bg-white/5 border border-white/10 rounded-xl p-2.5">
-                  <span className="text-base sm:text-lg font-black text-emerald-400 block">97%</span>
-                  <span className="text-[10px] text-slate-300 font-medium">Practical Lab Training</span>
+                <div className="text-slate-300">
+                  <span className="text-white font-bold">{course.duration || '8-10 Weeks'}</span> ({totalHours} Lab Hours)
                 </div>
-                <div className="bg-white/5 border border-white/10 rounded-xl p-2.5">
-                  <span className="text-base sm:text-lg font-black text-amber-400 block">100%</span>
-                  <span className="text-[10px] text-slate-300 font-medium">Placement Assistance</span>
+                <div className="text-slate-300">
+                  Mode: <span className="text-white font-bold">{trainingMode}</span>
                 </div>
-                <div className="bg-white/5 border border-white/10 rounded-xl p-2.5">
-                  <span className="text-base sm:text-lg font-black text-sky-400 block">1:1 RIG</span>
-                  <span className="text-[10px] text-slate-300 font-medium">Dedicated RTX Lab</span>
+                <div className="text-emerald-400 font-bold">
+                  ✓ 100% Placement Record
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Main 2-Column Content Area */}
-          <div className="p-5 sm:p-7 grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-7 items-start">
-            
-            {/* ===================================================================== */}
-            {/* LEFT COLUMN: 8 Columns (Main Course Details)                          */}
-            {/* ===================================================================== */}
-            <div className="lg:col-span-8 space-y-7">
-              
-              {/* 1. About The Course */}
-              <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-                <div className="border-b border-slate-100 pb-2">
-                  <span className="text-[10px] font-black text-[#D20A0B] uppercase tracking-wider block">
-                    COURSE OVERVIEW &bull; AMEERPET CAMPUS
-                  </span>
-                  <h2 className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
-                    Build Your Design Career with Industry-Focused CAD Training
-                  </h2>
-                </div>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  {course.overview}
-                </p>
-                <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 flex flex-wrap items-center justify-between gap-2">
-                  <span><strong>Prerequisite:</strong> {prerequisitesText}</span>
-                  <span className="text-[#D20A0B] font-bold">Level: {courseLevel}</span>
-                </div>
-              </div>
-
-              {/* 2. Advantages Of Enrolling In This Course (Exact CADDESK Reference) */}
-              <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-4">
-                <div className="border-b border-slate-100 pb-2">
-                  <span className="text-[10px] font-black text-[#D20A0B] uppercase tracking-wider block">
-                    WHY CHOOSE THIS PROGRAM
-                  </span>
-                  <h2 className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
-                    Advantages Of {course.title} Course
-                  </h2>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                    <span className="text-[#D20A0B] font-black text-sm block">01</span>
-                    <h3 className="text-xs font-bold text-slate-900">Industry-Standard CAD Software</h3>
-                    <p className="text-[11px] text-slate-500 leading-relaxed">
-                      Train on commercial CAD suites used across Fortune 500 manufacturing, automotive, and AEC firms worldwide.
-                    </p>
-                  </div>
-
-                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                    <span className="text-[#D20A0B] font-black text-sm block">02</span>
-                    <h3 className="text-xs font-bold text-slate-900">Intelligent 3D Modeling &amp; Assemblies</h3>
-                    <p className="text-[11px] text-slate-500 leading-relaxed">
-                      Master parametric solids, complex surfacing, top-down assembly constraints, and dynamic kinematics.
-                    </p>
-                  </div>
-
-                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                    <span className="text-[#D20A0B] font-black text-sm block">03</span>
-                    <h3 className="text-xs font-bold text-slate-900">High-Demand Engineering Skill</h3>
-                    <p className="text-[11px] text-slate-500 leading-relaxed">
-                      Ranked among the top technical competencies required by engineering recruitment panels in Hyderabad.
-                    </p>
-                  </div>
-
-                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                    <span className="text-[#D20A0B] font-black text-sm block">04</span>
-                    <h3 className="text-xs font-bold text-slate-900">Industry-Ready Drafting &amp; Workflows</h3>
-                    <p className="text-[11px] text-slate-500 leading-relaxed">
-                      Generate ASME/ISO production blueprints, automated Bill of Materials (BOM), and client-ready dossiers.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* 3. Authorized Tools We Use */}
-              <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-                <span className="text-[10px] font-black text-[#D20A0B] uppercase tracking-wider block">
-                  AUTHORIZED SOFTWARE ECOSYSTEM
-                </span>
-                <h2 className="text-base sm:text-lg font-black text-slate-900">
-                  Software &amp; Tools You Will Master
-                </h2>
-                <div className="flex flex-wrap gap-2 pt-1">
-                  {toolsList.map((tool, idx) => (
-                    <div
-                      key={idx}
-                      className="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 flex items-center gap-2 shadow-2xs"
-                    >
-                      <span className="w-2 h-2 rounded-full bg-[#D20A0B]"></span>
-                      <span>{tool}</span>
-                      <span className="text-[10px] font-normal text-slate-400 bg-white px-1.5 py-0.5 rounded border border-slate-200">
-                        Official License
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* 4. Course Content / Modules Syllabus (Clean Accordions) */}
-              <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-4">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                  <div>
-                    <span className="text-[10px] font-black text-[#D20A0B] uppercase tracking-wider block">
-                      CURRICULUM SPECIFICATION
-                    </span>
-                    <h2 className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
-                      Course Content &amp; Modules ({modulesList.length} Units &bull; {totalHours} Hours)
-                    </h2>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={expandAll}
-                      className="text-[11px] font-bold text-slate-600 hover:text-[#D20A0B] px-2.5 py-1 bg-slate-100 rounded-lg transition-colors cursor-pointer"
-                    >
-                      Expand All
-                    </button>
-                    <button
-                      type="button"
-                      onClick={collapseAll}
-                      className="text-[11px] font-bold text-slate-600 hover:text-[#D20A0B] px-2.5 py-1 bg-slate-100 rounded-lg transition-colors cursor-pointer"
-                    >
-                      Collapse All
-                    </button>
-                  </div>
-                </div>
-
-                <div className="space-y-2.5">
-                  {modulesList.map((mod) => {
-                    const isExpanded = expandedModules[mod.number] ?? false;
-
-                    return (
-                      <div
-                        key={mod.number}
-                        className="border border-slate-200 rounded-xl overflow-hidden transition-all bg-white"
-                      >
-                        <button
-                          type="button"
-                          onClick={() => toggleModule(mod.number)}
-                          className="w-full p-3.5 sm:p-4 flex items-center justify-between text-left hover:bg-slate-50 transition-colors cursor-pointer gap-3"
-                        >
-                          <div className="flex items-center gap-3 min-w-0">
-                            <span className="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 text-[#D20A0B] font-black text-xs flex items-center justify-center flex-shrink-0">
-                              {mod.number}
-                            </span>
-                            <h3 className="text-xs sm:text-sm font-bold text-slate-900 truncate">
-                              {mod.title}
-                            </h3>
-                          </div>
-
-                          <div className="flex items-center gap-2.5 flex-shrink-0">
-                            <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                              {mod.hours} Lab Hrs
-                            </span>
-                            <span className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-700">
-                              {isExpanded ? '−' : '+'}
-                            </span>
-                          </div>
-                        </button>
-
-                        {isExpanded && (
-                          <div className="px-4 pb-4 pt-1 border-t border-slate-100 bg-slate-50/50 space-y-2.5">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                              {mod.topics.map((topic: string, tIdx: number) => (
-                                <div
-                                  key={tIdx}
-                                  className="flex items-start gap-2 p-2 bg-white rounded-lg border border-slate-200 text-[11px] text-slate-700 leading-relaxed font-medium"
-                                >
-                                  <span className="text-[#D20A0B] font-bold">•</span>
-                                  <span>{topic}</span>
-                                </div>
-                              ))}
-                            </div>
-                            <div className="p-2 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center justify-between text-[11px] text-emerald-800">
-                              <span className="font-bold">✓ Hands-on Practical Lab Blueprint Exercise Included</span>
-                              <span className="text-[10px] font-extrabold uppercase bg-emerald-100 px-1.5 py-0.5 rounded">
-                                Mentor Checked
-                              </span>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* 5. New Batches & Training Modes (Classroom & Online) */}
-              <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-4">
-                <div className="border-b border-slate-100 pb-2">
-                  <span className="text-[10px] font-black text-[#D20A0B] uppercase tracking-wider block">
-                    BATCH TIMINGS &amp; SCHEDULE
-                  </span>
-                  <h2 className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
-                    Upcoming New Batches in Ameerpet Hyderabad
-                  </h2>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-black text-slate-900 uppercase">Classroom Training</span>
-                      <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                        1:1 Dedicated Rig
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-slate-600 leading-relaxed">
-                      Conducted at our premier Ameerpet Hyderabad campus with high-end RTX GPU rigs, dual monitors, and in-person senior design mentors.
-                    </p>
-                    <div className="text-[11px] font-bold text-slate-700 space-y-1 pt-1">
-                      <div>&bull; Morning Batch: 08:00 AM &ndash; 10:30 AM</div>
-                      <div>&bull; Evening Batch: 06:30 PM &ndash; 09:00 PM</div>
-                    </div>
-                  </div>
-
-                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-black text-slate-900 uppercase">Live Online Training</span>
-                      <span className="text-[10px] font-extrabold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
-                        Interactive Live
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-slate-600 leading-relaxed">
-                      Attend live interactive instructor-led classes with screen share, cloud lab software access, and full recorded lecture backups.
-                    </p>
-                    <div className="text-[11px] font-bold text-slate-700 space-y-1 pt-1">
-                      <div>&bull; Weekday Online: 07:00 PM &ndash; 09:00 PM</div>
-                      <div>&bull; Weekend Fast-Track: Sat &amp; Sun 10 AM &ndash; 3 PM</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 6. Dual Certificate Benefits */}
-              <div className="bg-gradient-to-r from-[#101E33] to-[#182C4A] text-white p-5 sm:p-6 rounded-2xl shadow-sm space-y-3">
-                <span className="text-[10px] font-black text-[#EF4444] uppercase tracking-wider block">
-                  INTERNATIONAL ACCREDITATION
-                </span>
-                <h3 className="text-base sm:text-lg font-black text-white">
-                  Earn Industry-Recognized Certification With Dual Certificate Benefits
-                </h3>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  Gain industry-recognized certification from RND CADD Training Institute, an authorized training partner, with dual certification benefits for higher placement selection across top multinationals.
-                </p>
-                <div className="flex flex-wrap items-center gap-3 pt-1 text-[11px] text-slate-300">
-                  <span className="flex items-center gap-1.5 font-bold text-white">
-                    <span className="text-emerald-400">✓</span> RND CADD Master Diploma
-                  </span>
-                  <span className="flex items-center gap-1.5 font-bold text-white">
-                    <span className="text-emerald-400">✓</span> {certificationText}
-                  </span>
-                  <span className="flex items-center gap-1.5 font-bold text-white">
-                    <span className="text-emerald-400">✓</span> Online QR Credential ID
-                  </span>
-                </div>
-              </div>
-
-              {/* 7. Capstone Project Blueprint */}
-              <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-                <div className="border-b border-slate-100 pb-2">
-                  <span className="text-[10px] font-black text-[#D20A0B] uppercase tracking-wider block">
-                    PORTFOLIO BLUEPRINT
-                  </span>
-                  <h2 className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
-                    Live Industry Capstone Project
-                  </h2>
-                </div>
-                <div>
-                  <h3 className="text-xs sm:text-sm font-bold text-slate-900">{capstoneData.title}</h3>
-                  <p className="text-xs text-slate-500 mt-1 leading-relaxed">{capstoneData.description}</p>
-                </div>
-                <div className="pt-2">
-                  <span className="text-[11px] font-bold text-slate-700 block mb-2">Verified Project Deliverables:</span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {capstoneData.deliverables.map((item: string, idx: number) => (
-                      <div key={idx} className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 flex items-center gap-2">
-                        <span className="w-5 h-5 rounded bg-[#D20A0B] text-white text-[10px] font-black flex items-center justify-center flex-shrink-0">
-                          0{idx + 1}
-                        </span>
-                        <span className="truncate">{item}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* 8. Career Opportunities After Course in Ameerpet Hyderabad */}
-              <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-4">
-                <div className="border-b border-slate-100 pb-2">
-                  <span className="text-[10px] font-black text-[#D20A0B] uppercase tracking-wider block">
-                    CAREER PATHWAYS &amp; PLACEMENT
-                  </span>
-                  <h2 className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
-                    Career Opportunities After {course.title} Course
-                  </h2>
-                  <p className="text-xs text-slate-500 mt-1">
-                    The demand for skilled CAD professionals is rapidly growing across manufacturing, automotive, aerospace, EPC, and infrastructure sectors.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {careerList.map((role, idx) => (
-                    <div key={idx} className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-extrabold text-slate-900">{role}</span>
-                        <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">Hiring</span>
-                      </div>
-                      <p className="text-[11px] text-slate-500 leading-relaxed">
-                        Responsible for 3D modeling, technical drafting, GD&amp;T validation, and client design reviews.
-                      </p>
-                      <div className="text-[11px] font-bold text-slate-800 pt-1">
-                        Salary: ₹4.5L &ndash; ₹9.2L PA
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Top Conglomerates Hiring Clients */}
-                <div className="pt-3 border-t border-slate-100 space-y-2">
-                  <span className="text-[11px] font-extrabold text-slate-700 block uppercase">
-                    Top Conglomerates Hiring From Ameerpet Campus:
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    {['Tata Technologies', 'Larsen & Toubro', 'Schneider Electric', 'Cyient', 'MEIL', 'Boeing & Airbus Tier-1', 'AtkinsRéalis', 'Jacobs'].map((partner, idx) => (
-                      <span key={idx} className="px-3 py-1 rounded-lg bg-slate-100 text-xs font-bold text-slate-700 border border-slate-200">
-                        {partner}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* 9. Frequently Asked Questions (Accordion) */}
-              <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-4">
-                <div className="border-b border-slate-100 pb-2">
-                  <span className="text-[10px] font-black text-[#D20A0B] uppercase tracking-wider block">
-                    FREQUENTLY ASKED QUESTIONS
-                  </span>
-                  <h2 className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
-                    Got Questions? We Have Answers
-                  </h2>
-                </div>
-
-                <div className="space-y-2.5">
-                  {faqs.map((faq, idx) => {
-                    const isOpen = expandedFaq === idx;
-                    return (
-                      <div key={idx} className="border border-slate-200 rounded-xl overflow-hidden bg-white">
-                        <button
-                          type="button"
-                          onClick={() => setExpandedFaq(isOpen ? null : idx)}
-                          className="w-full p-3.5 flex items-center justify-between text-left hover:bg-slate-50 transition-colors cursor-pointer gap-3"
-                        >
-                          <span className="text-xs sm:text-sm font-bold text-slate-800">
-                            {idx + 1}. {faq.q}
-                          </span>
-                          <span className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600 flex-shrink-0">
-                            {isOpen ? '−' : '+'}
-                          </span>
-                        </button>
-                        {isOpen && (
-                          <div className="px-4 pb-3.5 pt-1 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
-                            {faq.a}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-            </div>
-
-            {/* ===================================================================== */}
-            {/* RIGHT COLUMN: 4 Columns (Sticky Snapshot Card & Quick Lead Form)       */}
-            {/* ===================================================================== */}
-            <div className="lg:col-span-4 space-y-5 lg:sticky lg:top-4">
-              
-              {/* Course Snapshot Card */}
-              <div className="bg-white rounded-2xl border-2 border-slate-200 p-5 shadow-md space-y-4">
-                
-                {/* Course Image Preview */}
-                <div className="h-40 w-full rounded-xl overflow-hidden bg-slate-900 relative shadow-inner">
-                  <img
-                    src={course.image || 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80'}
-                    alt={course.title}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80';
-                    }}
-                  />
-                  <div className="absolute top-2.5 left-2.5 bg-[#D20A0B] text-white text-[9px] font-black uppercase px-2 py-0.5 rounded shadow">
-                    AMEERPET CAMPUS
-                  </div>
-                </div>
-
-                {/* Pricing & Guarantee */}
-                <div className="border-b border-slate-100 pb-3">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Standard Tuition Fee</span>
-                  <div className="flex items-baseline justify-between mt-0.5">
-                    <span className="text-2xl font-black text-[#D20A0B]">
-                      ₹{feeAmount.toLocaleString('en-IN')}
-                    </span>
-                    <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                      Zero Reservation Fee
-                    </span>
-                  </div>
-                  <span className="text-[10px] text-slate-400 block mt-0.5">All-Inclusive &bull; No Hidden Registration Charges</span>
-                </div>
-
-                {/* Quick Specs Matrix */}
-                <div className="space-y-2 text-xs text-slate-600">
-                  <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
-                    <span className="text-slate-500">Duration:</span>
-                    <span className="font-extrabold text-slate-900">{cleanDuration}</span>
-                  </div>
-                  <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
-                    <span className="text-slate-500">Total Lab Hours:</span>
-                    <span className="font-extrabold text-slate-900">{totalHours} Hours (1:1 Rig)</span>
-                  </div>
-                  <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
-                    <span className="text-slate-500">Training Modes:</span>
-                    <span className="font-extrabold text-slate-900">Classroom &amp; Online</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-500">Certification:</span>
-                    <span className="font-bold text-emerald-700 text-right truncate max-w-[160px]" title={certificationText}>
-                      Dual Authorized
-                    </span>
-                  </div>
-                </div>
-
-                {/* Primary Enrollment CTA Button */}
+          {/* Quick Tab Anchor Nav */}
+          <div className="sticky top-0 z-10 bg-white border-b border-slate-200 px-5 sm:px-8 py-2 shadow-xs">
+            <div className="max-w-5xl mx-auto flex items-center gap-2 overflow-x-auto no-scrollbar text-xs">
+              {[
+                { id: 'overview', label: 'Course Overview' },
+                { id: 'curriculum', label: `Course Contents (${modulesList.length} Units)` },
+                { id: 'tools', label: 'Tools We Use' },
+                { id: 'capstone', label: 'Capstone Project' },
+                { id: 'career', label: 'Career & Jobs' },
+                { id: 'faq', label: 'FAQ' },
+              ].map((tab) => (
                 <button
+                  key={tab.id}
                   type="button"
                   onClick={() => {
-                    onClose();
-                    onEnroll(course.title);
+                    setActiveTab(tab.id as any);
+                    const el = document.getElementById(`cd-section-${tab.id}`);
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                   }}
-                  className="w-full py-3 px-4 rounded-xl bg-[#D20A0B] hover:bg-[#B50809] active:scale-98 text-white font-black text-xs uppercase tracking-wider transition-all shadow-md hover:shadow-red-500/20 flex items-center justify-center gap-2 cursor-pointer"
+                  className={`py-1.5 px-3 rounded-lg font-bold whitespace-nowrap transition-all cursor-pointer ${
+                    activeTab === tab.id
+                      ? 'bg-[#15304C] text-white'
+                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                  }`}
                 >
-                  <span>ENROLL IN THIS COURSE NOW</span>
-                  <span>&rarr;</span>
+                  {tab.label}
                 </button>
-              </div>
+              ))}
+            </div>
+          </div>
 
-              {/* Get A Free Consultation Lead Card (Exact CADDESK Style) */}
-              <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3">
-                <div>
-                  <span className="text-[10px] font-black text-[#D20A0B] uppercase tracking-wider block">
-                    FREE CAREER CONSULTATION
-                  </span>
-                  <h3 className="text-sm font-black text-slate-900 mt-0.5">
-                    Book A Free Demo Class
+          {/* Main 2-Column Content Body (CAD DESK Style) */}
+          <div className="max-w-5xl mx-auto px-5 sm:px-8 py-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              
+              {/* LEFT COLUMN: Main Course Syllabus, Highlights, FAQ (8 Cols) */}
+              <div className="lg:col-span-8 space-y-6">
+                
+                {/* 1. TRAINING HIGHLIGHTS (CAD DESK Hallmark: 6 Clean Icons Grid) */}
+                <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-xs">
+                  <h3 className="text-xs font-black text-[#D20A0B] uppercase tracking-wider mb-3">
+                    TRAINING HIGHLIGHTS
                   </h3>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
-                    Talk directly to our senior CAD mentor and reserve a free live demonstration class.
-                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {trainingHighlights.map((item, idx) => (
+                      <div key={idx} className="flex items-start gap-2.5 p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                        <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
+                          ✓
+                        </span>
+                        <div>
+                          <h4 className="text-xs font-bold text-slate-900">{item.title}</h4>
+                          <p className="text-[11px] text-slate-500 leading-tight mt-0.5">{item.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
-                {isConsultSubmitted ? (
-                  <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-center space-y-1">
-                    <span className="text-xs font-black text-emerald-800 block">✓ Consultation Reserved!</span>
-                    <span className="text-[11px] text-emerald-700 block">
-                      Our Ameerpet coordinator will call you within 15 minutes.
+                {/* 2. COURSE OVERVIEW */}
+                <section id="cd-section-overview" className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-3">
+                  <div className="border-b border-slate-100 pb-2">
+                    <span className="text-[10px] font-black text-[#D20A0B] uppercase tracking-wider block">
+                      PROGRAM SYNOPSIS
+                    </span>
+                    <h3 className="text-base sm:text-lg font-black text-slate-900">
+                      Course Overview
+                    </h3>
+                  </div>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+                    {course.overview || course.tagline || 'Master end-to-end industrial drafting, modeling, and validation workflows conforming to international engineering standards.'}
+                  </p>
+                  
+                  {/* Prerequisite & Certification strip */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs">
+                    <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                      <span className="font-bold text-slate-500 block text-[10px] uppercase">Eligibility / Prerequisite</span>
+                      <span className="font-semibold text-slate-800">{prerequisitesText}</span>
+                    </div>
+                    <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                      <span className="font-bold text-slate-500 block text-[10px] uppercase">Awarded Credential</span>
+                      <span className="font-semibold text-slate-800">{certificationText}</span>
+                    </div>
+                  </div>
+                </section>
+
+                {/* 3. TOOLS WE USE */}
+                <section id="cd-section-tools" className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-3">
+                  <div className="border-b border-slate-100 pb-2">
+                    <span className="text-[10px] font-black text-[#D20A0B] uppercase tracking-wider block">
+                      SOFTWARE STACK
+                    </span>
+                    <h3 className="text-base sm:text-lg font-black text-slate-900">
+                      Industry Tools &amp; Software You Will Master
+                    </h3>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {toolsList.map((tool, idx) => (
+                      <div key={idx} className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                          <span className="w-7 h-7 rounded-lg bg-[#15304C] text-white flex items-center justify-center text-xs font-black">
+                            {tool.slice(0, 2).toUpperCase()}
+                          </span>
+                          <div>
+                            <span className="text-xs font-bold text-slate-900 block">{tool}</span>
+                            <span className="text-[10px] text-slate-400">Enterprise License &bull; Lab + Laptop</span>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                          Included
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                {/* 4. COURSE CONTENTS (Syllabus Accordion like CAD DESK) */}
+                <section id="cd-section-curriculum" className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                    <div>
+                      <span className="text-[10px] font-black text-[#D20A0B] uppercase tracking-wider block">
+                        STEP-BY-STEP CURRICULUM
+                      </span>
+                      <h3 className="text-base sm:text-lg font-black text-slate-900">
+                        Course Contents ({modulesList.length} Units)
+                      </h3>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={expandAllModules}
+                        className="text-[11px] font-bold text-blue-600 hover:underline cursor-pointer"
+                      >
+                        Expand All
+                      </button>
+                      <span className="text-slate-300">|</span>
+                      <button
+                        type="button"
+                        onClick={collapseAllModules}
+                        className="text-[11px] font-bold text-slate-500 hover:underline cursor-pointer"
+                      >
+                        Collapse All
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Module List Accordions */}
+                  <div className="space-y-2.5">
+                    {modulesList.map((mod) => {
+                      const isExpanded = expandedModules[mod.number] ?? false;
+
+                      return (
+                        <div
+                          key={mod.number}
+                          className="border border-slate-200 rounded-xl overflow-hidden transition-all bg-white hover:border-slate-300"
+                        >
+                          <button
+                            type="button"
+                            onClick={() => toggleModule(mod.number)}
+                            className="w-full p-3.5 flex items-center justify-between text-left cursor-pointer hover:bg-slate-50 transition-colors gap-3"
+                          >
+                            <div className="flex items-center gap-3 min-w-0">
+                              <span className="w-7 h-7 rounded-lg bg-slate-100 text-[#D20A0B] font-black text-xs flex items-center justify-center flex-shrink-0 border border-slate-200">
+                                {mod.number}
+                              </span>
+                              <h4 className="text-xs sm:text-sm font-bold text-slate-900 truncate">
+                                {mod.title}
+                              </h4>
+                            </div>
+
+                            <div className="flex items-center gap-2 flex-shrink-0">
+                              <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                                {mod.hours} Lab Hrs
+                              </span>
+                              <span className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-slate-700 font-bold text-xs">
+                                {isExpanded ? '−' : '+'}
+                              </span>
+                            </div>
+                          </button>
+
+                          {isExpanded && (
+                            <div className="px-4 pb-3.5 pt-1 border-t border-slate-100 bg-slate-50/50 space-y-2 text-xs">
+                              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                                Topics &amp; Practical Exercises:
+                              </span>
+                              <ul className="space-y-1.5 pl-1">
+                                {mod.topics.map((t: string, tIdx: number) => (
+                                  <li key={tIdx} className="flex items-start gap-2 text-slate-600 leading-snug">
+                                    <span className="text-[#D20A0B] font-bold text-sm leading-none mt-0.5">&bull;</span>
+                                    <span>{t}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </section>
+
+                {/* 5. MANDATORY CAPSTONE PROJECT */}
+                <section id="cd-section-capstone" className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-3">
+                  <div className="border-b border-slate-100 pb-2">
+                    <span className="text-[10px] font-black text-emerald-600 uppercase tracking-wider block">
+                      PRACTICAL PORTFOLIO
+                    </span>
+                    <h3 className="text-base sm:text-lg font-black text-slate-900">
+                      {capstoneData.title}
+                    </h3>
+                  </div>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    {capstoneData.description}
+                  </p>
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">
+                      Verified Portfolio Deliverables:
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {capstoneData.deliverables.map((item: string, idx: number) => (
+                        <div key={idx} className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 flex items-center gap-2">
+                          <span className="w-5 h-5 rounded bg-[#D20A0B] text-white flex items-center justify-center text-[10px]">
+                            0{idx + 1}
+                          </span>
+                          <span className="truncate">{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </section>
+
+                {/* 6. CAREER PATHWAYS & MNC JOBS */}
+                <section id="cd-section-career" className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-3">
+                  <div className="border-b border-slate-100 pb-2">
+                    <span className="text-[10px] font-black text-[#D20A0B] uppercase tracking-wider block">
+                      PLACEMENT OPPORTUNITIES
+                    </span>
+                    <h3 className="text-base sm:text-lg font-black text-slate-900">
+                      Target Job Roles &amp; Hiring Conglomerates
+                    </h3>
+                  </div>
+
+                  {/* Roles */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {careerList.map((role: string, idx: number) => (
+                      <div key={idx} className="p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between text-xs">
+                        <div>
+                          <span className="font-bold text-slate-900 block">{role}</span>
+                          <span className="text-[10px] text-slate-400">Starting CTC: ₹4.5L &ndash; ₹9.2L PA</span>
+                        </div>
+                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                          Active Hiring
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Hiring Partners */}
+                  <div className="pt-2">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
+                      Top Conglomerates Hiring From This Course:
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {hiringPartners.map((p, idx) => (
+                        <span key={idx} className="text-[11px] font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200">
+                          {p}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </section>
+
+                {/* 7. FREQUENTLY ASKED QUESTIONS (FAQ Accordions) */}
+                <section id="cd-section-faq" className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-3">
+                  <div className="border-b border-slate-100 pb-2">
+                    <span className="text-[10px] font-black text-blue-600 uppercase tracking-wider block">
+                      NEED HELP?
+                    </span>
+                    <h3 className="text-base sm:text-lg font-black text-slate-900">
+                      Frequently Asked Questions (FAQ)
+                    </h3>
+                  </div>
+
+                  <div className="space-y-2">
+                    {faqList.map((faq, idx) => {
+                      const isFaqOpen = expandedFaq === idx;
+                      return (
+                        <div key={idx} className="border border-slate-200 rounded-lg overflow-hidden">
+                          <button
+                            type="button"
+                            onClick={() => setExpandedFaq(isFaqOpen ? null : idx)}
+                            className="w-full p-3 text-left font-bold text-xs text-slate-800 flex items-center justify-between hover:bg-slate-50 transition-colors"
+                          >
+                            <span>{faq.q}</span>
+                            <span className="font-mono text-slate-500 font-bold ml-2">
+                              {isFaqOpen ? '−' : '+'}
+                            </span>
+                          </button>
+                          {isFaqOpen && (
+                            <div className="px-3 pb-3 pt-1 text-xs text-slate-600 bg-slate-50/70 border-t border-slate-100 leading-relaxed font-normal">
+                              {faq.a}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </section>
+
+              </div>
+
+              {/* RIGHT SIDEBAR: Sticky Course Info & Consultation Form (4 Cols) */}
+              <div className="lg:col-span-4 space-y-4">
+                
+                {/* Course Card Box */}
+                <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
+                  {/* Image */}
+                  <div className="relative h-40 w-full rounded-lg overflow-hidden bg-slate-900 border border-slate-200">
+                    <img
+                      src={course.image || 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80'}
+                      alt={course.title}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80';
+                      }}
+                    />
+                    <div className="absolute top-2 left-2 bg-[#D20A0B] text-white text-[9px] font-black uppercase px-2 py-0.5 rounded shadow">
+                      Ameerpet Lab
+                    </div>
+                  </div>
+
+                  {/* Fee */}
+                  <div className="border-b border-slate-100 pb-3">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Standard Program Fee</span>
+                    <div className="flex items-baseline gap-2 mt-0.5">
+                      <span className="text-2xl font-black text-[#D20A0B]">
+                        ₹{feeAmount.toLocaleString('en-IN')}
+                      </span>
+                      <span className="text-[11px] text-slate-500 font-medium">All Inclusive</span>
+                    </div>
+                    <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded inline-block mt-1">
+                      ✓ Zero Reservation Fee &bull; Free Demo Class
                     </span>
                   </div>
-                ) : (
-                  <form onSubmit={handleConsultSubmit} className="space-y-2.5">
-                    <div>
-                      <input
-                        type="text"
-                        placeholder="Your Full Name"
-                        value={consultName}
-                        onChange={(e) => setConsultName(e.target.value)}
-                        required
-                        className="w-full p-2.5 rounded-xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#D20A0B]"
-                      />
+
+                  {/* Specs Table */}
+                  <div className="space-y-2 text-xs">
+                    <div className="flex justify-between py-1 border-b border-slate-50">
+                      <span className="text-slate-500 font-medium">Duration:</span>
+                      <span className="font-bold text-slate-800">{course.duration || '10 Weeks'}</span>
                     </div>
-                    <div>
-                      <input
-                        type="tel"
-                        placeholder="WhatsApp / Phone Number"
-                        value={consultPhone}
-                        onChange={(e) => setConsultPhone(e.target.value)}
-                        required
-                        className="w-full p-2.5 rounded-xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#D20A0B]"
-                      />
+                    <div className="flex justify-between py-1 border-b border-slate-50">
+                      <span className="text-slate-500 font-medium">Lab Hours:</span>
+                      <span className="font-bold text-slate-800">{totalHours} Hours (1:1 Rig)</span>
                     </div>
-                    <div>
-                      <select
-                        value={consultBatch}
-                        onChange={(e) => setConsultBatch(e.target.value)}
-                        className="w-full p-2.5 rounded-xl border border-slate-200 text-xs text-slate-800 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#D20A0B]"
+                    <div className="flex justify-between py-1 border-b border-slate-50">
+                      <span className="text-slate-500 font-medium">Skill Level:</span>
+                      <span className="font-bold text-slate-800">{courseLevel}</span>
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-slate-50">
+                      <span className="text-slate-500 font-medium">Certification:</span>
+                      <span className="font-bold text-slate-800 text-right">{certificationText}</span>
+                    </div>
+                  </div>
+
+                  {/* Primary CTA */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      onEnroll(course.title);
+                    }}
+                    className="w-full py-3 px-4 rounded-xl bg-[#D20A0B] hover:bg-[#B50809] active:scale-98 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-md hover:shadow-red-500/20 cursor-pointer"
+                  >
+                    Enroll In This Program &rarr;
+                  </button>
+                </div>
+
+                {/* Quick Apply / Counseling Form (CAD DESK "For More Info Apply Now") */}
+                <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
+                  <div className="border-b border-slate-100 pb-2">
+                    <span className="text-[10px] font-black text-[#D20A0B] uppercase tracking-wider block">
+                      QUICK CONSULTATION
+                    </span>
+                    <h4 className="text-xs sm:text-sm font-extrabold text-slate-900">
+                      For More Info Apply Now
+                    </h4>
+                  </div>
+
+                  {isApplicationSubmitted ? (
+                    <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-center space-y-1">
+                      <span className="text-emerald-700 font-bold text-xs block">✓ Request Received!</span>
+                      <p className="text-[11px] text-emerald-600">
+                        Our Ameerpet course counselor will contact you shortly with syllabus PDF &amp; batch schedule.
+                      </p>
+                    </div>
+                  ) : (
+                    <form onSubmit={handleApplyForm} className="space-y-2.5">
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                          Candidate Name *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={candidateName}
+                          onChange={(e) => setCandidateName(e.target.value)}
+                          placeholder="Your Full Name"
+                          className="w-full p-2 border border-slate-200 rounded-lg text-xs bg-slate-50 focus:bg-white focus:outline-none focus:border-red-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                          Phone / WhatsApp Number *
+                        </label>
+                        <input
+                          type="tel"
+                          required
+                          value={candidatePhone}
+                          onChange={(e) => setCandidatePhone(e.target.value)}
+                          placeholder="+91 98490 XXXXX"
+                          className="w-full p-2 border border-slate-200 rounded-lg text-xs bg-slate-50 focus:bg-white focus:outline-none focus:border-red-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                          Preferred Batch Timing
+                        </label>
+                        <select
+                          value={selectedBatch}
+                          onChange={(e) => setSelectedBatch(e.target.value)}
+                          className="w-full p-2 border border-slate-200 rounded-lg text-xs bg-slate-50 focus:bg-white focus:outline-none focus:border-red-500"
+                        >
+                          <option value="Weekday Morning (08:00 AM - 10:30 AM)">Weekday Morning (08:00 AM)</option>
+                          <option value="Weekday Evening (06:30 PM - 09:00 PM)">Weekday Evening (06:30 PM)</option>
+                          <option value="Weekend Fast-Track (Sat & Sun)">Weekend Fast-Track (Sat &amp; Sun)</option>
+                        </select>
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="w-full py-2.5 px-3 rounded-lg bg-[#15304C] hover:bg-slate-900 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
                       >
-                        <option value="Weekday Morning (08:00 AM)">Weekday Morning (08:00 AM)</option>
-                        <option value="Weekday Evening (06:30 PM)">Weekday Evening (06:30 PM)</option>
-                        <option value="Weekend Fast-Track (10:00 AM)">Weekend Fast-Track (10:00 AM)</option>
-                      </select>
-                    </div>
+                        Request Free Callback &rarr;
+                      </button>
+                    </form>
+                  )}
 
-                    <button
-                      type="submit"
-                      className="w-full py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-extrabold uppercase tracking-wider transition-colors cursor-pointer"
-                    >
-                      Request Free Callback
-                    </button>
-                  </form>
-                )}
-
-                {/* Direct Helpline & Campus Location */}
-                <div className="pt-2 border-t border-slate-100 text-[11px] text-slate-600 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span>Helpline:</span>
+                  {/* Helpline */}
+                  <div className="pt-2 border-t border-slate-100 text-[11px] text-slate-600 flex items-center justify-between">
+                    <span>Inquiry Helpline:</span>
                     <a href="tel:+919849012345" className="font-bold text-[#D20A0B] hover:underline">
                       +91 98490 12345
                     </a>
                   </div>
-                  <div className="flex items-center justify-between text-[10px] text-slate-400">
-                    <span>Campus: Ameerpet, Hyderabad</span>
-                    <span>7 AM &ndash; 9:30 PM</span>
-                  </div>
                 </div>
+
               </div>
 
             </div>
-
           </div>
+
         </div>
 
-        {/* ========================================================================= */}
-        {/* MODAL BOTTOM BAR                                                          */}
-        {/* ========================================================================= */}
-        <div className="px-5 sm:px-7 py-3 bg-white border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 flex-shrink-0 z-20">
-          <div className="text-xs text-slate-600 flex items-center gap-2">
-            <span className="font-extrabold text-slate-900">Total Program Fee:</span>
-            <span className="text-[#D20A0B] font-black text-base">₹{feeAmount.toLocaleString('en-IN')}</span>
-            <span className="text-[10px] text-slate-400 hidden sm:inline">&bull; 1:1 RTX GPU Rig &bull; Free Demo Class Included</span>
+        {/* Modal Bottom Footer */}
+        <div className="bg-[#FFFFFF] border-t border-slate-200 px-5 sm:px-7 py-3 flex items-center justify-between gap-3 flex-shrink-0 z-20">
+          <div className="text-xs text-slate-600 truncate">
+            <span className="font-extrabold text-slate-900">Total Program Fee: </span>
+            <span className="text-[#D20A0B] font-black text-sm sm:text-base">₹{feeAmount.toLocaleString('en-IN')}</span>
+            <span className="text-slate-400 hidden sm:inline"> &bull; Zero Reservation Fee &bull; 1:1 Dedicated RTX Workstation</span>
           </div>
 
-          <div className="flex items-center space-x-2.5 w-full sm:w-auto">
+          <div className="flex items-center space-x-2 flex-shrink-0">
             <button
               type="button"
               onClick={onClose}
-              className="w-1/2 sm:w-auto px-4 py-2 border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-xl transition-colors cursor-pointer"
+              className="px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-lg transition-colors cursor-pointer"
             >
-              Back to Catalog
+              Back
             </button>
             <button
               type="button"
@@ -841,9 +789,9 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                 onClose();
                 onEnroll(course.title);
               }}
-              className="w-1/2 sm:w-auto px-6 py-2 bg-[#D20A0B] hover:bg-[#B50809] active:scale-98 text-white text-xs font-extrabold uppercase rounded-xl transition-all shadow-sm hover:shadow-red-500/20 cursor-pointer"
+              className="px-5 py-2 bg-[#D20A0B] hover:bg-[#B50809] active:scale-98 text-white text-xs font-extrabold uppercase tracking-wider rounded-lg transition-all shadow-sm cursor-pointer"
             >
-              Confirm Batch Enrollment &rarr;
+              Enroll Now &rarr;
             </button>
           </div>
         </div>
