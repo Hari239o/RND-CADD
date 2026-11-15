@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import type { Course } from '@/lib/courses-data';
+import { getCourseDynamicImage } from './CourseModal';
 
 interface CourseCardProps {
   course: Course;
@@ -61,7 +62,8 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onOpenDetails })
   };
 
   const partnerInfo = getPartnerInfo(course.stream || course.folder || '');
-  const courseImage = imageError || !course.image ? partnerInfo.fallbackImg : course.image;
+  const dynamicImage = getCourseDynamicImage(course);
+  const courseImage = imageError || !course.image ? dynamicImage : (course.image.includes('1581092160607') ? dynamicImage : course.image);
 
   return (
     <div
