@@ -7,7 +7,7 @@ import { CareerInfographic, HIRING_CONGLOMERATES } from './CareerInfographic';
 import { CourseCertificateShowcase } from './CourseCertificateShowcase';
 import { ScrollToTopProgress } from './ScrollToTopProgress';
 import { EnquiryModal } from './EnquiryModal';
-import { CoursePreviewMedia, CourseHeroBackground, getVerifiedCourseImages } from './CourseMediaBanner';
+import { CourseHeroBackground, getVerifiedCourseImages } from './CourseMediaBanner';
 
 interface CourseModalProps {
   course: Course | null;
@@ -39,6 +39,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
   if (!course) return null;
 
   const dynamicImage = getCourseDynamicImage(course);
+  const verifiedImages = getVerifiedCourseImages(course);
 
   // Tools & Software normalizer
   const toolsList: string[] = typeof (course as any).software === 'string' && (course as any).software.trim()
@@ -338,8 +339,8 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
 
         {/* 3. HERO BANNER: EXPANDED WIDTH UTILIZING BOTH LEFT AND RIGHT SIDES PROPERLY */}
         <div className="bg-[#15304C] text-white py-10 sm:py-12 border-b border-[#0F2038] relative overflow-hidden">
-          {/* Animated Ambient Engineering Background Canvas */}
-          <CourseHeroBackground stream={streamText} />
+          {/* Animated Ambient Engineering Background with Discipline Video Loop */}
+          <CourseHeroBackground stream={streamText} title={course.title} />
 
           <div className="max-w-[1560px] mx-auto px-4 sm:px-6 lg:px-10 relative z-10">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
@@ -395,8 +396,24 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
               {/* Right Column: Course Image Preview Card with Instant CTA */}
               <div className="lg:col-span-4">
                 <div className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden p-5 text-slate-800 space-y-4">
-                  {/* Interactive Dynamic Media Banner (3D Simulation Canvas & 4K Render) */}
-                  <CoursePreviewMedia course={course} mainTool={mainTool} />
+                  {/* Clean High-Resolution Course Software Preview (No gimmicky 3D canvas/FPS/simulation toggles) */}
+                  <div className="relative h-52 sm:h-56 w-full rounded-2xl overflow-hidden bg-slate-900 border border-slate-200/80 shadow-inner group">
+                    <img
+                      src={verifiedImages.primary}
+                      alt={course.title}
+                      onError={(e) => {
+                        const target = e.currentTarget as HTMLImageElement;
+                        if (target.src !== verifiedImages.secondary) {
+                          target.src = verifiedImages.secondary;
+                        }
+                      }}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
+                    <div className="absolute top-3 left-3 bg-[#15304C]/95 backdrop-blur-sm text-white text-[11px] font-bold px-3 py-1 rounded-md shadow-md border border-white/20">
+                      {verifiedImages.tag || mainTool}
+                    </div>
+                  </div>
 
                   {/* Fee & Batch Info */}
                   <div className="flex items-baseline justify-between border-b border-slate-100 pb-3">
