@@ -387,16 +387,25 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
       <div ref={scrollContainerRef} className="flex-1 overflow-y-auto bg-[#F8FAFC] relative">
         
         {/* Right Floating "Enquiry Now" Vertical Tab */}
-        <button
-          type="button"
-          onClick={() => setIsEnquiryModalOpen(true)}
-          className="fixed right-0 top-1/2 -translate-y-1/2 z-40 bg-[#EE2C3C] hover:bg-[#D20A0B] text-white text-xs font-black uppercase tracking-wider py-3.5 px-2.5 rounded-l-md shadow-xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
-          style={{ writingMode: 'vertical-rl' }}
-          title="Open Enquiry Dialog"
-        >
-          <span className="inline-block transform -rotate-90 text-sm">📞</span>
-          <span>Enquiry Now</span>
-        </button>
+        <div className="fixed right-0 top-1/2 -translate-y-1/2 z-50">
+          <button
+            type="button"
+            onClick={() => setIsEnquiryModalOpen(true)}
+            className="group flex items-center gap-2 bg-[#EE2C3C] hover:bg-[#D20A0B] text-white px-3 py-3.5 rounded-l-xl shadow-2xl cursor-pointer transition-all hover:pr-4"
+            style={{
+              writingMode: 'vertical-rl',
+              textOrientation: 'mixed',
+              transform: 'rotate(180deg)',
+            }}
+            aria-label="Open Enquiry Form"
+            title="Open Enquiry Dialog"
+          >
+            <span className="text-xs font-black tracking-widest uppercase flex items-center gap-2">
+              <span className="inline-block transform -rotate-90 text-sm">📞</span>
+              <span>Enquiry Now</span>
+            </span>
+          </button>
+        </div>
 
         {/* 3. HERO BANNER: EXPANDED WIDTH UTILIZING BOTH LEFT AND RIGHT SIDES PROPERLY */}
         <div className="bg-[#15304C] text-white py-10 sm:py-12 border-b border-[#0F2038]">

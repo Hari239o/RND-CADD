@@ -159,8 +159,10 @@ export default function HomePage() {
         onEnroll={(title) => handleOpenEnrollSection(title)}
       />
 
-      {/* Floating Right-edge "Enquiry Now" Vertical Button */}
-      <FloatingEnquiryButton onOpen={() => setIsEnquiryModalOpen(true)} />
+      {/* Floating Right-edge "Enquiry Now" Vertical Button (Hidden when CourseModal is open to prevent duplicate overlay) */}
+      {!selectedCourse && (
+        <FloatingEnquiryButton onOpen={() => setIsEnquiryModalOpen(true)} />
+      )}
 
       {/* Global Interactive Enquiry Modal matching exact user screenshot */}
       <EnquiryModal
@@ -172,8 +174,8 @@ export default function HomePage() {
         initialCourseTitle={enquiryInitialCourse}
       />
 
-      {/* Dynamic Circular Progress Scroll-To-Top Button matching Image 2 */}
-      <ScrollToTopProgress threshold={300} />
+      {/* Dynamic Circular Progress Scroll-To-Top Button (Hidden when CourseModal is open to prevent double button glitch) */}
+      {!selectedCourse && <ScrollToTopProgress threshold={300} />}
 
       {/* Footer */}
       <Footer
