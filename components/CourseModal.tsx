@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import type { Course } from '@/lib/courses-data';
-import { CareerInfographic } from './CareerInfographic';
+import { CareerInfographic, HIRING_CONGLOMERATES } from './CareerInfographic';
 import { CourseCertificateShowcase } from './CourseCertificateShowcase';
 import { ScrollToTopProgress } from './ScrollToTopProgress';
 import { EnquiryModal } from './EnquiryModal';
@@ -275,19 +275,6 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
     `Dynamic motion simulation, animations & design validation`,
     'Clash detection, interference check & parametric design tables',
     'Automated Bill of Quantities / Materials (BOM) extraction'
-  ];
-
-  // Top hiring MNC conglomerates
-  const hiringPartners = [
-    'Tata Technologies',
-    'Larsen & Toubro (L&T)',
-    'Schneider Electric',
-    'Cyient Limited',
-    'MEIL Infrastructure',
-    'Boeing & Airbus Tier-1',
-    'AtkinsRéalis',
-    'Jacobs Engineering',
-    'Alstom Transport'
   ];
 
   // Frequently Asked Questions
@@ -796,14 +783,21 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                 </div>
 
                 <div className="pt-2">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2.5">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">
                     Placement Drives with Top Recruiters:
                   </span>
-                  <div className="flex flex-wrap gap-2">
-                    {hiringPartners.map((p, idx) => (
-                      <span key={idx} className="text-xs sm:text-sm font-semibold text-slate-800 bg-white px-3.5 py-1.5 rounded-xl border border-slate-200 hover:border-[#EE2C3C] hover:text-[#EE2C3C] transition-colors shadow-2xs">
-                        {p}
-                      </span>
+                  <div className="flex flex-wrap gap-2.5 sm:gap-3">
+                    {HIRING_CONGLOMERATES.map((partner) => (
+                      <motion.div
+                        key={partner.id}
+                        whileHover={{ y: -2, scale: 1.02, transition: { duration: 0.15 } }}
+                        className="flex items-center gap-2.5 bg-white px-3.5 py-2 rounded-xl border border-slate-200/90 hover:border-[#EE2C3C] hover:shadow-md transition-all shadow-2xs cursor-pointer group"
+                      >
+                        {partner.renderLogo()}
+                        <span className="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-slate-900 transition-colors">
+                          {partner.name}
+                        </span>
+                      </motion.div>
                     ))}
                   </div>
                 </div>

@@ -151,24 +151,126 @@ export const getCourseCareerPathways = (course: Course): CareerPathwayItem[] => 
   ];
 };
 
+export interface HiringConglomerate {
+  id: string;
+  name: string;
+  renderLogo: () => React.ReactNode;
+}
+
+export const HIRING_CONGLOMERATES: HiringConglomerate[] = [
+  {
+    id: 'tata-tech',
+    name: 'Tata Technologies',
+    renderLogo: () => (
+      <div className="w-6 h-6 rounded-full border-[1.5px] border-[#1E4B88] flex items-center justify-center bg-blue-50/80 shadow-xs flex-shrink-0">
+        <span className="text-[11px] font-black text-[#1E4B88] leading-none">T</span>
+      </div>
+    ),
+  },
+  {
+    id: 'lt',
+    name: 'Larsen & Toubro (L&T)',
+    renderLogo: () => (
+      <div className="h-6 px-1.5 rounded bg-[#003B71] flex items-center justify-center text-white flex-shrink-0 shadow-xs">
+        <span className="text-[10px] font-black tracking-tighter">L&amp;T</span>
+      </div>
+    ),
+  },
+  {
+    id: 'schneider',
+    name: 'Schneider Electric',
+    renderLogo: () => (
+      <div className="w-6 h-6 rounded-md bg-[#3DCD58] flex items-center justify-center text-white flex-shrink-0 shadow-xs">
+        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M8 5l8 7-8 7" />
+        </svg>
+      </div>
+    ),
+  },
+  {
+    id: 'cyient',
+    name: 'Cyient Limited',
+    renderLogo: () => (
+      <div className="w-6 h-6 rounded-full bg-[#00A3E0] flex items-center justify-center text-white flex-shrink-0 shadow-xs">
+        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+          <circle cx="12" cy="12" r="7" />
+          <circle cx="12" cy="12" r="2.5" fill="currentColor" />
+        </svg>
+      </div>
+    ),
+  },
+  {
+    id: 'meil',
+    name: 'MEIL Infrastructure',
+    renderLogo: () => (
+      <div className="h-6 px-1.5 rounded-md bg-[#C4122F] flex items-center justify-center text-white font-black text-[9px] tracking-tight flex-shrink-0 shadow-xs">
+        MEIL
+      </div>
+    ),
+  },
+  {
+    id: 'boeing-airbus',
+    name: 'Boeing & Airbus Tier-1',
+    renderLogo: () => (
+      <div className="flex items-center -space-x-1.5 flex-shrink-0">
+        <div className="w-6 h-6 rounded-md bg-[#0033A0] flex items-center justify-center text-white shadow-xs z-10" title="Boeing">
+          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16.93V15h-2v3.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 11v2h2v-2l5-5h2v2l-3.5 3.5H19c.62 0 1.2.09 1.76.24C20.08 15.22 16.95 18.44 13 18.93z" />
+          </svg>
+        </div>
+        <div className="w-6 h-6 rounded-md bg-[#00205B] flex items-center justify-center text-white shadow-xs z-0" title="Airbus">
+          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+          </svg>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: 'atkins',
+    name: 'AtkinsRéalis',
+    renderLogo: () => (
+      <div className="w-6 h-6 rounded-md bg-[#E0004D] flex items-center justify-center text-white font-black text-[10px] flex-shrink-0 shadow-xs">
+        A
+      </div>
+    ),
+  },
+  {
+    id: 'jacobs',
+    name: 'Jacobs Engineering',
+    renderLogo: () => (
+      <div className="w-6 h-6 rounded-md bg-[#00529B] flex items-center justify-center text-white font-black text-[11px] flex-shrink-0 shadow-xs">
+        J
+      </div>
+    ),
+  },
+  {
+    id: 'alstom',
+    name: 'Alstom Transport',
+    renderLogo: () => (
+      <div className="h-6 px-1.5 rounded-md bg-[#002B49] flex items-center justify-center text-white flex-shrink-0 shadow-xs">
+        <span className="text-[10px] font-black text-[#FF003B] mr-0.5">/</span>
+        <span className="text-[9px] font-black tracking-tight">AL</span>
+      </div>
+    ),
+  },
+  {
+    id: 'siemens',
+    name: 'Siemens Energy',
+    renderLogo: () => (
+      <div className="w-6 h-6 rounded-md bg-[#00646E] flex items-center justify-center text-white font-black text-[10px] flex-shrink-0 shadow-xs">
+        S
+      </div>
+    ),
+  },
+];
+
 interface CareerInfographicProps {
   course: Course;
 }
 
 export const CareerInfographic: React.FC<CareerInfographicProps> = ({ course }) => {
   const pathways = getCourseCareerPathways(course);
-
-  const hiringPartners = [
-    'Tata Technologies',
-    'Larsen & Toubro (L&T)',
-    'Schneider Electric',
-    'Cyient Limited',
-    'MEIL Infrastructure',
-    'Boeing & Airbus Tier-1',
-    'AtkinsRéalis',
-    'Jacobs Engineering',
-    'Alstom Transport',
-  ];
 
   const renderIcon = (type: CareerPathwayItem['iconType']) => {
     switch (type) {
@@ -345,17 +447,21 @@ export const CareerInfographic: React.FC<CareerInfographicProps> = ({ course }) 
 
       {/* OUR HIRING CONGLOMERATES */}
       <div className="pt-3 border-t border-slate-100">
-        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2.5">
+        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">
           Our Hiring Conglomerates:
         </span>
-        <div className="flex flex-wrap gap-2">
-          {hiringPartners.map((p, idx) => (
-            <span
-              key={idx}
-              className="text-xs sm:text-sm font-semibold text-slate-800 bg-white px-3.5 py-1.5 rounded-xl border border-slate-200 hover:border-[#EE2C3C] hover:text-[#EE2C3C] transition-colors shadow-2xs"
+        <div className="flex flex-wrap gap-2.5 sm:gap-3">
+          {HIRING_CONGLOMERATES.map((partner) => (
+            <motion.div
+              key={partner.id}
+              whileHover={{ y: -2, scale: 1.02, transition: { duration: 0.15 } }}
+              className="flex items-center gap-2.5 bg-white px-3.5 py-2 rounded-xl border border-slate-200/90 hover:border-[#EE2C3C] hover:shadow-md transition-all shadow-2xs cursor-pointer group"
             >
-              {p}
-            </span>
+              {partner.renderLogo()}
+              <span className="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-slate-900 transition-colors">
+                {partner.name}
+              </span>
+            </motion.div>
           ))}
         </div>
       </div>
