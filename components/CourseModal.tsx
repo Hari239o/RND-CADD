@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import type { Course } from '@/lib/courses-data';
 import { CareerInfographic } from './CareerInfographic';
 import { CourseCertificateShowcase } from './CourseCertificateShowcase';
@@ -502,7 +503,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                     <button
                       type="button"
                       onClick={() => setIsEnquiryModalOpen(true)}
-                      className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs font-bold rounded-xl border border-slate-300 transition-colors cursor-pointer"
+                      className="w-full py-3 bg-white hover:bg-red-50 hover:text-[#EE2C3C] text-slate-900 text-xs sm:text-sm font-bold rounded-xl border-2 border-slate-900 hover:border-[#EE2C3C] transition-all cursor-pointer"
                     >
                       Enquire for Free Demo Class &rarr;
                     </button>
@@ -525,120 +526,130 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
             {/* LEFT COLUMN (8 COLS): Full Detailed Course Walkthrough */}
             <div className="lg:col-span-8 space-y-10">
               
-              {/* SECTION A: Key Course Metrics (Clean Open Layout, No Nested Cards) */}
-              <section className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-7 shadow-xs">
-                <div className="border-b border-slate-100 pb-3 mb-5 flex items-center justify-between">
-                  <h3 className="text-lg font-bold text-slate-900 tracking-tight">
-                    Course Academic Facts &amp; Eligibility
-                  </h3>
-                  <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200/60">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              {/* SECTION A: Key Course Metrics (Open Seamless 4-Pillar Layout, Absolutely No Nested Inner Box Cards) */}
+              <motion.section
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                className="bg-white border border-slate-200/80 rounded-3xl p-7 sm:p-8 shadow-sm"
+              >
+                <div className="border-b border-slate-100 pb-4 mb-6 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="w-2.5 h-6 bg-[#EE2C3C] rounded-full inline-block"></span>
+                    <h3 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-normal">
+                      Course Academic Facts &amp; Eligibility
+                    </h3>
+                  </div>
+                  <span className="hidden sm:inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200/80">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span>Admissions Open</span>
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-                  {/* Metric 1 */}
-                  <div className="bg-slate-50/70 border border-slate-200/80 rounded-xl p-4 space-y-1">
-                    <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-0 lg:divide-x lg:divide-slate-100">
+                  {/* Pillar 1 */}
+                  <div className="space-y-2 lg:pr-6">
+                    <span className="text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-wider block">
                       Eligibility / Prerequisite
                     </span>
-                    <p className="text-sm font-bold text-slate-800 leading-snug">
+                    <p className="text-base sm:text-lg font-bold text-slate-900 leading-snug">
                       {prerequisitesText}
                     </p>
                   </div>
 
-                  {/* Metric 2 */}
-                  <div className="bg-slate-50/70 border border-slate-200/80 rounded-xl p-4 space-y-1">
-                    <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+                  {/* Pillar 2 */}
+                  <div className="space-y-2 lg:px-6">
+                    <span className="text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-wider block">
                       Awarded Credential
                     </span>
-                    <p className="text-sm font-bold text-slate-800 leading-snug">
+                    <p className="text-base sm:text-lg font-bold text-slate-900 leading-snug">
                       {certificationText}
                     </p>
                   </div>
 
-                  {/* Metric 3 */}
-                  <div className="bg-slate-50/70 border border-slate-200/80 rounded-xl p-4 space-y-1">
-                    <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+                  {/* Pillar 3 */}
+                  <div className="space-y-2 lg:px-6">
+                    <span className="text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-wider block">
                       Training Mode
                     </span>
-                    <p className="text-sm font-bold text-slate-800 leading-snug">
+                    <p className="text-base sm:text-lg font-bold text-slate-900 leading-snug">
                       {trainingMode}
                     </p>
                   </div>
 
-                  {/* Metric 4 */}
-                  <div className="bg-slate-50/70 border border-slate-200/80 rounded-xl p-4 space-y-1">
-                    <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+                  {/* Pillar 4 */}
+                  <div className="space-y-2 lg:pl-6">
+                    <span className="text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-wider block">
                       Software Tools
                     </span>
-                    <p className="text-sm font-bold text-slate-800 leading-snug">
+                    <p className="text-base sm:text-lg font-bold text-slate-900 leading-snug">
                       {toolsList.join(', ')}
                     </p>
                   </div>
                 </div>
-              </section>
+              </motion.section>
 
-              {/* SECTION B: TRAINING HIGHLIGHTS (CLEAN 6-BOX GRID, NO HEADER BELOW TEXT) */}
+              {/* SECTION B: TRAINING HIGHLIGHTS (CLEAN 6-BOX GRID, NO CEMENT GREY, FRAMER MOTION HOVER) */}
               <section className="space-y-4">
-                <div className="border-b border-slate-200/90 pb-3">
-                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+                <div className="border-b border-slate-200/80 pb-3 flex items-center gap-3">
+                  <span className="w-2.5 h-6 bg-[#EE2C3C] rounded-full inline-block"></span>
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-normal">
                     Training <span className="text-[#EE2C3C]">Highlights</span>
                   </h2>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                   {trainingHighlights.map((item, idx) => (
-                    <div
+                    <motion.div
                       key={idx}
-                      className="bg-white border border-slate-200/90 rounded-2xl p-5 hover:border-[#EE2C3C] hover:shadow-md transition-all space-y-2 flex flex-col justify-between"
+                      whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                      className="bg-white border border-slate-200/80 rounded-2xl p-6 hover:border-[#EE2C3C] hover:shadow-lg transition-all space-y-3 flex flex-col justify-between"
                     >
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 rounded-xl bg-red-50/80 border border-red-100 flex items-center justify-center flex-shrink-0 text-[#EE2C3C]">
+                      <div className="flex items-center space-x-3.5">
+                        <div className="w-12 h-12 rounded-xl bg-red-50 text-[#EE2C3C] border border-red-100/80 flex items-center justify-center flex-shrink-0 shadow-2xs">
                           {item.icon}
                         </div>
-                        <h4 className="font-bold text-sm text-slate-900 leading-snug">
+                        <h4 className="font-bold text-base text-slate-900 leading-snug">
                           {item.title}
                         </h4>
                       </div>
-                      <p className="text-xs text-slate-600 leading-relaxed pt-1">
+                      <p className="text-sm text-slate-600 leading-relaxed pt-1">
                         {item.desc}
                       </p>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               </section>
 
               {/* SECTION C: COURSE HIGHLIGHTS (SPLIT BANNER WITH SOFTWARE-ACCURATE IMAGE) */}
-              <section className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs">
+              <section className="bg-white border border-slate-200/80 rounded-3xl overflow-hidden shadow-sm">
                 <div className="grid grid-cols-1 md:grid-cols-12 items-stretch">
                   
                   {/* Left: Dynamic Course Image */}
-                  <div className="md:col-span-5 relative min-h-[260px] bg-slate-100">
+                  <div className="md:col-span-5 relative min-h-[280px] bg-slate-900">
                     <img
                       src={dynamicImage}
                       alt={course.title}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute bottom-3 left-3 bg-[#15304C]/90 text-white px-2.5 py-1 rounded text-[11px] font-bold">
+                    <div className="absolute bottom-3 left-3 bg-[#15304C]/95 backdrop-blur-xs text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-md">
                       Ameerpet Workstation Lab
                     </div>
                   </div>
 
                   {/* Right: Checklist Items */}
-                  <div className="md:col-span-7 p-6 sm:p-7 flex flex-col justify-center space-y-3">
-                    <h3 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
+                  <div className="md:col-span-7 p-7 sm:p-8 flex flex-col justify-center space-y-4">
+                    <h3 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-normal">
                       Course Highlights &amp; Core Competencies
                     </h3>
 
-                    <div className="space-y-2.5 pt-1">
+                    <div className="space-y-3 pt-1">
                       {courseHighlights.map((item, idx) => (
-                        <div key={idx} className="flex items-start space-x-2.5">
+                        <div key={idx} className="flex items-start space-x-3">
                           <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0 font-bold text-xs mt-0.5">
                             ✓
                           </span>
-                          <span className="text-xs sm:text-sm font-semibold text-slate-800 leading-tight">
+                          <span className="text-sm sm:text-base font-semibold text-slate-800 leading-snug">
                             {item}
                           </span>
                         </div>
@@ -650,14 +661,17 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
               </section>
 
               {/* SECTION D: INTERACTIVE SYLLABUS & ROADMAP (ACCORDIONS) */}
-              <section className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-7 shadow-xs space-y-5">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
-                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
-                    Course Contents &amp; Units Breakdown
-                    <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200">
-                      {modulesList.length} Units
-                    </span>
-                  </h2>
+              <section className="bg-white border border-slate-200/80 rounded-3xl p-7 sm:p-8 shadow-sm space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                  <div className="flex items-center gap-3">
+                    <span className="w-2.5 h-6 bg-[#EE2C3C] rounded-full inline-block"></span>
+                    <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-normal flex items-center gap-3">
+                      Course Contents &amp; Units Breakdown
+                      <span className="text-xs font-bold text-[#EE2C3C] bg-red-50 border border-red-100 px-3 py-1 rounded-full">
+                        {modulesList.length} Units
+                      </span>
+                    </h2>
+                  </div>
                   
                   <div className="flex items-center space-x-2 text-xs">
                     <button
@@ -667,64 +681,68 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                         modulesList.forEach((m) => { allOpen[m.number] = true; });
                         setExpandedModules(allOpen);
                       }}
-                      className="px-3 py-1.5 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 font-bold cursor-pointer"
+                      className="px-3.5 py-2 rounded-xl border border-slate-300 text-slate-800 hover:border-[#EE2C3C] hover:text-[#EE2C3C] bg-white font-bold cursor-pointer transition-colors"
                     >
                       Expand All
                     </button>
                     <button
                       type="button"
                       onClick={() => setExpandedModules({})}
-                      className="px-3 py-1.5 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 font-bold cursor-pointer"
+                      className="px-3.5 py-2 rounded-xl border border-slate-300 text-slate-800 hover:border-[#EE2C3C] hover:text-[#EE2C3C] bg-white font-bold cursor-pointer transition-colors"
                     >
                       Collapse All
                     </button>
                   </div>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-3.5">
                   {modulesList.map((mod) => {
                     const isOpen = !!expandedModules[mod.number];
                     return (
                       <div
                         key={mod.number}
-                        className="border border-slate-200/90 rounded-xl overflow-hidden transition-all"
+                        className={`border rounded-2xl overflow-hidden transition-all ${
+                          isOpen ? 'border-[#EE2C3C]/40 shadow-sm' : 'border-slate-200/80 hover:border-slate-300'
+                        }`}
                       >
                         <button
                           type="button"
                           onClick={() => toggleModule(mod.number)}
-                          className={`w-full p-4 text-left flex items-center justify-between transition-colors cursor-pointer ${
-                            isOpen ? 'bg-slate-50 border-b border-slate-200' : 'bg-white hover:bg-slate-50/70'
-                          }`}
+                          className="w-full p-4 sm:p-5 text-left flex items-center justify-between transition-colors cursor-pointer bg-white"
                         >
-                          <div className="flex items-center space-x-3 pr-4">
-                            <span className="w-8 h-8 rounded-lg bg-[#15304C] text-white flex items-center justify-center font-mono font-bold text-xs flex-shrink-0">
+                          <div className="flex items-center space-x-3.5 pr-4">
+                            <span className={`w-9 h-9 rounded-xl flex items-center justify-center font-mono font-bold text-sm flex-shrink-0 transition-colors ${
+                              isOpen ? 'bg-[#EE2C3C] text-white' : 'bg-[#15304C] text-white'
+                            }`}>
                               {mod.number}
                             </span>
-                            <span className="font-bold text-sm sm:text-base text-slate-900 leading-snug">
+                            <span className="font-bold text-base sm:text-lg text-slate-900 leading-snug">
                               {mod.title}
                             </span>
                           </div>
 
                           <div className="flex items-center space-x-3 flex-shrink-0">
-                            <span className="text-xs font-semibold text-slate-500 bg-white border border-slate-200 px-2.5 py-1 rounded-md hidden sm:inline-block">
+                            <span className="text-xs font-bold text-slate-600 bg-white border border-slate-200 px-3 py-1 rounded-lg hidden sm:inline-block">
                               {mod.hours} Lab Hours
                             </span>
-                            <span className="w-6 h-6 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs">
+                            <span className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-sm transition-colors ${
+                              isOpen ? 'bg-red-50 text-[#EE2C3C]' : 'bg-slate-100 text-slate-600'
+                            }`}>
                               {isOpen ? '−' : '+'}
                             </span>
                           </div>
                         </button>
 
                         {isOpen && (
-                          <div className="p-4 bg-white space-y-2">
-                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-2">
+                          <div className="px-5 pb-5 pt-1 bg-white border-t border-slate-100 space-y-3">
+                            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
                               Topics Covered:
                             </span>
-                            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700">
+                            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700 font-medium">
                               {mod.topics.map((topic: string, tIdx: number) => (
-                                <li key={tIdx} className="flex items-start space-x-2">
-                                  <span className="text-[#EE2C3C] font-bold text-sm leading-none mt-0.5">&bull;</span>
-                                  <span>{topic}</span>
+                                <li key={tIdx} className="flex items-start space-x-2.5">
+                                  <span className="text-[#EE2C3C] font-bold text-base leading-none mt-0.5">&bull;</span>
+                                  <span className="leading-snug">{topic}</span>
                                 </li>
                               ))}
                             </ul>
@@ -743,46 +761,47 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
               <CourseCertificateShowcase course={course} />
 
               {/* SECTION G: DUAL CERTIFICATION & CAPSTONE PROJECT */}
-              <section className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-7 shadow-xs space-y-4">
-                <div className="border-b border-slate-100 pb-3">
-                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+              <section className="bg-white border border-slate-200/80 rounded-3xl p-7 sm:p-8 shadow-sm space-y-5">
+                <div className="border-b border-slate-100 pb-3 flex items-center gap-3">
+                  <span className="w-2.5 h-6 bg-[#EE2C3C] rounded-full inline-block"></span>
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-normal">
                     Dual Certification &amp; Industry Capstone
                   </h2>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
-                  <div className="space-y-1.5">
-                    <span className="text-[11px] font-bold text-[#EE2C3C] uppercase tracking-wider block">
+                  <div className="space-y-2">
+                    <span className="text-xs font-bold text-[#EE2C3C] uppercase tracking-wider block">
                       1. Course Completion Certificate
                     </span>
-                    <h4 className="text-sm font-bold text-slate-900">
+                    <h4 className="text-base sm:text-lg font-bold text-slate-900">
                       Certified {course.title} Associate
                     </h4>
-                    <p className="text-xs text-slate-500 leading-relaxed">
+                    <p className="text-sm text-slate-600 leading-relaxed">
                       Accredited by {certificationText} with lifetime online QR code verification.
                     </p>
                   </div>
 
-                  <div className="space-y-1.5 sm:border-l sm:border-slate-100 sm:pl-6">
-                    <span className="text-[11px] font-bold text-[#15304C] uppercase tracking-wider block">
+                  <div className="space-y-2 sm:border-l sm:border-slate-100 sm:pl-6">
+                    <span className="text-xs font-bold text-[#15304C] uppercase tracking-wider block">
                       2. Project Verification Certificate
                     </span>
-                    <h4 className="text-sm font-bold text-slate-900">
+                    <h4 className="text-base sm:text-lg font-bold text-slate-900">
                       Live Industrial Capstone Project Dossier
                     </h4>
-                    <p className="text-xs text-slate-500 leading-relaxed">
+                    <p className="text-sm text-slate-600 leading-relaxed">
                       Proof of hands-on model creation, drafting, and tolerance audits verified by senior mentors.
                     </p>
                   </div>
                 </div>
 
                 <div className="pt-2">
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2.5">
                     Placement Drives with Top Recruiters:
                   </span>
                   <div className="flex flex-wrap gap-2">
                     {hiringPartners.map((p, idx) => (
-                      <span key={idx} className="text-xs font-semibold text-slate-700 bg-slate-50 px-3 py-1 rounded-lg border border-slate-200/90">
+                      <span key={idx} className="text-xs sm:text-sm font-semibold text-slate-800 bg-white px-3.5 py-1.5 rounded-xl border border-slate-200 hover:border-[#EE2C3C] hover:text-[#EE2C3C] transition-colors shadow-2xs">
                         {p}
                       </span>
                     ))}
@@ -791,28 +810,33 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
               </section>
 
               {/* SECTION F: FREQUENTLY ASKED QUESTIONS */}
-              <section className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-7 shadow-xs space-y-3">
-                <h2 className="text-xl font-bold text-slate-900 tracking-tight mb-3">
-                  Frequently Asked Questions (FAQ)
-                </h2>
+              <section className="bg-white border border-slate-200/80 rounded-3xl p-7 sm:p-8 shadow-sm space-y-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="w-2.5 h-6 bg-[#EE2C3C] rounded-full inline-block"></span>
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-normal">
+                    Frequently Asked Questions (FAQ)
+                  </h2>
+                </div>
 
-                <div className="space-y-2.5">
+                <div className="space-y-3">
                   {faqList.map((faq, idx) => {
                     const isFaqOpen = expandedFaq === idx;
                     return (
-                      <div key={idx} className="border border-slate-200/90 rounded-xl overflow-hidden">
+                      <div key={idx} className="border border-slate-200/80 rounded-2xl overflow-hidden">
                         <button
                           type="button"
                           onClick={() => setExpandedFaq(isFaqOpen ? null : idx)}
-                          className="w-full p-3.5 text-left font-bold text-xs sm:text-sm text-slate-800 flex items-center justify-between hover:bg-slate-50 transition-colors"
+                          className="w-full p-4 sm:p-5 text-left font-bold text-sm sm:text-base text-slate-900 flex items-center justify-between hover:bg-slate-50/50 transition-colors cursor-pointer bg-white"
                         >
-                          <span>{faq.q}</span>
-                          <span className="font-mono text-slate-500 font-bold ml-2">
+                          <span className="pr-4">{faq.q}</span>
+                          <span className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs flex-shrink-0 ${
+                            isFaqOpen ? 'bg-red-50 text-[#EE2C3C]' : 'bg-slate-100 text-slate-600'
+                          }`}>
                             {isFaqOpen ? '−' : '+'}
                           </span>
                         </button>
                         {isFaqOpen && (
-                          <div className="px-4 pb-4 pt-1 text-xs text-slate-600 bg-slate-50/70 border-t border-slate-100 leading-relaxed">
+                          <div className="px-5 pb-5 pt-1 text-sm text-slate-600 bg-white border-t border-slate-100 leading-relaxed">
                             {faq.a}
                           </div>
                         )}
@@ -828,28 +852,31 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
             <aside className="lg:col-span-4 space-y-6 lg:sticky lg:top-6">
               
               {/* Card 1: Fast Enquiry & Free Demo Form */}
-              <div id="enquiry-form-card" className="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-sm space-y-4">
+              <div id="enquiry-form-card" className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-7 shadow-sm space-y-4">
                 <div className="border-b border-slate-100 pb-3">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-[#EE2C3C] bg-red-50 px-2 py-0.5 rounded">
+                  <span className="text-xs font-black uppercase tracking-wider text-[#EE2C3C] bg-red-50 border border-red-100 px-2.5 py-1 rounded-md">
                     ADMISSIONS OPEN
                   </span>
-                  <h3 className="text-lg font-bold text-slate-900 mt-1.5">
+                  <h3 className="text-xl font-bold text-slate-900 mt-2">
                     Book A Free Demo Class
                   </h3>
+                  <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                    Speak with a senior engineering counselor today.
+                  </p>
                 </div>
 
                 {isApplySubmitted ? (
-                  <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-center space-y-2">
-                    <span className="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-base mx-auto">
+                  <div className="p-5 bg-emerald-50 border border-emerald-200 rounded-2xl text-center space-y-2">
+                    <span className="w-12 h-12 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-lg mx-auto">
                       ✓
                     </span>
-                    <h4 className="font-bold text-sm text-emerald-900">Enquiry Received!</h4>
-                    <p className="text-xs text-emerald-700">
+                    <h4 className="font-bold text-base text-emerald-900">Enquiry Received!</h4>
+                    <p className="text-sm text-emerald-700 leading-relaxed">
                       Our counselor from {applyCenter} will call you at {applyPhone} within 15 minutes.
                     </p>
                   </div>
                 ) : (
-                  <form onSubmit={handleApplySubmit} className="space-y-3 text-xs">
+                  <form onSubmit={handleApplySubmit} className="space-y-3 text-sm">
                     <div>
                       <input
                         type="text"
@@ -857,7 +884,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                         value={applyName}
                         onChange={(e) => setApplyName(e.target.value)}
                         placeholder="Your Name"
-                        className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white focus:bg-white focus:border-slate-900 focus:outline-none text-slate-800 font-medium placeholder-slate-400"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:bg-white focus:border-[#EE2C3C] focus:ring-1 focus:ring-[#EE2C3C] focus:outline-none text-slate-800 font-medium text-sm placeholder-slate-400 transition-colors"
                       />
                     </div>
 
@@ -868,7 +895,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                         value={applyPhone}
                         onChange={(e) => setApplyPhone(e.target.value)}
                         placeholder="Phone Number"
-                        className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white focus:bg-white focus:border-slate-900 focus:outline-none text-slate-800 font-medium placeholder-slate-400"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:bg-white focus:border-[#EE2C3C] focus:ring-1 focus:ring-[#EE2C3C] focus:outline-none text-slate-800 font-medium text-sm placeholder-slate-400 transition-colors"
                       />
                     </div>
 
@@ -879,7 +906,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                           setApplyCategory(e.target.value);
                           setApplyCourse('');
                         }}
-                        className="w-full appearance-none px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white focus:border-slate-900 focus:outline-none text-slate-700 font-medium cursor-pointer pr-8"
+                        className="w-full appearance-none px-4 py-3 rounded-xl border border-slate-200 bg-white focus:border-[#EE2C3C] focus:ring-1 focus:ring-[#EE2C3C] focus:outline-none text-slate-700 font-medium text-sm cursor-pointer pr-10 transition-colors"
                       >
                         <option value="">Select Course Category</option>
                         <option value="Civil & BIM Architecture">Civil &amp; BIM Architecture</option>
@@ -889,8 +916,8 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                         <option value="Piping & Plant CAD">Piping &amp; Plant CAD</option>
                         <option value="Project Management (PPM)">Project Management (PPM)</option>
                       </select>
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-500">
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                         </svg>
                       </div>
@@ -900,7 +927,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                       <select
                         value={applyCourse || course.title}
                         onChange={(e) => setApplyCourse(e.target.value)}
-                        className="w-full appearance-none px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white focus:border-slate-900 focus:outline-none text-slate-700 font-medium cursor-pointer pr-8"
+                        className="w-full appearance-none px-4 py-3 rounded-xl border border-slate-200 bg-white focus:border-[#EE2C3C] focus:ring-1 focus:ring-[#EE2C3C] focus:outline-none text-slate-700 font-medium text-sm cursor-pointer pr-10 transition-colors"
                       >
                         <option value={course.title}>{course.title}</option>
                         <option value="AutoCAD Civil 2D & 3D Planning">AutoCAD Civil 2D &amp; 3D Planning</option>
@@ -910,8 +937,8 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                         <option value="ANSYS FEA & CFD Multiphysics Simulation">ANSYS FEA &amp; CFD Multiphysics</option>
                         <option value="STAAD.Pro & ETABS Structural Design">STAAD.Pro &amp; ETABS Structural</option>
                       </select>
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-500">
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                         </svg>
                       </div>
@@ -929,7 +956,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                           else if (s === 'Maharashtra') setApplyCenter('Pune (Shivaji Nagar)');
                           else if (s === 'Tamil Nadu') setApplyCenter('Chennai (Guindy)');
                         }}
-                        className="w-full appearance-none px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white focus:border-slate-900 focus:outline-none text-slate-700 font-medium cursor-pointer pr-8"
+                        className="w-full appearance-none px-4 py-3 rounded-xl border border-slate-200 bg-white focus:border-[#EE2C3C] focus:ring-1 focus:ring-[#EE2C3C] focus:outline-none text-slate-700 font-medium text-sm cursor-pointer pr-10 transition-colors"
                       >
                         <option value="Telangana">Telangana</option>
                         <option value="Andhra Pradesh">Andhra Pradesh</option>
@@ -937,8 +964,8 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                         <option value="Maharashtra">Maharashtra</option>
                         <option value="Tamil Nadu">Tamil Nadu</option>
                       </select>
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-500">
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                         </svg>
                       </div>
@@ -948,7 +975,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                       <select
                         value={applyCenter}
                         onChange={(e) => setApplyCenter(e.target.value)}
-                        className="w-full appearance-none px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white focus:border-slate-900 focus:outline-none text-slate-700 font-medium cursor-pointer pr-8"
+                        className="w-full appearance-none px-4 py-3 rounded-xl border border-slate-200 bg-white focus:border-[#EE2C3C] focus:ring-1 focus:ring-[#EE2C3C] focus:outline-none text-slate-700 font-medium text-sm cursor-pointer pr-10 transition-colors"
                       >
                         {applyState === 'Telangana' && (
                           <>
@@ -988,8 +1015,8 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                           </>
                         )}
                       </select>
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-500">
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                         </svg>
                       </div>
@@ -998,46 +1025,47 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                     <button
                       type="submit"
                       disabled={isApplySubmitting}
-                      className="w-full py-3.5 bg-black hover:bg-slate-900 active:scale-98 text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-all shadow-md cursor-pointer mt-1 disabled:opacity-60 flex items-center justify-center gap-2"
+                      className="w-full py-4 bg-[#15304C] hover:bg-[#EE2C3C] active:scale-98 text-white font-bold text-sm uppercase tracking-wider rounded-xl transition-all shadow-md cursor-pointer mt-2 disabled:opacity-60 flex items-center justify-center gap-2"
                     >
                       {isApplySubmitting ? (
                         <span>Submitting...</span>
                       ) : (
-                        <span>Submit</span>
+                        <span>Submit Enquiry &rarr;</span>
                       )}
                     </button>
                   </form>
                 )}
 
                 {/* Direct Helpline */}
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs sm:text-sm">
                   <span className="text-slate-500 font-semibold">Counselor Helpline:</span>
-                  <a href="tel:+919849012345" className="font-black text-[#15304C] hover:text-[#D20A0B]">
+                  <a href="tel:+919849012345" className="font-bold text-[#15304C] hover:text-[#EE2C3C] transition-colors">
                     +91 98490 12345
                   </a>
                 </div>
               </div>
 
               {/* Card 2: Workstation Lab & Batch Status */}
-              <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs space-y-3 text-xs">
-                <h4 className="font-bold text-slate-900 uppercase tracking-wide">
+              <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-7 shadow-sm space-y-3.5 text-sm">
+                <h4 className="font-bold text-slate-900 uppercase tracking-wide flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                   Lab &amp; Workstation Guarantee
                 </h4>
-                <div className="space-y-2 text-slate-600">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-emerald-600 font-bold">✓</span>
+                <div className="space-y-2.5 text-slate-700 font-medium">
+                  <div className="flex items-center space-x-2.5">
+                    <span className="text-emerald-600 font-bold text-base">✓</span>
                     <span>Dedicated NVIDIA RTX GPU Workstation</span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-emerald-600 font-bold">✓</span>
+                  <div className="flex items-center space-x-2.5">
+                    <span className="text-emerald-600 font-bold text-base">✓</span>
                     <span>1:1 Lab Seat &bull; No Computer Sharing</span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-emerald-600 font-bold">✓</span>
+                  <div className="flex items-center space-x-2.5">
+                    <span className="text-emerald-600 font-bold text-base">✓</span>
                     <span>Lab Open 7 Days: 07:00 AM to 09:30 PM</span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-emerald-600 font-bold">✓</span>
+                  <div className="flex items-center space-x-2.5">
+                    <span className="text-emerald-600 font-bold text-base">✓</span>
                     <span>Continuous High-Speed Fiber Internet</span>
                   </div>
                 </div>

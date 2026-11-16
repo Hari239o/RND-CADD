@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { motion } from 'framer-motion';
 import type { Course } from '@/lib/courses-data';
 
 export interface CareerPathwayItem {
@@ -221,15 +222,15 @@ export const CareerInfographic: React.FC<CareerInfographicProps> = ({ course }) 
   };
 
   return (
-    <div className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
-      {/* THE EXACT FAN / PETAL INFOGRAPHIC DIAGRAM */}
+    <div className="bg-white border border-slate-200/80 rounded-3xl p-7 sm:p-8 shadow-sm space-y-6">
+      {/* THE FAN / PETAL INFOGRAPHIC DIAGRAM */}
       <div className="relative">
         
         {/* Desktop / Tablet Fan Layout */}
         <div className="hidden md:block relative w-full max-w-4xl mx-auto py-4">
           
           {/* Top-Center Hub Arch */}
-          <div className="w-72 mx-auto bg-white rounded-3xl border border-slate-200 shadow-md p-5 text-center relative z-20">
+          <div className="w-80 mx-auto bg-white rounded-3xl border border-slate-200/80 shadow-md p-6 text-center relative z-20">
             <h4 className="text-base sm:text-lg font-bold text-slate-900 leading-snug">
               Career Opportunities<br />
               <span className="text-[#EE2C3C] font-bold">After {course.title}</span>
@@ -239,17 +240,18 @@ export const CareerInfographic: React.FC<CareerInfographicProps> = ({ course }) 
           {/* 5 Radiating Petal Diamonds Layout in Arc */}
           <div className="relative mt-6 pt-4 pb-12">
             
-            {/* Visual Arc Connector Line */}
-            <div className="absolute top-10 left-12 right-12 h-44 border-t-2 border-dashed border-slate-300 rounded-t-full pointer-events-none -z-0 opacity-60"></div>
+            {/* Visual Arc Connector Line (Smooth Crisp Arc, No Dashed Lines) */}
+            <div className="absolute top-10 left-12 right-12 h-44 border-t-2 border-slate-200 rounded-t-full pointer-events-none -z-0 opacity-80"></div>
 
             <div className="grid grid-cols-5 gap-3 items-start relative z-10">
-              {pathways.map((item, idx) => {
+              {pathways.map((item) => {
                 const isBlue = item.color === 'blue';
                 return (
                   <div key={item.id} className="flex flex-col items-center text-center space-y-3 group">
                     {/* Rotated Diamond Petal with Icon */}
-                    <div
-                      className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl rotate-45 flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110 cursor-pointer ${
+                    <motion.div
+                      whileHover={{ scale: 1.12, y: -4, transition: { duration: 0.2 } }}
+                      className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl rotate-45 flex items-center justify-center shadow-lg transition-transform cursor-pointer ${
                         isBlue
                           ? 'bg-gradient-to-br from-[#2563EB] to-[#1D4ED8] shadow-blue-500/25'
                           : 'bg-gradient-to-br from-[#F97316] to-[#EA580C] shadow-orange-500/25'
@@ -258,7 +260,7 @@ export const CareerInfographic: React.FC<CareerInfographicProps> = ({ course }) 
                       <div className="-rotate-45 flex items-center justify-center">
                         {renderIcon(item.iconType)}
                       </div>
-                    </div>
+                    </motion.div>
 
                     {/* Curved Pointer Arrow Indicator */}
                     <div className="flex flex-col items-center">
@@ -268,15 +270,17 @@ export const CareerInfographic: React.FC<CareerInfographicProps> = ({ course }) 
                     </div>
 
                     {/* Role Title & Details Label */}
-                    <div className="space-y-1">
-                      <h5 className="text-xs sm:text-[13px] font-bold text-slate-800 tracking-tight leading-snug group-hover:text-[#EE2C3C] transition-colors min-h-[2.2rem]">
+                    <div className="space-y-1.5">
+                      <h5 className="text-sm sm:text-base font-bold text-slate-900 tracking-normal leading-snug group-hover:text-[#EE2C3C] transition-colors min-h-[2.5rem]">
                         {item.role}
                       </h5>
-                      <span className="inline-block text-[10px] font-semibold text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded border border-slate-200">
-                        {item.ctc}
-                      </span>
                       <div>
-                        <span className="inline-block text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                        <span className="inline-block text-xs font-bold text-slate-800 bg-white px-3 py-1 rounded-lg border border-slate-200 shadow-2xs">
+                          {item.ctc}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="inline-block text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
                           {item.status}
                         </span>
                       </div>
@@ -340,15 +344,15 @@ export const CareerInfographic: React.FC<CareerInfographicProps> = ({ course }) 
       </div>
 
       {/* OUR HIRING CONGLOMERATES */}
-      <div className="pt-2 border-t border-slate-100">
-        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2.5">
+      <div className="pt-3 border-t border-slate-100">
+        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2.5">
           Our Hiring Conglomerates:
         </span>
         <div className="flex flex-wrap gap-2">
           {hiringPartners.map((p, idx) => (
             <span
               key={idx}
-              className="text-xs font-bold text-slate-700 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 hover:border-[#D20A0B] hover:text-[#D20A0B] transition-colors"
+              className="text-xs sm:text-sm font-semibold text-slate-800 bg-white px-3.5 py-1.5 rounded-xl border border-slate-200 hover:border-[#EE2C3C] hover:text-[#EE2C3C] transition-colors shadow-2xs"
             >
               {p}
             </span>

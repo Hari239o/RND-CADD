@@ -17,7 +17,7 @@ export const CourseCertificateShowcase: React.FC<CourseCertificateShowcaseProps>
   const mainTool = toolsList[0] || course.title;
 
   return (
-    <section className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 lg:p-10 shadow-xs space-y-6">
+    <section className="bg-white border border-slate-200/80 rounded-3xl p-7 sm:p-8 lg:p-10 shadow-sm space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
         
         {/* LEFT COLUMN: Narrative matching exact CAD DESK layout in user Image 1 */}
@@ -26,13 +26,13 @@ export const CourseCertificateShowcase: React.FC<CourseCertificateShowcaseProps>
             <span className="text-xs sm:text-sm font-bold text-slate-800 tracking-wide uppercase block">
               Certificate
             </span>
-            <div className="w-8 h-1 bg-[#F59E0B] rounded-full mt-1 mb-3"></div>
+            <div className="w-10 h-1 bg-[#EE2C3C] rounded-full mt-1.5 mb-3"></div>
             <h2 className="text-2xl sm:text-3xl lg:text-[32px] font-bold text-slate-900 leading-tight">
               How will you get your certificate?
             </h2>
           </div>
 
-          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed text-justify">
+          <p className="text-sm text-slate-600 leading-relaxed text-justify">
             CAD DESK is a pioneer in CAD/CAM/CAE training and most of the industries give great recognition to its certificate throughout India and abroad.{' '}
             <strong className="text-slate-900 font-bold">
               {course.title} Training Certificates
@@ -40,34 +40,35 @@ export const CourseCertificateShowcase: React.FC<CourseCertificateShowcaseProps>
             are ISO verified which makes it highly reputed comparing to the other local brands and helps the student get prioritize while going for job opportunities in the industry. CAD DESK Software Training is conducted by highly knowledgeable trainers which help students to enhance their skill set by putting great emphasizes on project-based learning.
           </p>
 
-          <div className="pt-2 space-y-2 text-xs">
-            <div className="flex items-center space-x-2 text-slate-700">
+          <div className="pt-2 space-y-2.5 text-sm">
+            <div className="flex items-center space-x-2.5 text-slate-800 font-medium">
               <span className="w-5 h-5 rounded-full bg-amber-100 text-[#F59E0B] flex items-center justify-center font-bold text-xs flex-shrink-0">
                 ★
               </span>
-              <span className="font-semibold">ISO 9001:2015 Global Quality Certified</span>
+              <span>ISO 9001:2015 Global Quality Certified</span>
             </div>
-            <div className="flex items-center space-x-2 text-slate-700">
+            <div className="flex items-center space-x-2.5 text-slate-800 font-medium">
               <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-xs flex-shrink-0">
                 ✓
               </span>
-              <span className="font-semibold">Lifetime Online QR Code Verifiable Credential</span>
+              <span>Lifetime Online QR Code Verifiable Credential</span>
             </div>
-            <div className="flex items-center space-x-2 text-slate-700">
+            <div className="flex items-center space-x-2.5 text-slate-800 font-medium">
               <span className="w-5 h-5 rounded-full bg-blue-100 text-[#15304C] flex items-center justify-center font-bold text-xs flex-shrink-0">
                 🏢
               </span>
-              <span className="font-semibold">Direct Recruiter Acceptance Across 500+ MNCs</span>
+              <span>Direct Recruiter Acceptance Across 500+ MNCs</span>
             </div>
           </div>
         </div>
 
         {/* RIGHT COLUMN: Official Certificate Sample matching exact Image 1 visual */}
         <div className="lg:col-span-7">
-          <div className="relative bg-white rounded-xl border-2 border-slate-300 shadow-xl overflow-hidden p-5 sm:p-7 select-none">
+          <div className="relative bg-white rounded-2xl border-2 border-slate-200 shadow-xl overflow-hidden p-6 sm:p-8 select-none">
             
-            {/* Background Security Border Guilloche Pattern */}
-            <div className="absolute inset-1.5 border border-dashed border-slate-300 pointer-events-none rounded-lg"></div>
+            {/* Background Security Border Elegant Double Guilloche Hairline (No Dashed Pattern) */}
+            <div className="absolute inset-2 border-2 border-[#15304C]/20 pointer-events-none rounded-xl"></div>
+            <div className="absolute inset-3.5 border border-[#F59E0B]/40 pointer-events-none rounded-lg"></div>
 
             {/* Top-Left Navy & Gold Arc Decorative Elements */}
             <div className="absolute -top-12 -left-12 w-32 h-32 rounded-full border-[10px] border-[#15304C]/10 pointer-events-none"></div>
