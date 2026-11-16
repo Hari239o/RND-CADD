@@ -521,27 +521,62 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
             {/* LEFT COLUMN (8 COLS): Full Detailed Course Walkthrough */}
             <div className="lg:col-span-8 space-y-10">
               
-              {/* SECTION A: Key Course Metrics Grid */}
-              <section className="bg-white border border-[#CBD5E1] rounded-2xl p-6 shadow-xs space-y-4">
-                <h3 className="text-lg font-black text-[#15304C] uppercase tracking-wide">
-                  Course Academic Facts &amp; Eligibility
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                  <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
-                    <span className="text-[11px] font-bold text-slate-500 uppercase block mb-1">Eligibility / Prerequisite</span>
-                    <span className="font-semibold text-slate-800">{prerequisitesText}</span>
+              {/* SECTION A: Key Course Metrics (Clean Open Layout, No Nested Cards) */}
+              <section className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-7 shadow-xs">
+                <div className="border-b border-slate-100 pb-3 mb-5 flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-900 tracking-tight">
+                      Course Academic Facts &amp; Eligibility
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Industrial certification requirements, laboratory hardware, and accredited software tools.
+                    </p>
                   </div>
-                  <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
-                    <span className="text-[11px] font-bold text-slate-500 uppercase block mb-1">Awarded Credential</span>
-                    <span className="font-semibold text-slate-800">{certificationText}</span>
+                  <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200/60">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    <span>Admissions Open</span>
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {/* Metric 1 */}
+                  <div className="space-y-1">
+                    <span className="text-xs font-medium text-slate-400 uppercase tracking-wider block">
+                      Eligibility / Prerequisite
+                    </span>
+                    <p className="text-sm font-semibold text-slate-800 leading-snug">
+                      {prerequisitesText}
+                    </p>
                   </div>
-                  <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
-                    <span className="text-[11px] font-bold text-slate-500 uppercase block mb-1">Training Mode</span>
-                    <span className="font-semibold text-slate-800">{trainingMode}</span>
+
+                  {/* Metric 2 */}
+                  <div className="space-y-1 sm:border-l sm:border-slate-100 sm:pl-6">
+                    <span className="text-xs font-medium text-slate-400 uppercase tracking-wider block">
+                      Awarded Credential
+                    </span>
+                    <p className="text-sm font-semibold text-slate-800 leading-snug">
+                      {certificationText}
+                    </p>
                   </div>
-                  <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
-                    <span className="text-[11px] font-bold text-slate-500 uppercase block mb-1">Authorized Software Tools</span>
-                    <span className="font-semibold text-slate-800">{toolsList.join(', ')}</span>
+
+                  {/* Metric 3 */}
+                  <div className="space-y-1 lg:border-l lg:border-slate-100 lg:pl-6">
+                    <span className="text-xs font-medium text-slate-400 uppercase tracking-wider block">
+                      Training Mode
+                    </span>
+                    <p className="text-sm font-semibold text-slate-800 leading-snug">
+                      {trainingMode}
+                    </p>
+                  </div>
+
+                  {/* Metric 4 */}
+                  <div className="space-y-1 sm:border-l sm:border-slate-100 sm:pl-6">
+                    <span className="text-xs font-medium text-slate-400 uppercase tracking-wider block">
+                      Software Tools
+                    </span>
+                    <p className="text-sm font-semibold text-slate-800 leading-snug">
+                      {toolsList.join(', ')}
+                    </p>
                   </div>
                 </div>
               </section>
@@ -724,28 +759,28 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2">
-                    <span className="text-xs font-black text-[#D20A0B] uppercase tracking-wider">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
+                  <div className="space-y-1.5">
+                    <span className="text-[11px] font-bold text-[#D20A0B] uppercase tracking-wider block">
                       1. Course Completion Certificate
                     </span>
                     <h4 className="text-sm font-bold text-slate-900">
                       Certified {course.title} Associate
                     </h4>
-                    <p className="text-xs text-slate-600">
-                      Accredited by {certificationText} with online QR verification.
+                    <p className="text-xs text-slate-500 leading-relaxed">
+                      Accredited by {certificationText} with lifetime online QR code verification.
                     </p>
                   </div>
 
-                  <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2">
-                    <span className="text-xs font-black text-[#15304C] uppercase tracking-wider">
+                  <div className="space-y-1.5 sm:border-l sm:border-slate-100 sm:pl-6">
+                    <span className="text-[11px] font-bold text-[#15304C] uppercase tracking-wider block">
                       2. Project Verification Certificate
                     </span>
                     <h4 className="text-sm font-bold text-slate-900">
                       Live Industrial Capstone Project Dossier
                     </h4>
-                    <p className="text-xs text-slate-600">
-                      Proof of hands-on model creation and drawings verified by Ameerpet senior mentors.
+                    <p className="text-xs text-slate-500 leading-relaxed">
+                      Proof of hands-on model creation, drafting, and tolerance audits verified by senior mentors.
                     </p>
                   </div>
                 </div>

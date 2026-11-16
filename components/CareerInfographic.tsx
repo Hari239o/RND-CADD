@@ -221,32 +221,12 @@ export const CareerInfographic: React.FC<CareerInfographicProps> = ({ course }) 
   };
 
   return (
-    <div className="bg-white border border-[#CBD5E1] rounded-2xl p-6 sm:p-8 shadow-xs space-y-8">
-      {/* Header */}
-      <div className="border-b border-slate-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <div>
-          <span className="text-[10px] font-black uppercase tracking-wider text-[#D20A0B] bg-red-50 border border-red-100 px-2 py-0.5 rounded">
-            PLACEMENT CELL
-          </span>
-          <h3 className="text-xl sm:text-2xl font-black text-[#15304C] tracking-tight mt-1">
-            Career Opportunities After {course.title} In Hyderabad
-          </h3>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Industry pathways, job profiles, starting compensation &amp; active recruiting partners.
-          </p>
-        </div>
-        <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full self-start sm:self-auto">
-          ✓ 100% Placement Support
-        </span>
-      </div>
-
-      {/* ========================================================================= */}
-      {/* 1. THE EXACT FAN / PETAL INFOGRAPHIC DIAGRAM (USER'S IMAGE 1)             */}
-      {/* ========================================================================= */}
-      <div className="bg-gradient-to-b from-slate-50/60 to-white rounded-2xl p-4 sm:p-8 border border-slate-200/80">
+    <div className="bg-white border border-[#CBD5E1] rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
+      {/* THE EXACT FAN / PETAL INFOGRAPHIC DIAGRAM */}
+      <div className="relative">
         
         {/* Desktop / Tablet Fan Layout */}
-        <div className="hidden md:block relative w-full max-w-4xl mx-auto py-6">
+        <div className="hidden md:block relative w-full max-w-4xl mx-auto py-4">
           
           {/* Top-Center Hub Arch */}
           <div className="w-72 mx-auto bg-white rounded-3xl border-2 border-slate-200 shadow-lg p-5 text-center relative z-20">
@@ -365,33 +345,7 @@ export const CareerInfographic: React.FC<CareerInfographicProps> = ({ course }) 
 
       </div>
 
-      {/* ========================================================================= */}
-      {/* 2. PLACEMENT CELL ROLES & CTC CARDS (USER'S IMAGE 2)                      */}
-      {/* ========================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-        {pathways.map((item) => (
-          <div
-            key={`card-${item.id}`}
-            className="p-4 bg-slate-50 hover:bg-white rounded-xl border border-slate-200 hover:border-[#15304C] transition-all flex items-center justify-between shadow-2xs hover:shadow-sm"
-          >
-            <div>
-              <h5 className="font-extrabold text-sm text-[#15304C]">
-                {item.role}
-              </h5>
-              <p className="text-xs text-slate-500 font-medium mt-0.5">
-                Starting CTC: <span className="font-bold text-slate-700">{item.ctc}</span>
-              </p>
-            </div>
-            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
-              {item.status}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      {/* ========================================================================= */}
-      {/* 3. OUR HIRING CONGLOMERATES (USER'S IMAGE 2 FOOTER)                       */}
-      {/* ========================================================================= */}
+      {/* OUR HIRING CONGLOMERATES */}
       <div className="pt-2 border-t border-slate-100">
         <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2.5">
           Our Hiring Conglomerates:
