@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 
 interface HeaderProps {
   activeStream: string;
@@ -9,14 +10,25 @@ interface HeaderProps {
   onOpenEnrollModal: () => void;
 }
 
+const NAV_ITEMS = [
+  { id: 'all', label: 'All Programs' },
+  { id: 'civil', label: 'Civil & BIM' },
+  { id: 'mechanical', label: 'Mechanical' },
+  { id: 'eee', label: 'Electrical' },
+  { id: 'interior', label: 'Interior' },
+  { id: 'piping', label: 'Piping' },
+  { id: 'ppm', label: 'PPM' },
+];
+
 export const Header: React.FC<HeaderProps> = ({
   activeStream,
   onSelectStream,
-  onOpenEnrollModal
+  onOpenEnrollModal,
 }) => {
-  const [currentUser, setCurrentUser] = React.useState<any>(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [hoveredTab, setHoveredTab] = useState<string | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const syncUser = () => {
       try {
         if (typeof window !== 'undefined') {
@@ -61,57 +73,77 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 transition-all pointer-events-none">
-      {/* Main Floating Navigation Bar with Box Shadow & Border Radius */}
-      <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1320px] mx-auto pt-3 sm:pt-4 pointer-events-auto">
-        <div className="bg-[#FFFFFF] rounded-2xl sm:rounded-3xl border border-[#CBD5E1] shadow-[0_12px_32px_-6px_rgba(15,23,42,0.1),0_4px_12px_rgba(15,23,42,0.03)] px-5 sm:px-7 py-2.5 sm:py-3 flex items-center justify-between gap-3 xl:gap-6 transition-all">
-          {/* Prominent Official RND CADD Logo */}
+      {/* Expanded Width & Luxurious Length Container */}
+      <div className="w-full px-3 sm:px-6 lg:px-8 max-w-[1560px] mx-auto pt-3 sm:pt-4 pointer-events-auto">
+        <motion.div
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="bg-white/95 backdrop-blur-md rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-[0_16px_40px_-10px_rgba(15,23,42,0.12),0_4px_16px_rgba(15,23,42,0.03)] px-6 sm:px-8 lg:px-10 py-3.5 sm:py-4 flex items-center justify-between gap-3 xl:gap-8 transition-all"
+        >
+          {/* Prominent Official RND CADD Logo (Increased Size) */}
           <a href="#" className="flex items-center shrink-0 group py-0.5">
             <img
               src="/logo.png"
               alt="RND CADD"
-              className="h-10 sm:h-12 lg:h-14 w-auto object-contain transition-transform duration-200 group-hover:scale-105 drop-shadow-sm"
+              className="h-11 sm:h-13 lg:h-15 xl:h-16 w-auto object-contain transition-transform duration-200 group-hover:scale-105 drop-shadow-xs"
             />
           </a>
 
-          {/* Stream Navigation Switcher - Exact Image 3 Rounded Pills without icons */}
+          {/* Stream Navigation Switcher with Framer Motion Sliding Pill (NO BORDERS) */}
           <nav
-            className="hidden lg:flex items-center justify-center flex-1 mx-2 xl:mx-3 space-x-1.5 xl:space-x-2 overflow-x-auto no-scrollbar scrollbar-none py-0.5"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            onMouseLeave={() => setHoveredTab(null)}
+            className="hidden lg:flex items-center justify-center p-1.5 bg-slate-100/80 rounded-full relative"
           >
-            {[
-              { id: 'all', label: 'All Programs' },
-              { id: 'civil', label: 'Civil & BIM' },
-              { id: 'mechanical', label: 'Mechanical' },
-              { id: 'eee', label: 'Electrical' },
-              { id: 'interior', label: 'Interior' },
-              { id: 'piping', label: 'Piping' },
-              { id: 'ppm', label: 'PPM' },
-            ].map((item) => {
+            {NAV_ITEMS.map((item) => {
               const isSelected = activeStream === item.id;
               return (
                 <button
                   key={item.id}
                   onClick={() => onSelectStream(item.id)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs sm:text-[12.5px] font-bold tracking-tight transition-all duration-200 cursor-pointer select-none whitespace-nowrap ${
-                    isSelected
-                      ? 'bg-[#EE2C3C] text-white border border-[#EE2C3C] shadow-md shadow-red-500/25 scale-105'
-                      : 'bg-white text-slate-800 border border-[#EE2C3C] hover:bg-red-50/50 hover:scale-105 shadow-sm'
-                  }`}
+                  onMouseEnter={() => setHoveredTab(item.id)}
+                  className="relative px-4 py-2 rounded-full text-xs sm:text-[13px] font-bold tracking-tight cursor-pointer select-none whitespace-nowrap focus:outline-none transition-colors"
                 >
-                  <span>{item.label}</span>
+                  {/* Framer Motion Active Sliding Indicator */}
+                  {isSelected && (
+                    <motion.div
+                      layoutId="activeNavTab"
+                      className="absolute inset-0 rounded-full bg-gradient-to-r from-[#EE2C3C] via-[#E01829] to-[#D20A0B] shadow-md shadow-red-500/30"
+                      transition={{ type: 'spring', stiffness: 450, damping: 35 }}
+                    />
+                  )}
+
+                  {/* Framer Motion Hover Highlight Indicator */}
+                  {hoveredTab === item.id && !isSelected && (
+                    <motion.div
+                      layoutId="hoverNavTab"
+                      className="absolute inset-0 rounded-full bg-slate-200/70"
+                      transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                    />
+                  )}
+
+                  <span
+                    className={`relative z-10 transition-colors duration-200 ${
+                      isSelected
+                        ? 'text-white'
+                        : 'text-slate-700 hover:text-slate-950'
+                    }`}
+                  >
+                    {item.label}
+                  </span>
                 </button>
               );
             })}
           </nav>
 
           {/* CTAs */}
-          <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
+          <div className="flex items-center space-x-2.5 sm:space-x-3.5 shrink-0">
             {isStudent ? (
               <>
-                {/* Active Jobs Portal Button (Separate Page: /jobs - Ref: https://jobs.unlox.com/) */}
+                {/* Active Jobs Portal Button */}
                 <Link
                   href="/jobs"
-                  className="relative group inline-flex items-center gap-2 px-4 sm:px-4.5 py-2.5 rounded-full bg-[#0F172A] hover:bg-[#EE2C3C] text-[#FFFFFF] border border-slate-700 hover:border-[#EE2C3C] text-xs font-black tracking-wide uppercase transition-all duration-200 shadow-md hover:shadow-red-500/25 cursor-pointer active:scale-95"
+                  className="relative group inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full bg-[#0F172A] hover:bg-[#EE2C3C] text-[#FFFFFF] border border-slate-700 hover:border-[#EE2C3C] text-xs font-black tracking-wide uppercase transition-all duration-200 shadow-md hover:shadow-red-500/25 cursor-pointer active:scale-95"
                 >
                   <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -126,7 +158,7 @@ export const Header: React.FC<HeaderProps> = ({
                 {/* Logged-in Student Portal Link */}
                 <Link
                   href="/portal/student"
-                  className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 rounded-full text-xs font-bold text-[#15304C] hover:text-[#EE2C3C] border-2 border-[#CBD5E1] hover:border-[#EE2C3C] bg-[#FFFFFF] transition-all shadow-xs hover:shadow"
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-bold text-[#15304C] hover:text-[#EE2C3C] border border-[#CBD5E1] hover:border-[#EE2C3C] bg-white transition-all shadow-xs hover:shadow"
                 >
                   <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                   <span>{currentUser?.name ? currentUser.name.split(' ')[0] : 'STUDENT'} (PORTAL)</span>
@@ -146,7 +178,7 @@ export const Header: React.FC<HeaderProps> = ({
               <>
                 <Link
                   href="/portal/admin"
-                  className="inline-flex items-center gap-1.5 px-4 sm:px-4.5 py-2.5 rounded-full text-xs font-bold text-[#FFFFFF] bg-[#15304C] hover:bg-[#0F2038] border border-[#15304C] transition-all shadow-sm"
+                  className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2.5 rounded-full text-xs font-bold text-white bg-[#15304C] hover:bg-[#0F2038] border border-[#15304C] transition-all shadow-sm"
                 >
                   <span className="w-2 h-2 rounded-full bg-blue-400"></span>
                   <span>ADMIN DASHBOARD</span>
@@ -161,19 +193,19 @@ export const Header: React.FC<HeaderProps> = ({
               </>
             ) : (
               <>
-                {/* Guest State: Upgraded Modern Sign In & Sign Up buttons */}
+                {/* Guest State: Modern Borderless Sign In & Glowing Sign Up */}
                 <Link
                   href="/signin"
-                  className="px-4 sm:px-5 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-bold text-[#15304C] hover:text-[#EE2C3C] bg-white hover:bg-slate-50 border-2 border-slate-300 hover:border-[#EE2C3C] transition-all duration-200 shadow-xs hover:shadow flex items-center gap-2 cursor-pointer"
+                  className="px-4.5 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold text-slate-700 hover:text-[#EE2C3C] bg-slate-100/70 hover:bg-slate-200/70 transition-all duration-200 flex items-center gap-1.5 cursor-pointer"
                 >
-                  <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                  <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                   </svg>
                   <span>Sign In</span>
                 </Link>
                 <Link
                   href="/signup"
-                  className="px-5 sm:px-6 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-extrabold tracking-wider uppercase bg-gradient-to-r from-[#EE2C3C] via-[#E01829] to-[#D20A0B] hover:from-[#D20A0B] hover:to-[#B50809] text-white transition-all duration-200 shadow-md hover:shadow-xl hover:shadow-red-500/30 hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-1.5 cursor-pointer border border-red-500/30"
+                  className="px-5 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm font-extrabold tracking-wider uppercase bg-gradient-to-r from-[#EE2C3C] via-[#E01829] to-[#D20A0B] hover:from-[#D20A0B] hover:to-[#B50809] text-white transition-all duration-200 shadow-md hover:shadow-xl hover:shadow-red-500/30 hover:scale-105 active:scale-95 flex items-center gap-1.5 cursor-pointer"
                 >
                   <span>SIGN UP</span>
                   <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -183,7 +215,7 @@ export const Header: React.FC<HeaderProps> = ({
               </>
             )}
           </div>
-        </div>
+        </motion.div>
       </div>
     </header>
   );
