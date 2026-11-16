@@ -296,18 +296,13 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
       <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1560px] mx-auto">
         
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-5 pb-3 border-b border-slate-200 gap-3">
-          <div>
-            <span className="text-[11px] font-bold text-[#EE2C3C] tracking-wider uppercase">
-              Global Certified Programs
-            </span>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight mt-0.5">
-              Explore Programs By Engineering Domain
-            </h2>
-          </div>
-          <p className="text-xs text-slate-500 max-w-md leading-relaxed">
-            Click any engineering discipline section below to immediately open all accredited programs in that domain right in place.
-          </p>
+        <div className="mb-5 pb-3 border-b border-slate-200">
+          <span className="text-[11px] font-bold text-[#EE2C3C] tracking-wider uppercase">
+            Global Certified Programs
+          </span>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight mt-0.5">
+            Explore Programs By Engineering Domain
+          </h2>
         </div>
 
         {/* ========================================================================= */}

@@ -187,7 +187,7 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
 
   return (
     <section id="revealed-courses" className="py-14 sm:py-16 bg-[#F8FAFC] border-t border-b border-[#CBD5E1]">
-      <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1320px] mx-auto">
+      <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1560px] mx-auto">
         {/* Section Header with Dynamic Domain Title */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-8 pb-5 border-b border-[#CBD5E1] gap-6">
           <div>
@@ -316,9 +316,6 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
                     </svg>
                   </button>
                 )}
-                <span className="text-[11px] font-semibold text-slate-400 mt-2">
-                  Showing {showAllCourses ? filteredCourses.length : Math.min(8, filteredCourses.length)} of {filteredCourses.length} Certified Courses
-                </span>
               </div>
             )}
           </>

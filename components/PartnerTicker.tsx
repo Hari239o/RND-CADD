@@ -310,9 +310,6 @@ export const PartnerTicker: React.FC = () => {
             <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-2">
               Great Universities, Top Global Firms
             </h3>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Trusted by Fortune 500 EPC conglomerates, CAD/BIM software pioneers, and accredited institutions
-            </p>
           </div>
         </div>
 
@@ -366,16 +363,13 @@ export const PartnerTicker: React.FC = () => {
         <div className="cad-container relative z-10">
           
           {/* Section Header */}
-          <div className="flex flex-col items-center text-center mb-12 sm:mb-16">
+          <div className="flex flex-col items-center text-center mb-10 sm:mb-12">
             <span className="text-xs sm:text-sm font-bold text-[#0066FF] tracking-wider uppercase bg-blue-50 px-3.5 py-1.5 rounded-full border border-blue-100 mb-3">
               Why hire from us ?
             </span>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#1D1D1F] tracking-tight">
               Hiring, Made Easy
             </h2>
-            <p className="text-sm sm:text-base text-slate-500 max-w-2xl mt-3 leading-relaxed">
-              Step into India’s most advanced engineering CAD, BIM &amp; EPC talent ecosystem with certified trainees ready for deployment.
-            </p>
           </div>
 
           {/* Grid of the 2 Signature Cards from jobs.unlox.com (Image 3) */}

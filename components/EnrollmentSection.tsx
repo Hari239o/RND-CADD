@@ -115,10 +115,10 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
 
   return (
     <section id="enrollment" className="py-16 sm:py-20 bg-gradient-to-b from-[#F8FAFC] to-[#F1F5F9] border-t border-slate-200">
-      <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1320px] mx-auto">
+      <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1560px] mx-auto">
         
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-12">
+        <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-red-50 text-[#EE2C3C] border border-red-200 mb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-[#EE2C3C] animate-pulse" />
             Admissions Open • Batch 2026
@@ -126,9 +126,6 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
             Reserve Your CAD Workstation Seat
           </h2>
-          <p className="text-sm text-slate-600 mt-2.5 leading-relaxed">
-            Get guaranteed 1:1 dedicated workstation access, official licensed software, and personalized mentorship at our Ameerpet campus.
-          </p>
         </div>
 
         {/* 2-Column Responsive Card Grid */}
