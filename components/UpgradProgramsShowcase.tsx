@@ -20,55 +20,6 @@ interface FolderDefinition {
   partnerMonogram: string;
 }
 
-// Discipline SVG Icon Helper
-const renderDisciplineIcon = (id: string) => {
-  switch (id) {
-    case 'civil':
-      return (
-        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-        </svg>
-      );
-    case 'mechanical':
-      return (
-        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-      );
-    case 'electrical':
-      return (
-        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
-      );
-    case 'interior':
-      return (
-        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-        </svg>
-      );
-    case 'piping':
-      return (
-        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-        </svg>
-      );
-    case 'ppm':
-      return (
-        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-        </svg>
-      );
-    default:
-      return (
-        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-        </svg>
-      );
-  }
-};
-
 export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
   activeStream,
   onSelectStream,
@@ -371,7 +322,7 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
             if (!isSelected) {
               // =====================================================================
               // COLLAPSED DISCIPLINE STRIP (Positioned right in line with all domains)
-              // Large size, no background image, ultra clean UI with slow motion
+              // Sleek narrow width, no icons, ultra clean & attractive typography
               // =====================================================================
               return (
                 <button
@@ -379,34 +330,31 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
                   type="button"
                   onClick={() => handleFolderActivate(folder.id, folder.stream)}
                   onMouseEnter={() => handleFolderActivate(folder.id, folder.stream)}
-                  className="relative rounded-2xl overflow-hidden cursor-pointer flex flex-col justify-between p-3.5 sm:p-4 group shadow-sm hover:shadow-2xl focus:outline-none select-none text-left transition-all duration-700 ease-in-out w-full lg:w-[130px] xl:w-[148px] 2xl:w-[162px] h-[88px] sm:h-[96px] lg:h-auto lg:min-h-[500px] flex-shrink-0 hover:lg:w-[142px] hover:xl:w-[162px] hover:2xl:w-[176px] bg-white hover:bg-slate-50/90 border-2 border-slate-200/90 hover:border-[#EE2C3C] hover:-translate-y-1"
+                  className="relative rounded-2xl overflow-hidden cursor-pointer flex flex-col justify-between p-2.5 sm:p-3 xl:p-3.5 group shadow-sm hover:shadow-xl focus:outline-none select-none text-left transition-all duration-500 ease-in-out w-full lg:w-[72px] xl:w-[82px] 2xl:w-[90px] h-[76px] sm:h-[84px] lg:h-auto lg:min-h-[500px] flex-shrink-0 hover:lg:w-[80px] hover:xl:w-[90px] hover:2xl:w-[100px] bg-white hover:bg-slate-50/90 border border-slate-200/90 hover:border-[#EE2C3C] hover:-translate-y-1"
                   title={`Open ${countInFolder} courses in ${folder.name}`}
                 >
                   {/* Top Glowing Red Accent Indicator */}
-                  <div className="absolute top-0 left-0 right-0 h-1.5 bg-slate-200 group-hover:bg-[#EE2C3C] transition-all duration-700" />
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-slate-200 group-hover:bg-[#EE2C3C] transition-all duration-500" />
 
-                  {/* DESKTOP TOP / MOBILE LEFT: Discipline Icon + Course Count Badge */}
-                  <div className="relative z-10 flex lg:flex-col items-center justify-between lg:items-center w-full gap-2 pt-1">
-                    <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-slate-100 group-hover:bg-red-50 text-slate-700 group-hover:text-[#EE2C3C] border border-slate-200 group-hover:border-red-200 flex items-center justify-center transition-all duration-700 group-hover:scale-110 flex-shrink-0 shadow-xs">
-                      {renderDisciplineIcon(folder.id)}
-                    </div>
-                    <span className="text-[10px] sm:text-[10.5px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-slate-100 group-hover:bg-[#EE2C3C] text-slate-700 group-hover:text-white border border-slate-200 group-hover:border-transparent transition-all duration-700 whitespace-nowrap shadow-2xs">
+                  {/* DESKTOP TOP / MOBILE LEFT: Course Count Badge (NO ICONS) */}
+                  <div className="relative z-10 flex lg:flex-col items-center justify-between lg:items-center w-full pt-1">
+                    <span className="text-[9.5px] xl:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 group-hover:bg-[#EE2C3C] text-slate-700 group-hover:text-white border border-slate-200 group-hover:border-transparent transition-all duration-500 whitespace-nowrap shadow-2xs">
                       {countInFolder} COURSES
                     </span>
                   </div>
 
-                  {/* DESKTOP CENTER: Large, High-Contrast Vertical Typography */}
-                  <div className="relative z-10 w-full hidden lg:flex flex-col items-center justify-center flex-1 my-4">
+                  {/* DESKTOP CENTER: Sleek, High-Contrast Vertical Typography */}
+                  <div className="relative z-10 w-full hidden lg:flex flex-col items-center justify-center flex-1 my-3">
                     <span
                       style={{
                         writingMode: 'vertical-rl',
                         transform: 'rotate(180deg)',
                       }}
-                      className="text-base sm:text-[17px] xl:text-lg font-black tracking-[0.2em] uppercase text-slate-800 group-hover:text-[#EE2C3C] transition-colors duration-700 py-3 whitespace-nowrap block"
+                      className="text-xs sm:text-[13px] xl:text-sm font-black tracking-[0.22em] uppercase text-slate-800 group-hover:text-[#EE2C3C] transition-colors duration-500 py-3 whitespace-nowrap block"
                     >
                       {folder.name}
                     </span>
-                    <span className="text-[9.5px] font-bold text-slate-400 group-hover:text-slate-600 tracking-widest uppercase block mt-1 transition-colors duration-700">
+                    <span className="text-[8.5px] font-bold text-slate-400 group-hover:text-slate-600 tracking-widest uppercase block mt-1 transition-colors duration-500">
                       DISCIPLINE
                     </span>
                   </div>
@@ -422,11 +370,11 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
                   </div>
 
                   {/* DESKTOP BOTTOM / MOBILE RIGHT: Explore Action Prompt */}
-                  <div className="relative z-10 w-full flex items-center justify-center pt-2 border-t border-slate-100 group-hover:border-red-100 transition-colors duration-700">
-                    <span className="text-[11px] font-bold text-slate-400 group-hover:text-[#EE2C3C] flex items-center gap-1.5 transition-all duration-700">
-                      <span className="hidden lg:inline">Explore</span>
+                  <div className="relative z-10 w-full flex items-center justify-center pt-2 border-t border-slate-100 group-hover:border-red-100 transition-colors duration-500">
+                    <span className="text-[10px] font-bold text-slate-400 group-hover:text-[#EE2C3C] flex items-center gap-1 transition-all duration-500">
+                      <span className="hidden lg:inline text-[11px] font-bold">Explore</span>
                       <span className="lg:hidden text-[10px] bg-red-50 text-[#EE2C3C] px-2.5 py-1 rounded-full font-black">Open ↓</span>
-                      <span className="hidden lg:inline transform group-hover:translate-x-1 transition-transform duration-500">→</span>
+                      <span className="hidden lg:inline transform group-hover:translate-x-0.5 transition-transform duration-300">→</span>
                     </span>
                   </div>
                 </button>
