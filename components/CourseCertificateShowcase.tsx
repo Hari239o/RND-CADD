@@ -17,7 +17,7 @@ export const CourseCertificateShowcase: React.FC<CourseCertificateShowcaseProps>
   const mainTool = toolsList[0] || course.title;
 
   return (
-    <section className="bg-white border border-[#CBD5E1] rounded-2xl p-6 sm:p-8 lg:p-10 shadow-xs space-y-6">
+    <section className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 lg:p-10 shadow-xs space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
         
         {/* LEFT COLUMN: Narrative matching exact CAD DESK layout in user Image 1 */}
@@ -27,7 +27,7 @@ export const CourseCertificateShowcase: React.FC<CourseCertificateShowcaseProps>
               Certificate
             </span>
             <div className="w-8 h-1 bg-[#F59E0B] rounded-full mt-1 mb-3"></div>
-            <h2 className="text-2xl sm:text-3xl lg:text-[34px] font-black text-[#15304C] leading-tight">
+            <h2 className="text-2xl sm:text-3xl lg:text-[32px] font-bold text-slate-900 leading-tight">
               How will you get your certificate?
             </h2>
           </div>

@@ -221,7 +221,7 @@ export const CareerInfographic: React.FC<CareerInfographicProps> = ({ course }) 
   };
 
   return (
-    <div className="bg-white border border-[#CBD5E1] rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
+    <div className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
       {/* THE EXACT FAN / PETAL INFOGRAPHIC DIAGRAM */}
       <div className="relative">
         
@@ -229,14 +229,11 @@ export const CareerInfographic: React.FC<CareerInfographicProps> = ({ course }) 
         <div className="hidden md:block relative w-full max-w-4xl mx-auto py-4">
           
           {/* Top-Center Hub Arch */}
-          <div className="w-72 mx-auto bg-white rounded-3xl border-2 border-slate-200 shadow-lg p-5 text-center relative z-20">
-            <h4 className="text-lg font-black text-[#15304C] leading-snug">
-              Career<br />Opportunities<br />
-              <span className="text-[#D20A0B] text-base font-extrabold">After {course.title}</span>
+          <div className="w-72 mx-auto bg-white rounded-3xl border border-slate-200 shadow-md p-5 text-center relative z-20">
+            <h4 className="text-base sm:text-lg font-bold text-slate-900 leading-snug">
+              Career Opportunities<br />
+              <span className="text-[#EE2C3C] font-bold">After {course.title}</span>
             </h4>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mt-1">
-              Course In Hyderabad
-            </span>
           </div>
 
           {/* 5 Radiating Petal Diamonds Layout in Arc */}
@@ -265,21 +262,21 @@ export const CareerInfographic: React.FC<CareerInfographicProps> = ({ course }) 
 
                     {/* Curved Pointer Arrow Indicator */}
                     <div className="flex flex-col items-center">
-                      <svg className="w-5 h-6 text-slate-400 group-hover:text-[#D20A0B] transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                      <svg className="w-5 h-6 text-slate-400 group-hover:text-[#EE2C3C] transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m0 0l-4-4m4 4l4-4" />
                       </svg>
                     </div>
 
                     {/* Role Title & Details Label */}
                     <div className="space-y-1">
-                      <h5 className="text-xs sm:text-[13px] font-black uppercase text-[#15304C] tracking-tight leading-snug group-hover:text-[#D20A0B] transition-colors min-h-[2rem]">
+                      <h5 className="text-xs sm:text-[13px] font-bold text-slate-800 tracking-tight leading-snug group-hover:text-[#EE2C3C] transition-colors min-h-[2.2rem]">
                         {item.role}
                       </h5>
-                      <span className="inline-block text-[10px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                      <span className="inline-block text-[10px] font-semibold text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded border border-slate-200">
                         {item.ctc}
                       </span>
                       <div>
-                        <span className="inline-block text-[9px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                        <span className="inline-block text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                           {item.status}
                         </span>
                       </div>
@@ -296,14 +293,11 @@ export const CareerInfographic: React.FC<CareerInfographicProps> = ({ course }) 
 
         {/* Mobile View: Vertical Clean Radial Cards */}
         <div className="md:hidden space-y-4">
-          <div className="bg-white rounded-2xl border-2 border-slate-200 p-4 text-center shadow-sm">
-            <h4 className="text-base font-black text-[#15304C]">
+          <div className="bg-white rounded-2xl border border-slate-200 p-4 text-center shadow-xs">
+            <h4 className="text-base font-bold text-slate-900">
               Career Opportunities<br />
-              <span className="text-[#D20A0B] text-sm">After {course.title}</span>
+              <span className="text-[#EE2C3C] text-sm">After {course.title}</span>
             </h4>
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mt-1">
-              Course In Hyderabad
-            </span>
           </div>
 
           <div className="space-y-2.5">

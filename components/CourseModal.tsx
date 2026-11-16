@@ -350,21 +350,21 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
     <div className="fixed inset-0 z-50 bg-[#F8FAFC] w-screen h-screen flex flex-col overflow-hidden text-[#0F172A] animate-fadeIn">
       
       {/* 1. TOP STICKY BAR: CLEAN BRANDING & CLOSE */}
-      <header className="bg-white border-b border-[#CBD5E1] py-3 px-4 sm:px-6 lg:px-8 flex-shrink-0 z-30 shadow-xs">
-        <div className="max-w-[1320px] mx-auto flex items-center justify-between">
+      <header className="bg-white border-b border-slate-200 py-3.5 px-4 sm:px-6 lg:px-10 flex-shrink-0 z-30 shadow-xs">
+        <div className="max-w-[1560px] mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3 sm:space-x-4 overflow-hidden">
             <img
               src="/logo.png"
               alt="RND CADD"
               className="h-8 sm:h-9 w-auto object-contain flex-shrink-0"
             />
-            <div className="h-5 w-px bg-[#CBD5E1]"></div>
+            <div className="h-5 w-px bg-slate-200"></div>
             <div className="flex items-center space-x-2 text-xs truncate">
-              <span className="font-extrabold text-[#15304C] uppercase tracking-wider text-xs sm:text-sm">
+              <span className="font-bold text-slate-800 uppercase tracking-wider text-xs sm:text-sm">
                 CAD DESK TRAINING INSTITUTE &bull; AMEERPET HYDERABAD
               </span>
               <span className="text-slate-300 hidden md:inline">&bull;</span>
-              <span className="text-[#D20A0B] font-mono font-bold hidden md:inline">
+              <span className="text-[#EE2C3C] font-mono font-bold hidden md:inline">
                 CODE: {(course.code || course.id).toUpperCase()}
               </span>
             </div>
@@ -390,7 +390,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
         <button
           type="button"
           onClick={() => setIsEnquiryModalOpen(true)}
-          className="fixed right-0 top-1/2 -translate-y-1/2 z-40 bg-[#D20A0B] hover:bg-[#B50809] text-white text-xs font-black uppercase tracking-wider py-3.5 px-2.5 rounded-l-md shadow-xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
+          className="fixed right-0 top-1/2 -translate-y-1/2 z-40 bg-[#EE2C3C] hover:bg-[#D20A0B] text-white text-xs font-black uppercase tracking-wider py-3.5 px-2.5 rounded-l-md shadow-xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
           style={{ writingMode: 'vertical-rl' }}
           title="Open Enquiry Dialog"
         >
@@ -398,10 +398,10 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
           <span>Enquiry Now</span>
         </button>
 
-        {/* 3. HERO BANNER: 2-COLUMN SPLIT UTILIZING BOTH LEFT AND RIGHT SIDES */}
+        {/* 3. HERO BANNER: EXPANDED WIDTH UTILIZING BOTH LEFT AND RIGHT SIDES PROPERLY */}
         <div className="bg-[#15304C] text-white py-10 sm:py-12 border-b border-[#0F2038]">
-          <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div className="max-w-[1560px] mx-auto px-4 sm:px-6 lg:px-10">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
               
               {/* Left Column: Course Identity, Badges & Highlights */}
               <div className="lg:col-span-8 space-y-4">
@@ -416,7 +416,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
 
                 {/* Badges */}
                 <div className="flex flex-wrap items-center gap-2 pt-1">
-                  <span className="px-3 py-1 rounded-md bg-[#D20A0B] text-white font-extrabold uppercase text-[11px] tracking-wider">
+                  <span className="px-3 py-1 rounded-md bg-[#EE2C3C] text-white font-bold uppercase text-[11px] tracking-wider">
                     {streamText} DISCIPLINE
                   </span>
                   <span className="px-3 py-1 rounded-md bg-white/15 text-white font-bold uppercase text-[11px] border border-white/20">
@@ -427,15 +427,10 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                   </span>
                 </div>
 
-                {/* Main Program Title */}
-                <h1 className="text-2xl sm:text-4xl lg:text-[42px] font-black text-white tracking-tight uppercase leading-tight">
+                {/* Main Program Title (Pleasant Modern Typography, No Clunky All-Caps) */}
+                <h1 className="text-2xl sm:text-3xl lg:text-[40px] font-extrabold text-white tracking-tight leading-snug">
                   {course.title} Course in Hyderabad
                 </h1>
-
-                {/* Tagline / Subtitle */}
-                <p className="text-sm sm:text-base text-slate-200 font-normal leading-relaxed max-w-3xl">
-                  {course.tagline || course.overview}
-                </p>
 
                 {/* Key Facts Row */}
                 <div className="flex flex-wrap items-center gap-6 pt-4 text-xs sm:text-sm text-slate-200 border-t border-white/15">
@@ -475,7 +470,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                   <div className="flex items-baseline justify-between border-b border-slate-100 pb-3">
                     <div>
                       <span className="text-[11px] font-semibold text-slate-500 uppercase block">Standard Tuition Fee</span>
-                      <span className="text-2xl font-black text-[#D20A0B]">₹{feeAmount.toLocaleString('en-IN')}</span>
+                      <span className="text-2xl font-black text-[#EE2C3C]">₹{feeAmount.toLocaleString('en-IN')}</span>
                     </div>
                     <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
                       Zero Reservation Fee
@@ -490,7 +485,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                         onClose();
                         onEnroll(course.title);
                       }}
-                      className="w-full py-3 bg-[#D20A0B] hover:bg-[#B50809] active:scale-98 text-white text-xs sm:text-sm font-black uppercase tracking-wider rounded-xl transition-all shadow-md cursor-pointer flex items-center justify-center space-x-1.5"
+                      className="w-full py-3.5 bg-[#EE2C3C] hover:bg-[#D20A0B] active:scale-98 text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition-all shadow-md cursor-pointer flex items-center justify-center space-x-1.5"
                     >
                       <span>Enroll In This Program &rarr;</span>
                     </button>
@@ -514,9 +509,9 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
           </div>
         </div>
 
-        {/* 4. MAIN BODY CONTAINER (2-COLUMN BALANCED LAYOUT) */}
-        <main className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* 4. MAIN BODY CONTAINER (2-COLUMN BALANCED LAYOUT PROPERLY USING LEFT & RIGHT) */}
+        <main className="max-w-[1560px] mx-auto px-4 sm:px-6 lg:px-10 py-10 sm:py-12">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
             
             {/* LEFT COLUMN (8 COLS): Full Detailed Course Walkthrough */}
             <div className="lg:col-span-8 space-y-10">
@@ -524,85 +519,77 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
               {/* SECTION A: Key Course Metrics (Clean Open Layout, No Nested Cards) */}
               <section className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-7 shadow-xs">
                 <div className="border-b border-slate-100 pb-3 mb-5 flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-bold text-slate-900 tracking-tight">
-                      Course Academic Facts &amp; Eligibility
-                    </h3>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Industrial certification requirements, laboratory hardware, and accredited software tools.
-                    </p>
-                  </div>
+                  <h3 className="text-lg font-bold text-slate-900 tracking-tight">
+                    Course Academic Facts &amp; Eligibility
+                  </h3>
                   <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200/60">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                     <span>Admissions Open</span>
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
                   {/* Metric 1 */}
-                  <div className="space-y-1">
-                    <span className="text-xs font-medium text-slate-400 uppercase tracking-wider block">
+                  <div className="bg-slate-50/70 border border-slate-200/80 rounded-xl p-4 space-y-1">
+                    <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
                       Eligibility / Prerequisite
                     </span>
-                    <p className="text-sm font-semibold text-slate-800 leading-snug">
+                    <p className="text-sm font-bold text-slate-800 leading-snug">
                       {prerequisitesText}
                     </p>
                   </div>
 
                   {/* Metric 2 */}
-                  <div className="space-y-1 sm:border-l sm:border-slate-100 sm:pl-6">
-                    <span className="text-xs font-medium text-slate-400 uppercase tracking-wider block">
+                  <div className="bg-slate-50/70 border border-slate-200/80 rounded-xl p-4 space-y-1">
+                    <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
                       Awarded Credential
                     </span>
-                    <p className="text-sm font-semibold text-slate-800 leading-snug">
+                    <p className="text-sm font-bold text-slate-800 leading-snug">
                       {certificationText}
                     </p>
                   </div>
 
                   {/* Metric 3 */}
-                  <div className="space-y-1 lg:border-l lg:border-slate-100 lg:pl-6">
-                    <span className="text-xs font-medium text-slate-400 uppercase tracking-wider block">
+                  <div className="bg-slate-50/70 border border-slate-200/80 rounded-xl p-4 space-y-1">
+                    <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
                       Training Mode
                     </span>
-                    <p className="text-sm font-semibold text-slate-800 leading-snug">
+                    <p className="text-sm font-bold text-slate-800 leading-snug">
                       {trainingMode}
                     </p>
                   </div>
 
                   {/* Metric 4 */}
-                  <div className="space-y-1 sm:border-l sm:border-slate-100 sm:pl-6">
-                    <span className="text-xs font-medium text-slate-400 uppercase tracking-wider block">
+                  <div className="bg-slate-50/70 border border-slate-200/80 rounded-xl p-4 space-y-1">
+                    <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
                       Software Tools
                     </span>
-                    <p className="text-sm font-semibold text-slate-800 leading-snug">
+                    <p className="text-sm font-bold text-slate-800 leading-snug">
                       {toolsList.join(', ')}
                     </p>
                   </div>
                 </div>
               </section>
 
-              {/* SECTION B: TRAINING HIGHLIGHTS (EXACT CAD DESK 6-BOX GRID) */}
+              {/* SECTION B: TRAINING HIGHLIGHTS (CLEAN 6-BOX GRID, NO HEADER BELOW TEXT) */}
               <section className="space-y-4">
-                <div className="border-b border-[#CBD5E1] pb-3">
-                  <h2 className="text-2xl sm:text-3xl font-black text-[#15304C]">
-                    Training <span className="text-[#D20A0B]">Highlights</span>
+                <div className="border-b border-slate-200/90 pb-3">
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+                    Training <span className="text-[#EE2C3C]">Highlights</span>
                   </h2>
-                  <p className="text-xs text-slate-500 mt-1">
-                    Industry benchmark technical training standards guaranteed for every enrolled student.
-                  </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                   {trainingHighlights.map((item, idx) => (
                     <div
                       key={idx}
-                      className="bg-white border border-[#CBD5E1] rounded-xl p-5 hover:border-[#D20A0B] hover:shadow-md transition-all space-y-2 flex flex-col justify-between"
+                      className="bg-white border border-slate-200/90 rounded-2xl p-5 hover:border-[#EE2C3C] hover:shadow-md transition-all space-y-2 flex flex-col justify-between"
                     >
                       <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 rounded-lg bg-red-50 border border-red-100 flex items-center justify-center flex-shrink-0">
+                        <div className="w-10 h-10 rounded-xl bg-red-50/80 border border-red-100 flex items-center justify-center flex-shrink-0 text-[#EE2C3C]">
                           {item.icon}
                         </div>
-                        <h4 className="font-bold text-sm text-[#15304C] leading-snug">
+                        <h4 className="font-bold text-sm text-slate-900 leading-snug">
                           {item.title}
                         </h4>
                       </div>
@@ -615,7 +602,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
               </section>
 
               {/* SECTION C: COURSE HIGHLIGHTS (SPLIT BANNER WITH SOFTWARE-ACCURATE IMAGE) */}
-              <section className="bg-white border border-[#CBD5E1] rounded-2xl overflow-hidden shadow-xs">
+              <section className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs">
                 <div className="grid grid-cols-1 md:grid-cols-12 items-stretch">
                   
                   {/* Left: Dynamic Course Image */}
@@ -631,8 +618,8 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                   </div>
 
                   {/* Right: Checklist Items */}
-                  <div className="md:col-span-7 p-6 flex flex-col justify-center space-y-3">
-                    <h3 className="text-xl font-black text-[#15304C]">
+                  <div className="md:col-span-7 p-6 sm:p-7 flex flex-col justify-center space-y-3">
+                    <h3 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
                       Course Highlights &amp; Core Competencies
                     </h3>
 
@@ -654,16 +641,14 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
               </section>
 
               {/* SECTION D: INTERACTIVE SYLLABUS & ROADMAP (ACCORDIONS) */}
-              <section className="bg-white border border-[#CBD5E1] rounded-2xl p-6 sm:p-7 shadow-xs space-y-5">
+              <section className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-7 shadow-xs space-y-5">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
-                  <div>
-                    <h2 className="text-xl sm:text-2xl font-black text-[#15304C]">
-                      Course Contents &amp; Units Breakdown
-                    </h2>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      {modulesList.length} Units &bull; {totalHours} Practical Workstation Hours
-                    </p>
-                  </div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
+                    Course Contents &amp; Units Breakdown
+                    <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200">
+                      {modulesList.length} Units
+                    </span>
+                  </h2>
                   
                   <div className="flex items-center space-x-2 text-xs">
                     <button
@@ -693,7 +678,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                     return (
                       <div
                         key={mod.number}
-                        className="border border-[#CBD5E1] rounded-xl overflow-hidden transition-all"
+                        className="border border-slate-200/90 rounded-xl overflow-hidden transition-all"
                       >
                         <button
                           type="button"
@@ -706,7 +691,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                             <span className="w-8 h-8 rounded-lg bg-[#15304C] text-white flex items-center justify-center font-mono font-bold text-xs flex-shrink-0">
                               {mod.number}
                             </span>
-                            <span className="font-extrabold text-sm sm:text-base text-slate-900 leading-snug">
+                            <span className="font-bold text-sm sm:text-base text-slate-900 leading-snug">
                               {mod.title}
                             </span>
                           </div>
@@ -729,7 +714,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700">
                               {mod.topics.map((topic: string, tIdx: number) => (
                                 <li key={tIdx} className="flex items-start space-x-2">
-                                  <span className="text-[#D20A0B] font-bold text-sm leading-none mt-0.5">&bull;</span>
+                                  <span className="text-[#EE2C3C] font-bold text-sm leading-none mt-0.5">&bull;</span>
                                   <span>{topic}</span>
                                 </li>
                               ))}
@@ -749,19 +734,16 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
               <CourseCertificateShowcase course={course} />
 
               {/* SECTION G: DUAL CERTIFICATION & CAPSTONE PROJECT */}
-              <section className="bg-white border border-[#CBD5E1] rounded-2xl p-6 sm:p-7 shadow-xs space-y-4">
+              <section className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-7 shadow-xs space-y-4">
                 <div className="border-b border-slate-100 pb-3">
-                  <h2 className="text-xl sm:text-2xl font-black text-[#15304C]">
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
                     Dual Certification &amp; Industry Capstone
                   </h2>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Graduates receive accredited certificates accepted worldwide across EPC contractors.
-                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
                   <div className="space-y-1.5">
-                    <span className="text-[11px] font-bold text-[#D20A0B] uppercase tracking-wider block">
+                    <span className="text-[11px] font-bold text-[#EE2C3C] uppercase tracking-wider block">
                       1. Course Completion Certificate
                     </span>
                     <h4 className="text-sm font-bold text-slate-900">
@@ -791,7 +773,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                   </span>
                   <div className="flex flex-wrap gap-2">
                     {hiringPartners.map((p, idx) => (
-                      <span key={idx} className="text-xs font-bold text-slate-700 bg-slate-100 px-3 py-1 rounded-md border border-slate-200">
+                      <span key={idx} className="text-xs font-semibold text-slate-700 bg-slate-50 px-3 py-1 rounded-lg border border-slate-200/90">
                         {p}
                       </span>
                     ))}
@@ -800,8 +782,8 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
               </section>
 
               {/* SECTION F: FREQUENTLY ASKED QUESTIONS */}
-              <section className="bg-white border border-[#CBD5E1] rounded-2xl p-6 sm:p-7 shadow-xs space-y-3">
-                <h2 className="text-xl font-black text-[#15304C] mb-3">
+              <section className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-7 shadow-xs space-y-3">
+                <h2 className="text-xl font-bold text-slate-900 tracking-tight mb-3">
                   Frequently Asked Questions (FAQ)
                 </h2>
 
@@ -809,7 +791,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                   {faqList.map((faq, idx) => {
                     const isFaqOpen = expandedFaq === idx;
                     return (
-                      <div key={idx} className="border border-slate-200 rounded-xl overflow-hidden">
+                      <div key={idx} className="border border-slate-200/90 rounded-xl overflow-hidden">
                         <button
                           type="button"
                           onClick={() => setExpandedFaq(isFaqOpen ? null : idx)}
@@ -837,17 +819,14 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
             <aside className="lg:col-span-4 space-y-6 lg:sticky lg:top-6">
               
               {/* Card 1: Fast Enquiry & Free Demo Form */}
-              <div id="enquiry-form-card" className="bg-white border border-[#CBD5E1] rounded-2xl p-6 shadow-md space-y-4">
+              <div id="enquiry-form-card" className="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-sm space-y-4">
                 <div className="border-b border-slate-100 pb-3">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-[#D20A0B] bg-red-50 px-2 py-0.5 rounded">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-[#EE2C3C] bg-red-50 px-2 py-0.5 rounded">
                     ADMISSIONS OPEN
                   </span>
-                  <h3 className="text-lg font-black text-[#15304C] mt-1.5">
+                  <h3 className="text-lg font-bold text-slate-900 mt-1.5">
                     Book A Free Demo Class
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Speak with a senior engineering counselor today.
-                  </p>
                 </div>
 
                 {isApplySubmitted ? (
@@ -1031,8 +1010,8 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
               </div>
 
               {/* Card 2: Workstation Lab & Batch Status */}
-              <div className="bg-white border border-[#CBD5E1] rounded-2xl p-5 shadow-xs space-y-3 text-xs">
-                <h4 className="font-black text-[#15304C] uppercase tracking-wide">
+              <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs space-y-3 text-xs">
+                <h4 className="font-bold text-slate-900 uppercase tracking-wide">
                   Lab &amp; Workstation Guarantee
                 </h4>
                 <div className="space-y-2 text-slate-600">
@@ -1061,11 +1040,11 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
         </main>
 
         {/* 5. STICKY BOTTOM ENROLLMENT BAR */}
-        <div className="sticky bottom-0 bg-white border-t border-[#CBD5E1] py-3 z-30 shadow-lg">
-          <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+        <div className="sticky bottom-0 bg-white border-t border-slate-200 py-3.5 z-30 shadow-lg">
+          <div className="max-w-[1560px] mx-auto px-4 sm:px-6 lg:px-10 flex items-center justify-between gap-4">
             <div className="text-xs sm:text-sm text-slate-700 truncate">
-              <span className="font-bold text-[#15304C]">Total Tuition Fee: </span>
-              <span className="text-[#D20A0B] font-black text-base sm:text-lg">₹{feeAmount.toLocaleString('en-IN')}</span>
+              <span className="font-bold text-slate-900">Total Tuition Fee: </span>
+              <span className="text-[#EE2C3C] font-black text-base sm:text-lg">₹{feeAmount.toLocaleString('en-IN')}</span>
               <span className="text-slate-400 hidden sm:inline"> &bull; Zero Reservation Fee &bull; 1:1 Dedicated RTX GPU Workstation</span>
             </div>
 
@@ -1083,7 +1062,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                   onClose();
                   onEnroll(course.title);
                 }}
-                className="px-5 py-2 bg-[#D20A0B] hover:bg-[#B50809] active:scale-98 text-white text-xs sm:text-sm font-extrabold uppercase tracking-wider rounded-lg transition-all shadow-md cursor-pointer"
+                className="px-5 py-2.5 bg-[#EE2C3C] hover:bg-[#D20A0B] active:scale-98 text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-lg transition-all shadow-md cursor-pointer"
               >
                 Enroll In This Program &rarr;
               </button>
