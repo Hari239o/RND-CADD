@@ -76,7 +76,13 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onOpenDetails })
           <img
             src={courseImage}
             alt={course.title}
-            onError={() => setImageError(true)}
+            onError={(e) => {
+              if (!imageError) {
+                setImageError(true);
+              } else {
+                (e.currentTarget as HTMLImageElement).src = partnerInfo.fallbackImg;
+              }
+            }}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
           />

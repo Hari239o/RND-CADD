@@ -7,6 +7,7 @@ import { CareerInfographic, HIRING_CONGLOMERATES } from './CareerInfographic';
 import { CourseCertificateShowcase } from './CourseCertificateShowcase';
 import { ScrollToTopProgress } from './ScrollToTopProgress';
 import { EnquiryModal } from './EnquiryModal';
+import { CoursePreviewMedia, CourseHeroBackground, getVerifiedCourseImages } from './CourseMediaBanner';
 
 interface CourseModalProps {
   course: Course | null;
@@ -14,69 +15,9 @@ interface CourseModalProps {
   onEnroll: (courseTitle: string) => void;
 }
 
-// Dynamic software-accurate high-resolution engineering imagery
+// Dynamic software-accurate high-resolution engineering imagery with guaranteed fallbacks
 export const getCourseDynamicImage = (c: Course): string => {
-  const query = `${c.id || ''} ${c.title || ''} ${c.stream || ''} ${c.folder || ''} ${c.category || ''} ${Array.isArray(c.tools) ? c.tools.join(' ') : ''} ${typeof (c as any).software === 'string' ? (c as any).software : ''}`.toLowerCase();
-
-  // ANSYS / FEA / CFD / Multiphysics simulation
-  if (query.includes('ansys') || query.includes('fea') || query.includes('cfd') || query.includes('fluent') || query.includes('simulation') || query.includes('multiphysics')) {
-    return 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80';
-  }
-  // CATIA V5 / Surface modeling / Aerospace / Automotive
-  if (query.includes('catia') || query.includes('aerospace') || query.includes('automotive') || query.includes('surfacing')) {
-    return 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80';
-  }
-  // SOLIDWORKS / Mechanical CAD / Creo / Machine Design
-  if (query.includes('solidworks') || query.includes('creo') || query.includes('inventor') || query.includes('cimatron') || query.includes('mechanical')) {
-    return 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1200&q=80';
-  }
-  // STAAD.Pro / ETABS / High-rise Structural Engineering
-  if (query.includes('staad') || query.includes('etabs') || query.includes('structural') || query.includes('seismic')) {
-    return 'https://images.unsplash.com/photo-1541971875076-8f970d573be6?auto=format&fit=crop&w=1200&q=80';
-  }
-  // REVIT / Architectural BIM / BIM Coordinator / Navisworks
-  if (query.includes('revit') || query.includes('bim') || query.includes('navisworks')) {
-    return 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80';
-  }
-  // AUTOCAD CIVIL / 2D Drafting / Survey Planning
-  if (query.includes('autocad') || query.includes('civil') || query.includes('drafting')) {
-    return 'https://images.unsplash.com/photo-1541888946425-d0fbb186156f?auto=format&fit=crop&w=1200&q=80';
-  }
-  // LUMION / 3ds Max / V-Ray / Enscape / Walkthroughs
-  if (query.includes('lumion') || query.includes('3ds max') || query.includes('v-ray') || query.includes('vray') || query.includes('enscape')) {
-    return 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80';
-  }
-  // SKETCHUP / Interior Architecture / Joinery
-  if (query.includes('sketchup') || query.includes('interior') || query.includes('joinery') || query.includes('modular')) {
-    return 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80';
-  }
-  // ELECTRICAL / EPLAN / Industrial Automation / PLC
-  if (query.includes('eplan') || query.includes('electrical') || query.includes('automation') || query.includes('plc') || query.includes('scada')) {
-    return 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1200&q=80';
-  }
-  // ETAP / Power Systems / Substation Distribution
-  if (query.includes('etap') || query.includes('power system') || query.includes('substation') || query.includes('grid')) {
-    return 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=1200&q=80';
-  }
-  // MATLAB / Simulink
-  if (query.includes('matlab') || query.includes('simulink')) {
-    return 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80';
-  }
-  // PIPING / SP3D / Plant CAD / Caesar II
-  if (query.includes('piping') || query.includes('sp3d') || query.includes('plant') || query.includes('caesar') || query.includes('pipeline')) {
-    return 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=1200&q=80';
-  }
-  // PRIMAVERA P6 / PPM / Project Management
-  if (query.includes('primavera') || query.includes('ppm') || query.includes('project management') || query.includes('schedule')) {
-    return 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80';
-  }
-
-  // Fallback to custom course image if valid and not the generic electrical breadboard
-  if (c.image && !c.image.includes('1581092160607')) {
-    return c.image;
-  }
-
-  return 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1200&q=80';
+  return getVerifiedCourseImages(c).primary;
 };
 
 export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnroll }) => {
@@ -396,8 +337,11 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
         </div>
 
         {/* 3. HERO BANNER: EXPANDED WIDTH UTILIZING BOTH LEFT AND RIGHT SIDES PROPERLY */}
-        <div className="bg-[#15304C] text-white py-10 sm:py-12 border-b border-[#0F2038]">
-          <div className="max-w-[1560px] mx-auto px-4 sm:px-6 lg:px-10">
+        <div className="bg-[#15304C] text-white py-10 sm:py-12 border-b border-[#0F2038] relative overflow-hidden">
+          {/* Animated Ambient Engineering Background Canvas */}
+          <CourseHeroBackground stream={streamText} />
+
+          <div className="max-w-[1560px] mx-auto px-4 sm:px-6 lg:px-10 relative z-10">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
               
               {/* Left Column: Course Identity, Badges & Highlights */}
@@ -450,18 +394,9 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
 
               {/* Right Column: Course Image Preview Card with Instant CTA */}
               <div className="lg:col-span-4">
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden p-5 text-slate-800 space-y-4">
-                  {/* Dynamic High-Res Course Image */}
-                  <div className="relative h-48 w-full rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
-                    <img
-                      src={dynamicImage}
-                      alt={course.title}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute top-2 left-2 bg-[#15304C]/90 text-white text-[10px] font-bold px-2.5 py-1 rounded">
-                      {mainTool}
-                    </div>
-                  </div>
+                <div className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden p-5 text-slate-800 space-y-4">
+                  {/* Interactive Dynamic Media Banner (3D Simulation Canvas & 4K Render) */}
+                  <CoursePreviewMedia course={course} mainTool={mainTool} />
 
                   {/* Fee & Batch Info */}
                   <div className="flex items-baseline justify-between border-b border-slate-100 pb-3">
@@ -612,12 +547,19 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
               <section className="bg-white border border-slate-200/80 rounded-3xl overflow-hidden shadow-sm">
                 <div className="grid grid-cols-1 md:grid-cols-12 items-stretch">
                   
-                  {/* Left: Dynamic Course Image */}
-                  <div className="md:col-span-5 relative min-h-[280px] bg-slate-900">
+                  {/* Left: Dynamic Course Image with Fail-Safe Multi-Tier Fallback */}
+                  <div className="md:col-span-5 relative min-h-[280px] bg-slate-900 overflow-hidden">
                     <img
                       src={dynamicImage}
                       alt={course.title}
-                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const verified = getVerifiedCourseImages(course);
+                        const target = e.currentTarget as HTMLImageElement;
+                        if (target.src !== verified.secondary) {
+                          target.src = verified.secondary;
+                        }
+                      }}
+                      className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
                     />
                     <div className="absolute bottom-3 left-3 bg-[#15304C]/95 backdrop-blur-xs text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-md">
                       Ameerpet Workstation Lab
