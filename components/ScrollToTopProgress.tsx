@@ -5,11 +5,13 @@ import React, { useState, useEffect } from 'react';
 interface ScrollToTopProgressProps {
   targetRef?: React.RefObject<HTMLElement | null>;
   threshold?: number;
+  className?: string;
 }
 
 export const ScrollToTopProgress: React.FC<ScrollToTopProgressProps> = ({
   targetRef,
   threshold = 150,
+  className,
 }) => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
@@ -66,13 +68,13 @@ export const ScrollToTopProgress: React.FC<ScrollToTopProgressProps> = ({
 
   return (
     <div
-      className="fixed bottom-6 right-6 z-50 transition-all duration-300 animate-in fade-in zoom-in-90"
+      className={className || "fixed bottom-6 right-6 z-50 transition-all duration-300 animate-in fade-in zoom-in-90"}
       style={{ pointerEvents: 'auto' }}
     >
       <button
         type="button"
         onClick={scrollToTop}
-        className="relative group w-12 h-12 sm:w-[50px] sm:h-[50px] bg-white rounded-full shadow-lg hover:shadow-xl flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer border border-slate-100"
+        className="relative group w-12 h-12 bg-white rounded-full shadow-lg hover:shadow-xl flex items-center justify-center overflow-hidden transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer border border-slate-200"
         title="Scroll to Top"
         aria-label="Scroll to top of page"
       >

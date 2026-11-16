@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
+import { COURSES } from '@/lib/courses-data';
 
 export const dynamic = 'force-dynamic';
 
@@ -1043,8 +1044,58 @@ function normalizeCourse(raw: any): StoredCourse {
   };
 }
 
+// Build complete in-memory courses list merging rich courses-data with seeded courses
+function buildAllWebsiteCourses(): StoredCourse[] {
+  const list: StoredCourse[] = [];
+  const addedTitles = new Set<string>();
+
+  // 1. First add all courses from COURSES in lib/courses-data.ts (the actual website courses)
+  COURSES.forEach((c, idx) => {
+    const existing = INITIAL_SEEDED_COURSES.find(
+      (s) => s.id.toLowerCase() === c.id.toLowerCase() || s.title.toLowerCase().trim() === c.title.toLowerCase().trim()
+    );
+
+    const folder = c.folder || (
+      c.stream === 'mechanical' ? 'mechanical' :
+      c.stream === 'eee' ? 'electrical' :
+      c.stream === 'interior' ? 'interior' :
+      c.stream === 'ppm' ? 'ppm' :
+      c.stream === 'piping' ? 'piping' : 'civil'
+    );
+
+    const feeAmount = c.fee || existing?.fee || (folder === 'ppm' ? 32000 : folder === 'civil' ? 35000 : 34000);
+    const codeVal = c.code || existing?.code || `CAD-${folder.toUpperCase().slice(0, 3)}-${String(idx + 1).padStart(2, '0')}`;
+    const softwareVal = Array.isArray(c.tools) && c.tools.length > 0 ? c.tools.join(', ') : (c as any).software || '';
+
+    const courseItem = normalizeCourse({
+      ...c,
+      code: codeVal,
+      folder,
+      fee: feeAmount,
+      price: feeAmount,
+      software: softwareVal,
+      classes: existing?.classes || (c as any).classes,
+    });
+
+    list.push(courseItem);
+    addedTitles.add(c.title.toLowerCase().trim());
+    addedTitles.add(c.id.toLowerCase().trim());
+  });
+
+  // 2. Add any remaining seeded courses from INITIAL_SEEDED_COURSES that aren't duplicates
+  INITIAL_SEEDED_COURSES.forEach((s) => {
+    if (!addedTitles.has(s.title.toLowerCase().trim()) && !addedTitles.has(s.id.toLowerCase().trim())) {
+      list.push(normalizeCourse(s));
+      addedTitles.add(s.title.toLowerCase().trim());
+      addedTitles.add(s.id.toLowerCase().trim());
+    }
+  });
+
+  return list;
+}
+
 // Global in-memory cache to ensure instant persistence across API calls in fallback mode
-let inMemoryCourses: StoredCourse[] = INITIAL_SEEDED_COURSES.map(normalizeCourse);
+let inMemoryCourses: StoredCourse[] = buildAllWebsiteCourses();
 
 // GET all courses or filter by folder / stream
 export async function GET(request: Request) {
@@ -1150,12 +1201,22 @@ export async function PUT(request: Request) {
       updatedAt: new Date().toISOString(),
     });
 
-    // Update in-memory store immediately
-    inMemoryCourses = inMemoryCourses.map(c =>
-      (courseId && c.id === courseId) || (courseTitle && c.title.toLowerCase().trim() === courseTitle.toLowerCase().trim())
-        ? updatedCourse
-        : c
-    );
+    // Update in-memory store immediately with case-insensitive matching
+    let matched = false;
+    inMemoryCourses = inMemoryCourses.map((c) => {
+      if (
+        (courseId && (c.id === courseId || c.id.toLowerCase() === courseId.toLowerCase())) ||
+        (courseTitle && c.title.toLowerCase().trim() === courseTitle.toLowerCase().trim())
+      ) {
+        matched = true;
+        return updatedCourse;
+      }
+      return c;
+    });
+
+    if (!matched) {
+      inMemoryCourses.push(updatedCourse);
+    }
 
     try {
       const { db, isConnected } = await connectToDatabase();

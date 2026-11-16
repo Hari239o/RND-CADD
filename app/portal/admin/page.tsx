@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import type { JobPost, JobApplicant } from '@/lib/jobs-data';
 import { INITIAL_JOBS } from '@/lib/jobs-data';
+import { COURSES } from '@/lib/courses-data';
 
 interface StudentRecord {
   id: string;
@@ -404,140 +405,56 @@ const RedCrossCloseButton = ({ onClick, title = 'Close' }: { onClick: () => void
 );
 
 
-const DEFAULT_COURSES: CourseItem[] = [
-  {
-    id: 'CRS-CIV-01',
-    code: 'BIM-CIV-90',
-    title: 'Civil CADD & Master BIM',
-    folder: 'civil',
-    domain: 'Civil & Architectural Engineering',
-    stream: 'civil',
-    software: 'Autodesk Revit Architecture, AutoCAD 2D/3D, Enscape 3D, 3ds Max',
-    duration: '90 Days (180 Hours)',
+const DEFAULT_COURSES: CourseItem[] = COURSES.map((c, idx) => {
+  const folder = (c.folder || (
+    c.stream === 'mechanical' ? 'mechanical' :
+    c.stream === 'eee' ? 'electrical' :
+    c.stream === 'interior' ? 'interior' :
+    c.stream === 'ppm' ? 'ppm' :
+    c.stream === 'piping' ? 'piping' : 'civil'
+  )) as any;
+
+  const domain =
+    folder === 'mechanical' ? 'Mechanical & Automotive Design' :
+    folder === 'electrical' ? 'Electrical & Automation Engineering' :
+    folder === 'interior' ? 'Interior Architecture & Space Planning' :
+    folder === 'ppm' ? 'Construction & EPC Project Management (PPM)' :
+    folder === 'piping' ? 'Process Plant & Piping Engineering' :
+    'Civil & Architectural Engineering';
+
+  const feeAmount = c.fee || (folder === 'ppm' ? 32000 : folder === 'civil' ? 35000 : 34000);
+
+  return {
+    id: c.id,
+    code: c.code || `CAD-${folder.toUpperCase().slice(0, 3)}-${String(idx + 1).padStart(2, '0')}`,
+    title: c.title,
+    folder,
+    domain,
+    stream: c.stream || (folder === 'mechanical' || folder === 'piping' ? 'mechanical' : folder === 'electrical' ? 'eee' : 'civil'),
+    category: c.category || 'Professional',
+    software: Array.isArray(c.tools) && c.tools.length > 0 ? c.tools.join(', ') : (c as any).software || '',
+    tools: Array.isArray(c.tools) ? c.tools : [],
+    duration: c.duration || '90 Days (180 Hours)',
+    totalHours: c.totalHours || 120,
+    level: c.level || 'Professional',
+    rating: c.rating || '4.9/5.0',
+    enrolledStudents: c.enrolledStudents || '1,420+ Engineers Trained',
     mode: 'Classroom & Dedicated CAD Workstation Lab',
-    fee: 35000,
-    price: 35000,
+    fee: feeAmount,
+    price: feeAmount,
     status: 'Active',
-    image: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80',
-    overview: 'Master end-to-end architectural BIM workflows from parametric floor layout generation to multi-disciplinary clash detection.',
-    syllabus: [
-      'AutoCAD 2D Drafting, Structural Detailing & Layer Architecture',
-      'Parametric Revit Families, Walls, Slabs, Grids & Elevation Sections',
-      'BIM 360 Construction Cloud Coordination & Clash Detection',
-      'Enscape Real-Time Daylight & Photorealistic Walkthrough Rendering'
-    ]
-  },
-  {
-    id: 'CRS-MEC-02',
-    code: 'CAD-MEC-90',
-    title: 'Mechanical CAD/CAM/CAE Diploma',
-    folder: 'mechanical',
-    domain: 'Mechanical & Automotive Design',
-    stream: 'mechanical',
-    software: 'Dassault CATIA V5, SolidWorks 2026, ANSYS Workbench',
-    duration: '90 Days (180 Hours)',
-    mode: 'Classroom & Dedicated CAD Workstation Lab',
-    fee: 32000,
-    price: 32000,
-    status: 'Active',
-    image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80',
-    overview: 'Comprehensive mechanical product engineering program encompassing parametric part sketching, Class-A surfacing, and ANSYS FEA.',
-    syllabus: [
-      'SolidWorks 3D Parametric Part Modeling, Sheet Metal & Welded Frames',
-      'CATIA V5 Generative Shape Design (GSD) & Surface Modeling',
-      'Mechanism Kinematics, Collision Analysis & Dynamic Motion Study',
-      'ANSYS FEA Static Structural, Thermal & Modal Vibration Simulation'
-    ]
-  },
-  {
-    id: 'CRS-ELE-03',
-    code: 'CAD-ELE-60',
-    title: 'Electrical CADD & Switchgear Design',
-    folder: 'electrical',
-    domain: 'Electrical & Automation Engineering',
-    stream: 'eee',
-    software: 'AutoCAD Electrical, MATLAB Simulink, ETAP Fundamentals',
-    duration: '60 Days (120 Hours)',
-    mode: 'Classroom & Dedicated CAD Workstation Lab',
-    fee: 28000,
-    price: 28000,
-    status: 'Active',
-    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80',
-    overview: 'Industrial electrical system design covering single-line diagrams, substation layouts, control panel schematics, and load flow transient calculations.',
-    syllabus: [
-      'Single Line Diagrams (SLD) & Substation Schematic Routing',
-      'Control Panel Layout, Wire Sizing & Bill of Materials (BOM)',
-      'PLC / SCADA Circuit Logic Schematics & Terminal Block Assignment',
-      'MATLAB Simulink Power System Modeling & Harmonic Analysis'
-    ]
-  },
-  {
-    id: 'CRS-INT-04',
-    code: 'ARC-INT-60',
-    title: 'Interior Architecture & 3D Visualization',
-    folder: 'interior',
-    domain: 'Interior Architecture & Space Planning',
-    stream: 'civil',
-    software: 'Trimble SketchUp Pro, Autodesk 3ds Max, Chaos V-Ray 6, AutoCAD',
-    duration: '60 Days (120 Hours)',
-    mode: 'Classroom & Dedicated CAD Workstation Lab',
-    fee: 30000,
-    price: 30000,
-    status: 'Active',
-    image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80',
-    overview: 'Interior architectural space planning, modular kitchen ergonomics, custom joinery millwork, and photorealistic raytraced 4K rendering.',
-    syllabus: [
-      'Residential & Commercial Floor Layout Space Planning in 2D AutoCAD',
-      'SketchUp Modular Kitchen & Wardrobe Joinery Details',
-      '3ds Max Photorealistic Interior Lighting, Materials & Camera Framing',
-      'V-Ray 6 Raytracing Render Engine & Cinematic 4K Post-Production'
-    ]
-  },
-  {
-    id: 'CRS-PPM-05',
-    code: 'PPM-PRO-45',
-    title: 'Project Planning & Management (PPM)',
-    folder: 'ppm',
-    domain: 'Construction & EPC Project Management (PPM)',
-    stream: 'civil',
-    software: 'Oracle Primavera P6 Professional, Microsoft Project (MSP)',
-    duration: '45 Days (90 Hours)',
-    mode: 'Executive Weekend / Regular Lab',
-    fee: 25000,
-    price: 25000,
-    status: 'Active',
-    image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80',
-    overview: 'Master enterprise construction project scheduling, Critical Path Method (CPM), resource allocation matrices, S-Curves, and cost-variance earned value management.',
-    syllabus: [
-      'Work Breakdown Structure (WBS) & Organizational Breakdown (OBS)',
-      'Critical Path Method (CPM), Float Analysis & Precedence Diagramming',
-      'Resource Leveling, Earned Value Analysis (EVA) & Cost S-Curves',
-      'Baseline Comparison, Variance Tracking & Executive Status Reporting'
-    ]
-  },
-  {
-    id: 'CRS-PIP-06',
-    code: 'PIP-IND-60',
-    title: 'Piping & Plant Engineering CADD',
-    folder: 'piping',
-    domain: 'Process Plant & Piping Engineering',
-    stream: 'mechanical',
-    software: 'AutoCAD Plant 3D, Intergraph SmartPlant 3D (SP3D), Caesar II',
-    duration: '60 Days (120 Hours)',
-    mode: 'Classroom & Dedicated CAD Workstation Lab',
-    fee: 34000,
-    price: 34000,
-    status: 'Active',
-    image: 'https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?auto=format&fit=crop&w=1200&q=80',
-    overview: 'Process piping drafting, equipment layout arrangements, 3D pipe routing, automated isometric generation, and Caesar II thermal expansion stress analysis.',
-    syllabus: [
-      'Piping & Instrumentation Diagrams (P&ID) Standard Symbology',
-      'Equipment Layout, 3D Piping Routing & Pipe Rack Design',
-      'Isometric Drawing Generation & Material Take-Off (MTO)',
-      'Caesar II Pipe Flexibility & Thermal Expansion Stress Analysis'
-    ]
-  }
-];
+    image: c.image || 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80',
+    overview: c.overview || c.tagline || '',
+    tagline: c.tagline || '',
+    prerequisites: c.prerequisites || 'Diploma / B.Tech / Working Professional',
+    certification: c.certification || 'Autodesk & Dassault Certificate',
+    careerRoles: Array.isArray(c.careerRoles) ? c.careerRoles : ['Design Engineer', 'CAD Specialist'],
+    capstoneProject: c.capstoneProject,
+    modules: c.modules as any,
+    syllabus: Array.isArray(c.modules) ? c.modules.map((m) => m.title) : ['Standard CAD Syllabus'],
+    classes: (c as any).classes || [],
+  };
+});
 
 export default function AdminPortalPage() {
   // Navigation State - Tab 01 "Student", Tab 02 "Courses" directly below

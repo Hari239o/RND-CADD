@@ -7,7 +7,7 @@ import { CareerInfographic } from './CareerInfographic';
 import { CourseCertificateShowcase } from './CourseCertificateShowcase';
 import { ScrollToTopProgress } from './ScrollToTopProgress';
 import { EnquiryModal } from './EnquiryModal';
-import { CourseHeroBackground, getVerifiedCourseImages } from './CourseMediaBanner';
+import { CourseHeroBackground, getVerifiedCourseImages, CourseSafeImage } from './CourseMediaBanner';
 
 interface CourseModalProps {
   course: Course | null;
@@ -316,27 +316,6 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
       {/* 2. FULL SCREEN SCROLLABLE CONTENT */}
       <div ref={scrollContainerRef} className="flex-1 overflow-y-auto bg-[#F8FAFC] relative">
         
-        {/* Right Floating "Enquiry Now" Vertical Tab */}
-        <div className="fixed right-0 top-1/2 -translate-y-1/2 z-50">
-          <button
-            type="button"
-            onClick={() => setIsEnquiryModalOpen(true)}
-            className="group flex items-center gap-2 bg-[#EE2C3C] hover:bg-[#D20A0B] text-white px-3 py-3.5 rounded-l-xl shadow-2xl cursor-pointer transition-all hover:pr-4"
-            style={{
-              writingMode: 'vertical-rl',
-              textOrientation: 'mixed',
-              transform: 'rotate(180deg)',
-            }}
-            aria-label="Open Enquiry Form"
-            title="Open Enquiry Dialog"
-          >
-            <span className="text-xs font-black tracking-widest uppercase flex items-center gap-2">
-              <span className="inline-block transform -rotate-90 text-sm">📞</span>
-              <span>Enquiry Now</span>
-            </span>
-          </button>
-        </div>
-
         {/* 3. HERO BANNER: EXPANDED WIDTH UTILIZING BOTH LEFT AND RIGHT SIDES PROPERLY */}
         <div className="bg-[#15304C] text-white py-10 sm:py-12 border-b border-[#0F2038] relative overflow-hidden">
           {/* Animated Ambient Engineering Background with Discipline Video Loop */}
@@ -396,17 +375,14 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
               {/* Right Column: Course Image Preview Card with Instant CTA */}
               <div className="lg:col-span-4">
                 <div className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden p-5 text-slate-800 space-y-4">
-                  {/* Clean High-Resolution Course Software Preview (No gimmicky 3D canvas/FPS/simulation toggles) */}
+                  {/* Clean High-Resolution Course Software Preview with Guaranteed Fail-Safe Fallback */}
                   <div className="relative h-52 sm:h-56 w-full rounded-2xl overflow-hidden bg-slate-900 border border-slate-200/80 shadow-inner group">
-                    <img
-                      src={verifiedImages.primary}
+                    <CourseSafeImage
+                      primary={verifiedImages.primary}
+                      secondary={verifiedImages.secondary}
+                      title={course.title}
+                      tag={verifiedImages.tag || mainTool}
                       alt={course.title}
-                      onError={(e) => {
-                        const target = e.currentTarget as HTMLImageElement;
-                        if (target.src !== verifiedImages.secondary) {
-                          target.src = verifiedImages.secondary;
-                        }
-                      }}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
@@ -1061,8 +1037,12 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
 
       </div>
 
-      {/* Dynamic Circular Progress Scroll-To-Top Button matching Image 2 */}
-      <ScrollToTopProgress targetRef={scrollContainerRef} threshold={200} />
+      {/* Dynamic Circular Progress Scroll-To-Top Button elevated above sticky footer */}
+      <ScrollToTopProgress
+        targetRef={scrollContainerRef}
+        threshold={200}
+        className="fixed bottom-20 right-6 z-50 transition-all duration-300 animate-in fade-in zoom-in-90"
+      />
 
       {/* Global Interactive Enquiry Modal matching exact user screenshot */}
       <EnquiryModal

@@ -100,6 +100,12 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
       }
     };
     fetchCourses();
+    const interval = setInterval(fetchCourses, 5000);
+    window.addEventListener('focus', fetchCourses);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', fetchCourses);
+    };
   }, []);
 
   const folders: FolderDefinition[] = [

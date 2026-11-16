@@ -288,7 +288,7 @@ export const COURSES: Course[] = [
     rating: '4.8/5.0',
     enrolledStudents: '840+ Designers Trained',
     tools: ['Autodesk 3ds Max 2026', 'Chaos V-Ray 6', 'Adobe Photoshop'],
-    image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=900&q=80',
+    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
     overview: 'Translate CAD blueprints and Revit files into stunning photorealistic architectural visualizations for real estate presentation, client walk-throughs, and portfolio development.',
     certification: 'RND CADD Architectural Visualization Master',
     careerRoles: ['3D Visualizer', 'Architectural CG Artist', 'Interior Render Specialist', 'Media Producer'],

@@ -4,7 +4,82 @@ import React, { useState } from 'react';
 import type { Course } from '@/lib/courses-data';
 
 // Curated, verified high-resolution imagery with multiple fallbacks for every discipline & software
+export const generateEngineeringFallbackSvg = (title: string, tag?: string): string => {
+  const safeTitle = (title || 'CAD DESK Training Course').replace(/[<>&"]/g, '');
+  const safeTag = (tag || 'Industry Certified Program').replace(/[<>&"]/g, '');
+  
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+    <defs>
+      <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#0F2338"/>
+        <stop offset="50%" stop-color="#15304C"/>
+        <stop offset="100%" stop-color="#0A1624"/>
+      </linearGradient>
+      <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+      </pattern>
+    </defs>
+    <rect width="800" height="500" fill="url(#bg)"/>
+    <rect width="800" height="500" fill="url(#grid)"/>
+    <circle cx="700" cy="100" r="180" fill="rgba(238,44,60,0.08)"/>
+    <circle cx="100" cy="400" r="220" fill="rgba(59,130,246,0.08)"/>
+    <g transform="translate(400, 220)" stroke="rgba(56,189,248,0.5)" stroke-width="2" fill="none">
+      <polygon points="0,-70 110,-10 0,50 -110,-10" fill="rgba(56,189,248,0.08)" />
+      <polygon points="0,50 110,-10 110,60 0,120" fill="rgba(56,189,248,0.04)" />
+      <polygon points="0,50 -110,-10 -110,60 0,120" fill="rgba(56,189,248,0.02)" />
+      <line x1="0" y1="-70" x2="0" y2="50" stroke="rgba(238,44,60,0.7)" stroke-dasharray="4,4"/>
+    </g>
+    <rect x="50" y="50" width="130" height="32" rx="16" fill="rgba(238,44,60,0.2)" stroke="#EE2C3C" stroke-width="1.5"/>
+    <text x="115" y="71" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="800" fill="#FFFFFF" text-anchor="middle" letter-spacing="1">CAD DESK</text>
+    <rect x="50" y="380" width="300" height="28" rx="6" fill="rgba(255,255,255,0.1)"/>
+    <text x="65" y="399" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="700" fill="#38BDF8">${safeTag}</text>
+    <text x="50" y="440" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="800" fill="#FFFFFF">${safeTitle}</text>
+  </svg>`;
+  
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+};
+
+export const CourseSafeImage: React.FC<{
+  primary: string;
+  secondary: string;
+  title: string;
+  tag?: string;
+  alt: string;
+  className?: string;
+}> = ({ primary, secondary, title, tag, alt, className }) => {
+  const [src, setSrc] = useState(primary);
+  const [hasErroredOnce, setHasErroredOnce] = useState(false);
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      onError={() => {
+        if (!hasErroredOnce && secondary && secondary !== src) {
+          setHasErroredOnce(true);
+          setSrc(secondary);
+        } else {
+          setSrc(generateEngineeringFallbackSvg(title, tag));
+        }
+      }}
+      className={className}
+    />
+  );
+};
+
 export const getVerifiedCourseImages = (c: Course): { primary: string; secondary: string; tag: string } => {
+  const customImage = typeof c.image === 'string' ? c.image.trim() : '';
+  const mainTag = (Array.isArray(c.tools) && c.tools[0]) || (c as any).software || c.title;
+
+  // 1. Priority 1: If course has an admin-edited or uploaded image URL, use it directly!
+  if (customImage && (customImage.startsWith('http') || customImage.startsWith('/') || customImage.startsWith('data:'))) {
+    return {
+      primary: customImage,
+      secondary: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80',
+      tag: mainTag,
+    };
+  }
+
   const query = `${c.id || ''} ${c.title || ''} ${c.stream || ''} ${c.folder || ''} ${c.category || ''} ${Array.isArray(c.tools) ? c.tools.join(' ') : ''} ${typeof (c as any).software === 'string' ? (c as any).software : ''}`.toLowerCase();
 
   // 1. 3ds Max & V-Ray / Architectural Visualization / Lumion / Walkthroughs
