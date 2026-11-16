@@ -3,6 +3,9 @@
 import React, { useState } from 'react';
 import type { Course } from '@/lib/courses-data';
 import { CareerInfographic } from './CareerInfographic';
+import { CourseCertificateShowcase } from './CourseCertificateShowcase';
+import { ScrollToTopProgress } from './ScrollToTopProgress';
+import { EnquiryModal } from './EnquiryModal';
 
 interface CourseModalProps {
   course: Course | null;
@@ -76,15 +79,20 @@ export const getCourseDynamicImage = (c: Course): string => {
 };
 
 export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnroll }) => {
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
   const [expandedModules, setExpandedModules] = useState<{ [key: string]: boolean }>({ '01': true, '02': false });
   const [expandedFaq, setExpandedFaq] = useState<number | null>(0);
   
   // Quick Enquiry Form State
   const [applyName, setApplyName] = useState('');
   const [applyPhone, setApplyPhone] = useState('');
-  const [applyEmail, setApplyEmail] = useState('');
-  const [applyBatch, setApplyBatch] = useState('Weekday Morning (08:00 AM - 10:30 AM)');
+  const [applyCategory, setApplyCategory] = useState('');
+  const [applyCourse, setApplyCourse] = useState('');
+  const [applyState, setApplyState] = useState('Telangana');
+  const [applyCenter, setApplyCenter] = useState('Ameerpet (Hyderabad Headquarters)');
+  const [isApplySubmitting, setIsApplySubmitting] = useState(false);
   const [isApplySubmitted, setIsApplySubmitted] = useState(false);
+  const [isEnquiryModalOpen, setIsEnquiryModalOpen] = useState(false);
 
   if (!course) return null;
 
@@ -316,9 +324,25 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
     }
   };
 
-  const handleApplySubmit = (e: React.FormEvent) => {
+  const handleApplySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!applyName.trim() || !applyPhone.trim()) return;
+    setIsApplySubmitting(true);
+    try {
+      await fetch('/api/enquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: applyName.trim(),
+          phone: applyPhone.trim(),
+          courseCategory: applyCategory || categoryText,
+          courseTitle: applyCourse || course.title,
+          state: applyState,
+          center: applyCenter,
+        }),
+      });
+    } catch {}
+    setIsApplySubmitting(false);
     setIsApplySubmitted(true);
   };
 
@@ -360,16 +384,18 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
       </header>
 
       {/* 2. FULL SCREEN SCROLLABLE CONTENT */}
-      <div className="flex-1 overflow-y-auto bg-[#F8FAFC] relative">
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto bg-[#F8FAFC] relative">
         
         {/* Right Floating "Enquiry Now" Vertical Tab */}
         <button
           type="button"
-          onClick={scrollToApply}
-          className="fixed right-0 top-1/2 -translate-y-1/2 z-40 bg-[#D20A0B] hover:bg-[#B50809] text-white text-xs font-black uppercase tracking-wider py-3.5 px-2.5 rounded-l-md shadow-xl transition-all cursor-pointer flex items-center justify-center"
+          onClick={() => setIsEnquiryModalOpen(true)}
+          className="fixed right-0 top-1/2 -translate-y-1/2 z-40 bg-[#D20A0B] hover:bg-[#B50809] text-white text-xs font-black uppercase tracking-wider py-3.5 px-2.5 rounded-l-md shadow-xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
           style={{ writingMode: 'vertical-rl' }}
+          title="Open Enquiry Dialog"
         >
-          Enquiry Now
+          <span className="inline-block transform -rotate-90 text-sm">📞</span>
+          <span>Enquiry Now</span>
         </button>
 
         {/* 3. HERO BANNER: 2-COLUMN SPLIT UTILIZING BOTH LEFT AND RIGHT SIDES */}
@@ -471,10 +497,10 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                     
                     <button
                       type="button"
-                      onClick={scrollToApply}
+                      onClick={() => setIsEnquiryModalOpen(true)}
                       className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs font-bold rounded-xl border border-slate-300 transition-colors cursor-pointer"
                     >
-                      Enquire for Free Demo Class &darr;
+                      Enquire for Free Demo Class &rarr;
                     </button>
                   </div>
 
@@ -684,7 +710,10 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
               {/* SECTION E: PLACEMENT CELL & CAREER OPPORTUNITIES INFOGRAPHIC (FAN INFOGRAPHIC MATCHING USER IMAGE 1 & 2) */}
               <CareerInfographic course={course} />
 
-              {/* SECTION F: DUAL CERTIFICATION & CAPSTONE PROJECT */}
+              {/* SECTION F: OFFICIAL CERTIFICATE OF COMPLETION SHOWCASE (MATCHING USER IMAGE 1 EXACTLY) */}
+              <CourseCertificateShowcase course={course} />
+
+              {/* SECTION G: DUAL CERTIFICATION & CAPSTONE PROJECT */}
               <section className="bg-white border border-[#CBD5E1] rounded-2xl p-6 sm:p-7 shadow-xs space-y-4">
                 <div className="border-b border-slate-100 pb-3">
                   <h2 className="text-xl sm:text-2xl font-black text-[#15304C]">
@@ -791,67 +820,168 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                     <span className="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-base mx-auto">
                       ✓
                     </span>
-                    <h4 className="font-bold text-sm text-emerald-900">Enquiry Submitted!</h4>
+                    <h4 className="font-bold text-sm text-emerald-900">Enquiry Received!</h4>
                     <p className="text-xs text-emerald-700">
-                      Our Ameerpet counselor will call you within 30 minutes with batch timings.
+                      Our counselor from {applyCenter} will call you at {applyPhone} within 15 minutes.
                     </p>
                   </div>
                 ) : (
                   <form onSubmit={handleApplySubmit} className="space-y-3 text-xs">
                     <div>
-                      <label className="font-bold text-slate-700 block mb-1">Your Full Name *</label>
                       <input
                         type="text"
                         required
                         value={applyName}
                         onChange={(e) => setApplyName(e.target.value)}
-                        placeholder="e.g. Ramesh Kumar"
-                        className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-slate-50 focus:bg-white focus:border-[#D20A0B] focus:outline-none"
+                        placeholder="Your Name"
+                        className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white focus:bg-white focus:border-slate-900 focus:outline-none text-slate-800 font-medium placeholder-slate-400"
                       />
                     </div>
 
                     <div>
-                      <label className="font-bold text-slate-700 block mb-1">Mobile Number (WhatsApp) *</label>
                       <input
                         type="tel"
                         required
                         value={applyPhone}
                         onChange={(e) => setApplyPhone(e.target.value)}
-                        placeholder="e.g. 98490 12345"
-                        className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-slate-50 focus:bg-white focus:border-[#D20A0B] focus:outline-none"
+                        placeholder="Phone Number"
+                        className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white focus:bg-white focus:border-slate-900 focus:outline-none text-slate-800 font-medium placeholder-slate-400"
                       />
                     </div>
 
-                    <div>
-                      <label className="font-bold text-slate-700 block mb-1">Email Address</label>
-                      <input
-                        type="email"
-                        value={applyEmail}
-                        onChange={(e) => setApplyEmail(e.target.value)}
-                        placeholder="e.g. ramesh@example.com"
-                        className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-slate-50 focus:bg-white focus:border-[#D20A0B] focus:outline-none"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="font-bold text-slate-700 block mb-1">Preferred Batch Timing</label>
+                    <div className="relative">
                       <select
-                        value={applyBatch}
-                        onChange={(e) => setApplyBatch(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-slate-50 focus:bg-white focus:border-[#D20A0B] focus:outline-none font-semibold text-slate-700"
+                        value={applyCategory || categoryText}
+                        onChange={(e) => {
+                          setApplyCategory(e.target.value);
+                          setApplyCourse('');
+                        }}
+                        className="w-full appearance-none px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white focus:border-slate-900 focus:outline-none text-slate-700 font-medium cursor-pointer pr-8"
                       >
-                        <option>Weekday Morning (08:00 AM - 10:30 AM)</option>
-                        <option>Weekday Evening (06:00 PM - 08:30 PM)</option>
-                        <option>Weekend Fast-Track (Saturday &amp; Sunday)</option>
-                        <option>Online Live Interactive Batch</option>
+                        <option value="">Select Course Category</option>
+                        <option value="Civil & BIM Architecture">Civil &amp; BIM Architecture</option>
+                        <option value="Mechanical CAD/CAE">Mechanical CAD/CAE</option>
+                        <option value="Electrical & Automation">Electrical &amp; Automation</option>
+                        <option value="Interior Architecture">Interior Architecture</option>
+                        <option value="Piping & Plant CAD">Piping &amp; Plant CAD</option>
+                        <option value="Project Management (PPM)">Project Management (PPM)</option>
                       </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-500">
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
+
+                    <div className="relative">
+                      <select
+                        value={applyCourse || course.title}
+                        onChange={(e) => setApplyCourse(e.target.value)}
+                        className="w-full appearance-none px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white focus:border-slate-900 focus:outline-none text-slate-700 font-medium cursor-pointer pr-8"
+                      >
+                        <option value={course.title}>{course.title}</option>
+                        <option value="AutoCAD Civil 2D & 3D Planning">AutoCAD Civil 2D &amp; 3D Planning</option>
+                        <option value="Revit Architecture & BIM Specialist">Revit Architecture &amp; BIM Specialist</option>
+                        <option value="SOLIDWORKS Master Professional">SOLIDWORKS Master Professional</option>
+                        <option value="CATIA V5 Aerospace & Automotive Surfacing">CATIA V5 Aerospace &amp; Automotive</option>
+                        <option value="ANSYS FEA & CFD Multiphysics Simulation">ANSYS FEA &amp; CFD Multiphysics</option>
+                        <option value="STAAD.Pro & ETABS Structural Design">STAAD.Pro &amp; ETABS Structural</option>
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-500">
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
+
+                    <div className="relative">
+                      <select
+                        value={applyState}
+                        onChange={(e) => {
+                          const s = e.target.value;
+                          setApplyState(s);
+                          if (s === 'Telangana') setApplyCenter('Ameerpet (Hyderabad Headquarters)');
+                          else if (s === 'Andhra Pradesh') setApplyCenter('Vijayawada (Benz Circle)');
+                          else if (s === 'Karnataka') setApplyCenter('Bengaluru (Indiranagar)');
+                          else if (s === 'Maharashtra') setApplyCenter('Pune (Shivaji Nagar)');
+                          else if (s === 'Tamil Nadu') setApplyCenter('Chennai (Guindy)');
+                        }}
+                        className="w-full appearance-none px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white focus:border-slate-900 focus:outline-none text-slate-700 font-medium cursor-pointer pr-8"
+                      >
+                        <option value="Telangana">Telangana</option>
+                        <option value="Andhra Pradesh">Andhra Pradesh</option>
+                        <option value="Karnataka">Karnataka</option>
+                        <option value="Maharashtra">Maharashtra</option>
+                        <option value="Tamil Nadu">Tamil Nadu</option>
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-500">
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
+
+                    <div className="relative">
+                      <select
+                        value={applyCenter}
+                        onChange={(e) => setApplyCenter(e.target.value)}
+                        className="w-full appearance-none px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white focus:border-slate-900 focus:outline-none text-slate-700 font-medium cursor-pointer pr-8"
+                      >
+                        {applyState === 'Telangana' && (
+                          <>
+                            <option value="Ameerpet (Hyderabad Headquarters)">Ameerpet (Hyderabad Headquarters)</option>
+                            <option value="Dilsukhnagar (Hyderabad)">Dilsukhnagar (Hyderabad)</option>
+                            <option value="Kukatpally (Hyderabad)">Kukatpally (Hyderabad)</option>
+                            <option value="Madhapur / Hitec City (Hyderabad)">Madhapur / Hitec City (Hyderabad)</option>
+                            <option value="Secunderabad">Secunderabad</option>
+                          </>
+                        )}
+                        {applyState === 'Andhra Pradesh' && (
+                          <>
+                            <option value="Vijayawada (Benz Circle)">Vijayawada (Benz Circle)</option>
+                            <option value="Visakhapatnam (Dwaraka Nagar)">Visakhapatnam (Dwaraka Nagar)</option>
+                            <option value="Guntur (Arundelpet)">Guntur (Arundelpet)</option>
+                            <option value="Tirupati (Bhavani Nagar)">Tirupati (Bhavani Nagar)</option>
+                          </>
+                        )}
+                        {applyState === 'Karnataka' && (
+                          <>
+                            <option value="Bengaluru (Indiranagar)">Bengaluru (Indiranagar)</option>
+                            <option value="Bengaluru (BTM Layout)">Bengaluru (BTM Layout)</option>
+                            <option value="Bengaluru (Marathahalli)">Bengaluru (Marathahalli)</option>
+                          </>
+                        )}
+                        {applyState === 'Maharashtra' && (
+                          <>
+                            <option value="Pune (Shivaji Nagar)">Pune (Shivaji Nagar)</option>
+                            <option value="Pune (Wakad)">Pune (Wakad)</option>
+                            <option value="Mumbai (Thane West)">Mumbai (Thane West)</option>
+                          </>
+                        )}
+                        {applyState === 'Tamil Nadu' && (
+                          <>
+                            <option value="Chennai (Guindy)">Chennai (Guindy)</option>
+                            <option value="Chennai (Anna Nagar)">Chennai (Anna Nagar)</option>
+                          </>
+                        )}
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-500">
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
                     </div>
 
                     <button
                       type="submit"
-                      className="w-full py-3 bg-[#D20A0B] hover:bg-[#B50809] active:scale-98 text-white font-black uppercase tracking-wider rounded-xl transition-all shadow-md cursor-pointer mt-1"
+                      disabled={isApplySubmitting}
+                      className="w-full py-3.5 bg-black hover:bg-slate-900 active:scale-98 text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-all shadow-md cursor-pointer mt-1 disabled:opacity-60 flex items-center justify-center gap-2"
                     >
-                      Request Free Call Back &rarr;
+                      {isApplySubmitting ? (
+                        <span>Submitting...</span>
+                      ) : (
+                        <span>Submit</span>
+                      )}
                     </button>
                   </form>
                 )}
@@ -927,6 +1057,17 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
         </div>
 
       </div>
+
+      {/* Dynamic Circular Progress Scroll-To-Top Button matching Image 2 */}
+      <ScrollToTopProgress targetRef={scrollContainerRef} threshold={200} />
+
+      {/* Global Interactive Enquiry Modal matching exact user screenshot */}
+      <EnquiryModal
+        isOpen={isEnquiryModalOpen}
+        onClose={() => setIsEnquiryModalOpen(false)}
+        initialCourseTitle={course.title}
+        initialCategory={categoryText}
+      />
     </div>
   );
 };

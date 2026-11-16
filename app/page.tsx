@@ -9,6 +9,8 @@ import { DisciplineCourseHub } from '@/components/DisciplineCourseHub';
 import { PartnerTicker } from '@/components/PartnerTicker';
 import { EnrollmentSection } from '@/components/EnrollmentSection';
 import { CourseModal } from '@/components/CourseModal';
+import { EnquiryModal, FloatingEnquiryButton } from '@/components/EnquiryModal';
+import { ScrollToTopProgress } from '@/components/ScrollToTopProgress';
 import { Footer } from '@/components/Footer';
 
 export default function HomePage() {
@@ -17,6 +19,22 @@ export default function HomePage() {
   const [enrollCourseTitle, setEnrollCourseTitle] = useState<string>('');
   const [enrolledCourses, setEnrolledCourses] = useState<string[]>([]);
   const [studentStream, setStudentStream] = useState<string>('');
+  const [isEnquiryModalOpen, setIsEnquiryModalOpen] = useState<boolean>(false);
+  const [enquiryInitialCourse, setEnquiryInitialCourse] = useState<string>('');
+
+  useEffect(() => {
+    const handleGlobalOpenEnquiry = (e: any) => {
+      if (e.detail?.courseTitle) {
+        setEnquiryInitialCourse(e.detail.courseTitle);
+      }
+      setIsEnquiryModalOpen(true);
+    };
+
+    window.addEventListener('open-enquiry-modal', handleGlobalOpenEnquiry);
+    return () => {
+      window.removeEventListener('open-enquiry-modal', handleGlobalOpenEnquiry);
+    };
+  }, []);
 
   useEffect(() => {
     const syncEnrolledData = () => {
@@ -141,10 +159,26 @@ export default function HomePage() {
         onEnroll={(title) => handleOpenEnrollSection(title)}
       />
 
+      {/* Floating Right-edge "Enquiry Now" Vertical Button */}
+      <FloatingEnquiryButton onOpen={() => setIsEnquiryModalOpen(true)} />
+
+      {/* Global Interactive Enquiry Modal matching exact user screenshot */}
+      <EnquiryModal
+        isOpen={isEnquiryModalOpen}
+        onClose={() => {
+          setIsEnquiryModalOpen(false);
+          setEnquiryInitialCourse('');
+        }}
+        initialCourseTitle={enquiryInitialCourse}
+      />
+
+      {/* Dynamic Circular Progress Scroll-To-Top Button matching Image 2 */}
+      <ScrollToTopProgress threshold={300} />
+
       {/* Footer */}
       <Footer
         onSelectStream={handleSelectStream}
-        onOpenEnrollModal={() => handleOpenEnrollSection()}
+        onOpenEnrollModal={() => setIsEnquiryModalOpen(true)}
       />
     </div>
   );
