@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import type { Course } from '@/lib/courses-data';
-import { CareerInfographic, HIRING_CONGLOMERATES } from './CareerInfographic';
+import { CareerInfographic } from './CareerInfographic';
 import { CourseCertificateShowcase } from './CourseCertificateShowcase';
 import { ScrollToTopProgress } from './ScrollToTopProgress';
 import { EnquiryModal } from './EnquiryModal';
@@ -741,23 +741,22 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                   </div>
                 </div>
 
-                <div className="pt-2">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">
-                    Placement Drives with Top Recruiters:
-                  </span>
-                  <div className="flex flex-wrap gap-2.5 sm:gap-3">
-                    {HIRING_CONGLOMERATES.map((partner) => (
-                      <motion.div
-                        key={partner.id}
-                        whileHover={{ y: -2, scale: 1.02, transition: { duration: 0.15 } }}
-                        className="flex items-center gap-2.5 bg-white px-3.5 py-2 rounded-xl border border-slate-200/90 hover:border-[#EE2C3C] hover:shadow-md transition-all shadow-2xs cursor-pointer group"
-                      >
-                        {partner.renderLogo()}
-                        <span className="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-slate-900 transition-colors">
-                          {partner.name}
-                        </span>
-                      </motion.div>
-                    ))}
+                <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                    <span className="font-bold text-slate-800">100% Industry Mentor Evaluated</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-blue-500" />
+                    <span className="font-bold text-slate-800">Instant Online QR Verification</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-amber-500" />
+                    <span className="font-bold text-slate-800">ISO 9001:2015 Accredited</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-purple-500" />
+                    <span className="font-bold text-slate-800">Shareable Digital Portfolio</span>
                   </div>
                 </div>
               </section>
