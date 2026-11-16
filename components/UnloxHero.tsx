@@ -156,33 +156,6 @@ export const UnloxHero: React.FC<UnloxHeroProps> = ({
             RESERVE WORKSTATION
           </button>
         </motion.div>
-
-        {/* Downward Institutional Credibility & Metric Pillars (Increases vertical size downward) */}
-        <motion.div
-          initial={{ opacity: 0, y: 25 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.8, ease: 'easeOut' }}
-          className="mt-12 sm:mt-16 lg:mt-20 w-full max-w-5xl mx-auto"
-        >
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-5 text-left">
-            <div className="bg-white/90 backdrop-blur-xs border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-md transition-shadow">
-              <div className="text-2xl sm:text-3xl font-black text-[#15304C] tracking-tight">15,000+</div>
-              <div className="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">Engineers Certified</div>
-            </div>
-            <div className="bg-white/90 backdrop-blur-xs border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-md transition-shadow">
-              <div className="text-2xl sm:text-3xl font-black text-[#D20A0B] tracking-tight">100%</div>
-              <div className="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">Placement Assistance</div>
-            </div>
-            <div className="bg-white/90 backdrop-blur-xs border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-md transition-shadow">
-              <div className="text-xl sm:text-2xl font-black text-[#15304C] tracking-tight">ISO 9001:2015</div>
-              <div className="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">Accredited Quality</div>
-            </div>
-            <div className="bg-white/90 backdrop-blur-xs border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-md transition-shadow">
-              <div className="text-2xl sm:text-3xl font-black text-[#15304C] tracking-tight">1:1 RTX Lab</div>
-              <div className="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">Dedicated GPU Workstation</div>
-            </div>
-          </div>
-        </motion.div>
       </motion.div>
 
       {/* Downward Scroll Indicator to Domain Programs */}
