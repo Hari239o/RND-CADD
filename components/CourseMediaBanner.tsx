@@ -121,8 +121,8 @@ export const getVerifiedCourseImages = (c: Course): { primary: string; secondary
   // 5. SOLIDWORKS / Creo / Machine Design
   if (query.includes('solidworks') || query.includes('creo') || query.includes('inventor') || query.includes('mechanical cad')) {
     return {
-      primary: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1200&q=80',
-      secondary: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80',
+      primary: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80',
+      secondary: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=1200&q=80',
       tag: 'Dassault SOLIDWORKS Professional',
     };
   }
@@ -148,8 +148,8 @@ export const getVerifiedCourseImages = (c: Course): { primary: string; secondary
   // 8. Mastercam / CNC / CAM Machining
   if (query.includes('mastercam') || query.includes('cnc') || query.includes('cam') || query.includes('machining')) {
     return {
-      primary: 'https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?auto=format&fit=crop&w=1200&q=80',
-      secondary: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1200&q=80',
+      primary: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80',
+      secondary: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=1200&q=80',
       tag: '5-Axis CNC Mastercam Station',
     };
   }
@@ -238,7 +238,7 @@ export const getDisciplineHeroMedia = (stream: string, title: string): Disciplin
   if (query.includes('mechanical') || query.includes('catia') || query.includes('solidworks') || query.includes('ansys') || query.includes('aerospace') || query.includes('automotive') || query.includes('creo')) {
     return {
       videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-robotic-arm-working-in-a-factory-42998-large.mp4',
-      fallbackBg: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1920&q=80',
+      fallbackBg: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1920&q=80',
       label: 'Mechanical CAD, CAE & Robotics Engineering Suite',
     };
   }

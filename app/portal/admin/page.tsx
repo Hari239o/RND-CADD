@@ -422,11 +422,11 @@ const DEFAULT_COURSES: CourseItem[] = COURSES.map((c, idx) => {
     folder === 'piping' ? 'Process Plant & Piping Engineering' :
     'Civil & Architectural Engineering';
 
-  const feeAmount = c.fee || (folder === 'ppm' ? 32000 : folder === 'civil' ? 35000 : 34000);
+  const feeAmount = c.fee || (folder === 'ppm' ? 32000 : folder === 'civil' ? (c.id === 'civil-autocad' ? 22000 : c.id === 'civil-revit-bim' ? 32000 : 35000) : 34000);
 
   return {
     id: c.id,
-    code: c.code || `CAD-${folder.toUpperCase().slice(0, 3)}-${String(idx + 1).padStart(2, '0')}`,
+    code: c.code || (c.id === 'civil-revit-bim' ? 'REV-BIM-12' : c.id === 'civil-autocad' ? 'CAD-CIV-2D' : `CAD-${folder.toUpperCase().slice(0, 3)}-${String(idx + 1).padStart(2, '0')}`),
     title: c.title,
     folder,
     domain,
@@ -764,7 +764,29 @@ export default function AdminPortalPage() {
       const res = await fetch('/api/courses');
       const data = await res.json();
       if (data.success && Array.isArray(data.courses)) {
-        setCourses(data.courses);
+        const hydrated = data.courses.map((c: CourseItem) => {
+          const auth = COURSES.find(
+            (def) => def.id.toLowerCase() === c.id.toLowerCase() || def.title.toLowerCase().trim() === c.title?.toLowerCase().trim()
+          );
+          if (!auth) return c;
+          const isBrokenImage = !c.image || c.image.includes('1541888946425') || c.image.includes('1581092335397') || c.image.includes('1504917599217');
+          const hasRichModules = Array.isArray(c.modules) && c.modules.length > 1;
+          const hasRichCapstone = c.capstoneProject && c.capstoneProject.title && !c.capstoneProject.title.endsWith('Live Industry Project');
+          return {
+            ...c,
+            image: isBrokenImage ? auth.image : c.image,
+            modules: hasRichModules ? c.modules : (auth.modules || c.modules),
+            syllabus: hasRichModules ? (c.syllabus || c.modules.map((m: any) => m.title)) : (auth.modules?.map((m) => m.title) || c.syllabus),
+            capstoneProject: hasRichCapstone ? c.capstoneProject : (auth.capstoneProject || c.capstoneProject),
+            careerRoles: Array.isArray(c.careerRoles) && c.careerRoles.length > 0 ? c.careerRoles : auth.careerRoles,
+            certification: c.certification || auth.certification,
+            prerequisites: c.prerequisites || auth.prerequisites,
+            tagline: c.tagline || auth.tagline,
+            totalHours: c.totalHours || auth.totalHours,
+            duration: c.duration || auth.duration,
+          };
+        });
+        setCourses(hydrated);
       }
     } catch (err) {
       console.error('Failed to load courses:', err);
@@ -1426,15 +1448,32 @@ export default function AdminPortalPage() {
     }
   };
 
-  // Initialize course for editing with all full-blueprint specs
+  // Initialize course for editing with all full-blueprint specs matching the website
   const handleStartEditCourse = (course: CourseItem) => {
+    const liveSource = COURSES.find(
+      (c) =>
+        c.id.toLowerCase() === course.id.toLowerCase() ||
+        c.title.toLowerCase().trim() === course.title.toLowerCase().trim() ||
+        (course.code && c.code && c.code.toLowerCase() === course.code.toLowerCase())
+    );
+
     const toolsList = Array.isArray(course.tools) && course.tools.length > 0
       ? course.tools
+      : (liveSource && Array.isArray(liveSource.tools) && liveSource.tools.length > 0)
+      ? liveSource.tools
       : course.software
       ? course.software.split(',').map((s) => s.trim()).filter(Boolean)
       : ['CAD Tools'];
 
-    const modulesList: CourseModuleItem[] = Array.isArray(course.modules) && course.modules.length > 0
+    const hasRichModules = Array.isArray(course.modules) &&
+      course.modules.length > 1 &&
+      course.modules.some((m) => Array.isArray(m.topics) && m.topics.length > 1);
+
+    const modulesList: CourseModuleItem[] = hasRichModules
+      ? (course.modules as CourseModuleItem[])
+      : (liveSource?.modules && liveSource.modules.length > 0)
+      ? (liveSource.modules as CourseModuleItem[])
+      : Array.isArray(course.modules) && course.modules.length > 0
       ? course.modules
       : (course.syllabus || []).map((s, idx) => ({
           number: String(idx + 1).padStart(2, '0'),
@@ -1443,9 +1482,15 @@ export default function AdminPortalPage() {
           topics: [s, 'Practical lab drafting & validation'],
         }));
 
-    const capstoneObj: CourseCapstoneItem = course.capstoneProject && course.capstoneProject.title
+    const hasRichCapstone = course.capstoneProject &&
+      course.capstoneProject.title &&
+      !course.capstoneProject.title.endsWith('Live Industry Project') &&
+      Array.isArray(course.capstoneProject.deliverables) &&
+      course.capstoneProject.deliverables.length > 0;
+
+    const capstoneObj: CourseCapstoneItem = hasRichCapstone
       ? course.capstoneProject
-      : {
+      : liveSource?.capstoneProject || course.capstoneProject || {
           title: `${course.title} Live Industry Project`,
           description: 'Real-world industrial drafting, modeling, and validation project with detailed engineering dossier.',
           deliverables: ['Design Drawings', '3D CAD Model', 'Project Dossier'],
@@ -1453,20 +1498,40 @@ export default function AdminPortalPage() {
 
     const careerList = Array.isArray(course.careerRoles) && course.careerRoles.length > 0
       ? course.careerRoles
+      : (liveSource && Array.isArray(liveSource.careerRoles) && liveSource.careerRoles.length > 0)
+      ? liveSource.careerRoles
       : ['CAD Design Engineer', 'Product Specialist', 'Project Engineer', 'Drafting Specialist'];
+
+    const validImage = course.image &&
+      !course.image.includes('1541888946425') &&
+      !course.image.includes('1581092335397') &&
+      !course.image.includes('1504917599217')
+      ? course.image
+      : liveSource?.image || course.image;
+
+    const prereq = course.prerequisites || liveSource?.prerequisites || 'Diploma / B.Tech / Working Professional';
+    const cert = course.certification || liveSource?.certification || 'Autodesk & Dassault Certificate';
+    const tagline = course.tagline || liveSource?.tagline || course.overview || '';
+    const overview = course.overview || liveSource?.overview || '';
+    const duration = course.duration || liveSource?.duration || '90 Days (180 Hours)';
+    const totalHours = Number(course.totalHours) || liveSource?.totalHours || 180;
+    const category = course.category || liveSource?.category || (course.folder === 'civil' ? 'PARAMETRIC BIM' : course.folder === 'mechanical' ? 'MECHANICAL CAE' : 'ENGINEERING CAD');
+    const level = course.level || liveSource?.level || 'Professional';
 
     setEditingCourse({
       ...course,
+      image: validImage,
       tools: toolsList,
       software: course.software || toolsList.join(', '),
-      category: course.category || (course.folder === 'civil' ? 'PARAMETRIC BIM' : course.folder === 'mechanical' ? 'MECHANICAL CAE' : 'ENGINEERING CAD'),
-      level: course.level || 'Professional',
-      duration: course.duration || '90 Days (180 Hours)',
-      totalHours: Number(course.totalHours) || 180,
+      category,
+      level,
+      duration,
+      totalHours,
       mode: course.mode || 'Classroom & Dedicated CAD Workstation Lab',
-      prerequisites: course.prerequisites || 'Diploma / B.Tech / Working Professional',
-      certification: course.certification || 'Autodesk & Dassault Certificate',
-      tagline: course.tagline || course.overview || '',
+      prerequisites: prereq,
+      certification: cert,
+      tagline,
+      overview,
       capstoneProject: capstoneObj,
       careerRoles: careerList,
       modules: modulesList,
@@ -3342,10 +3407,19 @@ export default function AdminPortalPage() {
                                   <div className="relative h-44 w-full overflow-hidden bg-slate-100">
                                     <img
                                       src={
-                                        course.image ||
-                                        'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80'
+                                        (course.image && !course.image.includes('1541888946425') && !course.image.includes('1581092335397') && !course.image.includes('1504917599217'))
+                                          ? course.image
+                                          : (COURSES.find((c) => c.id.toLowerCase() === course.id.toLowerCase() || c.title.toLowerCase().trim() === course.title.toLowerCase().trim())?.image
+                                            || 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=80')
                                       }
                                       alt={course.title}
+                                      onError={(e) => {
+                                        const fallback = COURSES.find((c) => c.id.toLowerCase() === course.id.toLowerCase() || c.title.toLowerCase().trim() === course.title.toLowerCase().trim())?.image
+                                          || 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=80';
+                                        if (e.currentTarget.src !== fallback) {
+                                          e.currentTarget.src = fallback;
+                                        }
+                                      }}
                                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                     />
                                     {/* Floating Circular Badge Overlapping Bottom Right */}
@@ -7489,7 +7563,18 @@ export default function AdminPortalPage() {
 
                     {editingCourse.image && (
                       <div className="mt-2.5 h-36 w-full rounded-xl overflow-hidden border-2 border-[#CBD5E1] bg-[#000000] relative shadow-inner">
-                        <img src={editingCourse.image} alt="Preview" className="w-full h-full object-cover" />
+                        <img
+                          src={editingCourse.image}
+                          alt="Preview"
+                          onError={(e) => {
+                            const fallback = COURSES.find((c) => c.id.toLowerCase() === editingCourse.id.toLowerCase() || c.title.toLowerCase().trim() === editingCourse.title.toLowerCase().trim())?.image
+                              || 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=80';
+                            if (e.currentTarget.src !== fallback) {
+                              e.currentTarget.src = fallback;
+                            }
+                          }}
+                          className="w-full h-full object-cover"
+                        />
                         <div className="absolute bottom-2 right-2 bg-black/70 text-[#FFFFFF] text-xs font-bold px-2.5 py-1 rounded font-mono font-bold">
                           Banner Preview
                         </div>

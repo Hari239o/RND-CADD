@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Course } from '@/lib/courses-data';
 import { COURSES } from '@/lib/courses-data';
 import { CourseCard } from './CourseCard';
@@ -16,10 +16,40 @@ export const CourseCatalog: React.FC<CourseCatalogProps> = ({
   onSelectStream,
   onOpenCourseModal
 }) => {
+  const [coursesList, setCoursesList] = useState<Course[]>(COURSES);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Fetch live courses from API to ensure instant sync with Admin updates
+  useEffect(() => {
+    const fetchLiveCourses = async () => {
+      try {
+        const res = await fetch('/api/courses');
+        const data = await res.json();
+        if (data.success && Array.isArray(data.courses) && data.courses.length > 0) {
+          const merged: Course[] = [...COURSES];
+          data.courses.forEach((sc: any) => {
+            const index = merged.findIndex(
+              (c) =>
+                c.id.toLowerCase() === sc.id?.toLowerCase() ||
+                c.title.toLowerCase().trim() === sc.title?.toLowerCase().trim()
+            );
+            if (index >= 0) {
+              merged[index] = { ...merged[index], ...sc };
+            } else {
+              merged.push(sc);
+            }
+          });
+          setCoursesList(merged);
+        }
+      } catch (err) {
+        console.error('Failed to load live courses in CourseCatalog:', err);
+      }
+    };
+    fetchLiveCourses();
+  }, []);
+
   // Filter courses based on active stream and search query
-  const filteredCourses = COURSES.filter((course) => {
+  const filteredCourses = coursesList.filter((course) => {
     const matchesStream = activeStream === 'all' || course.stream === activeStream;
     const query = searchQuery.toLowerCase().trim();
     if (!query) return matchesStream;

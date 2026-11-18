@@ -188,7 +188,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
     fee: 32000,
     price: 32000,
     status: 'Active',
-    image: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1200&q=80',
+    image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80',
     overview: 'Comprehensive mechanical product engineering program encompassing parametric part sketching, Class-A surfacing, mechanism kinematics, and finite element stress analysis.',
     tagline: 'Parametric Solid Modeling, Generative Surfacing, and Multi-Physics Simulation',
     syllabus: [
@@ -413,7 +413,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
     fee: 34000,
     price: 34000,
     status: 'Active',
-    image: 'https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?auto=format&fit=crop&w=1200&q=80',
+    image: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=1200&q=80',
     overview: 'Process piping drafting, equipment layout arrangements, 3D pipe routing, automated isometric generation, and Caesar II thermal expansion stress analysis.',
     tagline: 'Process Plant Layout, 3D Piping Routing, and Pipe Stress Analysis',
     syllabus: [
@@ -545,7 +545,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
     price: 30000,
     mode: 'Classroom & Dedicated CAD Workstation Lab',
     status: 'Active',
-    image: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1200&q=80',
+    image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80',
     overview: 'Certified SolidWorks Professional curriculum covering complex parametric assemblies, sheet metal unfolding, structural weldments, and GD&T production drawings.',
     tagline: 'Dassault Certified SolidWorks Professional (CSWP) Training Track',
     syllabus: [
@@ -886,7 +886,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
     price: 35000,
     mode: 'Classroom & Dedicated CAD Workstation Lab',
     status: 'Active',
-    image: 'https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?auto=format&fit=crop&w=1200&q=80',
+    image: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=1200&q=80',
     overview: 'Train in the world standard for mega-scale offshore and petrochemical plant engineering: Intergraph SmartPlant 3D. Master coordinate systems, structural steel frames, multi-tier pipe racks, and multi-user database collaboration.',
     tagline: 'Enterprise Multi-Disciplinary Plant Modeling, Equipment, Structural Grids & Piping',
     syllabus: [
@@ -1063,8 +1063,8 @@ function buildAllWebsiteCourses(): StoredCourse[] {
       c.stream === 'piping' ? 'piping' : 'civil'
     );
 
-    const feeAmount = c.fee || existing?.fee || (folder === 'ppm' ? 32000 : folder === 'civil' ? 35000 : 34000);
-    const codeVal = c.code || existing?.code || `CAD-${folder.toUpperCase().slice(0, 3)}-${String(idx + 1).padStart(2, '0')}`;
+    const feeAmount = c.fee || (c.id === 'civil-autocad' ? 22000 : c.id === 'civil-revit-bim' ? 32000 : c.id === 'civil-staad-pro' ? 35000 : existing?.fee || (folder === 'ppm' ? 32000 : folder === 'civil' ? 35000 : 34000));
+    const codeVal = c.code || existing?.code || (c.id === 'civil-revit-bim' ? 'REV-BIM-12' : c.id === 'civil-autocad' ? 'CAD-CIV-2D' : `CAD-${folder.toUpperCase().slice(0, 3)}-${String(idx + 1).padStart(2, '0')}`);
     const softwareVal = Array.isArray(c.tools) && c.tools.length > 0 ? c.tools.join(', ') : (c as any).software || '';
 
     const courseItem = normalizeCourse({
@@ -1113,13 +1113,34 @@ export async function GET(request: Request) {
       if (count === 0) {
         await collection.insertMany(inMemoryCourses);
       } else {
-        // Ensure all default courses exist in DB
+        // Ensure all default courses exist in DB and are hydrated with rich curriculum
         for (const defaultCourse of inMemoryCourses) {
           const exists = await collection.findOne({
             $or: [{ id: defaultCourse.id }, { title: defaultCourse.title }]
           });
           if (!exists) {
             await collection.insertOne(defaultCourse);
+          } else if (
+            !exists.modules ||
+            exists.modules.length === 0 ||
+            !exists.capstoneProject ||
+            (exists.image && (exists.image.includes('1541888946425') || exists.image.includes('1581092335397') || exists.image.includes('1504917599217')))
+          ) {
+            // Self-heal and sync rich curriculum & valid high-res imagery
+            await collection.updateOne(
+              { _id: exists._id },
+              {
+                $set: {
+                  modules: defaultCourse.modules,
+                  syllabus: defaultCourse.syllabus,
+                  capstoneProject: defaultCourse.capstoneProject,
+                  careerRoles: defaultCourse.careerRoles,
+                  certification: defaultCourse.certification,
+                  prerequisites: defaultCourse.prerequisites,
+                  image: defaultCourse.image,
+                }
+              }
+            );
           }
         }
       }
@@ -1132,7 +1153,24 @@ export async function GET(request: Request) {
       }
 
       const courses = await collection.find(query).toArray();
-      const normalized = courses.map(normalizeCourse);
+      const normalized = courses.map((c: any) => {
+        const fallback = inMemoryCourses.find(
+          (def) => def.id === c.id || def.title.toLowerCase().trim() === c.title?.toLowerCase().trim()
+        );
+        return normalizeCourse({
+          ...fallback,
+          ...c,
+          modules: Array.isArray(c.modules) && c.modules.length > 0 && c.modules[0]?.topics?.length > 1
+            ? c.modules
+            : fallback?.modules || c.modules,
+          capstoneProject: c.capstoneProject && c.capstoneProject.title && !c.capstoneProject.title.includes('Live Industry Project')
+            ? c.capstoneProject
+            : fallback?.capstoneProject || c.capstoneProject,
+          image: c.image && !c.image.includes('1541888946425') && !c.image.includes('1581092335397') && !c.image.includes('1504917599217')
+            ? c.image
+            : fallback?.image || c.image,
+        });
+      });
       return NextResponse.json({ success: true, source: 'mongodb', courses: normalized, folders: MAIN_FOLDERS });
     }
   } catch (err) {

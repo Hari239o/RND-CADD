@@ -26,7 +26,7 @@ export const OurProgramsGrid: React.FC<OurProgramsGridProps> = ({
     {
       id: 'civil-cadd',
       title: 'Civil CADD',
-      image: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=800&q=80',
+      image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80',
       description:
         'Civil CAD courses typically cover topics related to computer-aided design (CAD) software as it applies to civil engineering projects.',
       targetCourseId: 'civil-autocad-adv',

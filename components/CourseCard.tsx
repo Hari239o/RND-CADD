@@ -25,7 +25,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onOpenDetails })
         return {
           partner: 'Dassault Systèmes & PTC',
           logoText: 'CAD',
-          fallbackImg: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1200&q=80',
+          fallbackImg: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80',
         };
       case 'eee':
       case 'electrical':
