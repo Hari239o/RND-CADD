@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import React, { useRef } from 'react';
+import { motion, useMotionValue, useSpring, useTransform, useReducedMotion } from 'framer-motion';
 
 interface RndCaddHeroProps {
   onSelectStream: (stream: any) => void;
@@ -13,6 +13,39 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
   onExploreCatalog,
 }) => {
   const shouldReduceMotion = useReducedMotion();
+  const heroRef = useRef<HTMLDivElement>(null);
+
+  // Mouse tracking physics for 4-directional movement (up, down, left, right)
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  // Smooth springs for fluid, responsive cursor tracking
+  const springConfig = { stiffness: 220, damping: 22 };
+  const smoothX = useSpring(mouseX, springConfig);
+  const smoothY = useSpring(mouseY, springConfig);
+
+  // 2D Translation: moves toward the cursor in all 4 directions (up, down, left, right)
+  const translateX = useTransform(smoothX, [-0.5, 0.5], [-45, 45]);
+  const translateY = useTransform(smoothY, [-0.5, 0.5], [-45, 45]);
+
+  // 3D Perspective Rotation (tilts smoothly toward cursor like Unlox)
+  const rotateX = useTransform(smoothY, [-0.5, 0.5], [18, -18]);
+  const rotateY = useTransform(smoothX, [-0.5, 0.5], [-18, 18]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (shouldReduceMotion) return;
+    const target = heroRef.current || e.currentTarget;
+    const rect = target.getBoundingClientRect();
+    const xPct = (e.clientX - rect.left) / rect.width - 0.5;
+    const yPct = (e.clientY - rect.top) / rect.height - 0.5;
+    mouseX.set(xPct);
+    mouseY.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+  };
 
   const scrollToExperience = () => {
     const el = document.getElementById('upgrad-showcase') || document.getElementById('experience-disciplines');
@@ -22,7 +55,12 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
   };
 
   return (
-    <section className="relative w-full bg-white overflow-hidden border-b border-slate-100">
+    <section
+      ref={heroRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className="relative w-full bg-white overflow-hidden border-b border-slate-100"
+    >
       {/* Top Announcement Ticker Bar (Exact UNLOX style) */}
       <div className="w-full bg-[#15304C] text-white py-2 px-4 overflow-hidden select-none">
         <div className="flex items-center space-x-8 animate-marquee whitespace-nowrap text-xs sm:text-[13px] font-semibold tracking-wide">
@@ -114,23 +152,35 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
             </motion.div>
           </div>
 
-          {/* Right Column: Animated Company Logo with Soft Ambient Circles (Exact UNLOX Visual) */}
-          <div className="lg:col-span-5 flex items-center justify-center relative mt-8 lg:mt-0">
-            {/* Ambient Circular Layers */}
-            <div className="absolute w-[320px] sm:w-[420px] lg:w-[480px] h-[320px] sm:h-[420px] lg:h-[480px] rounded-full bg-slate-50/90 border border-slate-100 -z-10" />
-            <div className="absolute w-[240px] sm:w-[320px] lg:w-[360px] h-[240px] sm:h-[320px] lg:h-[360px] rounded-full bg-blue-50/40 -z-10" />
+          {/* Right Column: ONLY THE TRANSPARENT LOGO with Interactive Mouse Tracking (Up, Down, Left, Right) */}
+          <div
+            className="lg:col-span-5 flex items-center justify-center relative mt-8 lg:mt-0 py-6 select-none"
+            style={{ perspective: 1200 }}
+          >
+            {/* Soft Ambient Backdrop Light (matching Unlox.com's subtle circular glow) */}
+            <div className="absolute w-[320px] sm:w-[420px] lg:w-[480px] h-[320px] sm:h-[420px] lg:h-[480px] rounded-full bg-slate-100/50 -z-10 pointer-events-none" />
 
-            {/* Smooth Floating Logo Container */}
+            {/* Interactive Mouse-Tracking Animated Logo: NO white card box */}
             <motion.div
+              style={{
+                x: translateX,
+                y: translateY,
+                rotateX: rotateX,
+                rotateY: rotateY,
+                transformStyle: 'preserve-3d',
+              }}
               animate={{
-                y: shouldReduceMotion ? 0 : [0, -14, 0],
+                // Gentle idle floating when mouse is not moving
+                scale: shouldReduceMotion ? 1 : [1, 1.025, 1],
               }}
               transition={{
-                duration: 4.5,
-                repeat: Infinity,
-                ease: 'easeInOut',
+                scale: {
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                },
               }}
-              className="relative p-6 sm:p-10 bg-white rounded-3xl shadow-2xl border border-slate-100/90 flex items-center justify-center group"
+              className="relative flex items-center justify-center will-change-transform cursor-pointer"
             >
               <img
                 src="/logo_mark.png"
@@ -138,41 +188,9 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
                   e.currentTarget.src = '/logo.png';
                 }}
                 alt="RND CADD Logo"
-                className="w-56 sm:w-72 md:w-80 lg:w-[360px] h-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                className="w-64 sm:w-80 md:w-96 lg:w-[440px] xl:w-[480px] h-auto object-contain drop-shadow-[0_24px_40px_rgba(21,48,76,0.16)] transition-transform duration-200 hover:scale-105"
+                draggable={false}
               />
-
-              {/* Floating Live Badge 1 */}
-              <motion.div
-                animate={{
-                  y: shouldReduceMotion ? 0 : [0, 8, 0],
-                }}
-                transition={{
-                  duration: 3.6,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                  delay: 0.4,
-                }}
-                className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 bg-white border border-slate-200/80 shadow-lg px-3.5 py-1.5 rounded-full text-xs font-bold text-[#15304C] flex items-center gap-1.5"
-              >
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>1:1 RTX GPU Labs</span>
-              </motion.div>
-
-              {/* Floating Live Badge 2 */}
-              <motion.div
-                animate={{
-                  y: shouldReduceMotion ? 0 : [0, -8, 0],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                  delay: 0.8,
-                }}
-                className="absolute -bottom-3 -left-3 sm:-bottom-4 sm:-left-4 bg-white border border-slate-200/80 shadow-lg px-3.5 py-1.5 rounded-full text-xs font-bold text-[#D20A0B] flex items-center gap-1.5"
-              >
-                <span>★ ISO 9001:2015</span>
-              </motion.div>
             </motion.div>
           </div>
         </div>
