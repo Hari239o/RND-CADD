@@ -104,26 +104,26 @@ export const Header: React.FC<HeaderProps> = ({
     <>
       <header className="fixed top-0 left-0 right-0 z-50 transition-all pointer-events-none">
         {/* Expanded Width & Luxurious Length Container */}
-        <div className="w-full px-2.5 sm:px-6 lg:px-8 max-w-[1560px] mx-auto pt-2.5 sm:pt-4 pointer-events-auto">
+        <div className="w-full px-3 sm:px-6 lg:px-8 max-w-[1600px] mx-auto pt-3 sm:pt-4.5 pointer-events-auto">
           <motion.div
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="bg-white/95 backdrop-blur-md rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-[0_16px_40px_-10px_rgba(15,23,42,0.12),0_4px_16px_rgba(15,23,42,0.03)] px-3.5 sm:px-6 lg:px-8 xl:px-10 py-2.5 sm:py-3.5 lg:py-4 flex items-center justify-between gap-2 sm:gap-3 xl:gap-8 transition-all"
+            className="bg-white/95 backdrop-blur-md rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-[0_20px_45px_-12px_rgba(15,23,42,0.15),0_6px_20px_rgba(15,23,42,0.04)] px-4 sm:px-7 lg:px-9 xl:px-11 py-3.5 sm:py-4.5 lg:py-5 flex items-center justify-between gap-3 sm:gap-4 xl:gap-8 transition-all min-h-[72px] sm:min-h-[82px] lg:min-h-[92px]"
           >
             {/* Prominent Official RND CADD Logo */}
             <Link href="/" className="flex items-center shrink-0 group py-0.5" aria-label="RND CADD Home">
               <img
                 src="/logo.png"
                 alt="RND CADD"
-                className="h-8 sm:h-10 md:h-12 lg:h-14 xl:h-15 w-auto object-contain transition-transform duration-200 group-hover:scale-105 drop-shadow-xs"
+                className="h-10 sm:h-12 md:h-14 lg:h-16 xl:h-[72px] 2xl:h-[76px] w-auto object-contain transition-transform duration-200 group-hover:scale-105 drop-shadow-xs"
               />
             </Link>
 
             {/* Stream Navigation Switcher with Framer Motion Sliding Pill (Desktop Only) */}
             <nav
               onMouseLeave={() => setHoveredTab(null)}
-              className="hidden lg:flex items-center justify-center p-1.5 bg-slate-100/80 rounded-full relative"
+              className="hidden lg:flex items-center justify-center p-1.5 xl:p-2 bg-slate-100/90 rounded-full relative"
               aria-label="Desktop Stream Navigation"
             >
               {NAV_ITEMS.map((item) => {
@@ -133,7 +133,7 @@ export const Header: React.FC<HeaderProps> = ({
                     key={item.id}
                     onClick={() => onSelectStream(item.id)}
                     onMouseEnter={() => setHoveredTab(item.id)}
-                    className="relative px-3.5 xl:px-4 py-2 rounded-full text-xs sm:text-[13px] font-bold tracking-tight cursor-pointer select-none whitespace-nowrap focus:outline-none transition-colors"
+                    className="relative px-3.5 xl:px-4.5 py-2.5 rounded-full text-xs sm:text-[13px] xl:text-[14px] font-bold tracking-tight cursor-pointer select-none whitespace-nowrap focus:outline-none transition-colors"
                   >
                     {/* Framer Motion Active Sliding Indicator */}
                     {isSelected && (
@@ -174,7 +174,7 @@ export const Header: React.FC<HeaderProps> = ({
                   {/* Active Jobs Portal Button */}
                   <Link
                     href="/jobs"
-                    className="relative group inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full bg-[#0F172A] hover:bg-[#EE2C3C] text-[#FFFFFF] border border-slate-700 hover:border-[#EE2C3C] text-xs font-black tracking-wide uppercase transition-all duration-200 shadow-md hover:shadow-red-500/25 cursor-pointer active:scale-95"
+                    className="relative group inline-flex items-center gap-2 px-4.5 sm:px-5.5 py-2.5 sm:py-3 rounded-full bg-[#0F172A] hover:bg-[#EE2C3C] text-[#FFFFFF] border border-slate-700 hover:border-[#EE2C3C] text-xs font-black tracking-wide uppercase transition-all duration-200 shadow-md hover:shadow-red-500/25 cursor-pointer active:scale-95"
                   >
                     <span className="relative flex h-2 w-2">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -189,7 +189,7 @@ export const Header: React.FC<HeaderProps> = ({
                   {/* Logged-in Student Portal Link */}
                   <Link
                     href="/portal/student"
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-bold text-[#15304C] hover:text-[#EE2C3C] border border-[#CBD5E1] hover:border-[#EE2C3C] bg-white transition-all shadow-xs hover:shadow"
+                    className="inline-flex items-center gap-1.5 px-4.5 py-2.5 sm:py-3 rounded-full text-xs sm:text-[13px] font-bold text-[#15304C] hover:text-[#EE2C3C] border border-[#CBD5E1] hover:border-[#EE2C3C] bg-white transition-all shadow-xs hover:shadow"
                   >
                     <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                     <span>{currentUser?.name ? currentUser.name.split(' ')[0] : 'STUDENT'} (PORTAL)</span>
@@ -199,7 +199,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <button
                     type="button"
                     onClick={handleSignOut}
-                    className="px-3.5 py-2.5 rounded-full text-xs font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 transition-all cursor-pointer"
+                    className="px-4 py-2.5 sm:py-3 rounded-full text-xs sm:text-[13px] font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 transition-all cursor-pointer"
                     title="Sign Out"
                   >
                     Sign Out
@@ -209,7 +209,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <>
                   <Link
                     href="/portal/admin"
-                    className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2.5 rounded-full text-xs font-bold text-white bg-[#15304C] hover:bg-[#0F2038] border border-[#15304C] transition-all shadow-sm"
+                    className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full text-xs sm:text-[13px] font-bold text-white bg-[#15304C] hover:bg-[#0F2038] border border-[#15304C] transition-all shadow-sm"
                   >
                     <span className="w-2 h-2 rounded-full bg-blue-400"></span>
                     <span>ADMIN DASHBOARD</span>
@@ -217,7 +217,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <button
                     type="button"
                     onClick={handleSignOut}
-                    className="px-3.5 py-2.5 rounded-full text-xs font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 transition-all cursor-pointer"
+                    className="px-4 py-2.5 sm:py-3 rounded-full text-xs sm:text-[13px] font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 transition-all cursor-pointer"
                   >
                     Sign Out
                   </button>
@@ -226,7 +226,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <>
                   <Link
                     href="/signin"
-                    className="px-4.5 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold text-slate-700 hover:text-[#EE2C3C] bg-slate-100/70 hover:bg-slate-200/70 transition-all duration-200 flex items-center gap-1.5 cursor-pointer"
+                    className="px-5 sm:px-5.5 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-bold text-slate-700 hover:text-[#EE2C3C] bg-slate-100/70 hover:bg-slate-200/70 transition-all duration-200 flex items-center gap-1.5 cursor-pointer"
                   >
                     <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
@@ -235,7 +235,7 @@ export const Header: React.FC<HeaderProps> = ({
                   </Link>
                   <Link
                     href="/signup"
-                    className="px-5 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold tracking-wider uppercase bg-[#0F172A] hover:bg-[#1E293B] text-white transition-all duration-150 shadow-sm hover:shadow-md cursor-pointer"
+                    className="px-5.5 sm:px-6.5 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-bold tracking-wider uppercase bg-[#0F172A] hover:bg-[#1E293B] text-white transition-all duration-150 shadow-sm hover:shadow-md cursor-pointer"
                   >
                     SIGN UP
                   </Link>
@@ -244,11 +244,11 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
 
             {/* Mobile / Tablet Controls (< lg) */}
-            <div className="flex lg:hidden items-center gap-2 shrink-0">
+            <div className="flex lg:hidden items-center gap-2.5 shrink-0">
               {/* Quick Jobs Badge Link on Mobile */}
               <Link
                 href="/jobs"
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-900 text-white text-[10px] font-bold tracking-tight uppercase shadow-xs active:scale-95"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full bg-slate-900 text-white text-xs font-bold tracking-tight uppercase shadow-xs active:scale-95"
                 title="Jobs Portal"
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse"></span>
@@ -259,7 +259,7 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center transition-colors focus:outline-none cursor-pointer border border-slate-200"
+                className="w-11 h-11 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center transition-colors focus:outline-none cursor-pointer border border-slate-200"
                 aria-label={mobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
                 aria-expanded={mobileMenuOpen}
               >

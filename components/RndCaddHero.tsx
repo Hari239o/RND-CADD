@@ -74,7 +74,7 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
       <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,1)_0%,transparent_30%,transparent_70%,rgba(255,255,255,1)_100%)] pointer-events-none z-0" />
 
       {/* Full-Screen Edge-to-Edge Container: Comfortably utilizes the left side space */}
-      <div className="relative z-10 w-full px-6 sm:px-12 md:px-16 lg:px-20 xl:px-28 2xl:px-36 pt-28 sm:pt-36 lg:pt-40 pb-16 sm:pb-24 lg:pb-28">
+      <div className="relative z-10 w-full px-6 sm:px-12 md:px-16 lg:px-20 xl:px-28 2xl:px-36 pt-32 sm:pt-40 lg:pt-44 xl:pt-48 pb-16 sm:pb-24 lg:pb-28">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 xl:gap-20 items-center w-full">
           {/* Left Column: Occupies Left Side Naturally (UNLOX Full Screen Style) */}
           <div className="lg:col-span-7 flex flex-col justify-center text-left">
