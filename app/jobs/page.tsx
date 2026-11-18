@@ -367,6 +367,223 @@ function FreeOfCostHiringGraphic() {
 }
 
 // ============================================================
+// PARTNER COMPANIES (Image-2 Matching Real Corporate Logos)
+// ============================================================
+const PARTNER_COMPANIES = [
+  {
+    name: 'riveiT DIGITAL',
+    render: () => (
+      <div className="flex items-center gap-2">
+        <div className="w-7 h-7 rounded-full border-2 border-[#1A4F8B] flex items-center justify-center bg-blue-50/60 text-[#1A4F8B]">
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z" />
+          </svg>
+        </div>
+        <div className="flex flex-col leading-none text-left">
+          <span className="text-sm font-black text-[#1A4F8B] tracking-tight">riveiT</span>
+          <span className="text-[7.5px] font-bold text-slate-500 tracking-widest uppercase">DIGITAL</span>
+        </div>
+      </div>
+    ),
+  },
+  {
+    name: 'Boostr Netwave',
+    render: () => (
+      <div className="flex items-center gap-2">
+        <div className="w-6 h-6 flex items-center justify-center">
+          <svg className="w-6 h-6 text-slate-800" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+            <path d="M3 20L9 4L15 20L21 4" />
+          </svg>
+        </div>
+        <div className="flex flex-col leading-none text-left">
+          <span className="text-[11px] font-black text-slate-800 tracking-tight">Boostr Netwave</span>
+          <span className="text-[6.5px] font-bold text-slate-500 uppercase tracking-wider">SOLUTIONS PVT. LTD.</span>
+        </div>
+      </div>
+    ),
+  },
+  {
+    name: 'DoLittle Technologies',
+    render: () => (
+      <div className="flex items-center gap-2">
+        <div className="w-6 h-6 rounded-md bg-gradient-to-r from-[#2563EB] to-[#06B6D4] flex items-center justify-center text-white font-black text-[11px] shadow-xs">
+          DO
+        </div>
+        <div className="flex flex-col leading-none text-left">
+          <span className="text-xs font-black text-[#1E3A8A]">DoLittle</span>
+          <span className="text-[7px] font-semibold text-slate-500">Technologies Pvt Ltd</span>
+        </div>
+      </div>
+    ),
+  },
+  {
+    name: 'CORPORA',
+    render: () => (
+      <div className="flex items-center gap-2">
+        <div className="w-6 h-6 rounded-full border-[2.5px] border-[#0F172A] flex items-center justify-center font-black text-[11px] text-[#0F172A]">
+          C
+        </div>
+        <span className="text-xs font-black tracking-widest text-[#0F172A]">CORPORA</span>
+      </div>
+    ),
+  },
+  {
+    name: 'CAIT',
+    render: () => (
+      <div className="flex items-center gap-1.5">
+        <span className="text-base font-black tracking-tight text-[#0F172A]">CAIT</span>
+        <div className="w-3.5 h-3.5 rounded-sm bg-gradient-to-tr from-[#EA580C] to-[#F59E0B] skew-x-[-12deg]"></div>
+      </div>
+    ),
+  },
+  {
+    name: 'ATUMX',
+    render: () => (
+      <div className="flex items-center gap-0.5">
+        <span className="text-sm font-black tracking-wider text-[#0F172A]">ATUM</span>
+        <span className="text-base font-black text-[#EA580C]">X</span>
+      </div>
+    ),
+  },
+  {
+    name: 'Anandad Beauty',
+    render: () => (
+      <div className="flex items-center gap-1 bg-[#FFF5EB] px-2 py-0.5 rounded-md border border-[#FDE68A]/60">
+        <span className="text-xs font-serif italic font-bold text-[#B45309]">Anandad</span>
+        <span className="text-[9px] font-sans font-semibold text-[#92400E]">Beauty</span>
+      </div>
+    ),
+  },
+  {
+    name: 'abouv',
+    render: () => (
+      <div className="flex items-center gap-1.5">
+        <div className="w-5 h-5 rounded-full border-2 border-[#0D9488] flex items-center justify-center">
+          <div className="w-2 h-2 rounded-full bg-[#0D9488]"></div>
+        </div>
+        <span className="text-xs font-black tracking-tight text-[#0D9488]">abôuv</span>
+      </div>
+    ),
+  },
+  {
+    name: 'DORATIA TECHNOLOGIES',
+    render: () => (
+      <div className="flex items-center gap-1.5 bg-[#0F172A] text-white px-2 py-1 rounded">
+        <span className="text-[10px] font-black text-[#00A3E0]">d</span>
+        <div className="flex flex-col leading-none text-left">
+          <span className="text-[8px] font-black tracking-wider text-white">DORATIA TECHNOLOGIES</span>
+          <span className="text-[5.5px] font-medium text-slate-400">APPLIED INNOVATIONS</span>
+        </div>
+      </div>
+    ),
+  },
+  {
+    name: 'shaip',
+    render: () => (
+      <div className="flex items-center gap-2">
+        <div className="w-5 h-5 rounded bg-[#0284C7] flex items-center justify-center text-white">
+          <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+          </svg>
+        </div>
+        <span className="text-xs font-black text-[#4338CA] tracking-tight">shaip</span>
+      </div>
+    ),
+  },
+  {
+    name: 'Larsen & Toubro',
+    render: () => (
+      <div className="flex items-center gap-1.5 bg-[#003B71] text-white px-2.5 py-1 rounded-md shadow-xs">
+        <span className="text-xs font-black tracking-wider">L&amp;T</span>
+        <span className="text-[8px] font-semibold text-white/90 border-l border-white/30 pl-1.5">Construction</span>
+      </div>
+    ),
+  },
+  {
+    name: 'Tata Technologies',
+    render: () => (
+      <div className="flex items-center gap-2">
+        <div className="w-5 h-5 rounded-full border-[1.5px] border-[#1E4B88] flex items-center justify-center bg-blue-50/60 shadow-xs">
+          <span className="text-[10px] font-black text-[#1E4B88]">T</span>
+        </div>
+        <div className="flex flex-col leading-none text-left">
+          <span className="text-[11px] font-black text-[#1E4B88] tracking-wider">TATA</span>
+          <span className="text-[7px] font-bold text-slate-500 uppercase tracking-widest">TECHNOLOGIES</span>
+        </div>
+      </div>
+    ),
+  },
+  {
+    name: 'Autodesk',
+    render: () => (
+      <div className="flex items-center gap-1.5">
+        <svg className="w-4 h-4 text-[#0696D7]" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M2 19L11 4L16 12L13 17L11 13L8 19H2ZM17 14L22 19H14L17 14Z" />
+        </svg>
+        <span className="text-xs font-black text-slate-900 tracking-widest uppercase">AUTODESK</span>
+      </div>
+    ),
+  },
+  {
+    name: 'Bentley Systems',
+    render: () => (
+      <div className="flex items-center gap-1.5">
+        <div className="w-5 h-5 rounded bg-[#008542] flex items-center justify-center text-white text-[10px] font-black shadow-xs">
+          B
+        </div>
+        <span className="text-xs font-bold text-[#008542] tracking-tight">Bentley</span>
+      </div>
+    ),
+  },
+  {
+    name: 'Schneider Electric',
+    render: () => (
+      <div className="flex items-center gap-2">
+        <div className="w-5 h-5 rounded bg-[#3DCD58] flex items-center justify-center text-white shadow-xs">
+          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round">
+            <path d="M8 5l8 7-8 7" />
+          </svg>
+        </div>
+        <div className="flex flex-col leading-none text-left">
+          <span className="text-xs font-black text-[#2B3A4A] tracking-tight">Schneider</span>
+          <span className="text-[7px] font-bold text-[#3DCD58] uppercase tracking-wider">Electric</span>
+        </div>
+      </div>
+    ),
+  },
+  {
+    name: 'Worley',
+    render: () => (
+      <div className="flex items-center gap-1">
+        <span className="text-sm font-black text-slate-900 tracking-tight">Worley</span>
+        <span className="w-2 h-2 rounded-full bg-[#00A3E0]"></span>
+      </div>
+    ),
+  },
+  {
+    name: 'Jacobs',
+    render: () => (
+      <div className="flex items-center gap-1">
+        <span className="text-sm font-black text-[#00529B] tracking-widest uppercase">JACOBS</span>
+        <div className="w-1.5 h-1.5 rounded-full bg-[#00529B]"></div>
+      </div>
+    ),
+  },
+  {
+    name: 'Siemens Energy',
+    render: () => (
+      <div className="flex items-baseline gap-1.5">
+        <span className="text-sm font-black text-[#00646E] tracking-widest uppercase">SIEMENS</span>
+        <span className="text-[8.5px] font-black text-[#EB780A] uppercase tracking-wider">ENERGY</span>
+      </div>
+    ),
+  },
+];
+
+// ============================================================
 // MAIN COMPONENT
 // ============================================================
 export default function JobsPortalPage() {
@@ -908,38 +1125,32 @@ export default function JobsPortalPage() {
         </div>
       </section>
 
-      {/* RECRUITER PARTNER BRANDS TICKER (bg-[#C0DCFF] ribbon) */}
+      {/* RECRUITER PARTNER BRANDS TICKER (Image-2 Matching White Card Ribbon) */}
       <section className="bg-[#C0DCFF] py-6 sm:py-8 w-full flex flex-col items-center gap-5 border-y border-[#A5CAFE]/40 overflow-hidden">
         <p className="text-xl sm:text-2xl font-semibold text-[#1D1D1F] opacity-80 text-center px-4">
           Trusted by Leading Institutions &amp; Companies
         </p>
 
         <div className="w-full overflow-hidden relative">
-          <div className="flex items-center justify-around gap-8 sm:gap-14 animate-marquee whitespace-nowrap px-4 opacity-85">
-            <span className="text-base sm:text-lg font-bold text-[#1D1D1F] tracking-tight bg-white/70 px-4 py-2 rounded-xl shadow-xs">
-              LARSEN &amp; TOUBRO
-            </span>
-            <span className="text-base sm:text-lg font-bold text-[#1D1D1F] tracking-tight bg-white/70 px-4 py-2 rounded-xl shadow-xs">
-              TATA TECHNOLOGIES
-            </span>
-            <span className="text-base sm:text-lg font-bold text-[#1D1D1F] tracking-tight bg-white/70 px-4 py-2 rounded-xl shadow-xs">
-              WORLEY ENGINEERING
-            </span>
-            <span className="text-base sm:text-lg font-bold text-[#1D1D1F] tracking-tight bg-white/70 px-4 py-2 rounded-xl shadow-xs">
-              JACOBS ENGINEERING
-            </span>
-            <span className="text-base sm:text-lg font-bold text-[#1D1D1F] tracking-tight bg-white/70 px-4 py-2 rounded-xl shadow-xs">
-              PETROFAC
-            </span>
-            <span className="text-base sm:text-lg font-bold text-[#1D1D1F] tracking-tight bg-white/70 px-4 py-2 rounded-xl shadow-xs">
-              SCHNEIDER ELECTRIC
-            </span>
-            <span className="text-base sm:text-lg font-bold text-[#1D1D1F] tracking-tight bg-white/70 px-4 py-2 rounded-xl shadow-xs">
-              BENTLEY SYSTEMS
-            </span>
-            <span className="text-base sm:text-lg font-bold text-[#1D1D1F] tracking-tight bg-white/70 px-4 py-2 rounded-xl shadow-xs">
-              AUTODESK TRAINING LABS
-            </span>
+          <div className="flex items-center gap-4 sm:gap-6 animate-marquee whitespace-nowrap px-4">
+            {/* Set 1 */}
+            {PARTNER_COMPANIES.map((company, idx) => (
+              <div
+                key={`p1-${idx}`}
+                className="flex items-center justify-center rounded-xl shadow-md bg-white px-5 sm:px-7 py-2.5 h-[58px] min-w-[160px] sm:min-w-[175px] border border-white/80 hover:shadow-lg transition-transform hover:-translate-y-0.5 flex-shrink-0"
+              >
+                {company.render()}
+              </div>
+            ))}
+            {/* Set 2 (for seamless looping marquee) */}
+            {PARTNER_COMPANIES.map((company, idx) => (
+              <div
+                key={`p2-${idx}`}
+                className="flex items-center justify-center rounded-xl shadow-md bg-white px-5 sm:px-7 py-2.5 h-[58px] min-w-[160px] sm:min-w-[175px] border border-white/80 hover:shadow-lg transition-transform hover:-translate-y-0.5 flex-shrink-0"
+              >
+                {company.render()}
+              </div>
+            ))}
           </div>
         </div>
       </section>
