@@ -185,9 +185,9 @@ export const EnquiryModal: React.FC<EnquiryModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3.5 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
       <div
-        className="relative w-full max-w-[440px] bg-white rounded-2xl shadow-2xl p-6 sm:p-7 border border-slate-200 transition-all"
+        className="relative w-full max-w-[440px] max-h-[92dvh] overflow-y-auto bg-white rounded-2xl shadow-2xl p-5 sm:p-7 border border-slate-200 transition-all"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button X */}

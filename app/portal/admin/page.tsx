@@ -459,6 +459,7 @@ const DEFAULT_COURSES: CourseItem[] = COURSES.map((c, idx) => {
 export default function AdminPortalPage() {
   // Navigation State - Tab 01 "Student", Tab 02 "Courses" directly below
   const [activeTab, setActiveTab] = useState<string>('Student');
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false);
 
   const [adminUser, setAdminUser] = useState({
     name: 'Hari Kishore Reddy',
@@ -658,7 +659,7 @@ export default function AdminPortalPage() {
   // Toast Notification State
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Job Placement Management State (Real-time DB synced with jobs.unlox.com style)
+  // Job Placement Management State (Real-time DB synced with RND CADD Jobs Portal)
   const [adminJobs, setAdminJobs] = useState<JobPost[]>(INITIAL_JOBS);
   const [isLoadingJobs, setIsLoadingJobs] = useState<boolean>(false);
   const [jobSearchQuery, setJobSearchQuery] = useState<string>('');
@@ -2416,8 +2417,145 @@ export default function AdminPortalPage() {
         </div>
       )}
 
+      {/* MOBILE STICKY TOP BAR (< md) */}
+      <div className="md:hidden sticky top-0 z-40 bg-white border-b-2 border-[#E2E8F0] px-3.5 py-2.5 flex items-center justify-between shadow-xs">
+        <div className="flex items-center space-x-2.5 min-w-0">
+          <Link href="/" className="flex items-center shrink-0">
+            <img src="/logo.png" alt="RND CADD" className="h-8 w-auto object-contain" />
+          </Link>
+          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#EE2C3C] text-white tracking-wider uppercase">
+            ADMIN
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Link
+            href="/"
+            className="px-2.5 py-1.5 text-[11px] font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+          >
+            Site
+          </Link>
+          <button
+            type="button"
+            onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
+            className="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center border border-slate-200 cursor-pointer"
+            aria-label="Toggle Admin Menu"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              {isMobileNavOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M4 6h16M4 12h16m-7 6h7" />
+              )}
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* MOBILE HORIZONTAL SWIPEABLE TAB PILLS (< md) */}
+      <div className="md:hidden flex items-center gap-1.5 overflow-x-auto py-2 px-3 bg-white border-b border-slate-200 no-scrollbar whitespace-nowrap scrollbar-none z-30">
+        {adminNavItems.map((item) => {
+          const isActive = activeTab === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 flex-shrink-0 cursor-pointer ${
+                isActive
+                  ? 'bg-[#131313] text-white shadow-xs'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              <span>{item.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* MOBILE DRAWER (< md) */}
+      {isMobileNavOpen && (
+        <div className="fixed inset-0 z-50 md:hidden flex">
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-xs"
+            onClick={() => setIsMobileNavOpen(false)}
+          />
+          <div className="relative w-full max-w-xs bg-white h-full z-10 flex flex-col justify-between p-5 overflow-y-auto safe-pb shadow-2xl">
+            <div>
+              <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+                <div className="flex items-center gap-2.5">
+                  <img src="/logo.png" alt="RND CADD" className="h-9 w-auto object-contain" />
+                  <div>
+                    <h3 className="text-xs font-black text-slate-900 leading-tight">ADMIN CONTROL</h3>
+                    <span className="text-[10px] text-slate-500 font-medium">Ameerpet Campus</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsMobileNavOpen(false)}
+                  className="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center"
+                >
+                  &times;
+                </button>
+              </div>
+
+              {/* Admin Info */}
+              <div className="p-3 my-4 rounded-xl bg-slate-50 border border-slate-200">
+                <h4 className="text-xs font-extrabold text-slate-900">{adminUser.name}</h4>
+                <p className="text-[11px] text-slate-500 truncate mt-0.5">{adminUser.email}</p>
+                <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider block mt-1">
+                  Executive Admin
+                </span>
+              </div>
+
+              {/* Nav links */}
+              <div className="space-y-1">
+                {adminNavItems.map((item) => {
+                  const isActive = activeTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        setActiveTab(item.id);
+                        setIsMobileNavOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left ${
+                        isActive
+                          ? 'bg-[#131313] text-white shadow-xs'
+                          : 'text-slate-700 hover:bg-slate-100'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${isActive ? 'bg-white/20' : 'bg-slate-100'}`}>
+                          {item.tag}
+                        </span>
+                        <span>{item.label}</span>
+                      </span>
+                      {isActive && <span>✓</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-slate-200 mt-6 space-y-2">
+              <Link
+                href="/"
+                className="w-full py-2 px-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 block text-center hover:bg-slate-50"
+              >
+                Back to Main Website
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-[#EE2C3C] hover:bg-[#D71E2E] block text-center"
+              >
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* LEFT SIDEBAR - FIXED & IMMOBILE (Pointers locked to viewport, does not move when scrolling) */}
-      <aside className="w-full md:w-80 md:fixed md:top-0 md:left-0 md:bottom-0 md:h-screen bg-[#FFFFFF] border-r-2 border-[#E2E8F0] flex flex-col justify-between shadow-md z-30 flex-shrink-0">
+      <aside className="hidden md:flex w-full md:w-80 md:fixed md:top-0 md:left-0 md:bottom-0 md:h-screen bg-[#FFFFFF] border-r-2 border-[#E2E8F0] flex-col justify-between shadow-md z-30 flex-shrink-0">
         <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
           {/* Top Logo Container */}
           <div className="p-4 sm:p-5 border-b-2 border-[#E2E8F0] bg-[#FFFFFF] flex items-center justify-between flex-shrink-0">

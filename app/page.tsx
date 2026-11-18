@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import type { Course } from '@/lib/courses-data';
 import { Header } from '@/components/Header';
-import { UnloxHero } from '@/components/UnloxHero';
+import { RndCaddHero } from '@/components/RndCaddHero';
 import { UpgradProgramsShowcase } from '@/components/UpgradProgramsShowcase';
 import { DisciplineCourseHub } from '@/components/DisciplineCourseHub';
 import { PartnerTicker } from '@/components/PartnerTicker';
@@ -122,8 +122,8 @@ export default function HomePage() {
 
       {/* Main Landing Experience */}
       <main>
-        {/* Stage 1: Unlox Hero (Title Reveal & Welcome) */}
-        <UnloxHero
+        {/* Stage 1: Official Hero (Title Reveal & Welcome) */}
+        <RndCaddHero
           onSelectStream={(stream) => handleSelectStream(stream)}
           onExploreCatalog={() => handleSelectStream('all')}
         />

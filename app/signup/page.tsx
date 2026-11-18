@@ -159,7 +159,7 @@ export default function SignUpPage() {
       {/* Main Single MNC-Style Card */}
       <main className="flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
         <div className="w-full max-w-[480px]">
-          <div className="bg-[#FFFFFF] rounded-2xl border border-[#E2E8F0] shadow-[0_10px_35px_-5px_rgba(15,23,42,0.08),0_4px_12px_rgba(15,23,42,0.03)] p-7 sm:p-9">
+          <div className="bg-[#FFFFFF] rounded-2xl border border-[#E2E8F0] shadow-[0_10px_35px_-5px_rgba(15,23,42,0.08),0_4px_12px_rgba(15,23,42,0.03)] p-5 sm:p-8 md:p-9">
             
             {/* Top Centered Logo */}
             <div className="flex flex-col items-center text-center mb-6">

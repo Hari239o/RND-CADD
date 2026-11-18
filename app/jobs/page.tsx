@@ -912,8 +912,8 @@ export default function JobsPortalPage() {
 
         {/* Mobile Slide-out Menu */}
         <div
-          className={`fixed inset-0 z-40 bg-white flex flex-col items-start justify-start pt-24 px-6 gap-5 transition-transform duration-300 md:hidden shadow-2xl ${
-            mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          className={`fixed inset-0 z-40 bg-white flex flex-col items-start justify-start pt-24 px-6 pb-8 gap-5 transition-transform duration-300 md:hidden shadow-2xl overflow-y-auto ${
+            mobileMenuOpen ? 'translate-x-0 pointer-events-auto' : 'translate-x-full pointer-events-none'
           }`}
         >
           <a
@@ -1238,7 +1238,7 @@ export default function JobsPortalPage() {
       </section>
 
       {/* JOBS SECTION (Pleasant modern #E7F0FF cards, #0066ff buttons) */}
-      <section id="openings" className="w-full h-auto px-6 sm:px-12 lg:px-16 overflow-hidden py-14 max-w-[1400px] mx-auto">
+      <section id="openings" className="w-full h-auto px-3.5 sm:px-8 lg:px-16 overflow-hidden py-10 sm:py-14 max-w-[1400px] mx-auto">
         {/* Section Top Header with Prev/Next Navigation Controls */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
@@ -1368,7 +1368,7 @@ export default function JobsPortalPage() {
             {filteredJobs.map((job) => (
               <div
                 key={job.id}
-                className="w-[320px] sm:w-[350px] min-w-[320px] sm:min-w-[350px] snap-start bg-[#E7F0FF] rounded-[20px] p-6 flex flex-col justify-between gap-4 border border-[#C7DEFF]/60 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                className="w-[85vw] max-w-[350px] min-w-[260px] sm:w-[350px] sm:min-w-[350px] snap-start bg-[#E7F0FF] rounded-[20px] p-5 sm:p-6 flex flex-col justify-between gap-4 border border-[#C7DEFF]/60 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex-shrink-0"
               >
                 {/* Top Discipline Tag & Work Mode */}
                 <div>
@@ -1691,8 +1691,8 @@ export default function JobsPortalPage() {
 
       {/* MODAL 1: VIEW JOB DETAILS */}
       {selectedJobForDetails && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-6 max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-8 space-y-6 max-h-[92dvh] overflow-y-auto shadow-2xl">
             <div className="flex items-start justify-between">
               <div>
                 <span className="text-xs font-semibold px-3 py-1 rounded-full bg-[#E7F0FF] text-[#0066ff] uppercase tracking-wider">
@@ -1784,8 +1784,8 @@ export default function JobsPortalPage() {
 
       {/* MODAL 2: INTERACTIVE QUICK APPLY MODAL */}
       {selectedJobForApply && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 space-y-5 max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-8 space-y-5 max-h-[92dvh] overflow-y-auto shadow-2xl">
             <div className="flex items-start justify-between">
               <div>
                 <span className="text-xs font-semibold text-[#0066ff] uppercase tracking-wider">

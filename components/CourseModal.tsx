@@ -277,21 +277,21 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#F8FAFC] w-screen h-screen flex flex-col overflow-hidden text-[#0F172A] animate-fadeIn">
+    <div className="fixed inset-0 z-50 bg-[#F8FAFC] w-full h-full flex flex-col overflow-hidden text-[#0F172A] animate-fadeIn">
       
       {/* 1. TOP STICKY BAR: CLEAN BRANDING & CLOSE */}
-      <header className="bg-white border-b border-slate-200 py-3.5 px-4 sm:px-6 lg:px-10 flex-shrink-0 z-30 shadow-xs">
-        <div className="max-w-[1560px] mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-3 sm:space-x-4 overflow-hidden">
+      <header className="bg-white border-b border-slate-200 py-2.5 sm:py-3.5 px-3.5 sm:px-6 lg:px-10 flex-shrink-0 z-30 shadow-xs">
+        <div className="max-w-[1560px] mx-auto flex items-center justify-between gap-3">
+          <div className="flex items-center space-x-2.5 sm:space-x-4 overflow-hidden min-w-0">
             <img
               src="/logo.png"
               alt="RND CADD"
-              className="h-8 sm:h-9 w-auto object-contain flex-shrink-0"
+              className="h-7 sm:h-9 w-auto object-contain flex-shrink-0"
             />
-            <div className="h-5 w-px bg-slate-200"></div>
+            <div className="h-4 sm:h-5 w-px bg-slate-200 flex-shrink-0"></div>
             <div className="flex items-center space-x-2 text-xs truncate">
-              <span className="font-bold text-slate-800 uppercase tracking-wider text-xs sm:text-sm">
-                CAD DESK TRAINING INSTITUTE &bull; AMEERPET HYDERABAD
+              <span className="font-bold text-slate-800 uppercase tracking-wider text-xs sm:text-sm truncate">
+                RND CADD TRAINING INSTITUTE &bull; AMEERPET
               </span>
               <span className="text-slate-300 hidden md:inline">&bull;</span>
               <span className="text-[#EE2C3C] font-mono font-bold hidden md:inline">
@@ -300,11 +300,12 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
             </div>
           </div>
 
-          {/* Close Button */}
+          {/* Close Button (Touch optimized 40x40px min) */}
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-full bg-slate-100 hover:bg-red-50 hover:text-red-600 text-slate-700 flex items-center justify-center transition-all cursor-pointer border border-slate-200"
+            className="w-10 h-10 rounded-full bg-slate-100 hover:bg-red-50 hover:text-red-600 text-slate-700 flex items-center justify-center transition-all cursor-pointer border border-slate-200 flex-shrink-0 active:scale-95"
             title="Back to Catalog"
+            aria-label="Close dialog"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />

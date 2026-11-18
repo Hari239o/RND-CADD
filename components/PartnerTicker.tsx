@@ -352,9 +352,9 @@ export const PartnerTicker: React.FC = () => {
       </section>
 
       {/* ========================================================================= */}
-      {/* PART 2: EXACT IMAGE 3 (jobs.unlox.com "Hiring, Made Easy" Showcase)       */}
+      {/* PART 2: Interactive Feature Showcase ("Hiring, Made Easy")                */}
       {/* ========================================================================= */}
-      <section className="w-full py-16 sm:py-20 bg-[linear-gradient(to_bottom,#FFFFFF_0%,#F1F7FF_100%)] relative overflow-hidden">
+      <section className="w-full py-14 sm:py-20 bg-[linear-gradient(to_bottom,#FFFFFF_0%,#F1F7FF_100%)] relative overflow-hidden">
         
         {/* Subtle Ambient Background Gradients */}
         <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full bg-blue-100/40 blur-3xl pointer-events-none" />
@@ -363,26 +363,26 @@ export const PartnerTicker: React.FC = () => {
         <div className="cad-container relative z-10">
           
           {/* Section Header */}
-          <div className="flex flex-col items-center text-center mb-10 sm:mb-12">
+          <div className="flex flex-col items-center text-center mb-8 sm:mb-12">
             <span className="text-xs sm:text-sm font-bold text-[#0066FF] tracking-wider uppercase bg-blue-50 px-3.5 py-1.5 rounded-full border border-blue-100 mb-3">
               Why hire from us ?
             </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#1D1D1F] tracking-tight">
+            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-[#1D1D1F] tracking-tight">
               Hiring, Made Easy
             </h2>
           </div>
 
-          {/* Grid of the 2 Signature Cards from jobs.unlox.com (Image 3) */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+          {/* Grid of the 2 Signature Feature Cards */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 max-w-6xl mx-auto">
             
             {/* ------------------------------------------------------------- */}
             {/* CARD 1: Diverse Student Community (Concentric Orbiting Avatars)*/}
             {/* ------------------------------------------------------------- */}
-            <div className="flex flex-col justify-between p-8 sm:p-10 bg-white rounded-[28px] shadow-xl shadow-blue-500/5 border border-slate-100 hover:shadow-2xl transition-all duration-300">
+            <div className="flex flex-col justify-between p-4 sm:p-8 lg:p-10 bg-white rounded-2xl sm:rounded-[28px] shadow-xl shadow-blue-500/5 border border-slate-100 hover:shadow-2xl transition-all duration-300 overflow-hidden">
               
-              {/* Animated Orbiting Solar System Container */}
-              <div className="w-full flex items-center justify-center py-8">
-                <div className="relative w-[280px] h-[280px] sm:w-[300px] sm:h-[300px] flex items-center justify-center">
+              {/* Animated Orbiting Solar System Container (Responsive scale on mobile) */}
+              <div className="w-full flex items-center justify-center py-4 sm:py-8 overflow-hidden">
+                <div className="relative w-[240px] h-[240px] sm:w-[300px] sm:h-[300px] flex items-center justify-center scale-90 sm:scale-100 origin-center">
                   
                   {/* Outer Dotted Orbiting Ring (Counter-Clockwise) */}
                   <div className="absolute top-1/2 left-1/2 w-[270px] h-[270px] border border-dashed border-blue-200 rounded-full animate-rotate-ccw pointer-events-none">
@@ -523,31 +523,31 @@ export const PartnerTicker: React.FC = () => {
             {/* ------------------------------------------------------------- */}
             {/* CARD 2: Well-Trained Pool of Candidates (Candidate Cards Track)*/}
             {/* ------------------------------------------------------------- */}
-            <div className="flex flex-col justify-between p-8 sm:p-10 bg-white rounded-[28px] shadow-xl shadow-blue-500/5 border border-slate-100 hover:shadow-2xl transition-all duration-300">
+            <div className="flex flex-col justify-between p-4 sm:p-8 lg:p-10 bg-white rounded-2xl sm:rounded-[28px] shadow-xl shadow-blue-500/5 border border-slate-100 hover:shadow-2xl transition-all duration-300 overflow-hidden">
               
               {/* Candidate Cards Column */}
               <div className="w-full flex flex-col gap-3.5 py-4">
                 
                 {/* Candidate 1 */}
-                <div className="w-full flex items-center justify-between p-3.5 sm:p-4 bg-white rounded-2xl shadow-lg shadow-slate-200/60 border border-slate-100 hover:-translate-y-0.5 transition-all">
-                  <div className="flex items-center gap-3.5 min-w-0">
+                <div className="w-full flex items-center justify-between p-3 sm:p-4 bg-white rounded-2xl shadow-lg shadow-slate-200/60 border border-slate-100 hover:-translate-y-0.5 transition-all gap-2">
+                  <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
                     <img
                       src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=160&q=80"
                       alt="Shreya Moitra"
-                      className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover flex-shrink-0 border-2 border-blue-50"
+                      className="w-10 h-10 sm:w-14 sm:h-14 rounded-full object-cover flex-shrink-0 border-2 border-blue-50"
                     />
                     <div className="flex flex-col min-w-0">
-                      <h4 className="text-sm sm:text-base font-bold text-slate-900 truncate">
+                      <h4 className="text-xs sm:text-base font-bold text-slate-900 truncate">
                         Shreya Moitra
                       </h4>
-                      <p className="text-[11px] text-slate-500 truncate">
+                      <p className="text-[10px] sm:text-[11px] text-slate-500 truncate">
                         BIM Architect &amp; Revit • 2+ Years Exp.
                       </p>
                     </div>
                   </div>
                   <button
                     onClick={() => setConnectedCandidate('Shreya Moitra')}
-                    className={`px-5 sm:px-6 py-2 rounded-lg text-xs font-bold transition-all flex-shrink-0 cursor-pointer ${
+                    className={`px-3.5 sm:px-6 py-2 rounded-lg text-xs font-bold transition-all flex-shrink-0 cursor-pointer ${
                       connectedCandidate === 'Shreya Moitra'
                         ? 'bg-emerald-600 text-white'
                         : 'bg-[#0066FF] hover:bg-[#0052CC] text-white shadow-md shadow-blue-500/20 active:scale-95'
@@ -558,25 +558,25 @@ export const PartnerTicker: React.FC = () => {
                 </div>
 
                 {/* Candidate 2 */}
-                <div className="w-full flex items-center justify-between p-3.5 sm:p-4 bg-white rounded-2xl shadow-lg shadow-slate-200/60 border border-slate-100 hover:-translate-y-0.5 transition-all">
-                  <div className="flex items-center gap-3.5 min-w-0">
+                <div className="w-full flex items-center justify-between p-3 sm:p-4 bg-white rounded-2xl shadow-lg shadow-slate-200/60 border border-slate-100 hover:-translate-y-0.5 transition-all gap-2">
+                  <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
                     <img
                       src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=160&q=80"
                       alt="Surya K"
-                      className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover flex-shrink-0 border-2 border-blue-50"
+                      className="w-10 h-10 sm:w-14 sm:h-14 rounded-full object-cover flex-shrink-0 border-2 border-blue-50"
                     />
                     <div className="flex flex-col min-w-0">
-                      <h4 className="text-sm sm:text-base font-bold text-slate-900 truncate">
+                      <h4 className="text-xs sm:text-base font-bold text-slate-900 truncate">
                         Surya K
                       </h4>
-                      <p className="text-[11px] text-slate-500 truncate">
+                      <p className="text-[10px] sm:text-[11px] text-slate-500 truncate">
                         Mechanical CAD/CAE • SolidWorks &amp; CATIA
                       </p>
                     </div>
                   </div>
                   <button
                     onClick={() => setConnectedCandidate('Surya K')}
-                    className={`px-5 sm:px-6 py-2 rounded-lg text-xs font-bold transition-all flex-shrink-0 cursor-pointer ${
+                    className={`px-3.5 sm:px-6 py-2 rounded-lg text-xs font-bold transition-all flex-shrink-0 cursor-pointer ${
                       connectedCandidate === 'Surya K'
                         ? 'bg-emerald-600 text-white'
                         : 'bg-[#0066FF] hover:bg-[#0052CC] text-white shadow-md shadow-blue-500/20 active:scale-95'

@@ -32,7 +32,7 @@ html, body {
   line-height: 20px;
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  min-width: 320px;
 }
 
 @supports (scrollbar-gutter: stable) {
@@ -87,6 +87,7 @@ nav {
 /* Precise geometric engineering container - unified across entire site */
 .cad-container {
   max-width: 1320px;
+  width: 100%;
   margin-left: auto;
   margin-right: auto;
   padding-left: 1rem;
@@ -105,6 +106,23 @@ nav {
     padding-left: 2rem;
     padding-right: 2rem;
   }
+}
+
+/* Safe area padding utilities for notched mobile devices */
+.safe-pb {
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+.safe-pt {
+  padding-top: env(safe-area-inset-top, 16px);
+}
+
+/* Touch-optimized target helper */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Crisp technical selection */
@@ -178,7 +196,7 @@ nav {
 }
 
 /* ============================================================
-   Orbiting Animations from jobs.unlox.com (Image 3)
+   Orbiting Animations for Interactive Feature Cards
    ============================================================ */
 @keyframes rotate-cw {
   from {

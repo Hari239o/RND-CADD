@@ -357,6 +357,7 @@ const BookCoverGraphic = ({ book, onClick }: { book: EbookItem; onClick?: () => 
 export default function StudentPortalPage() {
   const [mounted, setMounted] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('Home');
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false);
   const [studentUser, setStudentUser] = useState({
     name: 'Student',
     email: '',
@@ -1576,8 +1577,155 @@ export default function StudentPortalPage() {
         color: '#000000',
       }}
     >
+      {/* MOBILE STICKY TOP BAR (< md) */}
+      <div className="md:hidden sticky top-0 z-40 bg-white border-b border-slate-200 px-3.5 py-2.5 flex items-center justify-between shadow-xs">
+        <div className="flex items-center space-x-2.5 min-w-0">
+          <div className="w-9 h-9 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 flex-shrink-0">
+            <img
+              src={studentUser.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}
+              alt={studentUser.name}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';
+              }}
+            />
+          </div>
+          <div className="min-w-0">
+            <span className="text-xs font-black text-slate-900 block truncate leading-tight">
+              {studentUser.name}
+            </span>
+            <span className="text-[10px] font-mono font-bold text-slate-500 block truncate">
+              ID: {studentUser.id}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Link
+            href="/"
+            className="px-2.5 py-1.5 text-[11px] font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+          >
+            Home
+          </Link>
+          <button
+            type="button"
+            onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
+            className="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center border border-slate-200 cursor-pointer"
+            aria-label="Toggle Portal Menu"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              {isMobileNavOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M4 6h16M4 12h16m-7 6h7" />
+              )}
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* MOBILE HORIZONTAL SWIPEABLE TAB PILLS (< md) */}
+      <div className="md:hidden flex items-center gap-1.5 overflow-x-auto py-2 px-3 bg-white border-b border-slate-200 no-scrollbar whitespace-nowrap scrollbar-none z-30">
+        {navItems.map((item) => {
+          const isActive = activeTab === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 flex-shrink-0 cursor-pointer ${
+                isActive
+                  ? 'bg-[#131313] text-white shadow-xs'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              <span>{item.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* MOBILE DRAWER (< md) */}
+      {isMobileNavOpen && (
+        <div className="fixed inset-0 z-50 md:hidden flex">
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-xs"
+            onClick={() => setIsMobileNavOpen(false)}
+          />
+          <div className="relative w-full max-w-xs bg-white h-full z-10 flex flex-col justify-between p-5 overflow-y-auto safe-pb shadow-2xl">
+            <div>
+              <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+                <div className="flex items-center gap-3">
+                  <img src="/logo.png" alt="RND CADD" className="h-9 w-auto object-contain" />
+                  <div>
+                    <h3 className="text-xs font-black text-slate-900 leading-tight">STUDENT PORTAL</h3>
+                    <span className="text-[10px] text-slate-500 font-medium">Ameerpet Campus</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsMobileNavOpen(false)}
+                  className="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center"
+                >
+                  &times;
+                </button>
+              </div>
+
+              {/* Student Info */}
+              <div className="p-3 my-4 rounded-xl bg-slate-50 border border-slate-200">
+                <h4 className="text-xs font-extrabold text-slate-900">{studentUser.name}</h4>
+                <p className="text-[11px] text-slate-500 font-mono mt-0.5">ID: {studentUser.id}</p>
+                <p className="text-[10px] text-slate-600 truncate mt-0.5">{studentUser.stream}</p>
+              </div>
+
+              {/* Nav links */}
+              <div className="space-y-1">
+                {navItems.map((item) => {
+                  const isActive = activeTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        setActiveTab(item.id);
+                        setIsMobileNavOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left ${
+                        isActive
+                          ? 'bg-[#131313] text-white shadow-xs'
+                          : 'text-slate-700 hover:bg-slate-100'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${isActive ? 'bg-white/20' : 'bg-slate-100'}`}>
+                          {item.tag}
+                        </span>
+                        <span>{item.label}</span>
+                      </span>
+                      {isActive && <span>✓</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-slate-200 mt-6 space-y-2">
+              <Link
+                href="/"
+                className="w-full py-2 px-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 block text-center hover:bg-slate-50"
+              >
+                Back to Main Website
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-[#EE2C3C] hover:bg-[#D71E2E] block text-center"
+              >
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* LEFT SIDEBAR - FIXED & IMMOBILE (Pointers locked to viewport, does not move when scrolling) */}
-      <aside className="w-full md:w-80 md:fixed md:top-0 md:left-0 md:bottom-0 md:h-screen bg-[#FFFFFF] border-r border-slate-200 flex flex-col justify-between shadow-xs z-30 flex-shrink-0">
+      <aside className="hidden md:flex w-full md:w-80 md:fixed md:top-0 md:left-0 md:bottom-0 md:h-screen bg-[#FFFFFF] border-r border-slate-200 flex-col justify-between shadow-xs z-30 flex-shrink-0">
         <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
           {/* Student Profile Identity */}
           <div className="px-5 pt-7 pb-5 sm:pt-8 sm:pb-5 border-b border-slate-200 bg-white flex-shrink-0">
@@ -2681,7 +2829,7 @@ export default function StudentPortalPage() {
             </div>
           )}
 
-          {/* TAB: JOBS & PLACEMENTS (Real-Time Synced with jobs.unlox.com styling) */}
+          {/* TAB: JOBS & PLACEMENTS (Real-Time Synced) */}
           {activeTab === 'Jobs' && (
             <div className="space-y-6">
               {/* Header Banner */}

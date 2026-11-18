@@ -39,7 +39,7 @@ export const WorkstationShowcase: React.FC = () => {
       ref={containerRef}
       className="relative w-full py-28 bg-[#FFFFFF] overflow-hidden border-b border-[#CBD5E1]"
     >
-      {/* Giant Background Typography Scrolling Horizontally (Signature Unlox Motion) */}
+      {/* Giant Background Typography Scrolling Horizontally (Architectural Motion) */}
       <div
         style={{
           transform: `translate3d(${giantTextX}%, 0, 0)`,

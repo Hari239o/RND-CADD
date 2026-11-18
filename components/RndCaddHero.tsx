@@ -3,12 +3,12 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 
-interface UnloxHeroProps {
+interface RndCaddHeroProps {
   onSelectStream: (stream: any) => void;
   onExploreCatalog: () => void;
 }
 
-export const UnloxHero: React.FC<UnloxHeroProps> = ({
+export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
   onSelectStream,
   onExploreCatalog,
 }) => {
@@ -63,7 +63,7 @@ export const UnloxHero: React.FC<UnloxHeroProps> = ({
   return (
     <div
       ref={containerRef}
-      className="relative w-full min-h-[85vh] sm:min-h-[90vh] lg:min-h-[95vh] bg-[#F8FAFC] flex flex-col justify-between pt-36 sm:pt-40 lg:pt-44 pb-14 sm:pb-18 lg:pb-24 px-4 sm:px-6 lg:px-8 overflow-hidden border-b border-[#CBD5E1]"
+      className="relative w-full min-h-[85vh] sm:min-h-[90vh] lg:min-h-[95vh] bg-[#F8FAFC] flex flex-col justify-between pt-28 sm:pt-36 lg:pt-40 pb-12 sm:pb-16 lg:pb-20 px-3.5 sm:px-6 lg:px-8 overflow-hidden border-b border-[#CBD5E1]"
     >
       {/* Clean CAD Architectural Blueprint Coordinate Grid with Parallax Scrubbing */}
       <motion.div
@@ -83,21 +83,21 @@ export const UnloxHero: React.FC<UnloxHeroProps> = ({
       {/* Hero Core Content Centered */}
       <motion.div
         style={{ opacity: heroOpacity }}
-        className="relative z-10 flex-1 flex flex-col items-center justify-center text-center max-w-5xl mx-auto my-auto w-full"
+        className="relative z-10 flex-1 flex flex-col items-center justify-center text-center max-w-5xl mx-auto my-auto w-full px-1"
       >
-        {/* Top Pill Badge (Exact Unlox Style with Logo Red) */}
+        {/* Top Pill Badge */}
         <motion.div
           initial={{ opacity: 0, y: -15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="inline-flex items-center space-x-2 border border-[#D20A0B] bg-[#FFFFFF] px-4 py-1.5 rounded-full text-xs font-bold text-[#D20A0B] shadow-sm mb-6 sm:mb-8"
+          className="inline-flex items-center space-x-2 border border-[#D20A0B] bg-[#FFFFFF] px-3.5 sm:px-4 py-1.5 rounded-full text-[10px] sm:text-xs font-bold text-[#D20A0B] shadow-sm mb-5 sm:mb-8"
         >
           <span className="w-2 h-2 rounded-full bg-[#D20A0B] animate-pulse"></span>
           <span>LEARNING REIMAGINED FOR INDUSTRY 4.0</span>
         </motion.div>
 
-        {/* Letter-By-Letter Split-Text Reveal: ENGINEERING in Logo Navy */}
-        <div className="overflow-hidden py-1 flex justify-center text-[#15304C] font-black text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl tracking-tight leading-none uppercase select-none">
+        {/* Letter-By-Letter Split-Text Reveal: ENGINEERING in Logo Navy (Fluid font size for 320px screens) */}
+        <div className="overflow-hidden py-1 flex justify-center text-[#15304C] font-black text-3xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl tracking-tight leading-none uppercase select-none max-w-full">
           {engineeringLetters.map((char, index) => (
             <motion.span
               key={index}
@@ -112,12 +112,12 @@ export const UnloxHero: React.FC<UnloxHeroProps> = ({
           ))}
         </div>
 
-        {/* Line 2: CAD in Navy, REIMAGINED in Logo Red #D20A0B */}
+        {/* Line 2: CAD in Navy, REIMAGINED in Logo Red #D20A0B (Fluid font size, wrap-safe) */}
         <motion.div
           initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
-          className="overflow-hidden py-1 flex items-center justify-center space-x-3 text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black tracking-tight leading-none uppercase mt-2 sm:mt-3 select-none"
+          className="overflow-hidden py-1 flex flex-wrap items-center justify-center gap-x-2 sm:gap-x-3 text-2xl sm:text-4xl md:text-6xl lg:text-8xl xl:text-9xl font-black tracking-tight leading-none uppercase mt-2 sm:mt-3 select-none"
         >
           <span className="text-[#15304C]">CAD</span>
           <span className="text-[#D20A0B]">REIMAGINED</span>
@@ -128,21 +128,21 @@ export const UnloxHero: React.FC<UnloxHeroProps> = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5, ease: 'easeOut' }}
-          className="mt-6 sm:mt-7 max-w-2xl sm:max-w-3xl text-xs sm:text-sm md:text-base text-[#475569] leading-relaxed"
+          className="mt-5 sm:mt-7 max-w-2xl sm:max-w-3xl text-xs sm:text-sm md:text-base text-[#475569] leading-relaxed px-2"
         >
           Industrial CAD, CAM, CAE &amp; BIM mastery on high-performance RTX GPU workstations. Certified programs for Civil, Mechanical, and Electrical engineers in Ameerpet, Hyderabad.
         </motion.div>
 
-        {/* Action CTAs */}
+        {/* Action CTAs: Full-width on mobile (320px-440px), auto on sm+ */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.65, ease: 'easeOut' }}
-          className="mt-8 sm:mt-10 flex flex-wrap items-center justify-center gap-4 sm:gap-5"
+          className="mt-6 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5 w-full sm:w-auto px-4 sm:px-0"
         >
           <button
             onClick={scrollToExperience}
-            className="px-8 sm:px-10 py-3.5 sm:py-4 bg-[#D20A0B] hover:bg-[#B50809] text-[#FFFFFF] text-xs sm:text-sm font-black tracking-wider uppercase transition-all shadow-md hover:shadow-xl hover:shadow-red-500/25 hover:-translate-y-0.5 rounded-xl active:translate-y-0 cursor-pointer"
+            className="w-full sm:w-auto px-7 sm:px-10 py-3.5 sm:py-4 bg-[#D20A0B] hover:bg-[#B50809] text-[#FFFFFF] text-xs sm:text-sm font-black tracking-wider uppercase transition-all shadow-md hover:shadow-xl hover:shadow-red-500/25 hover:-translate-y-0.5 rounded-xl active:translate-y-0 cursor-pointer text-center"
           >
             SELECT DISCIPLINE -&gt;
           </button>
@@ -151,7 +151,7 @@ export const UnloxHero: React.FC<UnloxHeroProps> = ({
               const el = document.getElementById('enrollment');
               if (el) el.scrollIntoView({ behavior: 'smooth' });
             }}
-            className="px-8 sm:px-10 py-3.5 sm:py-4 bg-[#FFFFFF] hover:bg-[#F1F5F9] border border-[#CBD5E1] text-[#15304C] text-xs sm:text-sm font-black tracking-wider uppercase transition-all shadow-sm hover:shadow-md rounded-xl cursor-pointer"
+            className="w-full sm:w-auto px-7 sm:px-10 py-3.5 sm:py-4 bg-[#FFFFFF] hover:bg-[#F1F5F9] border border-[#CBD5E1] text-[#15304C] text-xs sm:text-sm font-black tracking-wider uppercase transition-all shadow-sm hover:shadow-md rounded-xl cursor-pointer text-center"
           >
             RESERVE WORKSTATION
           </button>
@@ -161,9 +161,9 @@ export const UnloxHero: React.FC<UnloxHeroProps> = ({
       {/* Downward Scroll Indicator to Domain Programs */}
       <div
         onClick={scrollToExperience}
-        className="relative z-10 flex flex-col items-center justify-center text-xs text-slate-500 hover:text-[#D20A0B] cursor-pointer pt-8 sm:pt-12 transition-all duration-300 group"
+        className="relative z-10 flex flex-col items-center justify-center text-xs text-slate-500 hover:text-[#D20A0B] cursor-pointer pt-6 sm:pt-10 transition-all duration-300 group"
       >
-        <span className="uppercase tracking-[0.25em] text-[11px] font-black text-slate-400 group-hover:text-[#D20A0B] transition-colors">
+        <span className="uppercase tracking-[0.2em] sm:tracking-[0.25em] text-[10px] sm:text-[11px] font-black text-slate-400 group-hover:text-[#D20A0B] transition-colors text-center px-2">
           EXPLORE ENGINEERING DOMAINS
         </span>
         <motion.div

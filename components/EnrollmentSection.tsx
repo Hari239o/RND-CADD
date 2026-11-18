@@ -132,7 +132,7 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* Left Column: Campus Benefits & Workstation Promise (5 Cols) */}
-          <div className="lg:col-span-5 bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-7 shadow-sm space-y-6">
+          <div className="lg:col-span-5 bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-6 lg:p-7 shadow-sm space-y-6">
             <div className="flex items-center gap-3.5 pb-5 border-b border-slate-100">
               <img
                 src="/logo.png"
@@ -227,7 +227,7 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
           </div>
 
           {/* Right Column: Clean, Friendly Application Form (7 Cols) */}
-          <div className="lg:col-span-7 bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-sm">
+          <div className="lg:col-span-7 bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-sm">
             {submittedId ? (
               <div className="py-10 text-center space-y-4">
                 <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
