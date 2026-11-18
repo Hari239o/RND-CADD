@@ -2,9 +2,373 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { JobPost } from '@/lib/jobs-data';
 import { INITIAL_JOBS } from '@/lib/jobs-data';
 
+// ============================================================
+// ANIMATION GRAPHIC 1: Diverse Student Community (Orbital Rings)
+// ============================================================
+const ORBIT_INNER = [
+  { src: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80', deg: 0 },
+  { src: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80', deg: 120 },
+  { src: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80', deg: 240 },
+];
+
+const ORBIT_OUTER = [
+  { src: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80', deg: 0 },
+  { src: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80', deg: 72 },
+  { src: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&auto=format&fit=crop&q=80', deg: 144 },
+  { src: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100&auto=format&fit=crop&q=80', deg: 216 },
+  { src: 'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=100&auto=format&fit=crop&q=80', deg: 288 },
+];
+
+function OrbitalCommunityGraphic() {
+  return (
+    <div className="w-full flex items-center justify-center py-6 sm:py-8">
+      <div className="relative w-[280px] h-[280px] max-sm:w-[200px] max-sm:h-[200px] flex items-center justify-center">
+        {/* Inner Orbit (Clockwise rotation) */}
+        <div className="absolute top-1/2 left-1/2 w-[120px] h-[120px] max-sm:w-[90px] max-sm:h-[90px] border border-dotted border-gray-300 rounded-full animate-rotate-cw pointer-events-none">
+          {ORBIT_INNER.map((node, i) => (
+            <div
+              key={i}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[38px] h-[38px] max-sm:w-[28px] max-sm:h-[28px] rounded-full overflow-hidden shadow-md border-2 border-white"
+              style={{
+                transform: `rotate(${node.deg}deg) translateY(-150%) rotate(-${node.deg}deg)`,
+                transformOrigin: 'center center',
+              }}
+            >
+              <img
+                src={node.src}
+                alt="Student"
+                className="w-full h-full object-cover rounded-full animate-counter-cw"
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Outer Orbit (Counter-Clockwise rotation) */}
+        <div className="absolute top-1/2 left-1/2 w-[280px] h-[280px] max-sm:w-[200px] max-sm:h-[200px] border border-dotted border-gray-300 rounded-full animate-rotate-ccw pointer-events-none">
+          {ORBIT_OUTER.map((node, i) => (
+            <div
+              key={i}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[38px] h-[38px] max-sm:w-[28px] max-sm:h-[28px] rounded-full overflow-hidden shadow-md border-2 border-white"
+              style={{
+                transform: `rotate(${node.deg}deg) translateY(-350%) rotate(-${node.deg}deg)`,
+                transformOrigin: 'center center',
+              }}
+            >
+              <img
+                src={node.src}
+                alt="Student"
+                className="w-full h-full object-cover rounded-full animate-counter-ccw"
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Center Node */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[44px] h-[44px] max-sm:w-[32px] max-sm:h-[32px] rounded-full overflow-hidden border-2 border-[#0066ff] shadow-lg">
+          <img
+            src="https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=100&auto=format&fit=crop&q=80"
+            alt="Lead Candidate"
+            className="w-full h-full object-cover rounded-full"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// ANIMATION GRAPHIC 2: Well-Trained Pool of Candidates (Auto-Cycling Stack)
+// ============================================================
+interface CandidateItem {
+  id: number;
+  name: string;
+  desc: string;
+  img: string;
+}
+
+const INITIAL_CANDIDATES: CandidateItem[] = [
+  {
+    id: 1,
+    name: 'Shreya Moitra',
+    desc: 'UX Designer - 2+ Years of Experience',
+    img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
+  },
+  {
+    id: 2,
+    name: 'Surya K',
+    desc: 'UX Designer - 5+ Years of Experience',
+    img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80',
+  },
+  {
+    id: 3,
+    name: 'Simran M',
+    desc: 'UX Designer - 5+ Years of Experience',
+    img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&auto=format&fit=crop&q=80',
+  },
+  {
+    id: 4,
+    name: 'Rahul V',
+    desc: 'BIM Modeler - 3+ Years of Experience',
+    img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&auto=format&fit=crop&q=80',
+  },
+];
+
+function CyclingCandidatesGraphic() {
+  const [candidates, setCandidates] = useState<CandidateItem[]>(INITIAL_CANDIDATES);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCandidates((prev) => {
+        const copy = [...prev];
+        const last = copy.pop();
+        if (last) copy.unshift(last);
+        return copy;
+      });
+    }, 2400);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="w-full h-[280px] max-sm:h-auto my-6 max-sm:my-4 px-2 sm:px-4 flex flex-col gap-3 justify-center overflow-hidden">
+      <AnimatePresence initial={false}>
+        {candidates.slice(0, 3).map((item) => (
+          <motion.div
+            key={item.id}
+            layout
+            initial={{ opacity: 0, y: 35 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -35 }}
+            transition={{ duration: 0.55 }}
+            className="w-full flex py-2.5 px-5 max-sm:px-3 justify-between items-center shadow-md hover:shadow-lg rounded-[18px] bg-white border border-slate-100 transition-all"
+          >
+            <div className="flex items-center gap-3">
+              <img
+                src={item.img}
+                alt={item.name}
+                className="h-[48px] w-[48px] max-sm:h-9 max-sm:w-9 rounded-full object-cover border border-slate-200"
+              />
+              <div className="flex flex-col">
+                <h4 className="text-sm font-semibold text-[#1D1D1F] max-sm:text-xs">
+                  {item.name}
+                </h4>
+                <p className="text-[#333435]/60 text-[11px] max-sm:text-[9px] font-medium line-clamp-1">
+                  {item.desc}
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-[#0066ff] hover:bg-[#0055e6] px-6 py-1.5 rounded-md max-sm:px-3 max-sm:py-1 cursor-pointer transition shadow-xs flex-shrink-0">
+              <span className="text-xs font-semibold text-white">Connect</span>
+            </div>
+          </motion.div>
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ============================================================
+// ANIMATION GRAPHIC 3: Candidate Profile Window with Animated Tracks
+// ============================================================
+function CandidateProfileTracksGraphic() {
+  return (
+    <div className="w-full py-4 px-2 sm:px-6">
+      <div className="w-full rounded-[14px] overflow-hidden relative shadow-xl h-[280px] bg-white border border-slate-100">
+        {/* Header Bar */}
+        <div className="w-full bg-[#54AFF0] py-2 px-4 shadow-xs">
+          <h4 className="text-sm text-center font-semibold text-white tracking-wide">
+            Candidate Profile
+          </h4>
+        </div>
+
+        {/* Dynamic Tracks Area */}
+        <div className="w-full h-[calc(100%-36px)] relative overflow-hidden bg-slate-50/40">
+          {/* Track 1: Blue - Left to Right */}
+          <div className="flex items-center absolute top-7 left-0">
+            <motion.div
+              className="h-[14px] rounded-r-none"
+              style={{ backgroundColor: '#3AC6F2' }}
+              animate={{ width: ['60px', '140px', '60px'] }}
+              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <div className="relative -ml-2.5 flex items-center gap-1.5 bg-white py-0.5 px-2 rounded-full border border-sky-300 shadow-md">
+              <img
+                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=80"
+                alt="Robert"
+                className="w-5 h-5 rounded-full object-cover"
+              />
+              <span className="text-[11px] font-bold text-slate-700">Robert</span>
+            </div>
+          </div>
+
+          {/* Track 2: Green - Left to Right */}
+          <div className="flex items-center absolute top-36 left-0">
+            <motion.div
+              className="h-[14px] rounded-r-none"
+              style={{ backgroundColor: '#68F146' }}
+              animate={{ width: ['140px', '70px', '140px'] }}
+              transition={{ duration: 4.4, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <div className="relative -ml-2.5 flex items-center gap-1.5 bg-white py-0.5 px-2 rounded-full border border-emerald-300 shadow-md">
+              <img
+                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80"
+                alt="Sara Doe"
+                className="w-5 h-5 rounded-full object-cover"
+              />
+              <span className="text-[11px] font-bold text-slate-700">Sara Doe</span>
+            </div>
+          </div>
+
+          {/* Track 3: Red - Right to Left */}
+          <div className="flex items-center absolute top-32 right-0 flex-row-reverse">
+            <motion.div
+              className="h-[14px] rounded-l-none"
+              style={{ backgroundColor: '#F13C3C' }}
+              animate={{ width: ['60px', '125px', '60px'] }}
+              transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <div className="relative -mr-2.5 flex items-center gap-1.5 bg-white py-0.5 px-2 rounded-full border border-rose-300 shadow-md">
+              <img
+                src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=80&auto=format&fit=crop&q=80"
+                alt="Nagma Khan"
+                className="w-5 h-5 rounded-full object-cover"
+              />
+              <span className="text-[11px] font-bold text-slate-700">Nagma Khan</span>
+            </div>
+          </div>
+
+          {/* Track 4: Deep Blue - Right to Left */}
+          <div className="flex items-center absolute top-7 right-0 flex-row-reverse">
+            <motion.div
+              className="h-[14px] rounded-l-none"
+              style={{ backgroundColor: '#3189EF' }}
+              animate={{ width: ['180px', '95px', '180px'] }}
+              transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <div className="relative -mr-2.5 flex items-center gap-1.5 bg-white py-0.5 px-2 rounded-full border border-blue-300 shadow-md">
+              <img
+                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&auto=format&fit=crop&q=80"
+                alt="Will Smith"
+                className="w-5 h-5 rounded-full object-cover"
+              />
+              <span className="text-[11px] font-bold text-slate-700">Will Smith</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// ANIMATION GRAPHIC 4: Free of Cost Hiring Review Window
+// ============================================================
+const REVIEW_CANDIDATES = [
+  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=80',
+];
+
+function FreeOfCostHiringGraphic() {
+  const [photos, setPhotos] = useState<string[]>(REVIEW_CANDIDATES);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setPhotos((prev) => {
+        const copy = [...prev];
+        const first = copy.shift();
+        if (first) copy.push(first);
+        return copy;
+      });
+    }, 2800);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="w-full my-6 px-2 sm:px-6 h-[260px] flex items-center justify-center">
+      <div className="w-full max-w-[420px] bg-[#F4F4F4] rounded-[12px] h-[100%] relative border border-slate-200 shadow-xl overflow-hidden">
+        {/* macOS Style Window Dots */}
+        <div className="w-full flex items-center justify-start gap-1.5 px-3 py-2 bg-[#EAEAEA] border-b border-slate-200">
+          <div className="w-2.5 h-2.5 rounded-full bg-[#EE6767]" />
+          <div className="w-2.5 h-2.5 rounded-full bg-[#F6C566]" />
+          <div className="w-2.5 h-2.5 rounded-full bg-[#5BEB7B]" />
+        </div>
+
+        {/* Body Container */}
+        <div className="w-full h-[calc(100%-28px)] flex items-center justify-between p-4 relative overflow-hidden">
+          {/* Left: Featured Candidate Profile with Accept / Reject buttons */}
+          <div className="w-1/2 flex flex-col items-center justify-center">
+            <div className="w-28 h-28 rounded-xl overflow-hidden shadow-lg border-2 border-white bg-slate-200">
+              <img
+                src={photos[0]}
+                alt="Selected Candidate"
+                className="w-full h-full object-cover transition-all duration-700"
+              />
+            </div>
+            <div className="flex items-center justify-center gap-2 pt-2.5">
+              <div className="rounded-[30px] text-white bg-[#0066ff] hover:bg-[#0055e6] px-4 py-1 text-xs font-semibold cursor-pointer shadow-xs transition">
+                Accept
+              </div>
+              <div className="bg-[#FFD4E1] p-0.5 rounded-[31px]">
+                <div className="rounded-[30px] text-white bg-[#E13468] hover:bg-[#c92556] px-4 py-1 text-xs font-semibold cursor-pointer shadow-xs transition">
+                  Reject
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Middle: Queued Candidates */}
+          <div className="w-1/4 flex flex-col items-center gap-2.5">
+            <div className="w-16 h-16 rounded-xl overflow-hidden shadow-md border-2 border-white opacity-90">
+              <img
+                src={photos[1]}
+                alt="Candidate 2"
+                className="w-full h-full object-cover transition-all duration-700"
+              />
+            </div>
+            <div className="w-16 h-16 rounded-xl overflow-hidden shadow-md border-2 border-white opacity-80">
+              <img
+                src={photos[2]}
+                alt="Candidate 3"
+                className="w-full h-full object-cover transition-all duration-700"
+              />
+            </div>
+          </div>
+
+          {/* Right: Next Queue Cards */}
+          <div className="w-1/4 flex flex-col items-center gap-2.5 opacity-60">
+            <div className="w-14 h-14 rounded-xl overflow-hidden shadow-sm border border-white">
+              <img
+                src={photos[3]}
+                alt="Candidate 4"
+                className="w-full h-full object-cover transition-all duration-700"
+              />
+            </div>
+            <div className="w-14 h-14 rounded-xl overflow-hidden shadow-sm border border-white">
+              <img
+                src={photos[4]}
+                alt="Candidate 5"
+                className="w-full h-full object-cover transition-all duration-700"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// MAIN COMPONENT
+// ============================================================
 export default function JobsPortalPage() {
   const [jobsList, setJobsList] = useState<JobPost[]>(INITIAL_JOBS);
   const [isLoadingJobs, setIsLoadingJobs] = useState<boolean>(false);
@@ -580,7 +944,7 @@ export default function JobsPortalPage() {
         </div>
       </section>
 
-      {/* WHY HIRE FROM US SECTION (Linear Gradient to Top) */}
+      {/* WHY HIRE FROM US SECTION (Image-2 Matching Animated Grid) */}
       <section
         id="why-hire"
         className="w-full h-auto flex flex-col items-center py-20 bg-[linear-gradient(to_top,_#FFFFFF_0%,_#FFFFFF_5%,_#C0DCFF_100%)]"
@@ -592,128 +956,71 @@ export default function JobsPortalPage() {
           Hiring, Made Easy
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 w-[85%] max-w-[1200px] gap-6 py-10">
-          {/* Feature 1: Diverse Student Community */}
+        <div className="grid grid-cols-1 md:grid-cols-2 w-[85%] max-w-[1200px] gap-8 py-10">
+          {/* Card 1: Diverse Student Community with Orbital Rings Animation */}
           <div
             id="community"
-            className="flex flex-col h-full justify-between p-8 sm:p-10 bg-white rounded-[27px] shadow-lg shadow-[#91C2FF]/15 border border-slate-100 space-y-6"
+            className="flex flex-col h-full justify-between p-8 sm:p-10 bg-white rounded-[27px] shadow-lg shadow-[#91C2FF]/15 border border-slate-100"
           >
-            <div className="space-y-3">
-              <h3 className="text-2xl sm:text-3xl text-[#1D1D1F] opacity-90 font-medium">
+            {/* Top Animation Graphic */}
+            <OrbitalCommunityGraphic />
+
+            {/* Title & Description Below */}
+            <div className="flex flex-col gap-2 pt-2">
+              <h3 className="text-2xl sm:text-3xl text-[#1D1D1F] opacity-75 font-normal">
                 Diverse Student Community
               </h3>
-              <p className="text-sm sm:text-base text-[#1D1D1F] opacity-75 leading-relaxed">
-                Access candidates from varied engineering domains, backgrounds, and tool competencies that bring diversity, innovation, and fresh perspectives to your project delivery teams.
+              <p className="text-sm text-[#1D1D1F] opacity-75 leading-relaxed">
+                Access candidates from varied domains, backgrounds, and skill sets that bring diversity, innovation, and fresh perspectives to your team.
               </p>
-            </div>
-
-            {/* Interactive Candidate Cards Preview (Exact as reference) */}
-            <div className="space-y-2.5 pt-2">
-              <div className="p-3.5 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#0066ff] text-white flex items-center justify-center font-bold text-sm">
-                    SM
-                  </div>
-                  <div>
-                    <h5 className="text-sm font-bold text-[#1D1D1F]">Shreya Moitra</h5>
-                    <p className="text-xs text-slate-500">BIM Modeler &bull; Revit &amp; Navisworks</p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => showToast('Connecting with Shreya Moitra...')}
-                  className="px-4 py-1.5 rounded-full bg-[#C7DEFF] text-[#0066ff] hover:bg-[#a6c9ff] text-xs font-semibold transition"
-                >
-                  Connect
-                </button>
-              </div>
-
-              <div className="p-3.5 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#173B5D] text-white flex items-center justify-center font-bold text-sm">
-                    SK
-                  </div>
-                  <div>
-                    <h5 className="text-sm font-bold text-[#1D1D1F]">Surya K.</h5>
-                    <p className="text-xs text-slate-500">Mechanical CAD &bull; CATIA &amp; SolidWorks</p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => showToast('Connecting with Surya K...')}
-                  className="px-4 py-1.5 rounded-full bg-[#C7DEFF] text-[#0066ff] hover:bg-[#a6c9ff] text-xs font-semibold transition"
-                >
-                  Connect
-                </button>
-              </div>
             </div>
           </div>
 
-          {/* Feature 2: Well-Trained Pool of Candidates */}
-          <div className="flex flex-col h-full justify-between p-8 sm:p-10 bg-white rounded-[27px] shadow-lg shadow-[#91C2FF]/15 border border-slate-100 space-y-6">
-            <div className="space-y-3">
-              <h3 className="text-2xl sm:text-3xl text-[#1D1D1F] opacity-90 font-medium">
+          {/* Card 2: Well-Trained Pool of Candidates with Auto-Cycling Candidate Cards */}
+          <div className="flex flex-col h-full justify-between p-8 sm:p-10 bg-white rounded-[27px] shadow-lg shadow-[#91C2FF]/15 border border-slate-100">
+            {/* Top Animation Graphic */}
+            <CyclingCandidatesGraphic />
+
+            {/* Title & Description Below */}
+            <div className="flex flex-col gap-2 pt-2">
+              <h3 className="text-2xl sm:text-3xl text-[#1D1D1F] opacity-75 font-normal">
                 Well-Trained Pool of Candidates
               </h3>
-              <p className="text-sm sm:text-base text-[#1D1D1F] opacity-75 leading-relaxed">
-                Every candidate is industry-ready, trained with practical skills and real-time industrial drawing projects, ensuring faster onboarding and drastically reduced corporate training costs.
-              </p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-[#E7F0FF] border border-[#C7DEFF] space-y-2">
-              <div className="flex items-center justify-between text-xs font-semibold text-[#173B5D]">
-                <span>Industrial Rigor &amp; Clash Coordination</span>
-                <span className="text-[#0066ff] font-bold">100% Verified</span>
-              </div>
-              <div className="w-full bg-[#C7DEFF] h-2 rounded-full overflow-hidden">
-                <div className="bg-[#0066ff] h-full w-[95%] rounded-full" />
-              </div>
-              <p className="text-[11px] text-slate-500 pt-1">
-                Trained on dedicated NVIDIA Quadro workstations with real-world EPC drawings.
+              <p className="text-sm text-[#1D1D1F] opacity-75 leading-relaxed">
+                Every candidate is industry-ready, trained with practical skills and real-time projects, ensuring faster onboarding and reduced training costs.
               </p>
             </div>
           </div>
 
-          {/* Feature 3: Hire From Top Technical Labs */}
-          <div className="flex flex-col h-full justify-between p-8 sm:p-10 bg-white rounded-[27px] shadow-lg shadow-[#91C2FF]/15 border border-slate-100 space-y-6">
-            <div className="space-y-3">
-              <h3 className="text-2xl sm:text-3xl text-[#1D1D1F] opacity-90 font-medium">
-                Hire From Top Technical Labs
+          {/* Card 3: Hire From Top Tier Colleges with Candidate Profile Tracks */}
+          <div className="flex flex-col h-full justify-between p-8 sm:p-10 bg-white rounded-[27px] shadow-lg shadow-[#91C2FF]/15 border border-slate-100">
+            {/* Top Animation Graphic */}
+            <CandidateProfileTracksGraphic />
+
+            {/* Title & Description Below */}
+            <div className="flex flex-col gap-2 pt-2">
+              <h3 className="text-2xl sm:text-3xl text-[#1D1D1F] opacity-75 font-normal">
+                Hire From Top Tier Colleges
               </h3>
-              <p className="text-sm sm:text-base text-[#1D1D1F] opacity-75 leading-relaxed">
-                RND CADD connects you with ambitious engineering students from leading institutions, giving you direct access to premium, pre-screened talent across India.
+              <p className="text-sm text-[#1D1D1F] opacity-75 leading-relaxed">
+                RND CADD connects you with ambitious students from India’s leading institutions, giving you direct access to premium talent.
               </p>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <span className="px-4 py-2 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
-                ✓ 0-2 Years Experience
-              </span>
-              <span className="px-4 py-2 rounded-xl bg-blue-50 text-blue-700 text-xs font-bold border border-blue-200">
-                ✓ Certified Portfolios
-              </span>
             </div>
           </div>
 
-          {/* Feature 4: Free of Cost Hiring */}
-          <div className="flex flex-col h-full justify-between p-8 sm:p-10 bg-white rounded-[27px] shadow-lg shadow-[#91C2FF]/15 border border-slate-100 space-y-6">
-            <div className="space-y-3">
-              <h3 className="text-2xl sm:text-3xl text-[#1D1D1F] opacity-90 font-medium">
+          {/* Card 4: Free of Cost Hiring with Interactive Review Window */}
+          <div className="flex flex-col h-full justify-between p-8 sm:p-10 bg-white rounded-[27px] shadow-lg shadow-[#91C2FF]/15 border border-slate-100">
+            {/* Top Animation Graphic */}
+            <FreeOfCostHiringGraphic />
+
+            {/* Title & Description Below */}
+            <div className="flex flex-col gap-2 pt-2">
+              <h3 className="text-2xl sm:text-3xl text-[#1D1D1F] opacity-75 font-normal">
                 Free of Cost Hiring
               </h3>
-              <p className="text-sm sm:text-base text-[#1D1D1F] opacity-75 leading-relaxed">
-                Hire top engineering talent without paying a single rupee. RND CADD makes quality hiring accessible to every engineering enterprise by eliminating third-party recruitment fees.
+              <p className="text-sm text-[#1D1D1F] opacity-75 leading-relaxed">
+                Hire top talent without paying a single rupee. RND CADD makes quality hiring accessible to every employer by eliminating recruitment fees.
               </p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-emerald-50/80 border border-emerald-200 flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold text-emerald-900 block">Placement Guarantee</span>
-                <span className="text-[11px] text-emerald-700">Zero recruitment commission charged</span>
-              </div>
-              <span className="text-sm font-bold text-emerald-700 bg-white px-3 py-1.5 rounded-xl border border-emerald-200">
-                100% Free
-              </span>
             </div>
           </div>
         </div>
