@@ -132,10 +132,7 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
             className="lg:col-span-5 flex items-center justify-center relative mt-8 lg:mt-0 py-6 select-none"
             style={{ perspective: 1200 }}
           >
-            {/* Soft Ambient Backdrop Light (matching Unlox.com's subtle circular glow) */}
-            <div className="absolute w-[320px] sm:w-[420px] lg:w-[480px] h-[320px] sm:h-[420px] lg:h-[480px] rounded-full bg-slate-100/50 -z-10 pointer-events-none" />
-
-            {/* Interactive Mouse-Tracking Animated Logo: NO white card box */}
+            {/* Interactive Mouse-Tracking Animated Logo: seamlessly merged into hero background */}
             <motion.div
               style={{
                 x: translateX,
@@ -163,7 +160,7 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
                   e.currentTarget.src = '/logo.png';
                 }}
                 alt="RND CADD Logo"
-                className="w-64 sm:w-80 md:w-96 lg:w-[440px] xl:w-[480px] h-auto object-contain drop-shadow-[0_24px_40px_rgba(21,48,76,0.16)] transition-transform duration-200 hover:scale-105"
+                className="w-64 sm:w-80 md:w-96 lg:w-[440px] xl:w-[480px] h-auto object-contain transition-transform duration-200 hover:scale-105"
                 draggable={false}
               />
             </motion.div>
