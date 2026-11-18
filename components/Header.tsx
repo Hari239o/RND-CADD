@@ -139,7 +139,7 @@ export const Header: React.FC<HeaderProps> = ({
                     {isSelected && (
                       <motion.div
                         layoutId="activeNavTab"
-                        className="absolute inset-0 rounded-full bg-gradient-to-r from-[#EE2C3C] via-[#E01829] to-[#D20A0B] shadow-md shadow-red-500/30"
+                        className="absolute inset-0 rounded-full bg-[#0F172A] shadow-sm"
                         transition={{ type: 'spring', stiffness: 450, damping: 35 }}
                       />
                     )}
@@ -235,12 +235,9 @@ export const Header: React.FC<HeaderProps> = ({
                   </Link>
                   <Link
                     href="/signup"
-                    className="px-5 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm font-extrabold tracking-wider uppercase bg-gradient-to-r from-[#EE2C3C] via-[#E01829] to-[#D20A0B] hover:from-[#D20A0B] hover:to-[#B50809] text-white transition-all duration-200 shadow-md hover:shadow-xl hover:shadow-red-500/30 hover:scale-105 active:scale-95 flex items-center gap-1.5 cursor-pointer"
+                    className="px-5 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold tracking-wider uppercase bg-[#0F172A] hover:bg-[#1E293B] text-white transition-all duration-150 shadow-sm hover:shadow-md cursor-pointer"
                   >
-                    <span>SIGN UP</span>
-                    <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                    </svg>
+                    SIGN UP
                   </Link>
                 </>
               )}
@@ -363,7 +360,7 @@ export const Header: React.FC<HeaderProps> = ({
                       <Link
                         href="/signup"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex-1 py-2 text-center rounded-xl bg-gradient-to-r from-[#EE2C3C] to-[#D20A0B] text-white text-xs font-bold shadow-xs"
+                        className="flex-1 py-2 text-center rounded-xl bg-[#0F172A] hover:bg-[#1E293B] text-white text-xs font-bold shadow-xs transition-colors"
                       >
                         Sign Up
                       </Link>

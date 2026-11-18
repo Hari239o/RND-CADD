@@ -407,14 +407,14 @@ export const EnquiryModal: React.FC<EnquiryModalProps> = ({
   );
 };
 
-// Fixed Right-edge Vertical Tab: "Enquiry Now" (like CAD DESK)
+// Fixed Right-edge Vertical Tab: "Enquiry Now" - Clean MNC Theme without icons
 export const FloatingEnquiryButton: React.FC<{ onOpen: () => void }> = ({ onOpen }) => {
   return (
     <div className="fixed right-0 top-1/2 -translate-y-1/2 z-40 hidden md:block">
       <button
         type="button"
         onClick={onOpen}
-        className="group flex items-center gap-2 bg-[#D20A0B] hover:bg-[#B50809] text-white px-3 py-3 rounded-l-xl shadow-2xl cursor-pointer transition-all hover:pr-4"
+        className="group flex items-center bg-[#0F172A] hover:bg-[#1E293B] text-white px-3 py-3.5 rounded-l-xl border-l border-t border-b border-slate-700/60 shadow-xl cursor-pointer transition-all duration-150 hover:pr-4"
         style={{
           writingMode: 'vertical-rl',
           textOrientation: 'mixed',
@@ -422,9 +422,8 @@ export const FloatingEnquiryButton: React.FC<{ onOpen: () => void }> = ({ onOpen
         }}
         aria-label="Open Enquiry Form"
       >
-        <span className="text-xs font-black tracking-widest uppercase flex items-center gap-2.5">
-          <span className="inline-block transform -rotate-90 text-sm">📞</span>
-          <span>Enquiry Now</span>
+        <span className="text-xs font-bold tracking-widest uppercase">
+          Enquiry Now
         </span>
       </button>
     </div>
