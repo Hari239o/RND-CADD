@@ -94,40 +94,11 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
               <span className="text-[#D20A0B]">Build Your Future.</span>
             </motion.h1>
 
-            {/* Simple Steps Pattern (Replaces Heavy Paragraph Content) */}
-            <motion.div
-              initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
-              className="mt-5 sm:mt-6 flex flex-wrap items-center gap-2 sm:gap-3"
-            >
-              <div className="flex items-center gap-2 bg-slate-50/80 border border-slate-200/90 px-3.5 py-2 rounded-xl shadow-2xs">
-                <span className="w-5 h-5 rounded-full bg-[#15304C] text-white text-[11px] font-bold flex items-center justify-center shrink-0">
-                  1
-                </span>
-                <span className="text-xs sm:text-[13px] font-bold text-slate-800">Choose Stream</span>
-              </div>
-              <span className="text-slate-300 font-bold hidden sm:inline">&rarr;</span>
-              <div className="flex items-center gap-2 bg-slate-50/80 border border-slate-200/90 px-3.5 py-2 rounded-xl shadow-2xs">
-                <span className="w-5 h-5 rounded-full bg-[#D20A0B] text-white text-[11px] font-bold flex items-center justify-center shrink-0">
-                  2
-                </span>
-                <span className="text-xs sm:text-[13px] font-bold text-slate-800">1:1 RTX Lab Training</span>
-              </div>
-              <span className="text-slate-300 font-bold hidden sm:inline">&rarr;</span>
-              <div className="flex items-center gap-2 bg-slate-50/80 border border-slate-200/90 px-3.5 py-2 rounded-xl shadow-2xs">
-                <span className="w-5 h-5 rounded-full bg-emerald-600 text-white text-[11px] font-bold flex items-center justify-center shrink-0">
-                  3
-                </span>
-                <span className="text-xs sm:text-[13px] font-bold text-slate-800">Certification &amp; Placement</span>
-              </div>
-            </motion.div>
-
             {/* Action CTAs */}
             <motion.div
               initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.15, ease: 'easeOut' }}
+              transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
               className="mt-6 sm:mt-8 flex flex-wrap items-center gap-3 sm:gap-4"
             >
               <button
