@@ -39,8 +39,21 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
     };
   }, []);
 
-  // Fetch live courses from API
+  // Fetch live courses from localStorage (instant cache) & API
   useEffect(() => {
+    // 1. Instant check from localStorage
+    try {
+      if (typeof window !== 'undefined') {
+        const stored = localStorage.getItem('rnd_cadd_live_courses');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setAllCourses(parsed);
+          }
+        }
+      }
+    } catch {}
+
     const fetchCourses = async () => {
       try {
         const res = await fetch('/api/courses');
@@ -85,6 +98,7 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
               },
               modules: sc.modules || [],
               classes: sc.classes || [],
+              status: sc.status || 'Active',
             };
 
             if (index >= 0) {
@@ -94,16 +108,34 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
             }
           });
           setAllCourses(merged);
+          try {
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('rnd_cadd_live_courses', JSON.stringify(merged));
+            }
+          } catch {}
         }
       } catch (e) {
         console.error('Failed to load courses in UpgradProgramsShowcase:', e);
       }
     };
     fetchCourses();
+
+    const handleUpdate = (e: any) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setAllCourses(e.detail);
+      } else {
+        fetchCourses();
+      }
+    };
+
     const interval = setInterval(fetchCourses, 5000);
+    window.addEventListener('rnd_cadd_courses_updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
     window.addEventListener('focus', fetchCourses);
     return () => {
       clearInterval(interval);
+      window.removeEventListener('rnd_cadd_courses_updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
       window.removeEventListener('focus', fetchCourses);
     };
   }, []);
@@ -168,6 +200,7 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
   // Helper to retrieve courses for a given folder id
   const getFolderCourses = (folderId: string): Course[] => {
     return allCourses.filter((c) => {
+      if ((c as any).status === 'Inactive') return false;
       const folderVal = (c.folder || '').toLowerCase();
       const streamVal = (c.stream || '').toLowerCase();
       if (folderId === 'civil') {

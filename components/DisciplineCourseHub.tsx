@@ -26,8 +26,21 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
     setShowAllCourses(false);
   }, [activeStream, searchQuery]);
 
-  // Fetch live courses from MongoDB to dynamically reflect additions, edits, moved folders, and price changes
+  // Fetch live courses from localStorage (instant cache) & API
   useEffect(() => {
+    // 1. Instant check from localStorage
+    try {
+      if (typeof window !== 'undefined') {
+        const stored = localStorage.getItem('rnd_cadd_live_courses');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setCoursesList(parsed);
+          }
+        }
+      }
+    } catch {}
+
     const loadDynamicCourses = async () => {
       try {
         const res = await fetch('/api/courses');
@@ -104,6 +117,7 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
               capstoneProject: capstoneObj,
               modules: modulesList,
               classes: sc.classes || [],
+              status: sc.status || 'Active',
             };
 
             if (index >= 0) {
@@ -114,6 +128,11 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
           });
 
           setCoursesList(merged);
+          try {
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('rnd_cadd_live_courses', JSON.stringify(merged));
+            }
+          } catch {}
         }
       } catch (err) {
         console.error('Failed to load dynamic courses from API:', err);
@@ -122,17 +141,30 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
 
     loadDynamicCourses();
 
-    // Auto-sync whenever user focuses the tab or every 5 seconds so dashboard edits appear live
+    const handleUpdate = (e: any) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setCoursesList(e.detail);
+      } else {
+        loadDynamicCourses();
+      }
+    };
+
+    // Auto-sync whenever user focuses the tab or when admin dispatches course updates
     const interval = setInterval(loadDynamicCourses, 5000);
+    window.addEventListener('rnd_cadd_courses_updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
     window.addEventListener('focus', loadDynamicCourses);
     return () => {
       clearInterval(interval);
+      window.removeEventListener('rnd_cadd_courses_updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
       window.removeEventListener('focus', loadDynamicCourses);
     };
   }, []);
 
   // Filter courses based on active stream and search query
   const filteredCourses = coursesList.filter((course) => {
+    if ((course as any).status === 'Inactive') return false;
     const courseFolder = (course.folder || course.stream || '').toLowerCase();
     const active = activeStream.toLowerCase();
 

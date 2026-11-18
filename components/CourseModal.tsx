@@ -354,6 +354,13 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                   {course.title} Course in Hyderabad
                 </h1>
 
+                {/* Hero Tagline / Subtitle from Admin Course Management */}
+                {course.tagline && (
+                  <p className="text-sm sm:text-base text-slate-200 font-medium leading-relaxed max-w-3xl">
+                    {course.tagline}
+                  </p>
+                )}
+
                 {/* Key Facts Row */}
                 <div className="flex flex-wrap items-center gap-6 pt-4 text-xs sm:text-sm text-slate-200 border-t border-white/15">
                   <div className="flex items-center gap-1.5 font-bold text-amber-400">
@@ -442,6 +449,26 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
             {/* LEFT COLUMN (8 COLS): Full Detailed Course Walkthrough */}
             <div className="lg:col-span-8 space-y-10">
               
+              {/* SECTION 0: COURSE OVERVIEW & OBJECTIVE FROM ADMIN */}
+              {course.overview && (
+                <motion.section
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="bg-white border border-slate-200/80 rounded-3xl p-7 sm:p-8 shadow-sm space-y-3"
+                >
+                  <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
+                    <span className="w-2.5 h-6 bg-[#EE2C3C] rounded-full inline-block"></span>
+                    <h3 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-normal">
+                      Course Overview &amp; Learning Objectives
+                    </h3>
+                  </div>
+                  <p className="text-sm sm:text-base text-slate-700 leading-relaxed font-medium">
+                    {course.overview}
+                  </p>
+                </motion.section>
+              )}
+
               {/* SECTION A: Key Course Metrics (Open Seamless 4-Pillar Layout, Absolutely No Nested Inner Box Cards) */}
               <motion.section
                 initial={{ opacity: 0, y: 16 }}
@@ -684,12 +711,50 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
               <CourseCertificateShowcase course={course} />
 
               {/* SECTION G: DUAL CERTIFICATION & CAPSTONE PROJECT */}
-              <section className="bg-white border border-slate-200/80 rounded-3xl p-7 sm:p-8 shadow-sm space-y-5">
-                <div className="border-b border-slate-100 pb-3 flex items-center gap-3">
-                  <span className="w-2.5 h-6 bg-[#EE2C3C] rounded-full inline-block"></span>
-                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-normal">
-                    Dual Certification &amp; Industry Capstone
-                  </h2>
+              <section className="bg-white border border-slate-200/80 rounded-3xl p-7 sm:p-8 shadow-sm space-y-6">
+                <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="w-2.5 h-6 bg-[#EE2C3C] rounded-full inline-block"></span>
+                    <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-normal">
+                      Dual Certification &amp; Industry Capstone Project
+                    </h2>
+                  </div>
+                  <span className="text-xs font-bold text-[#EE2C3C] bg-red-50 border border-red-100 px-3 py-1 rounded-full">
+                    Mandatory Portfolio
+                  </span>
+                </div>
+
+                {/* Real Capstone Project Details from Admin Course Management */}
+                <div className="p-5 sm:p-6 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-3">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <span className="text-xs font-bold text-[#EE2C3C] uppercase tracking-wider">
+                      Industry Capstone Project Blueprint
+                    </span>
+                    <span className="text-xs font-bold text-emerald-700 bg-emerald-100/70 px-2.5 py-0.5 rounded-full">
+                      Live Industry Deliverable
+                    </span>
+                  </div>
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-900">
+                    {course.capstoneProject?.title || `${course.title} Live Industry Project`}
+                  </h3>
+                  <p className="text-sm text-slate-600 leading-relaxed">
+                    {course.capstoneProject?.description || 'Real-world industrial drafting, modeling, and validation project with detailed engineering dossier.'}
+                  </p>
+
+                  {course.capstoneProject?.deliverables && course.capstoneProject.deliverables.length > 0 && (
+                    <div className="pt-2">
+                      <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">
+                        Verified Deliverables Submitted:
+                      </span>
+                      <div className="flex flex-wrap gap-2">
+                        {course.capstoneProject.deliverables.map((del, dIdx) => (
+                          <span key={dIdx} className="px-3 py-1 rounded-lg bg-white border border-slate-300 text-xs font-semibold text-slate-800 shadow-2xs">
+                            ✓ {del}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">

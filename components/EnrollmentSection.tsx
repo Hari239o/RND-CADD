@@ -23,8 +23,20 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedId, setSubmittedId] = useState<string | null>(null);
 
-  // Sync with live courses from database
+  // Sync with live courses from localStorage (instant cache) & database
   useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const stored = localStorage.getItem('rnd_cadd_live_courses');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setCoursesList(parsed);
+          }
+        }
+      }
+    } catch {}
+
     const fetchCourses = async () => {
       try {
         const res = await fetch('/api/courses');
@@ -37,6 +49,24 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
       }
     };
     fetchCourses();
+
+    const handleUpdate = (e: any) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setCoursesList(e.detail);
+      } else {
+        fetchCourses();
+      }
+    };
+
+    window.addEventListener('rnd_cadd_courses_updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+    window.addEventListener('focus', fetchCourses);
+
+    return () => {
+      window.removeEventListener('rnd_cadd_courses_updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+      window.removeEventListener('focus', fetchCourses);
+    };
   }, []);
 
   // Sync preselectedCourse prop

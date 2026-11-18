@@ -20,6 +20,19 @@ export interface CareerPathwayItem {
 }
 
 export const getCourseCareerPathways = (course: Course): CareerPathwayItem[] => {
+  // Priority 1: Use live admin-curated career roles if provided
+  if (Array.isArray(course.careerRoles) && course.careerRoles.length >= 2) {
+    const expRanges = ['0 – 2 Yrs', '2 – 4 Yrs', '4 – 6 Yrs', '6 – 8 Yrs', '8+ Yrs'];
+    const ctcRanges = ['₹4.5L – ₹9.0L PA', '₹6.0L – ₹11.5L PA', '₹8.0L – ₹15.0L PA', '₹11.0L – ₹19.0L PA', '₹15.0L – ₹28.0L+ PA'];
+    return course.careerRoles.slice(0, 5).map((r, i) => ({
+      id: String(i + 1),
+      step: String(i + 1).padStart(2, '0'),
+      experience: expRanges[i] || `${i * 2}+ Yrs`,
+      role: r,
+      ctc: ctcRanges[i] || '₹12.0L – ₹22.0L PA',
+    }));
+  }
+
   const query = `${course.id || ''} ${course.title || ''} ${course.stream || ''} ${course.folder || ''} ${course.category || ''} ${Array.isArray(course.tools) ? course.tools.join(' ') : ''} ${typeof (course as any).software === 'string' ? (course as any).software : ''}`.toLowerCase();
 
   // 1. CNC / Mastercam / Manufacturing

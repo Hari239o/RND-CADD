@@ -63,7 +63,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onOpenDetails })
 
   const partnerInfo = getPartnerInfo(course.stream || course.folder || '');
   const dynamicImage = getCourseDynamicImage(course);
-  const courseImage = imageError || !course.image ? dynamicImage : (course.image.includes('1581092160607') ? dynamicImage : course.image);
+  const courseImage = imageError || !course.image ? dynamicImage : course.image;
 
   return (
     <div

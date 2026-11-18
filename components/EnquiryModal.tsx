@@ -64,39 +64,80 @@ export const EnquiryModal: React.FC<EnquiryModalProps> = ({
   const [state, setState] = useState('Telangana');
   const [center, setCenter] = useState('Ameerpet (Hyderabad Headquarters)');
   
+  const [coursesList, setCoursesList] = useState<any[]>(COURSES);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [enquiryId, setEnquiryId] = useState('');
 
+  // Sync live courses dynamically from localStorage & API
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const stored = localStorage.getItem('rnd_cadd_live_courses');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setCoursesList(parsed);
+          }
+        }
+      }
+    } catch {}
+
+    const fetchCourses = async () => {
+      try {
+        const res = await fetch('/api/courses');
+        const data = await res.json();
+        if (data.success && Array.isArray(data.courses) && data.courses.length > 0) {
+          setCoursesList(data.courses);
+        }
+      } catch (err) {}
+    };
+    fetchCourses();
+
+    const handleUpdate = (e: any) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setCoursesList(e.detail);
+      } else {
+        fetchCourses();
+      }
+    };
+    window.addEventListener('rnd_cadd_courses_updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+    return () => {
+      window.removeEventListener('rnd_cadd_courses_updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    };
+  }, []);
+
   // Synchronize when initialCourseTitle changes
   useEffect(() => {
     if (initialCourseTitle) {
       setCourse(initialCourseTitle);
-      const match = COURSES.find((c) => c.title.toLowerCase() === initialCourseTitle.toLowerCase());
+      const match = coursesList.find((c) => c.title.toLowerCase() === initialCourseTitle.toLowerCase());
       if (match) {
-        if (match.stream === 'civil') setCategory('Civil & BIM');
-        else if (match.stream === 'mechanical') setCategory('Mechanical CAD/CAE');
-        else if (match.stream === 'eee') setCategory('Electrical & Automation');
-        else if (match.stream === 'interior') setCategory('Interior Architecture');
-        else if (match.stream === 'piping') setCategory('Piping & Plant CAD');
-        else if (match.stream === 'ppm') setCategory('Project Management (PPM)');
+        if (match.stream === 'civil' || match.folder === 'civil') setCategory('Civil & BIM');
+        else if (match.stream === 'mechanical' || match.folder === 'mechanical') setCategory('Mechanical CAD/CAE');
+        else if (match.stream === 'eee' || match.folder === 'electrical') setCategory('Electrical & Automation');
+        else if (match.stream === 'interior' || match.folder === 'interior') setCategory('Interior Architecture');
+        else if (match.stream === 'piping' || match.folder === 'piping') setCategory('Piping & Plant CAD');
+        else if (match.stream === 'ppm' || match.folder === 'ppm') setCategory('Project Management (PPM)');
       }
     }
-  }, [initialCourseTitle]);
+  }, [initialCourseTitle, coursesList]);
 
   // Filter courses based on chosen category
   const availableCourses = React.useMemo(() => {
-    if (!category) return COURSES;
+    if (!category) return coursesList;
     const catLower = category.toLowerCase();
-    if (catLower.includes('civil')) return COURSES.filter((c) => c.stream === 'civil');
-    if (catLower.includes('mech')) return COURSES.filter((c) => c.stream === 'mechanical');
-    if (catLower.includes('elect') || catLower.includes('eee')) return COURSES.filter((c) => c.stream === 'eee');
-    if (catLower.includes('inter')) return COURSES.filter((c) => c.stream === 'interior');
-    if (catLower.includes('pip')) return COURSES.filter((c) => c.stream === 'piping');
-    if (catLower.includes('ppm') || catLower.includes('proj')) return COURSES.filter((c) => c.stream === 'ppm');
-    return COURSES;
-  }, [category]);
+    if (catLower.includes('civil')) return coursesList.filter((c) => c.stream === 'civil' || c.folder === 'civil');
+    if (catLower.includes('mech')) return coursesList.filter((c) => c.stream === 'mechanical' || c.folder === 'mechanical');
+    if (catLower.includes('elect') || catLower.includes('eee')) return coursesList.filter((c) => c.stream === 'eee' || c.folder === 'electrical');
+    if (catLower.includes('inter')) return coursesList.filter((c) => c.stream === 'interior' || c.folder === 'interior');
+    if (catLower.includes('pip')) return coursesList.filter((c) => c.stream === 'piping' || c.folder === 'piping');
+    if (catLower.includes('ppm') || catLower.includes('proj')) return coursesList.filter((c) => c.stream === 'ppm' || c.folder === 'ppm');
+    return coursesList;
+  }, [category, coursesList]);
 
   // Available centers based on chosen state
   const availableCenters = React.useMemo(() => {

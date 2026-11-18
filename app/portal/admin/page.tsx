@@ -738,6 +738,18 @@ export default function AdminPortalPage() {
     }, 4000);
   };
 
+  // Persist live courses locally for instant real-time sync with website
+  const persistLiveCourses = (updatedList: CourseItem[]) => {
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('rnd_cadd_live_courses', JSON.stringify(updatedList));
+        window.dispatchEvent(new CustomEvent('rnd_cadd_courses_updated', { detail: updatedList }));
+      }
+    } catch (e) {
+      console.error('Failed to persist live courses:', e);
+    }
+  };
+
   // Fetch real students from API
   const fetchStudents = async (silent = false) => {
     if (!silent) setIsLoadingStudents(true);
@@ -787,6 +799,7 @@ export default function AdminPortalPage() {
           };
         });
         setCourses(hydrated);
+        persistLiveCourses(hydrated);
       }
     } catch (err) {
       console.error('Failed to load courses:', err);
@@ -1637,7 +1650,9 @@ export default function AdminPortalPage() {
       });
       const data = await res.json();
       if (data.success && data.course) {
-        setCourses((prev) => [data.course, ...prev]);
+        const nextList = [data.course, ...courses];
+        setCourses(nextList);
+        persistLiveCourses(nextList);
         setShowAddCourseModal(false);
         showToast(`Course "${coursePayload.title}" created and synced live to website.`);
         setNewCourse({
@@ -1736,7 +1751,9 @@ export default function AdminPortalPage() {
       });
       const data = await res.json();
       if (data.success && data.course) {
-        setCourses((prev) => prev.map((c) => (c.id === updatedPayload.id ? data.course : c)));
+        const nextList = courses.map((c) => (c.id === updatedPayload.id ? data.course : c));
+        setCourses(nextList);
+        persistLiveCourses(nextList);
         setEditingCourse(null);
         showToast(`Course "${updatedPayload.title}" updated and synced live to website.`);
       } else {
@@ -1762,7 +1779,9 @@ export default function AdminPortalPage() {
       });
       const data = await res.json();
       if (data.success) {
-        setCourses((prev) => prev.filter((c) => c.id !== course.id));
+        const nextList = courses.filter((c) => c.id !== course.id);
+        setCourses(nextList);
+        persistLiveCourses(nextList);
         showToast(`Course "${course.title}" deleted.`);
       } else {
         alert(data.message || 'Failed to delete course.');
@@ -1800,7 +1819,9 @@ export default function AdminPortalPage() {
       });
       const data = await res.json();
       if (data.success && data.course) {
-        setCourses((prev) => prev.map((c) => (c.id === updatedCourse.id ? data.course : c)));
+        const nextList = courses.map((c) => (c.id === updatedCourse.id ? data.course : c));
+        setCourses(nextList);
+        persistLiveCourses(nextList);
         showToast(`Moved "${movingCourse.title}" to ${targetFolder.shortName} folder.`);
         setMovingCourse(null);
       } else {
