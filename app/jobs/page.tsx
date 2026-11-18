@@ -826,9 +826,6 @@ export default function JobsPortalPage() {
           <a href="#community" className="hover:text-[#0066ff] transition">
             Student Community
           </a>
-          <a href="#employers" className="text-[#0066ff] font-semibold flex items-center gap-1 hover:underline">
-            For Employers <span>&rarr;</span>
-          </a>
         </div>
 
         {/* Right Navigation & Auth Buttons */}
@@ -864,12 +861,6 @@ export default function JobsPortalPage() {
               >
                 Register
               </Link>
-              <a
-                href="#employers"
-                className="text-[#0066ff] font-medium text-sm flex items-center gap-1 hover:underline pl-2"
-              >
-                For Employers <span>&rsaquo;</span>
-              </a>
             </>
           )}
         </div>
@@ -936,13 +927,6 @@ export default function JobsPortalPage() {
             className="text-lg font-semibold text-[#1D1D1F] hover:text-[#0066ff]"
           >
             Student Community
-          </a>
-          <a
-            href="#employers"
-            onClick={() => setMobileMenuOpen(false)}
-            className="text-lg font-semibold text-[#0066ff] flex items-center gap-1"
-          >
-            For Employers &rarr;
           </a>
 
           <div className="w-full pt-4 border-t border-slate-200 flex flex-col gap-3">
