@@ -71,12 +71,12 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
               initial={{ opacity: 0, y: shouldReduceMotion ? 0 : -8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, ease: 'easeOut' }}
-              className="inline-flex items-center gap-2 self-start border border-blue-200 bg-blue-50/70 px-4 py-1.5 rounded-full text-xs sm:text-[13px] font-medium text-[#15304C] shadow-2xs mb-5 sm:mb-6"
+              className="inline-flex items-center gap-2 self-start border border-blue-200 bg-blue-50/70 px-4 py-1.5 rounded-full text-xs sm:text-[13px] font-medium text-[#15304C] shadow-2xs mb-4 sm:mb-5"
             >
               <svg className="w-4 h-4 text-[#D20A0B]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
               </svg>
-              <span>Learning Reimagined For The Future</span>
+              <span>Industry 4.0 CAD &amp; BIM Academy</span>
             </motion.div>
 
             {/* Headline */}
@@ -84,20 +84,20 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
               initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.05, ease: 'easeOut' }}
-              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-[#15304C] tracking-tight leading-[1.08]"
+              className="text-4xl sm:text-6xl md:text-7xl font-black text-[#15304C] tracking-tight leading-[1.1]"
             >
-              Engineering <br />
-              Made <span className="text-[#D20A0B]">Simple</span>
+              Master Industrial CAD. <br />
+              <span className="text-[#D20A0B]">Build Your Future.</span>
             </motion.h1>
 
-            {/* Inspirational Subtext */}
+            {/* Concise Subtext: Simple lines only */}
             <motion.p
               initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
-              className="mt-5 sm:mt-6 text-base sm:text-lg lg:text-xl text-slate-600 leading-relaxed font-normal max-w-xl"
+              className="mt-4 sm:mt-5 text-base sm:text-lg text-slate-600 leading-relaxed font-normal max-w-lg"
             >
-              RND CADD was created with one simple yet powerful core belief: &ldquo;Engineering Made Simple&rdquo;. Dive into our dynamic programs, master real-world CAD on high-performance RTX workstations, connect with awesome mentors, and experience education like never before.
+              Hands-on CAD, CAM, CAE &amp; BIM training on dedicated RTX GPU workstations. Certified curriculum with real-world projects and placement support.
             </motion.p>
 
             {/* Action CTAs */}
