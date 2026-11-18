@@ -83,39 +83,57 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
               <span>Industry 4.0 CAD &amp; BIM Academy</span>
             </motion.div>
 
-            {/* Headline */}
+            {/* Headline with Decreased, Balanced Font Size */}
             <motion.h1
               initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.05, ease: 'easeOut' }}
-              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[88px] font-black text-[#15304C] tracking-tight leading-[1.08]"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#15304C] tracking-tight leading-[1.14]"
             >
-              Master Industrial <br />
-              <span className="text-[#15304C]">CAD.</span> <br />
+              Master Industrial CAD. <br />
               <span className="text-[#D20A0B]">Build Your Future.</span>
             </motion.h1>
 
-            {/* Concise Subtext */}
-            <motion.p
+            {/* Simple Steps Pattern (Replaces Heavy Paragraph Content) */}
+            <motion.div
               initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
-              className="mt-5 sm:mt-6 text-base sm:text-lg lg:text-xl text-slate-600 leading-relaxed font-normal max-w-2xl"
+              className="mt-5 sm:mt-6 flex flex-wrap items-center gap-2 sm:gap-3"
             >
-              Hands-on CAD, CAM, CAE &amp; BIM training on dedicated RTX GPU workstations. Certified curriculum with real-world projects and placement support.
-            </motion.p>
+              <div className="flex items-center gap-2 bg-slate-50/80 border border-slate-200/90 px-3.5 py-2 rounded-xl shadow-2xs">
+                <span className="w-5 h-5 rounded-full bg-[#15304C] text-white text-[11px] font-bold flex items-center justify-center shrink-0">
+                  1
+                </span>
+                <span className="text-xs sm:text-[13px] font-bold text-slate-800">Choose Stream</span>
+              </div>
+              <span className="text-slate-300 font-bold hidden sm:inline">&rarr;</span>
+              <div className="flex items-center gap-2 bg-slate-50/80 border border-slate-200/90 px-3.5 py-2 rounded-xl shadow-2xs">
+                <span className="w-5 h-5 rounded-full bg-[#D20A0B] text-white text-[11px] font-bold flex items-center justify-center shrink-0">
+                  2
+                </span>
+                <span className="text-xs sm:text-[13px] font-bold text-slate-800">1:1 RTX Lab Training</span>
+              </div>
+              <span className="text-slate-300 font-bold hidden sm:inline">&rarr;</span>
+              <div className="flex items-center gap-2 bg-slate-50/80 border border-slate-200/90 px-3.5 py-2 rounded-xl shadow-2xs">
+                <span className="w-5 h-5 rounded-full bg-emerald-600 text-white text-[11px] font-bold flex items-center justify-center shrink-0">
+                  3
+                </span>
+                <span className="text-xs sm:text-[13px] font-bold text-slate-800">Certification &amp; Placement</span>
+              </div>
+            </motion.div>
 
             {/* Action CTAs */}
             <motion.div
               initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.15, ease: 'easeOut' }}
-              className="mt-8 sm:mt-10 flex flex-wrap items-center gap-4"
+              className="mt-6 sm:mt-8 flex flex-wrap items-center gap-3 sm:gap-4"
             >
               <button
                 type="button"
                 onClick={scrollToExperience}
-                className="px-9 sm:px-11 py-4 bg-[#D20A0B] hover:bg-[#B50809] text-white text-sm sm:text-base font-bold rounded-xl transition-all duration-150 shadow-md hover:shadow-xl hover:shadow-red-500/25 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer text-center"
+                className="px-7 sm:px-8 py-3 sm:py-3.5 bg-[#D20A0B] hover:bg-[#B50809] text-white text-xs sm:text-sm font-bold rounded-xl transition-all duration-150 shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 cursor-pointer text-center"
               >
                 Explore Programs
               </button>
@@ -125,7 +143,7 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
                   const el = document.getElementById('enrollment');
                   if (el) el.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="px-9 sm:px-11 py-4 bg-white hover:bg-slate-50 border border-slate-300 hover:border-slate-400 text-[#15304C] text-sm sm:text-base font-bold rounded-xl transition-all duration-150 shadow-2xs hover:shadow-xs cursor-pointer text-center"
+                className="px-7 sm:px-8 py-3 sm:py-3.5 bg-white hover:bg-slate-50 border border-slate-300 hover:border-slate-400 text-[#15304C] text-xs sm:text-sm font-bold rounded-xl transition-all duration-150 shadow-2xs hover:shadow-xs cursor-pointer text-center"
               >
                 Reserve Workstation
               </button>
