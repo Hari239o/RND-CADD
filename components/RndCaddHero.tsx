@@ -25,8 +25,8 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
   const smoothY = useSpring(mouseY, springConfig);
 
   // 2D Translation: moves toward the cursor in all 4 directions (up, down, left, right)
-  const translateX = useTransform(smoothX, [-0.5, 0.5], [-45, 45]);
-  const translateY = useTransform(smoothY, [-0.5, 0.5], [-45, 45]);
+  const translateX = useTransform(smoothX, [-0.5, 0.5], [-50, 50]);
+  const translateY = useTransform(smoothY, [-0.5, 0.5], [-50, 50]);
 
   // 3D Perspective Rotation (tilts smoothly toward cursor like Unlox)
   const rotateX = useTransform(smoothY, [-0.5, 0.5], [18, -18]);
@@ -59,19 +59,23 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
       ref={heroRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative w-full bg-white overflow-hidden border-b border-slate-100"
+      className="relative w-full min-h-[85vh] sm:min-h-[90vh] lg:min-h-[94vh] bg-white overflow-hidden border-b border-slate-100 flex items-center"
     >
-      {/* Main Hero Container */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 sm:pt-36 lg:pt-40 pb-16 sm:pb-24 lg:pb-28">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-          {/* Left Column: Simple, Inspirational Student-Friendly Messaging (UNLOX Style) */}
+      {/* Soft Curved Intersecting Backdrop Arcs (Exact unlox.com Image 2 & Image 3) */}
+      <div className="absolute -top-32 sm:-top-48 right-[-10%] w-[56vw] max-w-[950px] h-[56vw] max-h-[950px] rounded-full bg-[#EDF5FF] -z-10 pointer-events-none" />
+      <div className="absolute -bottom-32 sm:-bottom-48 right-[-5%] w-[60vw] max-w-[1000px] h-[60vw] max-h-[1000px] rounded-full bg-[#EBF3FF]/85 -z-10 pointer-events-none" />
+
+      {/* Full-Screen Edge-to-Edge Container: Comfortably utilizes the left side space */}
+      <div className="w-full px-6 sm:px-12 md:px-16 lg:px-20 xl:px-28 2xl:px-36 pt-28 sm:pt-36 lg:pt-40 pb-16 sm:pb-24 lg:pb-28">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 xl:gap-20 items-center w-full">
+          {/* Left Column: Occupies Left Side Naturally (UNLOX Full Screen Style) */}
           <div className="lg:col-span-7 flex flex-col justify-center text-left">
             {/* Top Pill Badge */}
             <motion.div
               initial={{ opacity: 0, y: shouldReduceMotion ? 0 : -8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, ease: 'easeOut' }}
-              className="inline-flex items-center gap-2 self-start border border-blue-200 bg-blue-50/70 px-4 py-1.5 rounded-full text-xs sm:text-[13px] font-medium text-[#15304C] shadow-2xs mb-4 sm:mb-5"
+              className="inline-flex items-center gap-2 self-start border border-blue-200/90 bg-blue-50/70 px-4 py-1.5 rounded-full text-xs sm:text-[13px] font-medium text-[#15304C] shadow-2xs mb-5 sm:mb-6"
             >
               <svg className="w-4 h-4 text-[#D20A0B]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
@@ -84,18 +88,19 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
               initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.05, ease: 'easeOut' }}
-              className="text-4xl sm:text-6xl md:text-7xl font-black text-[#15304C] tracking-tight leading-[1.1]"
+              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[88px] font-black text-[#15304C] tracking-tight leading-[1.08]"
             >
-              Master Industrial CAD. <br />
+              Master Industrial <br />
+              <span className="text-[#15304C]">CAD.</span> <br />
               <span className="text-[#D20A0B]">Build Your Future.</span>
             </motion.h1>
 
-            {/* Concise Subtext: Simple lines only */}
+            {/* Concise Subtext */}
             <motion.p
               initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
-              className="mt-4 sm:mt-5 text-base sm:text-lg text-slate-600 leading-relaxed font-normal max-w-lg"
+              className="mt-5 sm:mt-6 text-base sm:text-lg lg:text-xl text-slate-600 leading-relaxed font-normal max-w-2xl"
             >
               Hands-on CAD, CAM, CAE &amp; BIM training on dedicated RTX GPU workstations. Certified curriculum with real-world projects and placement support.
             </motion.p>
@@ -110,7 +115,7 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
               <button
                 type="button"
                 onClick={scrollToExperience}
-                className="px-8 sm:px-10 py-3.5 sm:py-4 bg-[#D20A0B] hover:bg-[#B50809] text-white text-sm sm:text-base font-bold rounded-xl transition-all duration-150 shadow-md hover:shadow-xl hover:shadow-red-500/25 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer text-center"
+                className="px-9 sm:px-11 py-4 bg-[#D20A0B] hover:bg-[#B50809] text-white text-sm sm:text-base font-bold rounded-xl transition-all duration-150 shadow-md hover:shadow-xl hover:shadow-red-500/25 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer text-center"
               >
                 Explore Programs
               </button>
@@ -120,19 +125,19 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
                   const el = document.getElementById('enrollment');
                   if (el) el.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="px-8 sm:px-10 py-3.5 sm:py-4 bg-white hover:bg-slate-50 border border-slate-300 hover:border-slate-400 text-[#15304C] text-sm sm:text-base font-bold rounded-xl transition-all duration-150 shadow-2xs hover:shadow-xs cursor-pointer text-center"
+                className="px-9 sm:px-11 py-4 bg-white hover:bg-slate-50 border border-slate-300 hover:border-slate-400 text-[#15304C] text-sm sm:text-base font-bold rounded-xl transition-all duration-150 shadow-2xs hover:shadow-xs cursor-pointer text-center"
               >
                 Reserve Workstation
               </button>
             </motion.div>
           </div>
 
-          {/* Right Column: ONLY THE TRANSPARENT LOGO with Interactive Mouse Tracking (Up, Down, Left, Right) */}
+          {/* Right Column: LARGE TRANSPARENT LOGO with Interactive 4-Directional Tracking (Exact Unlox Scale) */}
           <div
             className="lg:col-span-5 flex items-center justify-center relative mt-8 lg:mt-0 py-6 select-none"
             style={{ perspective: 1200 }}
           >
-            {/* Interactive Mouse-Tracking Animated Logo: seamlessly merged into hero background */}
+            {/* Interactive Mouse-Tracking Animated Logo */}
             <motion.div
               style={{
                 x: translateX,
@@ -160,7 +165,7 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
                   e.currentTarget.src = '/logo.png';
                 }}
                 alt="RND CADD Logo"
-                className="w-64 sm:w-80 md:w-96 lg:w-[440px] xl:w-[480px] h-auto object-contain transition-transform duration-200 hover:scale-105"
+                className="w-72 sm:w-96 md:w-[460px] lg:w-[540px] xl:w-[620px] 2xl:w-[680px] h-auto object-contain transition-transform duration-200 hover:scale-105"
                 draggable={false}
               />
             </motion.div>
