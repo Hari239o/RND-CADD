@@ -61,33 +61,8 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
       onMouseLeave={handleMouseLeave}
       className="relative w-full bg-white overflow-hidden border-b border-slate-100"
     >
-      {/* Top Announcement Ticker Bar (Exact UNLOX style) */}
-      <div className="w-full bg-[#15304C] text-white py-2 px-4 overflow-hidden select-none">
-        <div className="flex items-center space-x-8 animate-marquee whitespace-nowrap text-xs sm:text-[13px] font-semibold tracking-wide">
-          <span>RND CADD is now ISO 9001:2015 certified!</span>
-          <span className="text-red-400">•</span>
-          <span>Industry 4.0 CAD, CAM, CAE &amp; BIM Center</span>
-          <span className="text-red-400">•</span>
-          <span>1:1 Dedicated RTX Workstation Labs</span>
-          <span className="text-red-400">•</span>
-          <span>Admissions Open for 2026 Batch</span>
-          <span className="text-red-400">•</span>
-          <span>Over 25,000+ Engineers Trained</span>
-          <span className="text-red-400">•</span>
-          <span>RND CADD is now ISO 9001:2015 certified!</span>
-          <span className="text-red-400">•</span>
-          <span>Industry 4.0 CAD, CAM, CAE &amp; BIM Center</span>
-          <span className="text-red-400">•</span>
-          <span>1:1 Dedicated RTX Workstation Labs</span>
-          <span className="text-red-400">•</span>
-          <span>Admissions Open for 2026 Batch</span>
-          <span className="text-red-400">•</span>
-          <span>Over 25,000+ Engineers Trained</span>
-        </div>
-      </div>
-
       {/* Main Hero Container */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-28 lg:pt-32 pb-16 sm:pb-24 lg:pb-28">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 sm:pt-36 lg:pt-40 pb-16 sm:pb-24 lg:pb-28">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
           {/* Left Column: Simple, Inspirational Student-Friendly Messaging (UNLOX Style) */}
           <div className="lg:col-span-7 flex flex-col justify-center text-left">
