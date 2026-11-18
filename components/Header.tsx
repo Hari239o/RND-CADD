@@ -109,21 +109,21 @@ export const Header: React.FC<HeaderProps> = ({
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="bg-white/95 backdrop-blur-md rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-[0_20px_45px_-12px_rgba(15,23,42,0.15),0_6px_20px_rgba(15,23,42,0.04)] px-4 sm:px-7 lg:px-9 xl:px-11 py-3.5 sm:py-4.5 lg:py-5 flex items-center justify-between gap-3 sm:gap-4 xl:gap-8 transition-all min-h-[72px] sm:min-h-[82px] lg:min-h-[92px]"
+            className="bg-white/95 backdrop-blur-md rounded-full border border-slate-200/90 shadow-[0_10px_35px_-8px_rgba(15,23,42,0.08),0_2px_8px_rgba(15,23,42,0.03)] px-4 sm:px-6 lg:px-8 py-2 sm:py-2.5 flex items-center justify-between gap-3 sm:gap-4 xl:gap-8 transition-all min-h-[58px] sm:min-h-[64px] lg:min-h-[68px]"
           >
             {/* Prominent Official RND CADD Logo */}
             <Link href="/" className="flex items-center shrink-0 group py-0.5" aria-label="RND CADD Home">
               <img
                 src="/logo.png"
                 alt="RND CADD"
-                className="h-10 sm:h-12 md:h-14 lg:h-16 xl:h-[72px] 2xl:h-[76px] w-auto object-contain transition-transform duration-200 group-hover:scale-105 drop-shadow-xs"
+                className="h-8 sm:h-9 md:h-10 lg:h-11 w-auto object-contain transition-transform duration-200 group-hover:scale-102 drop-shadow-xs"
               />
             </Link>
 
-            {/* Stream Navigation Switcher with Framer Motion Sliding Pill (Desktop Only) */}
+            {/* Stream Navigation Switcher with Clean White Sliding Pill (Desktop Only) */}
             <nav
               onMouseLeave={() => setHoveredTab(null)}
-              className="hidden lg:flex items-center justify-center p-1.5 xl:p-2 bg-slate-100/90 rounded-full relative"
+              className="hidden lg:flex items-center justify-center p-1 bg-slate-100/80 rounded-full relative border border-slate-200/70 shadow-xs"
               aria-label="Desktop Stream Navigation"
             >
               {NAV_ITEMS.map((item) => {
@@ -133,14 +133,14 @@ export const Header: React.FC<HeaderProps> = ({
                     key={item.id}
                     onClick={() => onSelectStream(item.id)}
                     onMouseEnter={() => setHoveredTab(item.id)}
-                    className="relative px-3.5 xl:px-4.5 py-2.5 rounded-full text-xs sm:text-[13px] xl:text-[14px] font-bold tracking-tight cursor-pointer select-none whitespace-nowrap focus:outline-none transition-colors"
+                    className="relative px-3.5 xl:px-4 py-1.5 xl:py-2 rounded-full text-xs xl:text-[13px] font-semibold tracking-normal cursor-pointer select-none whitespace-nowrap focus:outline-none transition-colors"
                   >
-                    {/* Framer Motion Active Sliding Indicator */}
+                    {/* Framer Motion Active Clean White Sliding Pill */}
                     {isSelected && (
                       <motion.div
                         layoutId="activeNavTab"
-                        className="absolute inset-0 rounded-full bg-[#0F172A] shadow-sm"
-                        transition={{ type: 'spring', stiffness: 450, damping: 35 }}
+                        className="absolute inset-0 rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] border border-slate-200/80"
+                        transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                       />
                     )}
 
@@ -148,19 +148,20 @@ export const Header: React.FC<HeaderProps> = ({
                     {hoveredTab === item.id && !isSelected && (
                       <motion.div
                         layoutId="hoverNavTab"
-                        className="absolute inset-0 rounded-full bg-slate-200/70"
+                        className="absolute inset-0 rounded-full bg-slate-200/50"
                         transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                       />
                     )}
 
                     <span
-                      className={`relative z-10 transition-colors duration-200 ${
+                      className={`relative z-10 transition-colors duration-200 flex items-center gap-1.5 ${
                         isSelected
-                          ? 'text-white'
-                          : 'text-slate-700 hover:text-slate-950'
+                          ? 'text-slate-900 font-bold'
+                          : 'text-slate-600 hover:text-slate-900 font-medium'
                       }`}
                     >
-                      {item.label}
+                      {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-[#EE2C3C]"></span>}
+                      <span>{item.label}</span>
                     </span>
                   </button>
                 );
@@ -168,20 +169,17 @@ export const Header: React.FC<HeaderProps> = ({
             </nav>
 
             {/* Desktop CTAs */}
-            <div className="hidden lg:flex items-center space-x-2.5 sm:space-x-3.5 shrink-0">
+            <div className="hidden lg:flex items-center space-x-2 sm:space-x-2.5 shrink-0">
               {isStudent ? (
                 <>
                   {/* Active Jobs Portal Button */}
                   <Link
                     href="/jobs"
-                    className="relative group inline-flex items-center gap-2 px-4.5 sm:px-5.5 py-2.5 sm:py-3 rounded-full bg-[#0F172A] hover:bg-[#EE2C3C] text-[#FFFFFF] border border-slate-700 hover:border-[#EE2C3C] text-xs font-black tracking-wide uppercase transition-all duration-200 shadow-md hover:shadow-red-500/25 cursor-pointer active:scale-95"
+                    className="relative group inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-900 hover:bg-[#EE2C3C] text-white text-xs font-bold tracking-wide uppercase transition-all duration-200 shadow-xs active:scale-95"
                   >
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#EE2C3C] group-hover:bg-white"></span>
-                    </span>
-                    <span>EXPLORE JOBS</span>
-                    <span className="text-[10px] font-black px-1.5 py-0.2 rounded-full bg-red-500/20 group-hover:bg-white/20 text-red-300 group-hover:text-white border border-red-500/30">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Jobs</span>
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-white/20 text-white">
                       LIVE
                     </span>
                   </Link>
@@ -189,9 +187,9 @@ export const Header: React.FC<HeaderProps> = ({
                   {/* Logged-in Student Portal Link */}
                   <Link
                     href="/portal/student"
-                    className="inline-flex items-center gap-1.5 px-4.5 py-2.5 sm:py-3 rounded-full text-xs sm:text-[13px] font-bold text-[#15304C] hover:text-[#EE2C3C] border border-[#CBD5E1] hover:border-[#EE2C3C] bg-white transition-all shadow-xs hover:shadow"
+                    className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold text-slate-800 hover:text-[#EE2C3C] border border-slate-200 hover:border-[#EE2C3C] bg-white transition-all shadow-2xs hover:shadow-xs"
                   >
-                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                     <span>{currentUser?.name ? currentUser.name.split(' ')[0] : 'STUDENT'} (PORTAL)</span>
                   </Link>
 
@@ -199,7 +197,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <button
                     type="button"
                     onClick={handleSignOut}
-                    className="px-4 py-2.5 sm:py-3 rounded-full text-xs sm:text-[13px] font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 transition-all cursor-pointer"
+                    className="px-3 py-1.5 rounded-full text-xs font-medium text-slate-500 hover:text-red-600 hover:bg-red-50 transition-all cursor-pointer"
                     title="Sign Out"
                   >
                     Sign Out
@@ -209,15 +207,15 @@ export const Header: React.FC<HeaderProps> = ({
                 <>
                   <Link
                     href="/portal/admin"
-                    className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full text-xs sm:text-[13px] font-bold text-white bg-[#15304C] hover:bg-[#0F2038] border border-[#15304C] transition-all shadow-sm"
+                    className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold text-white bg-[#15304C] hover:bg-[#0F2038] transition-all shadow-xs"
                   >
-                    <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
                     <span>ADMIN DASHBOARD</span>
                   </Link>
                   <button
                     type="button"
                     onClick={handleSignOut}
-                    className="px-4 py-2.5 sm:py-3 rounded-full text-xs sm:text-[13px] font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 transition-all cursor-pointer"
+                    className="px-3 py-1.5 rounded-full text-xs font-medium text-slate-500 hover:text-red-600 hover:bg-red-50 transition-all cursor-pointer"
                   >
                     Sign Out
                   </button>
@@ -226,18 +224,21 @@ export const Header: React.FC<HeaderProps> = ({
                 <>
                   <Link
                     href="/signin"
-                    className="px-5 sm:px-5.5 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-bold text-slate-700 hover:text-[#EE2C3C] bg-slate-100/70 hover:bg-slate-200/70 transition-all duration-200 flex items-center gap-1.5 cursor-pointer"
+                    className="px-4 py-2 rounded-full text-xs xl:text-[13px] font-semibold text-slate-700 hover:text-slate-950 bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-slate-300 transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer"
                   >
-                    <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                    <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                     </svg>
                     <span>Sign In</span>
                   </Link>
                   <Link
                     href="/signup"
-                    className="px-5.5 sm:px-6.5 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-bold tracking-wider uppercase bg-[#0F172A] hover:bg-[#1E293B] text-white transition-all duration-150 shadow-sm hover:shadow-md cursor-pointer"
+                    className="px-5 py-2 rounded-full text-xs xl:text-[13px] font-bold bg-[#EE2C3C] hover:bg-[#D20A0B] text-white transition-all shadow-xs hover:shadow-md hover:shadow-red-500/20 active:scale-95 cursor-pointer flex items-center gap-1.5"
                   >
-                    SIGN UP
+                    <span>Sign Up</span>
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
                   </Link>
                 </>
               )}
@@ -353,14 +354,14 @@ export const Header: React.FC<HeaderProps> = ({
                       <Link
                         href="/signin"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex-1 py-2 text-center rounded-xl bg-white border border-slate-300 text-xs font-bold text-slate-800 hover:bg-slate-50 shadow-2xs"
+                        className="flex-1 py-2 text-center rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-2xs transition-colors"
                       >
                         Sign In
                       </Link>
                       <Link
                         href="/signup"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex-1 py-2 text-center rounded-xl bg-[#0F172A] hover:bg-[#1E293B] text-white text-xs font-bold shadow-xs transition-colors"
+                        className="flex-1 py-2 text-center rounded-xl bg-[#EE2C3C] hover:bg-[#D20A0B] text-white text-xs font-semibold shadow-xs transition-colors"
                       >
                         Sign Up
                       </Link>

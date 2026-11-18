@@ -51,11 +51,17 @@ interface StoredCourse {
   price: number;
   status: 'Active' | 'Inactive';
   image: string;
+  labImage?: string;
+  certificateImage?: string;
   overview: string;
   tagline?: string;
   prerequisites?: string;
   certification?: string;
+  awardedCredential?: string;
+  highlights?: string[];
   careerRoles?: string[];
+  careerPathways?: { step: string; experience: string; role: string; ctc: string }[];
+  faqs?: { question: string; answer: string }[];
   capstoneProject?: CourseCapstone;
   modules?: CourseModule[];
   syllabus: string[];
@@ -969,6 +975,55 @@ function normalizeCourse(raw: any): StoredCourse {
     ? raw.careerRoles
     : ['CAD Design Engineer', 'Product Specialist', 'Project Engineer', 'Drafting Specialist'];
 
+  const highlights: string[] = Array.isArray(raw.highlights) && raw.highlights.length > 0
+    ? raw.highlights
+    : [
+        `3D Modeling & Parametric Assembly in ${tools[0] || raw.title}`,
+        `Learn to create live industrial projects using ${tools[0] || raw.title}`,
+        'Drafting standards, GD&T tolerances & multi-sheet production sets',
+        'Dynamic motion simulation, animations & design validation',
+        'Clash detection, interference check & parametric design tables',
+        'Automated Bill of Quantities / Materials (BOM) extraction',
+      ];
+
+  const careerPathways = Array.isArray(raw.careerPathways) && raw.careerPathways.length > 0
+    ? raw.careerPathways
+    : [
+        { step: '01', experience: '0 – 2 Yrs', role: (careerRoles[0] || 'Junior CAD Modeler'), ctc: '₹4.5L – ₹9.0L PA' },
+        { step: '02', experience: '2 – 4 Yrs', role: (careerRoles[1] || 'Design & Project Engineer'), ctc: '₹6.0L – ₹11.5L PA' },
+        { step: '03', experience: '4 – 6 Yrs', role: (careerRoles[2] || 'Lead Technical Specialist'), ctc: '₹8.0L – ₹15.0L PA' },
+        { step: '04', experience: '6 – 8 Yrs', role: (careerRoles[3] || 'Principal CAD Consultant'), ctc: '₹12.0L – ₹22.0L+ PA' },
+      ];
+
+  const faqs = Array.isArray(raw.faqs) && raw.faqs.length > 0
+    ? raw.faqs
+    : [
+        {
+          question: `Is there any prerequisite for the ${raw.title || 'CAD'} Course in Hyderabad?`,
+          answer: `No strict prerequisite. ${raw.prerequisites || 'Diploma / B.Tech / Working Professional'}. Anyone from an engineering, diploma, architecture, or design background can join. The training begins from software fundamentals and advances to complex industrial projects.`,
+        },
+        {
+          question: 'Will I get practical hands-on computer lab training?',
+          answer: 'Yes, 100% guaranteed. Every student gets an unshared, high-performance RTX GPU computer rig during both instruction and practice lab hours. Our lab is open 7 days a week from 07:00 AM to 09:30 PM.',
+        },
+        {
+          question: 'How does the placement assistance support work?',
+          answer: 'Upon submission and evaluation of your Capstone Project, our placement team schedules 3 rounds of technical CAD interviews, polishes your resume, and lines up direct interviews with top EPC and MNC recruiters.',
+        },
+        {
+          question: 'How will I receive my course completion certificate?',
+          answer: `You will receive a world-wide verifiable certificate accredited with official QR code verification and ${raw.certification || 'Autodesk & Dassault'} authorization, accepted across top engineering enterprises in India and abroad.`,
+        },
+        {
+          question: 'Can I access lecture recordings if I miss any class?',
+          answer: 'Yes, every enrolled student receives lifetime student portal login credentials where recorded classes, practice datasets, family libraries, and PDF manuals are accessible 24/7.',
+        },
+      ];
+
+  const labImage = raw.labImage || '';
+  const certificateImage = raw.certificateImage || '';
+  const awardedCredential = raw.awardedCredential || raw.certification || 'Autodesk & Dassault Systèmes Certificate';
+
   const totalHours = Number(raw.totalHours) || (modules.reduce((sum: number, m: any) => sum + (m.hours || 0), 0) || 120);
 
   return {
@@ -991,11 +1046,17 @@ function normalizeCourse(raw: any): StoredCourse {
     price: fee,
     status: raw.status === 'Inactive' ? 'Inactive' : 'Active',
     image: raw.image || 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80',
+    labImage,
+    certificateImage,
     overview: raw.overview || raw.tagline || 'Comprehensive engineering CAD curriculum with live lab exercises and capstone verification.',
     tagline: raw.tagline || raw.overview || 'Industry Certified Curriculum',
     prerequisites: raw.prerequisites || 'Diploma / B.Tech / Working Professional',
     certification: raw.certification || 'Autodesk & Dassault Certificate',
+    awardedCredential,
+    highlights,
     careerRoles,
+    careerPathways,
+    faqs,
     capstoneProject,
     modules,
     syllabus,

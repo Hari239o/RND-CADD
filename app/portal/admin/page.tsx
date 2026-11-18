@@ -141,6 +141,18 @@ interface CourseCapstoneItem {
   deliverables: string[];
 }
 
+interface CareerPathwayStep {
+  step: string;
+  experience: string;
+  role: string;
+  ctc: string;
+}
+
+interface CourseFaqItem {
+  question: string;
+  answer: string;
+}
+
 interface CourseItem {
   id: string;
   code: string;
@@ -161,11 +173,17 @@ interface CourseItem {
   price?: number;
   status: 'Active' | 'Inactive';
   image?: string;
+  labImage?: string;
+  certificateImage?: string;
   tagline?: string;
   overview?: string;
   prerequisites?: string;
   certification?: string;
+  awardedCredential?: string;
+  highlights?: string[];
   careerRoles?: string[];
+  careerPathways?: CareerPathwayStep[];
+  faqs?: CourseFaqItem[];
   capstoneProject?: CourseCapstoneItem;
   modules?: CourseModuleItem[];
   syllabus: string[];
@@ -550,11 +568,50 @@ export default function AdminPortalPage() {
     mode: 'Classroom & Dedicated CAD Workstation Lab',
     fee: 35000,
     image: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80',
+    labImage: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80',
+    certificateImage: '',
     tagline: 'Comprehensive Industry CAD/BIM Program with 4D Scheduling & Portfolios',
     overview: 'Comprehensive industry CAD program with live labs, capstone project, and portfolio preparation.',
     prerequisites: 'Diploma / B.Tech / Working Professional',
     certification: 'Autodesk & Dassault Certificate',
+    awardedCredential: 'Autodesk Certified Professional: Revit Architecture & BIM Specialist',
     careerRolesText: 'BIM Modeler, CAD Design Engineer, Architectural Draftsman, Project Coordinator',
+    highlights: [
+      '3D Modeling & Parametric Assembly in Industrial Toolsuite',
+      'Learn to create live industrial projects with real-scale models',
+      'Drafting standards, GD&T tolerances & multi-sheet production sets',
+      'Dynamic motion simulation, animations & design validation',
+      'Clash detection, interference check & parametric design tables',
+      'Automated Bill of Quantities / Materials (BOM) extraction',
+    ],
+    careerPathways: [
+      { step: '01', experience: '0 – 2 Yrs', role: 'BIM Architectural Modeler', ctc: '₹4.5L – ₹9.0L PA' },
+      { step: '02', experience: '2 – 4 Yrs', role: 'Revit Family Specialist', ctc: '₹5.5L – ₹10.5L PA' },
+      { step: '03', experience: '4 – 6 Yrs', role: 'Lead BIM Coordinator', ctc: '₹7.0L – ₹13.5L PA' },
+      { step: '04', experience: '6 – 8 Yrs', role: 'Clash & 4D Simulation Lead', ctc: '₹9.5L – ₹17.0L PA' },
+    ] as CareerPathwayStep[],
+    faqs: [
+      {
+        question: 'Is there any prerequisite for this course in Hyderabad?',
+        answer: 'No strict prerequisite. Diploma / B.Tech / Working Professional / Mechanical / Civil / Electrical Graduate can join. Training starts from software fundamentals.',
+      },
+      {
+        question: 'Will I get practical hands-on computer lab training?',
+        answer: 'Yes, 100% guaranteed. Every student gets an unshared, high-performance RTX GPU computer rig during both instruction and practice lab hours.',
+      },
+      {
+        question: 'How does the placement assistance support work?',
+        answer: 'Upon submission and evaluation of your Capstone Project, our placement team schedules technical CAD interviews and lines up direct interviews with top EPC and MNC recruiters.',
+      },
+      {
+        question: 'How will I receive my course completion certificate?',
+        answer: 'You will receive a world-wide verifiable certificate accredited with official QR code verification and Autodesk & Dassault authorization.',
+      },
+      {
+        question: 'Can I access lecture recordings if I miss any class?',
+        answer: 'Yes, every enrolled student receives lifetime student portal login credentials where recorded classes, practice datasets, family libraries, and PDF manuals are accessible 24/7.',
+      },
+    ] as CourseFaqItem[],
     capstoneTitle: 'Commercial Complex 5-Story BIM Model with Multi-Trade Clash Report',
     capstoneDescription: 'Real-world industrial drafting, modeling, and validation project with detailed bill of quantities.',
     capstoneDeliverablesText: 'Central BIM Model (.rvt), Automated Bill of Quantities, Navisworks Clash Matrix, 4D Construction Timeline Animation',
@@ -1531,9 +1588,61 @@ export default function AdminPortalPage() {
     const category = course.category || liveSource?.category || (course.folder === 'civil' ? 'PARAMETRIC BIM' : course.folder === 'mechanical' ? 'MECHANICAL CAE' : 'ENGINEERING CAD');
     const level = course.level || liveSource?.level || 'Professional';
 
+    const defaultHighlights = [
+      `3D Modeling & Parametric Assembly in ${toolsList[0] || course.title}`,
+      `Learn to create live industrial projects using ${toolsList[0] || course.title}`,
+      'Drafting standards, GD&T tolerances & multi-sheet production sets',
+      'Dynamic motion simulation, animations & design validation',
+      'Clash detection, interference check & parametric design tables',
+      'Automated Bill of Quantities / Materials (BOM) extraction',
+    ];
+
+    const defaultCareerPathways: CareerPathwayStep[] = careerList.slice(0, 4).map((r, i) => {
+      const exps = ['0 – 2 Yrs', '2 – 4 Yrs', '4 – 6 Yrs', '6 – 8 Yrs'];
+      const ctcs = ['₹4.5L – ₹9.0L PA', '₹5.5L – ₹10.5L PA', '₹7.5L – ₹14.0L PA', '₹10.0L – ₹18.0L+ PA'];
+      return {
+        step: String(i + 1).padStart(2, '0'),
+        experience: exps[i] || `${i * 2}+ Yrs`,
+        role: r,
+        ctc: ctcs[i] || '₹12.0L – ₹22.0L PA',
+      };
+    });
+
+    const defaultFaqs: CourseFaqItem[] = [
+      {
+        question: `Is there any prerequisite for the ${course.title} Course in Hyderabad?`,
+        answer: `No strict prerequisite. ${prereq}. Anyone from an engineering, diploma, architecture, or design background can join. The training begins from software fundamentals and advances to complex industrial projects.`,
+      },
+      {
+        question: 'Will I get practical hands-on computer lab training?',
+        answer: 'Yes, 100% guaranteed. Every student gets an unshared, high-performance RTX GPU computer rig during both instruction and practice lab hours. Our lab is open 7 days a week from 07:00 AM to 09:30 PM.',
+      },
+      {
+        question: 'How does the placement assistance support work?',
+        answer: 'Upon submission and evaluation of your Capstone Project, our placement team schedules 3 rounds of technical CAD interviews, polishes your resume, and lines up direct interviews with top EPC and MNC recruiters.',
+      },
+      {
+        question: 'How will I receive my course completion certificate?',
+        answer: `You will receive a world-wide verifiable certificate accredited with official QR code verification and ${cert} authorization, accepted across top engineering enterprises in India and abroad.`,
+      },
+      {
+        question: 'Can I access lecture recordings if I miss any class?',
+        answer: 'Yes, every enrolled student receives lifetime student portal login credentials where recorded classes, practice datasets, family libraries, and PDF manuals are accessible 24/7.',
+      },
+    ];
+
+    const labImage = course.labImage || (liveSource as any)?.labImage || 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80';
+    const certificateImage = course.certificateImage || (liveSource as any)?.certificateImage || '';
+    const awardedCredential = course.awardedCredential || (liveSource as any)?.awardedCredential || cert;
+    const highlights = Array.isArray(course.highlights) && course.highlights.length > 0 ? course.highlights : (liveSource as any)?.highlights || defaultHighlights;
+    const careerPathways = Array.isArray(course.careerPathways) && course.careerPathways.length > 0 ? course.careerPathways : (liveSource as any)?.careerPathways || defaultCareerPathways;
+    const faqs = Array.isArray(course.faqs) && course.faqs.length > 0 ? course.faqs : (liveSource as any)?.faqs || defaultFaqs;
+
     setEditingCourse({
       ...course,
       image: validImage,
+      labImage,
+      certificateImage,
       tools: toolsList,
       software: course.software || toolsList.join(', '),
       category,
@@ -1543,8 +1652,12 @@ export default function AdminPortalPage() {
       mode: course.mode || 'Classroom & Dedicated CAD Workstation Lab',
       prerequisites: prereq,
       certification: cert,
+      awardedCredential,
       tagline,
       overview,
+      highlights,
+      careerPathways,
+      faqs,
       capstoneProject: capstoneObj,
       careerRoles: careerList,
       modules: modulesList,
@@ -1615,11 +1728,17 @@ export default function AdminPortalPage() {
       fee: Number(newCourse.fee) || 30000,
       price: Number(newCourse.fee) || 30000,
       image: newCourse.image || 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80',
+      labImage: newCourse.labImage || 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80',
+      certificateImage: newCourse.certificateImage || '',
       tagline: newCourse.tagline || newCourse.overview || 'Comprehensive engineering CAD curriculum with live lab exercises.',
       overview: newCourse.overview || 'Comprehensive engineering CAD curriculum with live lab exercises.',
       prerequisites: newCourse.prerequisites || 'Diploma / B.Tech / Working Professional',
       certification: newCourse.certification || 'Autodesk & Dassault Certificate',
+      awardedCredential: newCourse.awardedCredential || newCourse.certification || 'Autodesk Certified Professional: Revit Architecture & BIM Specialist',
+      highlights: newCourse.highlights || [],
       careerRoles,
+      careerPathways: newCourse.careerPathways || [],
+      faqs: newCourse.faqs || [],
       capstoneProject: {
         title: newCourse.capstoneTitle || `${newCourse.title.trim()} Live Industry Project`,
         description: newCourse.capstoneDescription || 'Real-world industrial drafting, modeling, and validation project.',
@@ -1998,7 +2117,7 @@ export default function AdminPortalPage() {
   };
 
   // Upload Media (Images & Videos)
-  const handleFileUpload = async (file: File, target: 'courseImage' | 'classVideo') => {
+  const handleFileUpload = async (file: File, target: 'courseImage' | 'labImage' | 'certificateImage' | 'classVideo') => {
     setIsUploadingMedia(true);
     try {
       const formData = new FormData();
@@ -2015,7 +2134,21 @@ export default function AdminPortalPage() {
           } else {
             setNewCourse((prev) => ({ ...prev, image: data.url }));
           }
-          showToast('Course image uploaded successfully.');
+          showToast('Course banner image uploaded successfully.');
+        } else if (target === 'labImage') {
+          if (editingCourse) {
+            setEditingCourse({ ...editingCourse, labImage: data.url });
+          } else {
+            setNewCourse((prev) => ({ ...prev, labImage: data.url }));
+          }
+          showToast('Workstation lab image uploaded successfully.');
+        } else if (target === 'certificateImage') {
+          if (editingCourse) {
+            setEditingCourse({ ...editingCourse, certificateImage: data.url });
+          } else {
+            setNewCourse((prev) => ({ ...prev, certificateImage: data.url }));
+          }
+          showToast('Certificate specimen image uploaded successfully.');
         } else if (target === 'classVideo') {
           setNewClassForm((prev) => ({
             ...prev,
@@ -7069,6 +7202,17 @@ export default function AdminPortalPage() {
                     </div>
                   </div>
 
+                  <div>
+                    <label className="block font-bold text-[#334155] mb-1">Awarded Credential Title (Pillar 2)</label>
+                    <input
+                      type="text"
+                      value={newCourse.awardedCredential || newCourse.certification || ''}
+                      onChange={(e) => setNewCourse({ ...newCourse, awardedCredential: e.target.value })}
+                      placeholder="e.g. Autodesk Certified Professional: Revit Architecture & BIM Specialist"
+                      className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-semibold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                    />
+                  </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="block font-bold text-[#334155] mb-1">Training Schedule / Mode</label>
@@ -7076,7 +7220,7 @@ export default function AdminPortalPage() {
                         type="text"
                         value={newCourse.mode}
                         onChange={(e) => setNewCourse({ ...newCourse, mode: e.target.value })}
-                        placeholder="e.g. Weekday & Weekend Fast-Track"
+                        placeholder="e.g. Classroom & Dedicated CAD Workstation Lab"
                         className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-semibold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
                       />
                     </div>
@@ -7095,14 +7239,18 @@ export default function AdminPortalPage() {
                   </div>
                 </div>
 
-                {/* 3. Media, Banner Image & Toolchain */}
-                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
+                {/* 3. Media, Workstation Lab & Certificate Imagery */}
+                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-5">
                   <span className="text-xs font-black text-[#131313] uppercase tracking-wider block border-b pb-2 border-[#CBD5E1]">
-                    3. Course Media, Banner &amp; Authorized Toolchain
+                    3. Course Visual Assets, Workstation Lab &amp; Certificate Images
                   </span>
 
+                  {/* Primary Course Banner */}
                   <div>
-                    <label className="block font-bold text-[#334155] mb-1">Banner Image URL / Upload</label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block font-bold text-[#334155]">Primary Course Banner Image *</label>
+                      <span className="text-[11px] font-bold text-slate-500 uppercase">Hero &amp; Catalog</span>
+                    </div>
                     <div className="flex gap-2">
                       <input
                         type="text"
@@ -7128,12 +7276,103 @@ export default function AdminPortalPage() {
                     {newCourse.image && (
                       <div className="mt-2.5 h-36 w-full rounded-xl overflow-hidden border-2 border-[#CBD5E1] bg-[#000000] relative shadow-inner">
                         <img src={newCourse.image} alt="Course Preview" className="w-full h-full object-cover" />
-                        <div className="absolute bottom-2 right-2 bg-black/70 text-[#FFFFFF] text-xs font-bold px-2.5 py-1 rounded font-mono font-bold">
+                        <div className="absolute bottom-2 right-2 bg-black/75 text-[#FFFFFF] text-xs font-bold px-2.5 py-1 rounded font-mono">
                           Banner Preview
                         </div>
                       </div>
                     )}
                   </div>
+
+                  {/* Secondary Workstation Lab Photo */}
+                  <div className="pt-3 border-t border-slate-100">
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block font-bold text-[#334155]">Secondary Lab Image (Ameerpet Workstation Lab)</label>
+                      <span className="text-[11px] font-bold text-blue-600 uppercase">Section C Lab Showcase</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={newCourse.labImage || ''}
+                        onChange={(e) => setNewCourse({ ...newCourse, labImage: e.target.value })}
+                        placeholder="https://images.unsplash.com/..."
+                        className="flex-1 p-2.5 rounded-xl border-2 border-[#CBD5E1] font-semibold text-xs bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                      />
+                      <label className="px-4 py-2.5 bg-[#15304C] hover:bg-[#0f2338] text-[#FFFFFF] text-xs font-bold rounded-xl cursor-pointer flex items-center justify-center whitespace-nowrap shadow-sm">
+                        <span>{isUploadingMedia ? 'Uploading...' : 'Upload Lab Image'}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleFileUpload(file, 'labImage');
+                          }}
+                        />
+                      </label>
+                    </div>
+
+                    {newCourse.labImage && (
+                      <div className="mt-2.5 h-36 w-full rounded-xl overflow-hidden border-2 border-[#CBD5E1] bg-[#000000] relative shadow-inner">
+                        <img
+                          src={newCourse.labImage}
+                          alt="Workstation Lab Preview"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute bottom-2 left-2 bg-[#15304C]/95 text-[#FFFFFF] text-xs font-bold px-2.5 py-1 rounded font-mono shadow-md">
+                          Ameerpet Workstation Lab Preview
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Certificate Sample Specimen */}
+                  <div className="pt-3 border-t border-slate-100">
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block font-bold text-[#334155]">Certificate Sample Specimen Image</label>
+                      <span className="text-[11px] font-bold text-amber-600 uppercase">Section F Certificate</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={newCourse.certificateImage || ''}
+                        onChange={(e) => setNewCourse({ ...newCourse, certificateImage: e.target.value })}
+                        placeholder="Leave blank to use generated official ISO certificate specimen, or paste image URL / upload custom"
+                        className="flex-1 p-2.5 rounded-xl border-2 border-[#CBD5E1] font-semibold text-xs bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                      />
+                      <label className="px-4 py-2.5 bg-[#D97706] hover:bg-[#B45309] text-[#FFFFFF] text-xs font-bold rounded-xl cursor-pointer flex items-center justify-center whitespace-nowrap shadow-sm">
+                        <span>{isUploadingMedia ? 'Uploading...' : 'Upload Certificate'}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleFileUpload(file, 'certificateImage');
+                          }}
+                        />
+                      </label>
+                    </div>
+
+                    {newCourse.certificateImage && (
+                      <div className="mt-2.5 h-36 w-full rounded-xl overflow-hidden border-2 border-amber-300 bg-[#FFFFFF] relative shadow-inner flex items-center justify-center p-1">
+                        <img
+                          src={newCourse.certificateImage}
+                          alt="Certificate Specimen Preview"
+                          className="w-full h-full object-contain"
+                        />
+                        <div className="absolute bottom-2 right-2 bg-amber-600 text-[#FFFFFF] text-xs font-bold px-2.5 py-1 rounded font-mono shadow-md">
+                          Certificate Specimen Preview
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* 4. Authorized Toolchain & Course Overview */}
+                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
+                  <span className="text-xs font-black text-[#131313] uppercase tracking-wider block border-b pb-2 border-[#CBD5E1]">
+                    4. Authorized Toolchain &amp; Course Overview
+                  </span>
 
                   <div>
                     <label className="block font-bold text-[#334155] mb-1">Authorized Toolchain (Comma Separated)</label>
@@ -7158,9 +7397,9 @@ export default function AdminPortalPage() {
                   </div>
 
                   <div>
-                    <label className="block font-bold text-[#334155] mb-1">Course Overview &amp; Content</label>
+                    <label className="block font-bold text-[#334155] mb-1">Course Overview &amp; Learning Objectives</label>
                     <textarea
-                      rows={2}
+                      rows={3}
                       value={newCourse.overview}
                       onChange={(e) => setNewCourse({ ...newCourse, overview: e.target.value })}
                       className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-medium bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
@@ -7168,72 +7407,279 @@ export default function AdminPortalPage() {
                   </div>
                 </div>
 
-                {/* 4. Capstone Project & Career Pathways */}
-                <div className="space-y-6">
-                  {/* Capstone Project Blueprint */}
-                  <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
-                    <span className="text-xs font-black text-[#00873D] uppercase tracking-wider block border-b pb-2 border-[#CBD5E1]">
-                      5. Capstone Project Blueprint (Mandatory Portfolio Project)
+                {/* 5. Course Highlights & Core Competencies (Live Checklist Builder) */}
+                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
+                  <div className="flex items-center justify-between pb-2 border-b border-[#CBD5E1]">
+                    <span className="text-xs font-black text-[#059669] uppercase tracking-wider">
+                      5. Course Highlights &amp; Core Competencies ({newCourse.highlights?.length || 0} Items)
                     </span>
-
-                    <div>
-                      <label className="block font-bold text-[#334155] mb-1">Portfolio Project Title</label>
-                      <input
-                        type="text"
-                        value={newCourse.capstoneTitle}
-                        onChange={(e) => setNewCourse({ ...newCourse, capstoneTitle: e.target.value })}
-                        placeholder="e.g. Mechanical CAD/CAM/CAE Diploma Live Industry Project"
-                        className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-bold text-[#0F172A] bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block font-bold text-[#334155] mb-1">Project Description</label>
-                      <textarea
-                        rows={2}
-                        value={newCourse.capstoneDescription}
-                        onChange={(e) => setNewCourse({ ...newCourse, capstoneDescription: e.target.value })}
-                        className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-medium bg-[#FFFFFF]"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block font-bold text-[#334155] mb-1">Verified Deliverables (Comma Separated)</label>
-                      <input
-                        type="text"
-                        value={newCourse.capstoneDeliverablesText}
-                        onChange={(e) => setNewCourse({ ...newCourse, capstoneDeliverablesText: e.target.value })}
-                        placeholder="e.g. Design Drawings, 3D CAD Model, Project Dossier"
-                        className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-semibold text-xs bg-[#FFFFFF]"
-                      />
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const cur = newCourse.highlights || [];
+                        setNewCourse({
+                          ...newCourse,
+                          highlights: [...cur, `Industrial modeling & project validation with ${newCourse.software?.split(',')[0] || 'CAD Suite'}`],
+                        });
+                      }}
+                      className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase transition-all shadow-xs cursor-pointer"
+                    >
+                      + Add Competency
+                    </button>
                   </div>
 
-                  {/* Career Pathways */}
-                  <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-3">
-                    <span className="text-xs font-black text-[#EE2C3C] uppercase tracking-wider block border-b pb-2 border-[#CBD5E1]">
-                      6. Career Pathways (Job Placement Titles)
-                    </span>
+                  <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
+                    {(newCourse.highlights || []).map((highlight, hIdx) => (
+                      <div key={hIdx} className="flex items-center space-x-2 bg-slate-50 p-2 rounded-xl border border-slate-200">
+                        <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                          ✓
+                        </span>
+                        <input
+                          type="text"
+                          value={highlight}
+                          onChange={(e) => {
+                            const list = [...(newCourse.highlights || [])];
+                            list[hIdx] = e.target.value;
+                            setNewCourse({ ...newCourse, highlights: list });
+                          }}
+                          className="flex-1 p-1.5 text-xs font-semibold bg-white rounded-lg border border-slate-200 focus:outline-none focus:border-emerald-600"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const list = (newCourse.highlights || []).filter((_, i) => i !== hIdx);
+                            setNewCourse({ ...newCourse, highlights: list });
+                          }}
+                          className="text-xs text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-2 py-1 rounded font-bold cursor-pointer transition-colors"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
-                    <div>
-                      <label className="block font-bold text-[#334155] mb-1">Placement Titles (Comma Separated)</label>
-                      <input
-                        type="text"
-                        value={newCourse.careerRolesText}
-                        onChange={(e) => setNewCourse({ ...newCourse, careerRolesText: e.target.value })}
-                        placeholder="e.g. CAD Design Engineer, Automotive Product Designer, FEA Simulation Analyst"
-                        className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-semibold text-xs bg-[#FFFFFF]"
-                      />
-                    </div>
+                {/* 6. Career Progression Path (Career Pathways Step Builder) */}
+                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
+                  <div className="flex items-center justify-between pb-2 border-b border-[#CBD5E1]">
+                    <span className="text-xs font-black text-[#EE2C3C] uppercase tracking-wider">
+                      6. Career Progression Path ({newCourse.careerPathways?.length || 0} Steps)
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const cur = newCourse.careerPathways || [];
+                        const nextNum = String(cur.length + 1).padStart(2, '0');
+                        setNewCourse({
+                          ...newCourse,
+                          careerPathways: [
+                            ...cur,
+                            {
+                              step: nextNum,
+                              experience: `${cur.length * 2} – ${(cur.length + 1) * 2} Yrs`,
+                              role: `Lead ${newCourse.title.split(' ')[0] || 'CAD'} Specialist`,
+                              ctc: '₹8.0L – ₹15.0L PA',
+                            },
+                          ],
+                        });
+                      }}
+                      className="px-3 py-1 rounded-lg bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs font-bold uppercase transition-all shadow-xs cursor-pointer"
+                    >
+                      + Add Career Step
+                    </button>
+                  </div>
+
+                  <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+                    {(newCourse.careerPathways || []).map((stepItem, sIdx) => (
+                      <div key={sIdx} className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-black text-slate-800">
+                            STEP {stepItem.step || String(sIdx + 1).padStart(2, '0')}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const cur = (newCourse.careerPathways || []).filter((_, i) => i !== sIdx);
+                              setNewCourse({ ...newCourse, careerPathways: cur });
+                            }}
+                            className="text-xs text-rose-600 hover:text-rose-800 font-bold px-1.5 py-0.5 rounded cursor-pointer"
+                          >
+                            Remove
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                          <div>
+                            <label className="block text-[10px] font-bold text-slate-500 uppercase">Experience</label>
+                            <input
+                              type="text"
+                              value={stepItem.experience}
+                              onChange={(e) => {
+                                const cur = [...(newCourse.careerPathways || [])];
+                                cur[sIdx] = { ...cur[sIdx], experience: e.target.value };
+                                setNewCourse({ ...newCourse, careerPathways: cur });
+                              }}
+                              placeholder="e.g. 0 – 2 Yrs"
+                              className="w-full p-1.5 text-xs font-semibold bg-white rounded border border-slate-200"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-[10px] font-bold text-slate-500 uppercase">Job Role Title</label>
+                            <input
+                              type="text"
+                              value={stepItem.role}
+                              onChange={(e) => {
+                                const cur = [...(newCourse.careerPathways || [])];
+                                cur[sIdx] = { ...cur[sIdx], role: e.target.value };
+                                setNewCourse({ ...newCourse, careerPathways: cur });
+                              }}
+                              placeholder="e.g. BIM Architectural Modeler"
+                              className="w-full p-1.5 text-xs font-bold text-slate-900 bg-white rounded border border-slate-200"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-[10px] font-bold text-slate-500 uppercase">Expected CTC</label>
+                            <input
+                              type="text"
+                              value={stepItem.ctc}
+                              onChange={(e) => {
+                                const cur = [...(newCourse.careerPathways || [])];
+                                cur[sIdx] = { ...cur[sIdx], ctc: e.target.value };
+                                setNewCourse({ ...newCourse, careerPathways: cur });
+                              }}
+                              placeholder="e.g. ₹4.5L – ₹9.0L PA"
+                              className="w-full p-1.5 text-xs font-bold text-emerald-700 bg-white rounded border border-slate-200"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 7. Dual Certification & Industry Capstone Project Blueprint */}
+                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
+                  <span className="text-xs font-black text-[#00873D] uppercase tracking-wider block border-b pb-2 border-[#CBD5E1]">
+                    7. Dual Certification &amp; Industry Capstone Project (Mandatory Portfolio)
+                  </span>
+
+                  <div>
+                    <label className="block font-bold text-[#334155] mb-1">Portfolio Project Title</label>
+                    <input
+                      type="text"
+                      value={newCourse.capstoneTitle}
+                      onChange={(e) => setNewCourse({ ...newCourse, capstoneTitle: e.target.value })}
+                      placeholder="e.g. Commercial Complex 5-Story BIM Model with Multi-Trade Clash Report"
+                      className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-bold text-[#0F172A] bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-[#334155] mb-1">Project Description</label>
+                    <textarea
+                      rows={2}
+                      value={newCourse.capstoneDescription}
+                      onChange={(e) => setNewCourse({ ...newCourse, capstoneDescription: e.target.value })}
+                      className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-medium bg-[#FFFFFF]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-[#334155] mb-1">Verified Deliverables (Comma Separated)</label>
+                    <input
+                      type="text"
+                      value={newCourse.capstoneDeliverablesText}
+                      onChange={(e) => setNewCourse({ ...newCourse, capstoneDeliverablesText: e.target.value })}
+                      placeholder="e.g. Central BIM Model (.rvt), Automated Bill of Quantities, Navisworks Clash Matrix"
+                      className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-semibold text-xs bg-[#FFFFFF]"
+                    />
+                  </div>
+                </div>
+
+                {/* 8. Frequently Asked Questions (FAQ Accordion Builder) */}
+                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
+                  <div className="flex items-center justify-between pb-2 border-b border-[#CBD5E1]">
+                    <span className="text-xs font-black text-[#2563EB] uppercase tracking-wider">
+                      8. Frequently Asked Questions (FAQ) ({newCourse.faqs?.length || 0} Questions)
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const cur = newCourse.faqs || [];
+                        setNewCourse({
+                          ...newCourse,
+                          faqs: [
+                            ...cur,
+                            {
+                              question: `What job assistance is provided for ${newCourse.title || 'this program'}?`,
+                              answer: 'Our placement cell conducts mock technical CAD interviews and coordinates direct hiring with top EPC firms.',
+                            },
+                          ],
+                        });
+                      }}
+                      className="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold uppercase transition-all shadow-xs cursor-pointer"
+                    >
+                      + Add FAQ Item
+                    </button>
+                  </div>
+
+                  <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+                    {(newCourse.faqs || []).map((faqItem, fIdx) => (
+                      <div key={fIdx} className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-slate-700">FAQ #{fIdx + 1}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const cur = (newCourse.faqs || []).filter((_, i) => i !== fIdx);
+                              setNewCourse({ ...newCourse, faqs: cur });
+                            }}
+                            className="text-xs text-rose-600 hover:text-rose-800 font-bold px-1.5 py-0.5 rounded cursor-pointer"
+                          >
+                            Remove
+                          </button>
+                        </div>
+
+                        <div>
+                          <input
+                            type="text"
+                            value={faqItem.question}
+                            onChange={(e) => {
+                              const cur = [...(newCourse.faqs || [])];
+                              cur[fIdx] = { ...cur[fIdx], question: e.target.value };
+                              setNewCourse({ ...newCourse, faqs: cur });
+                            }}
+                            placeholder="Question"
+                            className="w-full p-2 text-xs font-bold text-slate-900 bg-white rounded border border-slate-200"
+                          />
+                        </div>
+
+                        <div>
+                          <textarea
+                            rows={2}
+                            value={faqItem.answer}
+                            onChange={(e) => {
+                              const cur = [...(newCourse.faqs || [])];
+                              cur[fIdx] = { ...cur[fIdx], answer: e.target.value };
+                              setNewCourse({ ...newCourse, faqs: cur });
+                            }}
+                            placeholder="Answer"
+                            className="w-full p-2 text-xs text-slate-700 bg-white rounded border border-slate-200"
+                          />
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
 
-              {/* 4. Interactive Module Syllabus Builder (Full Width) */}
+              {/* 9. Interactive Module Syllabus Builder (Full Width) */}
               <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-[#CBD5E1] gap-2">
                   <span className="text-xs font-black text-[#131313] uppercase tracking-wider">
-                    4. Module Syllabus Specification ({newCourse.modules?.length || 0} Units)
+                    9. Course Contents &amp; Module Syllabus Breakdown ({newCourse.modules?.length || 0} Units)
                   </span>
                   <button
                     type="button"
@@ -7525,6 +7971,17 @@ export default function AdminPortalPage() {
                     </div>
                   </div>
 
+                  <div>
+                    <label className="block font-bold text-[#334155] mb-1">Awarded Credential Title (Pillar 2)</label>
+                    <input
+                      type="text"
+                      value={editingCourse.awardedCredential || editingCourse.certification || ''}
+                      onChange={(e) => setEditingCourse({ ...editingCourse, awardedCredential: e.target.value })}
+                      placeholder="e.g. Autodesk Certified Professional: Revit Architecture & BIM Specialist"
+                      className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-semibold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                    />
+                  </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="block font-bold text-[#334155] mb-1">Training Schedule / Mode</label>
@@ -7532,7 +7989,7 @@ export default function AdminPortalPage() {
                         type="text"
                         value={editingCourse.mode || ''}
                         onChange={(e) => setEditingCourse({ ...editingCourse, mode: e.target.value })}
-                        placeholder="e.g. Weekday & Weekend Fast-Track"
+                        placeholder="e.g. Classroom & Dedicated CAD Workstation Lab"
                         className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-semibold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
                       />
                     </div>
@@ -7553,19 +8010,24 @@ export default function AdminPortalPage() {
                   </div>
                 </div>
 
-                {/* 3. Media, Banner Image & Toolchain */}
-                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
+                {/* 3. Media, Workstation Lab & Certificate Imagery */}
+                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-5">
                   <span className="text-xs font-black text-[#131313] uppercase tracking-wider block border-b pb-2 border-[#CBD5E1]">
-                    3. Course Media, Banner &amp; Authorized Toolchain
+                    3. Course Visual Assets, Workstation Lab &amp; Certificate Images
                   </span>
 
+                  {/* Primary Course Banner */}
                   <div>
-                    <label className="block font-bold text-[#334155] mb-1">Course Image URL / Upload</label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block font-bold text-[#334155]">Primary Course Banner Image *</label>
+                      <span className="text-[11px] font-bold text-slate-500 uppercase">Hero &amp; Catalog</span>
+                    </div>
                     <div className="flex gap-2">
                       <input
                         type="text"
                         value={editingCourse.image || ''}
                         onChange={(e) => setEditingCourse({ ...editingCourse, image: e.target.value })}
+                        placeholder="https://images.unsplash.com/..."
                         className="flex-1 p-2.5 rounded-xl border-2 border-[#CBD5E1] font-semibold text-xs bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
                       />
                       <label className="px-4 py-2.5 bg-[#131313] hover:bg-[#262626] text-[#FFFFFF] text-xs font-bold rounded-xl cursor-pointer flex items-center justify-center whitespace-nowrap shadow-sm">
@@ -7586,7 +8048,7 @@ export default function AdminPortalPage() {
                       <div className="mt-2.5 h-36 w-full rounded-xl overflow-hidden border-2 border-[#CBD5E1] bg-[#000000] relative shadow-inner">
                         <img
                           src={editingCourse.image}
-                          alt="Preview"
+                          alt="Banner Preview"
                           onError={(e) => {
                             const fallback = COURSES.find((c) => c.id.toLowerCase() === editingCourse.id.toLowerCase() || c.title.toLowerCase().trim() === editingCourse.title.toLowerCase().trim())?.image
                               || 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=80';
@@ -7596,12 +8058,103 @@ export default function AdminPortalPage() {
                           }}
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute bottom-2 right-2 bg-black/70 text-[#FFFFFF] text-xs font-bold px-2.5 py-1 rounded font-mono font-bold">
-                          Banner Preview
+                        <div className="absolute bottom-2 right-2 bg-black/75 text-[#FFFFFF] text-xs font-bold px-2.5 py-1 rounded font-mono">
+                          Primary Banner Preview
                         </div>
                       </div>
                     )}
                   </div>
+
+                  {/* Secondary Workstation Lab Photo */}
+                  <div className="pt-3 border-t border-slate-100">
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block font-bold text-[#334155]">Secondary Lab Image (Ameerpet Workstation Lab)</label>
+                      <span className="text-[11px] font-bold text-blue-600 uppercase">Section C Lab Showcase</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={editingCourse.labImage || ''}
+                        onChange={(e) => setEditingCourse({ ...editingCourse, labImage: e.target.value })}
+                        placeholder="https://images.unsplash.com/..."
+                        className="flex-1 p-2.5 rounded-xl border-2 border-[#CBD5E1] font-semibold text-xs bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                      />
+                      <label className="px-4 py-2.5 bg-[#15304C] hover:bg-[#0f2338] text-[#FFFFFF] text-xs font-bold rounded-xl cursor-pointer flex items-center justify-center whitespace-nowrap shadow-sm">
+                        <span>{isUploadingMedia ? 'Uploading...' : 'Upload Lab Image'}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleFileUpload(file, 'labImage');
+                          }}
+                        />
+                      </label>
+                    </div>
+
+                    {editingCourse.labImage && (
+                      <div className="mt-2.5 h-36 w-full rounded-xl overflow-hidden border-2 border-[#CBD5E1] bg-[#000000] relative shadow-inner">
+                        <img
+                          src={editingCourse.labImage}
+                          alt="Workstation Lab Preview"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute bottom-2 left-2 bg-[#15304C]/95 text-[#FFFFFF] text-xs font-bold px-2.5 py-1 rounded font-mono shadow-md">
+                          Ameerpet Workstation Lab Preview
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Certificate Sample Specimen */}
+                  <div className="pt-3 border-t border-slate-100">
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block font-bold text-[#334155]">Certificate Sample Specimen Image</label>
+                      <span className="text-[11px] font-bold text-amber-600 uppercase">Section F Certificate</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={editingCourse.certificateImage || ''}
+                        onChange={(e) => setEditingCourse({ ...editingCourse, certificateImage: e.target.value })}
+                        placeholder="Leave blank to use generated official ISO certificate specimen, or paste image URL / upload custom"
+                        className="flex-1 p-2.5 rounded-xl border-2 border-[#CBD5E1] font-semibold text-xs bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                      />
+                      <label className="px-4 py-2.5 bg-[#D97706] hover:bg-[#B45309] text-[#FFFFFF] text-xs font-bold rounded-xl cursor-pointer flex items-center justify-center whitespace-nowrap shadow-sm">
+                        <span>{isUploadingMedia ? 'Uploading...' : 'Upload Certificate'}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleFileUpload(file, 'certificateImage');
+                          }}
+                        />
+                      </label>
+                    </div>
+
+                    {editingCourse.certificateImage && (
+                      <div className="mt-2.5 h-36 w-full rounded-xl overflow-hidden border-2 border-amber-300 bg-[#FFFFFF] relative shadow-inner flex items-center justify-center p-1">
+                        <img
+                          src={editingCourse.certificateImage}
+                          alt="Certificate Specimen Preview"
+                          className="w-full h-full object-contain"
+                        />
+                        <div className="absolute bottom-2 right-2 bg-amber-600 text-[#FFFFFF] text-xs font-bold px-2.5 py-1 rounded font-mono shadow-md">
+                          Certificate Specimen Preview
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* 4. Authorized Toolchain & Course Overview */}
+                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
+                  <span className="text-xs font-black text-[#131313] uppercase tracking-wider block border-b pb-2 border-[#CBD5E1]">
+                    4. Authorized Toolchain &amp; Course Overview
+                  </span>
 
                   <div>
                     <label className="block font-bold text-[#334155] mb-1">Authorized Toolchain (Comma Separated)</label>
@@ -7609,7 +8162,7 @@ export default function AdminPortalPage() {
                       type="text"
                       value={editingCourse.software}
                       onChange={(e) => setEditingCourse({ ...editingCourse, software: e.target.value })}
-                      placeholder="e.g. Dassault CATIA V5, SolidWorks 2026, ANSYS Workbench"
+                      placeholder="e.g. Autodesk Revit 2026, Navisworks Manage, BIM 360, Enscape"
                       className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-semibold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
                     />
                   </div>
@@ -7620,15 +8173,15 @@ export default function AdminPortalPage() {
                       type="text"
                       value={editingCourse.tagline || ''}
                       onChange={(e) => setEditingCourse({ ...editingCourse, tagline: e.target.value })}
-                      placeholder="e.g. Parametric Solid Modeling, Generative Surfacing, and Multi-Physics Simulation"
+                      placeholder="e.g. Autodesk Authorized Revit BIM Professional Certification"
                       className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-semibold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
                     />
                   </div>
 
                   <div>
-                    <label className="block font-bold text-[#334155] mb-1">Course Overview &amp; Content</label>
+                    <label className="block font-bold text-[#334155] mb-1">Course Overview &amp; Learning Objectives</label>
                     <textarea
-                      rows={2}
+                      rows={3}
                       value={editingCourse.overview || ''}
                       onChange={(e) => setEditingCourse({ ...editingCourse, overview: e.target.value })}
                       className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-medium bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
@@ -7636,109 +8189,313 @@ export default function AdminPortalPage() {
                   </div>
                 </div>
 
-                {/* 4. Capstone Project & Career Pathways */}
-                <div className="space-y-6">
-                  {/* Capstone Project Blueprint */}
-                  <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
-                    <span className="text-xs font-black text-[#00873D] uppercase tracking-wider block border-b pb-2 border-[#CBD5E1]">
-                      5. Capstone Project Blueprint (Mandatory Portfolio Project)
+                {/* 5. Course Highlights & Core Competencies (Live Checklist Builder) */}
+                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
+                  <div className="flex items-center justify-between pb-2 border-b border-[#CBD5E1]">
+                    <span className="text-xs font-black text-[#059669] uppercase tracking-wider">
+                      5. Course Highlights &amp; Core Competencies ({editingCourse.highlights?.length || 0} Items)
                     </span>
-
-                    <div>
-                      <label className="block font-bold text-[#334155] mb-1">Portfolio Project Title</label>
-                      <input
-                        type="text"
-                        value={editingCourse.capstoneProject?.title || ''}
-                        onChange={(e) =>
-                          setEditingCourse({
-                            ...editingCourse,
-                            capstoneProject: {
-                              ...(editingCourse.capstoneProject || {
-                                description: 'Real-world industrial drafting, modeling, and validation project.',
-                                deliverables: ['Design Drawings', '3D CAD Model', 'Project Dossier'],
-                              }),
-                              title: e.target.value,
-                            },
-                          })
-                        }
-                        placeholder="e.g. Mechanical CAD/CAM/CAE Diploma Live Industry Project"
-                        className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-bold text-[#0F172A] bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block font-bold text-[#334155] mb-1">Project Description</label>
-                      <textarea
-                        rows={2}
-                        value={editingCourse.capstoneProject?.description || ''}
-                        onChange={(e) =>
-                          setEditingCourse({
-                            ...editingCourse,
-                            capstoneProject: {
-                              ...(editingCourse.capstoneProject || {
-                                title: `${editingCourse.title} Live Industry Project`,
-                                deliverables: ['Design Drawings', '3D CAD Model', 'Project Dossier'],
-                              }),
-                              description: e.target.value,
-                            },
-                          })
-                        }
-                        className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-medium bg-[#FFFFFF]"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block font-bold text-[#334155] mb-1">Verified Deliverables (Comma Separated)</label>
-                      <input
-                        type="text"
-                        value={editingCourse.capstoneProject?.deliverables?.join(', ') || ''}
-                        onChange={(e) => {
-                          const list = e.target.value.split(',').map((s) => s.trim()).filter(Boolean);
-                          setEditingCourse({
-                            ...editingCourse,
-                            capstoneProject: {
-                              ...(editingCourse.capstoneProject || {
-                                title: `${editingCourse.title} Live Industry Project`,
-                                description: 'Real-world industrial drafting, modeling, and validation project.',
-                              }),
-                              deliverables: list,
-                            },
-                          });
-                        }}
-                        placeholder="e.g. Design Drawings, 3D CAD Model, Project Dossier"
-                        className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-semibold text-xs bg-[#FFFFFF]"
-                      />
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const cur = editingCourse.highlights || [];
+                        setEditingCourse({
+                          ...editingCourse,
+                          highlights: [...cur, `Industrial modeling & project validation with ${editingCourse.software?.split(',')[0] || 'CAD Suite'}`],
+                        });
+                      }}
+                      className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase transition-all shadow-xs cursor-pointer"
+                    >
+                      + Add Competency
+                    </button>
                   </div>
 
-                  {/* Career Pathways */}
-                  <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-3">
-                    <span className="text-xs font-black text-[#EE2C3C] uppercase tracking-wider block border-b pb-2 border-[#CBD5E1]">
-                      6. Career Pathways (Job Placement Titles)
-                    </span>
+                  <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
+                    {(editingCourse.highlights || []).map((highlight, hIdx) => (
+                      <div key={hIdx} className="flex items-center space-x-2 bg-slate-50 p-2 rounded-xl border border-slate-200">
+                        <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                          ✓
+                        </span>
+                        <input
+                          type="text"
+                          value={highlight}
+                          onChange={(e) => {
+                            const list = [...(editingCourse.highlights || [])];
+                            list[hIdx] = e.target.value;
+                            setEditingCourse({ ...editingCourse, highlights: list });
+                          }}
+                          className="flex-1 p-1.5 text-xs font-semibold bg-white rounded-lg border border-slate-200 focus:outline-none focus:border-emerald-600"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const list = (editingCourse.highlights || []).filter((_, i) => i !== hIdx);
+                            setEditingCourse({ ...editingCourse, highlights: list });
+                          }}
+                          className="text-xs text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-2 py-1 rounded font-bold cursor-pointer transition-colors"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
-                    <div>
-                      <label className="block font-bold text-[#334155] mb-1">Placement Titles (Comma Separated)</label>
-                      <input
-                        type="text"
-                        value={editingCourse.careerRoles?.join(', ') || ''}
-                        onChange={(e) => {
-                          const roles = e.target.value.split(',').map((s) => s.trim()).filter(Boolean);
-                          setEditingCourse({ ...editingCourse, careerRoles: roles });
-                        }}
-                        placeholder="e.g. CAD Design Engineer, Automotive Product Designer, FEA Simulation Analyst"
-                        className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-semibold text-xs bg-[#FFFFFF]"
-                      />
-                    </div>
+                {/* 6. Career Progression Path (Career Pathways Step Builder) */}
+                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
+                  <div className="flex items-center justify-between pb-2 border-b border-[#CBD5E1]">
+                    <span className="text-xs font-black text-[#EE2C3C] uppercase tracking-wider">
+                      6. Career Progression Path ({editingCourse.careerPathways?.length || 0} Steps)
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const cur = editingCourse.careerPathways || [];
+                        const nextNum = String(cur.length + 1).padStart(2, '0');
+                        setEditingCourse({
+                          ...editingCourse,
+                          careerPathways: [
+                            ...cur,
+                            {
+                              step: nextNum,
+                              experience: `${cur.length * 2} – ${(cur.length + 1) * 2} Yrs`,
+                              role: `Lead ${editingCourse.title.split(' ')[0]} Specialist`,
+                              ctc: '₹8.0L – ₹15.0L PA',
+                            },
+                          ],
+                        });
+                      }}
+                      className="px-3 py-1 rounded-lg bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs font-bold uppercase transition-all shadow-xs cursor-pointer"
+                    >
+                      + Add Career Step
+                    </button>
+                  </div>
+
+                  <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+                    {(editingCourse.careerPathways || []).map((stepItem, sIdx) => (
+                      <div key={sIdx} className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-black text-slate-800">
+                            STEP {stepItem.step || String(sIdx + 1).padStart(2, '0')}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const cur = (editingCourse.careerPathways || []).filter((_, i) => i !== sIdx);
+                              setEditingCourse({ ...editingCourse, careerPathways: cur });
+                            }}
+                            className="text-xs text-rose-600 hover:text-rose-800 font-bold px-1.5 py-0.5 rounded cursor-pointer"
+                          >
+                            Remove
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                          <div>
+                            <label className="block text-[10px] font-bold text-slate-500 uppercase">Experience</label>
+                            <input
+                              type="text"
+                              value={stepItem.experience}
+                              onChange={(e) => {
+                                const cur = [...(editingCourse.careerPathways || [])];
+                                cur[sIdx] = { ...cur[sIdx], experience: e.target.value };
+                                setEditingCourse({ ...editingCourse, careerPathways: cur });
+                              }}
+                              placeholder="e.g. 0 – 2 Yrs"
+                              className="w-full p-1.5 text-xs font-semibold bg-white rounded border border-slate-200"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-[10px] font-bold text-slate-500 uppercase">Job Role Title</label>
+                            <input
+                              type="text"
+                              value={stepItem.role}
+                              onChange={(e) => {
+                                const cur = [...(editingCourse.careerPathways || [])];
+                                cur[sIdx] = { ...cur[sIdx], role: e.target.value };
+                                setEditingCourse({ ...editingCourse, careerPathways: cur });
+                              }}
+                              placeholder="e.g. BIM Architectural Modeler"
+                              className="w-full p-1.5 text-xs font-bold text-slate-900 bg-white rounded border border-slate-200"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-[10px] font-bold text-slate-500 uppercase">Expected CTC</label>
+                            <input
+                              type="text"
+                              value={stepItem.ctc}
+                              onChange={(e) => {
+                                const cur = [...(editingCourse.careerPathways || [])];
+                                cur[sIdx] = { ...cur[sIdx], ctc: e.target.value };
+                                setEditingCourse({ ...editingCourse, careerPathways: cur });
+                              }}
+                              placeholder="e.g. ₹4.5L – ₹9.0L PA"
+                              className="w-full p-1.5 text-xs font-bold text-emerald-700 bg-white rounded border border-slate-200"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 7. Dual Certification & Industry Capstone Project Blueprint */}
+                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
+                  <span className="text-xs font-black text-[#00873D] uppercase tracking-wider block border-b pb-2 border-[#CBD5E1]">
+                    7. Dual Certification &amp; Industry Capstone Project (Mandatory Portfolio)
+                  </span>
+
+                  <div>
+                    <label className="block font-bold text-[#334155] mb-1">Portfolio Project Title</label>
+                    <input
+                      type="text"
+                      value={editingCourse.capstoneProject?.title || ''}
+                      onChange={(e) =>
+                        setEditingCourse({
+                          ...editingCourse,
+                          capstoneProject: {
+                            ...(editingCourse.capstoneProject || {
+                              description: 'Real-world industrial drafting, modeling, and validation project.',
+                              deliverables: ['Design Drawings', '3D CAD Model', 'Project Dossier'],
+                            }),
+                            title: e.target.value,
+                          },
+                        })
+                      }
+                      placeholder="e.g. Commercial Complex 5-Story BIM Model with Multi-Trade Clash Report"
+                      className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-bold text-[#0F172A] bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-[#334155] mb-1">Project Description</label>
+                    <textarea
+                      rows={2}
+                      value={editingCourse.capstoneProject?.description || ''}
+                      onChange={(e) =>
+                        setEditingCourse({
+                          ...editingCourse,
+                          capstoneProject: {
+                            ...(editingCourse.capstoneProject || {
+                              title: `${editingCourse.title} Live Industry Project`,
+                              deliverables: ['Design Drawings', '3D CAD Model', 'Project Dossier'],
+                            }),
+                            description: e.target.value,
+                          },
+                        })
+                      }
+                      className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-medium bg-[#FFFFFF]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-[#334155] mb-1">Verified Deliverables (Comma Separated)</label>
+                    <input
+                      type="text"
+                      value={editingCourse.capstoneProject?.deliverables?.join(', ') || ''}
+                      onChange={(e) => {
+                        const list = e.target.value.split(',').map((s) => s.trim()).filter(Boolean);
+                        setEditingCourse({
+                          ...editingCourse,
+                          capstoneProject: {
+                            ...(editingCourse.capstoneProject || {
+                              title: `${editingCourse.title} Live Industry Project`,
+                              description: 'Real-world industrial drafting, modeling, and validation project.',
+                            }),
+                            deliverables: list,
+                          },
+                        });
+                      }}
+                      placeholder="e.g. Central BIM Model (.rvt), Automated Bill of Quantities, Navisworks Clash Matrix"
+                      className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-semibold text-xs bg-[#FFFFFF]"
+                    />
+                  </div>
+                </div>
+
+                {/* 8. Frequently Asked Questions (FAQ Accordion Builder) */}
+                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
+                  <div className="flex items-center justify-between pb-2 border-b border-[#CBD5E1]">
+                    <span className="text-xs font-black text-[#2563EB] uppercase tracking-wider">
+                      8. Frequently Asked Questions (FAQ) ({editingCourse.faqs?.length || 0} Questions)
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const cur = editingCourse.faqs || [];
+                        setEditingCourse({
+                          ...editingCourse,
+                          faqs: [
+                            ...cur,
+                            {
+                              question: `What job assistance is provided for ${editingCourse.title}?`,
+                              answer: 'Our placement cell conducts mock technical CAD interviews and coordinates direct hiring with top EPC firms.',
+                            },
+                          ],
+                        });
+                      }}
+                      className="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold uppercase transition-all shadow-xs cursor-pointer"
+                    >
+                      + Add FAQ Item
+                    </button>
+                  </div>
+
+                  <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+                    {(editingCourse.faqs || []).map((faqItem, fIdx) => (
+                      <div key={fIdx} className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-slate-700">FAQ #{fIdx + 1}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const cur = (editingCourse.faqs || []).filter((_, i) => i !== fIdx);
+                              setEditingCourse({ ...editingCourse, faqs: cur });
+                            }}
+                            className="text-xs text-rose-600 hover:text-rose-800 font-bold px-1.5 py-0.5 rounded cursor-pointer"
+                          >
+                            Remove
+                          </button>
+                        </div>
+
+                        <div>
+                          <input
+                            type="text"
+                            value={faqItem.question}
+                            onChange={(e) => {
+                              const cur = [...(editingCourse.faqs || [])];
+                              cur[fIdx] = { ...cur[fIdx], question: e.target.value };
+                              setEditingCourse({ ...editingCourse, faqs: cur });
+                            }}
+                            placeholder="Question"
+                            className="w-full p-2 text-xs font-bold text-slate-900 bg-white rounded border border-slate-200"
+                          />
+                        </div>
+
+                        <div>
+                          <textarea
+                            rows={2}
+                            value={faqItem.answer}
+                            onChange={(e) => {
+                              const cur = [...(editingCourse.faqs || [])];
+                              cur[fIdx] = { ...cur[fIdx], answer: e.target.value };
+                              setEditingCourse({ ...editingCourse, faqs: cur });
+                            }}
+                            placeholder="Answer"
+                            className="w-full p-2 text-xs text-slate-700 bg-white rounded border border-slate-200"
+                          />
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
 
-              {/* 4. Interactive Module Syllabus Builder (Full Width) */}
+              {/* 9. Interactive Module Syllabus Builder (Full Width) */}
               <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-[#CBD5E1] gap-2">
                   <span className="text-xs font-black text-[#131313] uppercase tracking-wider">
-                    4. Module Syllabus Specification ({editingCourse.modules?.length || 0} Units)
+                    9. Course Contents &amp; Module Syllabus Breakdown ({editingCourse.modules?.length || 0} Units)
                   </span>
                   <button
                     type="button"

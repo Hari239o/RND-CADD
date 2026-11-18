@@ -20,7 +20,18 @@ export interface CareerPathwayItem {
 }
 
 export const getCourseCareerPathways = (course: Course): CareerPathwayItem[] => {
-  // Priority 1: Use live admin-curated career roles if provided
+  // Priority 1: Use live admin-curated career pathways if provided
+  if (Array.isArray((course as any).careerPathways) && (course as any).careerPathways.length > 0) {
+    return (course as any).careerPathways.map((item: any, idx: number) => ({
+      id: String(idx + 1),
+      step: item.step || String(idx + 1).padStart(2, '0'),
+      experience: item.experience || `${idx * 2} – ${(idx + 1) * 2} Yrs`,
+      role: item.role || `Engineering Role ${idx + 1}`,
+      ctc: item.ctc || '₹6.0L – ₹12.0L PA',
+    }));
+  }
+
+  // Priority 2: Use live admin-curated career roles if provided
   if (Array.isArray(course.careerRoles) && course.careerRoles.length >= 2) {
     const expRanges = ['0 – 2 Yrs', '2 – 4 Yrs', '4 – 6 Yrs', '6 – 8 Yrs', '8+ Yrs'];
     const ctcRanges = ['₹4.5L – ₹9.0L PA', '₹6.0L – ₹11.5L PA', '₹8.0L – ₹15.0L PA', '₹11.0L – ₹19.0L PA', '₹15.0L – ₹28.0L+ PA'];

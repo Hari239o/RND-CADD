@@ -22,9 +22,15 @@ export interface Course {
   enrolledStudents: string;
   tools: string[];
   image: string;
+  labImage?: string;
+  certificateImage?: string;
   overview: string;
   certification: string;
+  awardedCredential?: string;
+  highlights?: string[];
   careerRoles: string[];
+  careerPathways?: { step: string; experience: string; role: string; ctc: string }[];
+  faqs?: { question: string; answer: string }[];
   prerequisites: string;
   capstoneProject: {
     title: string;

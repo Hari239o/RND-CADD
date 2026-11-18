@@ -506,7 +506,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                       Awarded Credential
                     </span>
                     <p className="text-base sm:text-lg font-bold text-slate-900 leading-snug">
-                      {certificationText}
+                      {(course as any).awardedCredential || certificationText}
                     </p>
                   </div>
 
@@ -571,7 +571,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                   {/* Left: Dynamic Course Image with Fail-Safe Multi-Tier Fallback */}
                   <div className="md:col-span-5 relative min-h-[280px] bg-slate-900 overflow-hidden">
                     <img
-                      src={dynamicImage}
+                      src={(course as any).labImage || dynamicImage}
                       alt={course.title}
                       onError={(e) => {
                         const verified = getVerifiedCourseImages(course);
@@ -594,7 +594,10 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                     </h3>
 
                     <div className="space-y-3 pt-1">
-                      {courseHighlights.map((item, idx) => (
+                      {((Array.isArray((course as any).highlights) && (course as any).highlights.length > 0)
+                        ? (course as any).highlights
+                        : courseHighlights
+                      ).map((item: string, idx: number) => (
                         <div key={idx} className="flex items-start space-x-3">
                           <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0 font-bold text-xs mt-0.5">
                             ✓
@@ -813,7 +816,13 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                 </div>
 
                 <div className="space-y-3">
-                  {faqList.map((faq, idx) => {
+                  {((Array.isArray((course as any).faqs) && (course as any).faqs.length > 0)
+                    ? (course as any).faqs.map((f: any) => ({
+                        q: f.question || f.q || '',
+                        a: f.answer || f.a || '',
+                      }))
+                    : faqList
+                  ).map((faq: { q: string; a: string }, idx: number) => {
                     const isFaqOpen = expandedFaq === idx;
                     return (
                       <div key={idx} className="border border-slate-200/80 rounded-2xl overflow-hidden">

@@ -64,7 +64,20 @@ export const CourseCertificateShowcase: React.FC<CourseCertificateShowcaseProps>
 
         {/* RIGHT COLUMN: Official Certificate Sample matching exact Image 1 visual */}
         <div className="lg:col-span-7">
-          <div className="relative bg-white rounded-2xl border-2 border-slate-200 shadow-xl overflow-hidden p-6 sm:p-8 select-none">
+          {(course as any).certificateImage ? (
+            <div className="relative bg-white rounded-2xl border-2 border-slate-200 shadow-xl overflow-hidden p-2 select-none group">
+              <img
+                src={(course as any).certificateImage}
+                alt={`${course.title} Certificate of Completion`}
+                className="w-full h-auto object-contain rounded-xl border border-slate-100 shadow-sm transition-transform duration-500 group-hover:scale-[1.01]"
+              />
+              <div className="absolute bottom-4 right-4 bg-[#15304C]/95 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg shadow-md flex items-center space-x-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span>Verified Certificate Specimen</span>
+              </div>
+            </div>
+          ) : (
+            <div className="relative bg-white rounded-2xl border-2 border-slate-200 shadow-xl overflow-hidden p-6 sm:p-8 select-none">
             
             {/* Background Security Border Elegant Double Guilloche Hairline (No Dashed Pattern) */}
             <div className="absolute inset-2 border-2 border-[#15304C]/20 pointer-events-none rounded-xl"></div>
@@ -229,6 +242,7 @@ export const CourseCertificateShowcase: React.FC<CourseCertificateShowcaseProps>
             </div>
 
           </div>
+          )}
         </div>
 
       </div>
