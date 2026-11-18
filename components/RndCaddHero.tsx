@@ -61,8 +61,20 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
       onMouseLeave={handleMouseLeave}
       className="relative w-full min-h-[85vh] sm:min-h-[90vh] lg:min-h-[94vh] bg-white overflow-hidden border-b border-slate-100 flex items-center"
     >
+      {/* Background Circles - EXACT Unlox Architecture matching Image 2 */}
+      <div className="absolute w-[85vw] h-[85vw] max-w-[1100px] max-h-[1100px] -top-[55%] sm:-top-[60%] lg:-top-[68%] left-[25%] sm:left-[32%] lg:left-[40%] flex items-center justify-center pointer-events-none select-none z-0">
+        <div className="w-full h-full rounded-full bg-[radial-gradient(circle,_rgba(255,255,255,0)_35%,_rgba(145,194,255,0.42)_100%)]" />
+      </div>
+
+      <div className="absolute w-[85vw] h-[85vw] max-w-[1100px] max-h-[1100px] top-[45%] sm:top-[42%] lg:top-[38%] left-[25%] sm:left-[32%] lg:left-[40%] flex items-center justify-center pointer-events-none select-none z-0">
+        <div className="w-full h-full rounded-full bg-[radial-gradient(circle,_rgba(255,255,255,0)_35%,_rgba(145,194,255,0.42)_100%)]" />
+      </div>
+
+      {/* Seamless Vertical Gradient Overlay to blend top and bottom with page background */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,1)_0%,transparent_30%,transparent_70%,rgba(255,255,255,1)_100%)] pointer-events-none z-0" />
+
       {/* Full-Screen Edge-to-Edge Container: Comfortably utilizes the left side space */}
-      <div className="w-full px-6 sm:px-12 md:px-16 lg:px-20 xl:px-28 2xl:px-36 pt-28 sm:pt-36 lg:pt-40 pb-16 sm:pb-24 lg:pb-28">
+      <div className="relative z-10 w-full px-6 sm:px-12 md:px-16 lg:px-20 xl:px-28 2xl:px-36 pt-28 sm:pt-36 lg:pt-40 pb-16 sm:pb-24 lg:pb-28">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 xl:gap-20 items-center w-full">
           {/* Left Column: Occupies Left Side Naturally (UNLOX Full Screen Style) */}
           <div className="lg:col-span-7 flex flex-col justify-center text-left">
@@ -117,17 +129,11 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
             </motion.div>
           </div>
 
-          {/* Right Column: LARGE TRANSPARENT LOGO with Background Circles (Exact Image 2) */}
+          {/* Right Column: LARGE TRANSPARENT LOGO (Image 2 style) */}
           <div
-            className="lg:col-span-5 flex items-center justify-center relative mt-8 lg:mt-0 py-8 select-none"
+            className="lg:col-span-5 flex items-center justify-center relative mt-8 lg:mt-0 py-8 select-none z-10"
             style={{ perspective: 1200 }}
           >
-            {/* Top Backdrop Circle (curves down from above the logo) */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[82%] w-[480px] sm:w-[600px] md:w-[700px] lg:w-[780px] h-[480px] sm:h-[600px] md:h-[700px] lg:h-[780px] rounded-full bg-[#EDF5FF] -z-10 pointer-events-none" />
-
-            {/* Bottom Backdrop Circle (curves up from below the logo) */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[18%] w-[480px] sm:w-[600px] md:w-[700px] lg:w-[780px] h-[480px] sm:h-[600px] md:h-[700px] lg:h-[780px] rounded-full bg-[#EBF3FF]/90 -z-10 pointer-events-none" />
-
             {/* Interactive Mouse-Tracking Animated Logo */}
             <motion.div
               style={{
