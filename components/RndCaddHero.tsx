@@ -61,10 +61,6 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
       onMouseLeave={handleMouseLeave}
       className="relative w-full min-h-[85vh] sm:min-h-[90vh] lg:min-h-[94vh] bg-white overflow-hidden border-b border-slate-100 flex items-center"
     >
-      {/* Soft Curved Intersecting Backdrop Arcs (Exact unlox.com Image 2 & Image 3) */}
-      <div className="absolute -top-32 sm:-top-48 right-[-10%] w-[56vw] max-w-[950px] h-[56vw] max-h-[950px] rounded-full bg-[#EDF5FF] -z-10 pointer-events-none" />
-      <div className="absolute -bottom-32 sm:-bottom-48 right-[-5%] w-[60vw] max-w-[1000px] h-[60vw] max-h-[1000px] rounded-full bg-[#EBF3FF]/85 -z-10 pointer-events-none" />
-
       {/* Full-Screen Edge-to-Edge Container: Comfortably utilizes the left side space */}
       <div className="w-full px-6 sm:px-12 md:px-16 lg:px-20 xl:px-28 2xl:px-36 pt-28 sm:pt-36 lg:pt-40 pb-16 sm:pb-24 lg:pb-28">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 xl:gap-20 items-center w-full">
@@ -121,11 +117,17 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
             </motion.div>
           </div>
 
-          {/* Right Column: LARGE TRANSPARENT LOGO with Interactive 4-Directional Tracking (Exact Unlox Scale) */}
+          {/* Right Column: LARGE TRANSPARENT LOGO with Background Circles (Exact Image 2) */}
           <div
-            className="lg:col-span-5 flex items-center justify-center relative mt-8 lg:mt-0 py-6 select-none"
+            className="lg:col-span-5 flex items-center justify-center relative mt-8 lg:mt-0 py-8 select-none"
             style={{ perspective: 1200 }}
           >
+            {/* Top Backdrop Circle (curves down from above the logo) */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[82%] w-[480px] sm:w-[600px] md:w-[700px] lg:w-[780px] h-[480px] sm:h-[600px] md:h-[700px] lg:h-[780px] rounded-full bg-[#EDF5FF] -z-10 pointer-events-none" />
+
+            {/* Bottom Backdrop Circle (curves up from below the logo) */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[18%] w-[480px] sm:w-[600px] md:w-[700px] lg:w-[780px] h-[480px] sm:h-[600px] md:h-[700px] lg:h-[780px] rounded-full bg-[#EBF3FF]/90 -z-10 pointer-events-none" />
+
             {/* Interactive Mouse-Tracking Animated Logo */}
             <motion.div
               style={{
