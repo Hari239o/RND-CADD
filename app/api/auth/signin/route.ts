@@ -51,11 +51,11 @@ export async function POST(request: NextRequest) {
           message: 'Signed in as Student 1',
           user: {
             id: 'stu_master_01',
-            name: 'Ram.g',
+            name: 'Student 1',
             email: normalizedEmail,
             role: 'student',
-            mobile: '+91 99080 12345',
-            officialMobile: '+91 99080 12345',
+            mobile: '',
+            officialMobile: '',
             stream: 'Civil CADD & Master BIM',
             assignedCourses: ['Civil CADD & Master BIM', 'Interior Architecture & 3D Visualization']
           },

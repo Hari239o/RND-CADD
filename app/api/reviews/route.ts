@@ -18,22 +18,7 @@ export interface CourseReview {
   createdAt: string;
 }
 
-let inMemoryReviews: CourseReview[] = [
-  {
-    id: 'rev-init-1',
-    studentId: 'STU-001',
-    studentName: 'Ram.g',
-    studentEmail: 'student1@gmail.com',
-    studentPhoto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
-    courseName: 'Civil CADD & Master BIM',
-    rating: 5,
-    review:
-      'The hands-on practical drafting in AutoCAD and Revit 2026 is exceptional. Er. Swamy Naidu explained BIM coordinates and multi-storey structural layout clearly. Workstations with NVIDIA Quadro rigs made 3D rendering smooth without any lag.',
-    trainerFeedback: 'Excellent teaching and doubt resolution',
-    status: 'Verified',
-    createdAt: new Date(Date.now() - 3600000 * 24 * 2).toISOString(),
-  },
-];
+let inMemoryReviews: CourseReview[] = [];
 
 export async function GET(request: NextRequest) {
   try {
@@ -51,6 +36,12 @@ export async function GET(request: NextRequest) {
         query.courseName = course;
       }
 
+      await db.collection('reviews').deleteMany({
+        $or: [
+          { id: 'rev-init-1' },
+          { studentName: 'Ram.g' }
+        ]
+      });
       const dbReviews = await db
         .collection('reviews')
         .find(query)

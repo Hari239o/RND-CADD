@@ -595,7 +595,7 @@ export const JobsPortalShowcase: React.FC<JobsPortalShowcaseProps> = ({
                       type="text"
                       value={applicantStudentId}
                       onChange={(e) => setApplicantStudentId(e.target.value)}
-                      placeholder="e.g. STU-HYD-8492"
+                      placeholder="e.g. STU-001"
                       className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium focus:border-[#EE2C3C] focus:outline-none"
                     />
                   </div>

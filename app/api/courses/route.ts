@@ -1123,9 +1123,9 @@ function normalizeCourse(raw: any): StoredCourse {
             videoType: 'drive',
             videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
             description: 'Introduction to standard user interface, navigation shortcuts, template configurations, and BIS/ISO standards.',
-            pdfUrl: '/uploads/sample-lecture-notes.pdf',
-            pdfName: `${raw.code || 'CAD'}-Class-01-Notes.pdf`,
-            pdfSize: '2.4 MB',
+            pdfUrl: undefined,
+            pdfName: undefined,
+            pdfSize: undefined,
           },
           {
             id: `cls-auto-2`,

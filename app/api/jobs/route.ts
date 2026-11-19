@@ -23,6 +23,8 @@ export async function GET(request: Request) {
 
         // Ensure baseline verified openings always exist in MongoDB
         const existingIds = new Set(dbJobs.map((j: any) => j.id));
+        // Purge legacy seeded dummy jobs if any
+        await jobsCollection.deleteMany({ id: { $in: ['JOB-2026-001', 'JOB-2026-002', 'JOB-2026-003', 'JOB-2026-004', 'JOB-2026-005', 'JOB-2026-006'] } });
         const missingInitial = INITIAL_JOBS.filter((j) => !existingIds.has(j.id));
         if (missingInitial.length > 0) {
           try {
@@ -62,6 +64,8 @@ export async function GET(request: Request) {
         let dbNotifs = await notifCollection.find({}).sort({ timestamp: -1 }).limit(20).toArray();
 
         const existingNotifIds = new Set(dbNotifs.map((n: any) => n.id));
+        // Purge legacy seeded dummy notifs if any
+        await notifCollection.deleteMany({ id: { $in: ['NOTIF-001', 'NOTIF-002', 'NOTIF-003'] } });
         const missingNotifs = INITIAL_NOTIFICATIONS.filter((n) => !existingNotifIds.has(n.id));
         if (missingNotifs.length > 0) {
           try {

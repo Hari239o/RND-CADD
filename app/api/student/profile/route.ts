@@ -5,7 +5,7 @@ import { connectToDatabase } from '@/lib/mongodb';
 let fallbackProfiles: Record<string, any> = {
   'student1@gmail.com': {
     studentId: 'STU-001',
-    name: 'Ram.g',
+    name: 'Student 1',
     email: 'student1@gmail.com',
     password: '9908',
     phone: '',
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
     const isStudent1 = email === 'student1@gmail.com';
     const profile = fallbackProfiles[email] || {
       studentId: isStudent1 ? 'STU-001' : `STU-${Math.floor(100 + Math.random() * 900)}`,
-      name: isStudent1 ? 'Student 1 (Ram.g)' : email.split('@')[0],
+      name: isStudent1 ? 'Student 1' : email.split('@')[0],
       email: email,
       phone: '',
       college: '',

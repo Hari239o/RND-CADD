@@ -869,7 +869,7 @@ export default function AdminPortalPage() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Job Placement Management State (Real-time DB synced with RND CADD Jobs Portal)
-  const [adminJobs, setAdminJobs] = useState<JobPost[]>(INITIAL_JOBS);
+  const [adminJobs, setAdminJobs] = useState<JobPost[]>([]);
   const [isLoadingJobs, setIsLoadingJobs] = useState<boolean>(false);
   const [jobSearchQuery, setJobSearchQuery] = useState<string>('');
   const [jobFilterStatus, setJobFilterStatus] = useState<'all' | 'Active' | 'Closed' | 'WithApplicants'>('all');
@@ -2641,7 +2641,7 @@ export default function AdminPortalPage() {
       if (!fileUrl) {
         fileUrl = await new Promise<string>((resolve) => {
           const reader = new FileReader();
-          reader.onload = (e) => resolve((e.target?.result as string) || '/sample-certificate.pdf');
+          reader.onload = (e) => resolve((e.target?.result as string) || '');
           reader.readAsDataURL(file);
         });
       }
@@ -4235,7 +4235,7 @@ export default function AdminPortalPage() {
 
                                   {/* Download PDF Button */}
                                   <a
-                                    href={item.certificate.fileUrl || '/sample-certificate.pdf'}
+                                    href={item.certificate.fileUrl || '#'}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     download
@@ -10685,7 +10685,7 @@ export default function AdminPortalPage() {
             <div className="p-6 overflow-y-auto flex-1 bg-[#F8FAFC]">
               <div className="w-full h-[620px] rounded-xl overflow-hidden border-2 border-[#CBD5E1] bg-[#1E293B] shadow-inner">
                 <iframe
-                  src={viewingCertificate.fileUrl || '/sample-certificate.pdf'}
+                  src={viewingCertificate.fileUrl || ''}
                   title="Certificate PDF"
                   className="w-full h-full border-0"
                 />
@@ -10700,7 +10700,7 @@ export default function AdminPortalPage() {
               </span>
               <div className="flex items-center space-x-3">
                 <a
-                  href={viewingCertificate.fileUrl || '/sample-certificate.pdf'}
+                  href={viewingCertificate.fileUrl || '#'}
                   target="_blank"
                   rel="noopener noreferrer"
                   download

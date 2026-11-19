@@ -18,59 +18,18 @@ export interface AssignmentItem {
 }
 
 // In-memory fallback cache
-let inMemoryAssignments: AssignmentItem[] = [
-  {
-    id: 'asgn-init-1',
-    title: 'AutoCAD 2D Working Plan & Sectional Elevation Assignment',
-    course: 'Civil CADD & Master BIM',
-    description:
-      'Draft complete 2BHK municipal approval floor plan with wall thickness 230mm/115mm, door/window schedules, dimension styles according to NBC 2026, and staircase sectional elevation at 1:100 scale.',
-    pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
-    pdfName: 'AutoCAD-2D-Working-Plan-Assignment.pdf',
-    pdfSize: '2.4 MB',
-    dueDate: '2026-11-25',
-    maxScore: 100,
-    createdAt: new Date(Date.now() - 3600000 * 48).toISOString(),
-    updatedAt: new Date(Date.now() - 3600000 * 48).toISOString(),
-  },
-  {
-    id: 'asgn-init-2',
-    title: 'Autodesk Revit 2026 Multi-Story Residential BIM Project',
-    course: 'Civil CADD & Master BIM',
-    description:
-      'Construct parametric G+3 residential building model with curtain walling, structural column grid, topographical contours, schedule quantities, and export Navisworks clash report.',
-    pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
-    pdfName: 'Revit-MultiStory-BIM-Project-Spec.pdf',
-    pdfSize: '4.8 MB',
-    dueDate: '2026-11-30',
-    maxScore: 100,
-    createdAt: new Date(Date.now() - 3600000 * 24).toISOString(),
-    updatedAt: new Date(Date.now() - 3600000 * 24).toISOString(),
-  },
-  {
-    id: 'asgn-init-3',
-    title: 'SolidWorks CSWP Parametric Flange Coupling Assembly',
-    course: 'Mechanical CAD/CAM/CAE Diploma',
-    description:
-      'Model protected type flexible flange coupling components (shaft, key, hex bolts, hub) with GD&T tolerances, interference detection analysis, and generate complete 2D production drawing with BOM.',
-    pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
-    pdfName: 'SolidWorks-Flange-Coupling-Task.pdf',
-    pdfSize: '3.1 MB',
-    dueDate: '2026-11-28',
-    maxScore: 100,
-    createdAt: new Date(Date.now() - 3600000 * 72).toISOString(),
-    updatedAt: new Date(Date.now() - 3600000 * 72).toISOString(),
-  },
-];
+let inMemoryAssignments: AssignmentItem[] = [];
 
 async function ensureDbSeeded(db: any) {
   try {
-    const count = await db.collection('assignments').countDocuments();
-    if (count === 0) {
-      await db.collection('assignments').insertMany(inMemoryAssignments);
-    }
+    await db.collection('assignments').deleteMany({
+      $or: [
+        { id: { $in: ['asgn-init-1', 'asgn-init-2', 'asgn-init-3'] } },
+        { pdfUrl: { $regex: 'dummy\.pdf', $options: 'i' } }
+      ]
+    });
   } catch (err) {
-    console.error('Failed to seed assignments collection:', err);
+    console.error('Failed to clean assignments collection:', err);
   }
 }
 

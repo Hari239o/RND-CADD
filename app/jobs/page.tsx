@@ -698,7 +698,7 @@ export default function JobsPortalPage() {
   const handleInitiateApply = (job: JobPost) => {
     setSelectedJobForApply(job);
     if (currentUser) {
-      setApplicantName(currentUser.name || 'Ram.g');
+      setApplicantName(currentUser.name || 'Student');
       setApplicantEmail(currentUser.email || 'student1@gmail.com');
       setApplicantStudentId(currentUser.studentId || currentUser.id || 'STU-001');
       setApplicantStream(currentUser.stream || job.discipline);

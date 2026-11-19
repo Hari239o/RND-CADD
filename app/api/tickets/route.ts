@@ -29,74 +29,19 @@ export interface SupportTicket {
 }
 
 // In-memory fallback cache for instant response if MongoDB is offline
-let inMemoryTickets: SupportTicket[] = [
-  {
-    id: 'tkt-init-1',
-    ticketNumber: 'TKT-2026-8492',
-    studentId: 'STU-HYD-8492',
-    studentName: 'Ram.g',
-    studentEmail: 'student1@gmail.com',
-    course: 'Civil CADD & Master BIM',
-    category: 'Coursework & Project Doubts',
-    priority: 'Medium',
-    subject: 'Revit 2026 Wall Join coordinate warning during Level 2 floor plan',
-    description:
-      'While connecting exterior brick veneer to interior partition drywall on Level 2, Revit shows overlapping geometry warning and fails to clean the corner joint automatically.',
-    status: 'Resolved',
-    adminReply:
-      "Hello Ram, this occurs when wall layer wrapping at ends is set to 'Both' while the junction angle is non-perpendicular. Go to Modify > Geometry > Wall Joins, hover over the junction, click 'Next' to cycle through the join configurations and switch to 'Miter' or 'Clean Join'. Your submitted .rvt file has also been verified and corrected.",
-    resolvedBy: 'Er. Swamy Naidu (Director / Chief Architect)',
-    resolvedAt: new Date(Date.now() - 3600000 * 24).toISOString(),
-    createdAt: new Date(Date.now() - 3600000 * 36).toISOString(),
-    updatedAt: new Date(Date.now() - 3600000 * 24).toISOString(),
-  },
-  {
-    id: 'tkt-init-2',
-    ticketNumber: 'TKT-2026-8493',
-    studentId: 'STU-HYD-8492',
-    studentName: 'Ram.g',
-    studentEmail: 'student1@gmail.com',
-    course: 'Civil CADD & Master BIM',
-    category: 'Software & License',
-    priority: 'High',
-    subject: 'AutoCAD 2026 Student Lab License activation code renewal',
-    description:
-      'My lab workstation desktop #4 serial key for AutoCAD Architecture and 3D modeling showed standalone license validation timeout today morning during lab session.',
-    status: 'In Progress',
-    adminReply:
-      'IT admin has renewed the network multi-seat server license. Please restart Autodesk Desktop Licensing Service or enter the standalone educational key sent to your student email.',
-    resolvedBy: 'CAD Admin Desk',
-    resolvedAt: new Date(Date.now() - 3600000 * 2).toISOString(),
-    createdAt: new Date(Date.now() - 3600000 * 6).toISOString(),
-    updatedAt: new Date(Date.now() - 3600000 * 2).toISOString(),
-  },
-  {
-    id: 'tkt-init-3',
-    ticketNumber: 'TKT-2026-8501',
-    studentId: 'STU-HYD-8411',
-    studentName: 'Priya Sharma',
-    studentEmail: 'priya.sharma@gmail.com',
-    course: 'Mechanical CAD/CAM/CAE Diploma',
-    category: 'Coursework & Project Doubts',
-    priority: 'Medium',
-    subject: 'ANSYS Workbench Static Structural Mesh refinement doubt',
-    description:
-      'Facing skewness exceeding 0.85 near the fillet curvature of the crane hook bracket. Need guidance on sphere of influence sizing and inflation layers.',
-    status: 'Open',
-    createdAt: new Date(Date.now() - 3600000 * 4).toISOString(),
-    updatedAt: new Date(Date.now() - 3600000 * 4).toISOString(),
-  },
-];
+let inMemoryTickets: SupportTicket[] = [];
 
 // Helper to seed DB if empty
 async function ensureDbSeeded(db: any) {
   try {
-    const count = await db.collection('tickets').countDocuments();
-    if (count === 0) {
-      await db.collection('tickets').insertMany(inMemoryTickets);
-    }
+    await db.collection('tickets').deleteMany({
+      $or: [
+        { id: { $in: ['tkt-init-1', 'tkt-init-2', 'tkt-init-3'] } },
+        { ticketNumber: { $in: ['TKT-2026-8492', 'TKT-2026-8493', 'TKT-2026-8501'] } }
+      ]
+    });
   } catch (err) {
-    console.error('Failed to seed tickets collection:', err);
+    console.error('Failed to clean tickets collection:', err);
   }
 }
 

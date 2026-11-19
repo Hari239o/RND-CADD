@@ -61,7 +61,7 @@ export default function SignInPage() {
     if (normEmail === 'student1@gmail.com') {
       if (trimmedPassword === '9908') {
         const userObj = {
-          name: 'Ram.g',
+          name: 'Student 1',
           email: normEmail,
           role: 'student',
           stream: 'Civil & Architectural BIM',

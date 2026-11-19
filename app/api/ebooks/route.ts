@@ -24,49 +24,7 @@ export interface EbookItem {
 }
 
 // In-memory fallback cache
-let inMemoryEbooks: EbookItem[] = [
-  {
-    id: 'ebook-init-1',
-    title: 'AutoCAD 2026 Complete Civil Drafting & Detailing Handbook',
-    course: 'Civil CADD & Master BIM',
-    pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
-    pdfName: 'AutoCAD-2026-Civil-Drafting-Handbook.pdf',
-    pdfSize: '14.2 MB',
-    pages: '340 Pages',
-    description: 'Comprehensive guide covering 2D floor plans, elevation detailing, layer standards, dynamic blocks, and municipal drawing submission.',
-    accessType: 'free',
-    targetAudience: 'all',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'ebook-init-2',
-    title: 'Autodesk Revit Architecture & Parametric BIM Standards Manual',
-    course: 'Civil CADD & Master BIM',
-    pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
-    pdfName: 'Autodesk-Revit-BIM-Standard-Manual.pdf',
-    pdfSize: '22.8 MB',
-    pages: '480 Pages',
-    description: 'Industrial reference manual for parametric family editor, multi-trade clash detection, automated schedules, and Navisworks coordination.',
-    accessType: 'locked',
-    targetAudience: 'course',
-    targetCourse: 'Civil CADD & Master BIM',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'ebook-init-3',
-    title: 'SolidWorks Mechanical Design & CSWA/CSWP Mastery Workbook',
-    course: 'Mechanical CAD/CAM/CAE Diploma',
-    pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
-    pdfName: 'SolidWorks-Mechanical-CSWP-Workbook.pdf',
-    pdfSize: '18.6 MB',
-    pages: '290 Pages',
-    description: 'Part modeling, sheetmetal stamping, welded structures, mold design, and drafting standards for CSWA/CSWP examination.',
-    accessType: 'locked',
-    targetAudience: 'course',
-    targetCourse: 'Mechanical CAD/CAM/CAE Diploma',
-    createdAt: new Date().toISOString(),
-  },
-];
+let inMemoryEbooks: EbookItem[] = [];
 
 // Helper to determine if an ebook is unlocked for a student
 function computeUnlockedStatus(
@@ -120,9 +78,13 @@ export async function GET(request: NextRequest) {
     if (isConnected && db) {
       const collection = db.collection('ebooks');
       const count = await collection.countDocuments();
-      if (count === 0 && inMemoryEbooks.length > 0) {
-        await collection.insertMany(inMemoryEbooks);
-      }
+      // Purge any legacy dummy ebooks
+      await collection.deleteMany({
+        $or: [
+          { id: { $in: ['ebook-init-1', 'ebook-init-2', 'ebook-init-3'] } },
+          { pdfUrl: { $regex: 'dummy\.pdf', $options: 'i' } }
+        ]
+      });
 
       if ((studentId || email) && enrolledCourses.length === 0) {
         try {

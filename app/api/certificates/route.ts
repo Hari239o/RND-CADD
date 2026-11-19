@@ -24,27 +24,7 @@ export interface StudentCertificate {
 }
 
 // In-memory fallback cache
-let inMemoryCertificates: StudentCertificate[] = [
-  {
-    id: 'cert-init-1',
-    certId: 'RND-AUTODESK-849201',
-    studentId: 'STU-001',
-    studentName: 'Student 1',
-    studentEmail: 'student1@gmail.com',
-    course: 'Civil CADD & Master BIM',
-    track: 'Autodesk Revit & Civil BIM Specialist',
-    grade: 'Grade A+ (Distinction)',
-    issueDate: 'November 06, 2026',
-    fileUrl: '/sample-certificate.pdf',
-    fileName: 'Autodesk-Civil-BIM-STU-001.pdf',
-    fileSize: '1.4 MB',
-    fileType: 'pdf',
-    isVerified: true,
-    issuer: 'Er. Swamy Naidu (Academic Director)',
-    notes: 'Official verified PDF certificate uploaded for student.',
-    createdAt: new Date().toISOString(),
-  },
-];
+let inMemoryCertificates: StudentCertificate[] = [];
 
 // GET: Fetch certificates (optionally filtered by studentId or email)
 export async function GET(request: NextRequest) {
@@ -57,9 +37,15 @@ export async function GET(request: NextRequest) {
     if (isConnected && db) {
       const collection = db.collection('certificates');
       const count = await collection.countDocuments();
-      if (count === 0 && inMemoryCertificates.length > 0) {
-        await collection.insertMany(inMemoryCertificates);
-      }
+      // Purge any legacy dummy certificates
+      await collection.deleteMany({
+        $or: [
+          { id: 'cert-init-1' },
+          { certId: 'RND-AUTODESK-849201' },
+          { fileName: 'Autodesk-Civil-BIM-STU-001.pdf' },
+          { fileUrl: '/sample-certificate.pdf' }
+        ]
+      });
 
       let query: any = {};
       if (studentId && email) {
@@ -86,9 +72,9 @@ export async function GET(request: NextRequest) {
         track: doc.track || doc.course || 'Authorized CAD Specialist',
         grade: doc.grade || 'Grade A+ (Distinction)',
         issueDate: doc.issueDate || new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-        fileUrl: doc.fileUrl || '/sample-certificate.pdf',
+        fileUrl: doc.fileUrl || '',
         fileName: doc.fileName || 'Official-Certificate.pdf',
-        fileSize: doc.fileSize || '1.4 MB',
+        fileSize: doc.fileSize || '',
         fileType: 'pdf',
         isVerified: doc.isVerified ?? true,
         issuer: doc.issuer || 'Er. Swamy Naidu (Academic Director)',

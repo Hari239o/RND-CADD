@@ -212,9 +212,9 @@ const DEFAULT_COURSE_CLASSES: Record<string, CourseClass[]> = {
       videoType: 'drive',
       videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
       description: 'Introduction to standard user interface, navigation shortcuts, template configurations, and BIS/ISO standards.',
-      pdfUrl: '/uploads/sample-lecture-notes.pdf',
-      pdfName: 'BIM-CIV-90-Class-01-Notes.pdf',
-      pdfSize: '2.4 MB',
+      pdfUrl: undefined,
+      pdfName: undefined,
+      pdfSize: undefined,
     },
     {
       id: 'cls-civ-2',
@@ -224,9 +224,9 @@ const DEFAULT_COURSE_CLASSES: Record<string, CourseClass[]> = {
       videoType: 'drive',
       videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
       description: 'Modeling structural compound walls, core layers, elevation datum levels, and structural grid alignments.',
-      pdfUrl: '/uploads/sample-lecture-notes.pdf',
-      pdfName: 'Revit Architectural Modeling Guide.pdf',
-      pdfSize: '5.1 MB',
+      pdfUrl: undefined,
+      pdfName: undefined,
+      pdfSize: undefined,
     },
     {
       id: 'cls-civ-3',
@@ -236,9 +236,9 @@ const DEFAULT_COURSE_CLASSES: Record<string, CourseClass[]> = {
       videoType: 'drive',
       videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
       description: 'Creating parametric window/door families, curtain wall mullion layout, and reference planes.',
-      pdfUrl: '/uploads/sample-lecture-notes.pdf',
-      pdfName: 'Parametric BIM Families & Curtain Walls.pdf',
-      pdfSize: '4.2 MB',
+      pdfUrl: undefined,
+      pdfName: undefined,
+      pdfSize: undefined,
     },
     {
       id: 'cls-civ-4',
@@ -248,9 +248,9 @@ const DEFAULT_COURSE_CLASSES: Record<string, CourseClass[]> = {
       videoType: 'drive',
       videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
       description: 'Multi-trade hard clash detection, 4D construction schedule simulation, and GPU real-time daylight rendering.',
-      pdfUrl: '/uploads/sample-lecture-notes.pdf',
-      pdfName: 'Clash Coordination & 4K Visualization.pdf',
-      pdfSize: '6.8 MB',
+      pdfUrl: undefined,
+      pdfName: undefined,
+      pdfSize: undefined,
     },
   ],
   'interior architecture & 3d visualization': [
@@ -262,9 +262,9 @@ const DEFAULT_COURSE_CLASSES: Record<string, CourseClass[]> = {
       videoType: 'drive',
       videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
       description: 'Anthropometric dimensions, circulation corridors, furniture clearance standards, and false ceiling grids.',
-      pdfUrl: '/uploads/sample-lecture-notes.pdf',
-      pdfName: 'Interior Space Planning Standards.pdf',
-      pdfSize: '3.8 MB',
+      pdfUrl: undefined,
+      pdfName: undefined,
+      pdfSize: undefined,
     },
     {
       id: 'cls-int-2',
@@ -274,9 +274,9 @@ const DEFAULT_COURSE_CLASSES: Record<string, CourseClass[]> = {
       videoType: 'drive',
       videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
       description: 'Tandem drawer mechanisms, carcass panels, shutter finishes, edge-banding, and hardware specifications.',
-      pdfUrl: '/uploads/sample-lecture-notes.pdf',
-      pdfName: 'Modular Kitchen & Millwork Joinery.pdf',
-      pdfSize: '4.6 MB',
+      pdfUrl: undefined,
+      pdfName: undefined,
+      pdfSize: undefined,
     },
     {
       id: 'cls-int-3',
@@ -286,9 +286,9 @@ const DEFAULT_COURSE_CLASSES: Record<string, CourseClass[]> = {
       videoType: 'drive',
       videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
       description: 'IES photometric spotlights, dome HDRI environment lighting, PBR reflection glossiness, and normal bump maps.',
-      pdfUrl: '/uploads/sample-lecture-notes.pdf',
-      pdfName: 'V-Ray 6 Photorealistic Interior Rendering.pdf',
-      pdfSize: '7.2 MB',
+      pdfUrl: undefined,
+      pdfName: undefined,
+      pdfSize: undefined,
     },
   ],
 };
@@ -677,7 +677,7 @@ export default function StudentPortalPage() {
           paymentReceipts: Array.isArray(p.paymentReceipts) ? p.paymentReceipts : prev.paymentReceipts,
         }));
         if (!isEditingProfile) {
-          setEditName(p.name || 'Ram.g');
+          setEditName(p.name || 'Student');
           setEditPhone(p.phone || '');
           setEditCollege(p.college || '');
           setEditNativePlace(p.nativePlace || '');
@@ -3490,7 +3490,7 @@ export default function StudentPortalPage() {
                               </button>
 
                               <a
-                                href={cert.fileUrl || '/sample-certificate.pdf'}
+                                href={cert.fileUrl || '#'}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 download={cert.fileName || `${cert.certId || 'Certificate'}.pdf`}
@@ -4789,7 +4789,7 @@ export default function StudentPortalPage() {
             <div className="p-4 sm:p-6 overflow-y-auto flex-1 bg-slate-50/60">
               <div className="w-full h-[650px] rounded-xl overflow-hidden border border-slate-200 bg-white shadow-xs">
                 <iframe
-                  src={selectedCertificateForView.fileUrl || '/sample-certificate.pdf'}
+                  src={selectedCertificateForView.fileUrl || ''}
                   title={selectedCertificateForView.fileName || 'Official Certificate'}
                   className="w-full h-full border-0"
                 />
@@ -4803,7 +4803,7 @@ export default function StudentPortalPage() {
               </div>
               <div className="flex items-center space-x-3">
                 <a
-                  href={selectedCertificateForView.fileUrl || '/sample-certificate.pdf'}
+                  href={selectedCertificateForView.fileUrl || '#'}
                   target="_blank"
                   rel="noopener noreferrer"
                   download={selectedCertificateForView.fileName || `${selectedCertificateForView.certId || 'Certificate'}.pdf`}
