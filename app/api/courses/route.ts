@@ -61,6 +61,7 @@ interface StoredCourse {
   highlights?: string[];
   trainingHighlights?: { title: string; desc: string }[];
   labGuarantees?: string[];
+  hiddenSections?: string[];
   careerRoles?: string[];
   careerPathways?: { step: string; experience: string; role: string; ctc: string }[];
   faqs?: { question: string; answer: string }[];
@@ -1092,6 +1093,7 @@ function normalizeCourse(raw: any): StoredCourse {
           'Lab Open 7 Days: 07:00 AM to 09:30 PM',
           'Continuous High-Speed Fiber Internet',
         ],
+    hiddenSections: Array.isArray(raw.hiddenSections) ? raw.hiddenSections : [],
     careerRoles,
     careerPathways,
     faqs,

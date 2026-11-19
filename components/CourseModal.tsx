@@ -229,6 +229,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
     'Continuous High-Speed Fiber Internet',
   ];
 
+  const hiddenSections: string[] = Array.isArray((course as any).hiddenSections) ? (course as any).hiddenSections : [];
   const labGuarantees: string[] = (course as any).labGuarantees && (course as any).labGuarantees.length > 0
     ? (course as any).labGuarantees
     : defaultLabGuarantees;
@@ -474,7 +475,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
             <div className="lg:col-span-8 space-y-10">
               
               {/* SECTION 0: COURSE OVERVIEW & OBJECTIVE FROM ADMIN */}
-              {course.overview && (
+              {!hiddenSections.includes("sec-3") && course.overview && (
                 <motion.section
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -494,6 +495,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
               )}
 
               {/* SECTION A: Key Course Metrics (Open Seamless 4-Pillar Layout, Absolutely No Nested Inner Box Cards) */}
+              {!hiddenSections.includes("sec-2") && (
               <motion.section
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -555,8 +557,10 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                   </div>
                 </div>
               </motion.section>
+              )}
 
               {/* SECTION B: TRAINING HIGHLIGHTS (CLEAN 6-BOX GRID, NO CEMENT GREY, FRAMER MOTION HOVER) */}
+              {!hiddenSections.includes("sec-4") && (
               <section className="space-y-4">
                 <div className="border-b border-slate-200/80 pb-3 flex items-center gap-3">
                   <span className="w-2.5 h-6 bg-[#EE2C3C] rounded-full inline-block"></span>
@@ -587,8 +591,10 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                   ))}
                 </div>
               </section>
+              )}
 
               {/* SECTION C: COURSE HIGHLIGHTS (SPLIT BANNER WITH SOFTWARE-ACCURATE IMAGE) */}
+              {!hiddenSections.includes("sec-5") && (
               <section className="bg-white border border-slate-200/80 rounded-3xl overflow-hidden shadow-sm">
                 <div className="grid grid-cols-1 md:grid-cols-12 items-stretch">
                   
@@ -636,8 +642,10 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
 
                 </div>
               </section>
+              )}
 
               {/* SECTION D: INTERACTIVE SYLLABUS & ROADMAP (ACCORDIONS) */}
+              {!hiddenSections.includes("sec-6") && (
               <section className="bg-white border border-slate-200/80 rounded-3xl p-7 sm:p-8 shadow-sm space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                   <div className="flex items-center gap-3">
@@ -730,14 +738,16 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                   })}
                 </div>
               </section>
+              )}
 
               {/* SECTION E: PLACEMENT CELL & CAREER OPPORTUNITIES INFOGRAPHIC (FAN INFOGRAPHIC MATCHING USER IMAGE 1 & 2) */}
-              <CareerInfographic course={course} />
+              {!hiddenSections.includes("sec-7") && <CareerInfographic course={course} />}
 
               {/* SECTION F: OFFICIAL CERTIFICATE OF COMPLETION SHOWCASE (MATCHING USER IMAGE 1 EXACTLY) */}
-              <CourseCertificateShowcase course={course} />
+              {!hiddenSections.includes("sec-8") && <CourseCertificateShowcase course={course} />}
 
               {/* SECTION G: DUAL CERTIFICATION & CAPSTONE PROJECT */}
+              {!hiddenSections.includes("sec-9") && (
               <section className="bg-white border border-slate-200/80 rounded-3xl p-7 sm:p-8 shadow-sm space-y-6">
                 <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -829,8 +839,10 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                   </div>
                 </div>
               </section>
+              )}
 
               {/* SECTION F: FREQUENTLY ASKED QUESTIONS */}
+              {!hiddenSections.includes("sec-10") && (
               <section className="bg-white border border-slate-200/80 rounded-3xl p-7 sm:p-8 shadow-sm space-y-4">
                 <div className="flex items-center gap-3 mb-2">
                   <span className="w-2.5 h-6 bg-[#EE2C3C] rounded-full inline-block"></span>
@@ -872,6 +884,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                   })}
                 </div>
               </section>
+              )}
 
             </div>
 
@@ -1073,6 +1086,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
               </div>
 
               {/* Card 2: Workstation Lab & Batch Status */}
+              {!hiddenSections.includes("sec-5") && (
               <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-7 shadow-sm space-y-3.5 text-sm">
                 <h4 className="font-bold text-slate-900 uppercase tracking-wide flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
@@ -1087,6 +1101,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                   ))}
                 </div>
               </div>
+              )}
 
             </aside>
 

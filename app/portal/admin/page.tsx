@@ -159,6 +159,7 @@ interface TrainingHighlightItem {
 }
 
 interface CourseItem {
+  hiddenSections?: string[];
   id: string;
   code: string;
   title: string;
@@ -416,6 +417,135 @@ const GoogleDriveIcon = ({ className = 'w-4 h-4' }: { className?: string }) => (
   </svg>
 );
 
+
+interface SectionHeaderActionsProps {
+  secCoreId: string;
+  isEditing: boolean;
+  hiddenSections?: string[];
+  onAdd: (secCoreId: string, isEditing: boolean) => void;
+  onEdit: (secCoreId: string, isEditing: boolean) => void;
+  onToggleHide: (secCoreId: string, isEditing: boolean) => void;
+  onDelete: (secCoreId: string, isEditing: boolean) => void;
+}
+
+const SectionHeaderActions: React.FC<SectionHeaderActionsProps> = ({
+  secCoreId,
+  isEditing,
+  hiddenSections = [],
+  onAdd,
+  onEdit,
+  onToggleHide,
+  onDelete,
+}) => {
+  const isHidden = hiddenSections.includes(secCoreId);
+
+  return (
+    <div className="flex items-center flex-wrap gap-1.5 sm:gap-2">
+      {/* + Add Button */}
+      <button
+        type="button"
+        onClick={() => onAdd(secCoreId, isEditing)}
+        className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition-all active:scale-95 cursor-pointer"
+        title="Add item or activate this section"
+      >
+        <svg className="w-3.5 h-3.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
+        </svg>
+        <span>Add</span>
+      </button>
+
+      {/* ✎ Edit Button */}
+      <button
+        type="button"
+        onClick={() => onEdit(secCoreId, isEditing)}
+        className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs transition-all active:scale-95 cursor-pointer"
+        title="Jump to edit this section"
+      >
+        <svg className="w-3.5 h-3.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+        </svg>
+        <span>Edit</span>
+      </button>
+
+      {/* 👁 Hide / Show Button */}
+      <button
+        type="button"
+        onClick={() => onToggleHide(secCoreId, isEditing)}
+        className={`inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-bold shadow-xs transition-all active:scale-95 cursor-pointer ${
+          isHidden
+            ? 'bg-amber-600 hover:bg-amber-700 text-white ring-2 ring-amber-300'
+            : 'bg-slate-700 hover:bg-slate-800 text-white'
+        }`}
+        title={isHidden ? 'Unhide section on live website' : 'Hide section from live website'}
+      >
+        {isHidden ? (
+          <>
+            <svg className="w-3.5 h-3.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            <span>Show</span>
+          </>
+        ) : (
+          <>
+            <svg className="w-3.5 h-3.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+            </svg>
+            <span>Hide</span>
+          </>
+        )}
+      </button>
+
+      {/* 🗑 Delete Button */}
+      <button
+        type="button"
+        onClick={() => onDelete(secCoreId, isEditing)}
+        className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition-all active:scale-95 cursor-pointer"
+        title="Delete content and hide section"
+      >
+        <svg className="w-3.5 h-3.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+        <span>Delete</span>
+      </button>
+    </div>
+  );
+};
+
+interface SectionHiddenNoticeProps {
+  secCoreId: string;
+  isEditing: boolean;
+  hiddenSections?: string[];
+  onToggleHide: (secCoreId: string, isEditing: boolean) => void;
+}
+
+const SectionHiddenNotice: React.FC<SectionHiddenNoticeProps> = ({
+  secCoreId,
+  isEditing,
+  hiddenSections = [],
+  onToggleHide,
+}) => {
+  if (!hiddenSections.includes(secCoreId)) return null;
+
+  return (
+    <div className="flex items-center justify-between p-3.5 rounded-xl bg-amber-50 border-2 border-amber-300 text-amber-900 text-xs sm:text-sm font-semibold shadow-xs">
+      <div className="flex items-center space-x-2">
+        <span className="px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 font-black text-2xs uppercase tracking-wider">
+          HIDDEN ON LIVE WEBSITE
+        </span>
+        <span>This section is currently hidden on the website popup modal. Students will not see it.</span>
+      </div>
+      <button
+        type="button"
+        onClick={() => onToggleHide(secCoreId, isEditing)}
+        className="text-xs font-bold text-amber-800 underline hover:text-amber-950 ml-2 cursor-pointer whitespace-nowrap"
+      >
+        Unhide Now
+      </button>
+    </div>
+  );
+};
+
 const RedCrossCloseButton = ({ onClick, title = 'Close' }: { onClick: () => void; title?: string }) => (
   <button
     type="button"
@@ -563,6 +693,7 @@ export default function AdminPortalPage() {
 
   // New Course Template State
   const [newCourse, setNewCourse] = useState({
+    hiddenSections: [] as string[],
     code: '',
     title: '',
     folder: 'civil' as string,
@@ -1705,6 +1836,237 @@ export default function AdminPortalPage() {
   };
 
   // Add New Course to MongoDB & live sync to website
+  
+  // Section action handlers for both Add Modal and Edit Modal
+  const handleSectionAdd = (secCoreId: string, isEditing: boolean) => {
+    // Unhide the section if it was hidden
+    if (isEditing) {
+      if (editingCourse?.hiddenSections?.includes(secCoreId)) {
+        setEditingCourse(prev => prev ? {
+          ...prev,
+          hiddenSections: (prev.hiddenSections || []).filter(s => s !== secCoreId)
+        } : null);
+      }
+    } else {
+      if (newCourse.hiddenSections?.includes(secCoreId)) {
+        setNewCourse(prev => ({
+          ...prev,
+          hiddenSections: (prev.hiddenSections || []).filter(s => s !== secCoreId)
+        }));
+      }
+    }
+
+    if (secCoreId === 'sec-4') {
+      const newCard = {
+        title: 'New Training Highlight',
+        desc: 'Comprehensive practical training and mentor guidance for industry readiness.'
+      };
+      if (isEditing) {
+        setEditingCourse(prev => prev ? {
+          ...prev,
+          trainingHighlights: [...(prev.trainingHighlights || []), newCard]
+        } : null);
+      } else {
+        setNewCourse(prev => ({
+          ...prev,
+          trainingHighlights: [...(prev.trainingHighlights || []), newCard]
+        }));
+      }
+    } else if (secCoreId === 'sec-5') {
+      const newGuarantee = 'Dedicated 1:1 High-Performance Workstation Rig';
+      if (isEditing) {
+        setEditingCourse(prev => prev ? {
+          ...prev,
+          labGuarantees: [...(prev.labGuarantees || []), newGuarantee]
+        } : null);
+      } else {
+        setNewCourse(prev => ({
+          ...prev,
+          labGuarantees: [...(prev.labGuarantees || []), newGuarantee]
+        }));
+      }
+    } else if (secCoreId === 'sec-6') {
+      if (isEditing) {
+        const nextNum = String((editingCourse?.modules?.length || 0) + 1).padStart(2, '0');
+        const newMod: CourseModuleItem = {
+          number: nextNum,
+          title: `Unit ${nextNum}: Advanced Application & Industrial Workflows`,
+          hours: 20,
+          topics: ['Core architectural concepts', 'Practical lab hands-on drafting', 'Industry documentation']
+        };
+        setEditingCourse(prev => prev ? {
+          ...prev,
+          modules: [...(prev.modules || []), newMod]
+        } : null);
+      } else {
+        const nextNum = String((newCourse.modules?.length || 0) + 1).padStart(2, '0');
+        const newMod: CourseModuleItem = {
+          number: nextNum,
+          title: `Unit ${nextNum}: Advanced Application & Industrial Workflows`,
+          hours: 20,
+          topics: ['Core architectural concepts', 'Practical lab hands-on drafting', 'Industry documentation']
+        };
+        setNewCourse(prev => ({
+          ...prev,
+          modules: [...(prev.modules || []), newMod]
+        }));
+      }
+    } else if (secCoreId === 'sec-7') {
+      if (isEditing) {
+        const nextIdx = (editingCourse?.careerPathways?.length || 0) + 1;
+        const newStep: CareerPathwayStep = {
+          step: `Step 0${nextIdx}`,
+          experience: '2 - 4 Years',
+          role: 'Senior Project Design Specialist',
+          ctc: '₹8.0 - 12.0 LPA'
+        };
+        setEditingCourse(prev => prev ? {
+          ...prev,
+          careerPathways: [...(prev.careerPathways || []), newStep]
+        } : null);
+      } else {
+        const nextIdx = (newCourse.careerPathways?.length || 0) + 1;
+        const newStep: CareerPathwayStep = {
+          step: `Step 0${nextIdx}`,
+          experience: '2 - 4 Years',
+          role: 'Senior Project Design Specialist',
+          ctc: '₹8.0 - 12.0 LPA'
+        };
+        setNewCourse(prev => ({
+          ...prev,
+          careerPathways: [...(prev.careerPathways || []), newStep]
+        }));
+      }
+    } else if (secCoreId === 'sec-9') {
+      const newDeliv = 'Comprehensive Multi-Disciplinary Drawing & BIM Coordination Dossier';
+      if (isEditing) {
+        setEditingCourse(prev => {
+          if (!prev) return null;
+          const cp = prev.capstoneProject || { title: 'Industrial Capstone Portfolio', description: '', deliverables: [] };
+          return {
+            ...prev,
+            capstoneProject: {
+              ...cp,
+              deliverables: [...(cp.deliverables || []), newDeliv]
+            }
+          };
+        });
+      } else {
+        setNewCourse(prev => ({
+          ...prev,
+          capstoneDeliverablesText: prev.capstoneDeliverablesText
+            ? `${prev.capstoneDeliverablesText}, ${newDeliv}`
+            : newDeliv
+        }));
+      }
+    } else if (secCoreId === 'sec-10') {
+      const newFaq: CourseFaqItem = {
+        question: 'What career and placement support is provided after course completion?',
+        answer: 'Students receive 100% placement support including mock technical interviews, resume preparation, and direct placement drives.'
+      };
+      if (isEditing) {
+        setEditingCourse(prev => prev ? {
+          ...prev,
+          faqs: [...(prev.faqs || []), newFaq]
+        } : null);
+      } else {
+        setNewCourse(prev => ({
+          ...prev,
+          faqs: [...(prev.faqs || []), newFaq]
+        }));
+      }
+    }
+
+    handleSectionEdit(secCoreId, isEditing);
+  };
+
+  const handleSectionEdit = (secCoreId: string, isEditing: boolean) => {
+    const elId = `${isEditing ? 'edit-' : 'add-'}${secCoreId}`;
+    const el = document.getElementById(elId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const input = el.querySelector<HTMLInputElement | HTMLTextAreaElement>('input, textarea, select');
+      if (input) {
+        setTimeout(() => input.focus(), 250);
+      }
+    }
+  };
+
+  const handleSectionToggleHide = (secCoreId: string, isEditing: boolean) => {
+    if (isEditing) {
+      setEditingCourse(prev => {
+        if (!prev) return null;
+        const currentHidden = prev.hiddenSections || [];
+        const isHidden = currentHidden.includes(secCoreId);
+        const nextHidden = isHidden
+          ? currentHidden.filter(s => s !== secCoreId)
+          : [...currentHidden, secCoreId];
+        return { ...prev, hiddenSections: nextHidden };
+      });
+    } else {
+      setNewCourse(prev => {
+        const currentHidden = prev.hiddenSections || [];
+        const isHidden = currentHidden.includes(secCoreId);
+        const nextHidden = isHidden
+          ? currentHidden.filter(s => s !== secCoreId)
+          : [...currentHidden, secCoreId];
+        return { ...prev, hiddenSections: nextHidden };
+      });
+    }
+  };
+
+  const handleSectionDelete = (secCoreId: string, isEditing: boolean) => {
+    const secLabels: Record<string, string> = {
+      'sec-1': '1. Hero & Basics',
+      'sec-2': '2. Academic Facts',
+      'sec-3': '3. Overview',
+      'sec-4': '4. Training Highlights',
+      'sec-5': '5. Lab & Guarantees',
+      'sec-6': '6. Syllabus Units',
+      'sec-7': '7. Career Path',
+      'sec-8': '8. Certificate',
+      'sec-9': '9. Capstone Project',
+      'sec-10': '10. FAQs',
+    };
+    const label = secLabels[secCoreId] || secCoreId;
+    if (!window.confirm(`Are you sure you want to delete and hide Section [${label}]? This will reset its contents and remove it from the live website.`)) {
+      return;
+    }
+
+    if (isEditing) {
+      setEditingCourse(prev => {
+        if (!prev) return null;
+        const currentHidden = prev.hiddenSections || [];
+        const nextHidden = currentHidden.includes(secCoreId) ? currentHidden : [...currentHidden, secCoreId];
+        const updated = { ...prev, hiddenSections: nextHidden };
+        if (secCoreId === 'sec-3') updated.overview = '';
+        if (secCoreId === 'sec-4') updated.trainingHighlights = [];
+        if (secCoreId === 'sec-5') updated.labGuarantees = [];
+        if (secCoreId === 'sec-6') { updated.modules = []; updated.syllabus = []; }
+        if (secCoreId === 'sec-7') { updated.careerPathways = []; updated.careerRoles = []; }
+        if (secCoreId === 'sec-8') updated.certificateImage = '';
+        if (secCoreId === 'sec-9') updated.capstoneProject = { title: '', description: '', deliverables: [] };
+        if (secCoreId === 'sec-10') updated.faqs = [];
+        return updated;
+      });
+    } else {
+      setNewCourse(prev => {
+        const currentHidden = prev.hiddenSections || [];
+        const nextHidden = currentHidden.includes(secCoreId) ? currentHidden : [...currentHidden, secCoreId];
+        const updated = { ...prev, hiddenSections: nextHidden };
+        if (secCoreId === 'sec-3') updated.overview = '';
+        if (secCoreId === 'sec-4') updated.trainingHighlights = [];
+        if (secCoreId === 'sec-5') updated.labGuarantees = [];
+        if (secCoreId === 'sec-6') { updated.modules = []; updated.syllabusText = ''; }
+        if (secCoreId === 'sec-7') { updated.careerPathways = []; updated.careerRolesText = ''; }
+        if (secCoreId === 'sec-8') updated.certificateImage = '';
+        if (secCoreId === 'sec-9') { updated.capstoneTitle = ''; updated.capstoneDescription = ''; updated.capstoneDeliverablesText = ''; }
+        if (secCoreId === 'sec-10') updated.faqs = [];
+        return updated;
+      });
+    }
+  };
+
   const handleAddNewCourse = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCourse.title.trim()) return;
@@ -1769,6 +2131,7 @@ export default function AdminPortalPage() {
       image: newCourse.image || 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80',
       labImage: newCourse.labImage || 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80',
       certificateImage: newCourse.certificateImage || '',
+      hiddenSections: newCourse.hiddenSections || [],
       tagline: newCourse.tagline || newCourse.overview || 'Comprehensive engineering CAD curriculum with live lab exercises.',
       overview: newCourse.overview || 'Comprehensive engineering CAD curriculum with live lab exercises.',
       prerequisites: newCourse.prerequisites || 'Diploma / B.Tech / Working Professional',
@@ -1888,6 +2251,7 @@ export default function AdminPortalPage() {
       const syllabus = modules.map((m) => m.title);
 
       const updatedPayload: CourseItem = {
+        hiddenSections: editingCourse.hiddenSections || [],
         ...editingCourse,
         domain: matchedFolder.name,
         stream:
@@ -7102,29 +7466,41 @@ export default function AdminPortalPage() {
                 Order-Wise Sections:
               </span>
               {[
-                { id: 'add-sec-1', label: '1. Hero & Basics' },
-                { id: 'add-sec-2', label: '2. Academic Facts' },
-                { id: 'add-sec-3', label: '3. Overview' },
-                { id: 'add-sec-4', label: '4. Training Highlights' },
-                { id: 'add-sec-5', label: '5. Lab & Guarantees' },
-                { id: 'add-sec-6', label: '6. Syllabus Units' },
-                { id: 'add-sec-7', label: '7. Career Path' },
-                { id: 'add-sec-8', label: '8. Certificate' },
-                { id: 'add-sec-9', label: '9. Capstone Project' },
-                { id: 'add-sec-10', label: '10. FAQs' },
-              ].map((sec) => (
-                <button
-                  key={sec.id}
-                  type="button"
-                  onClick={() => {
-                    const el = document.getElementById(sec.id);
-                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }}
-                  className="px-3.5 py-1.5 rounded-lg bg-white border border-slate-300 hover:border-slate-800 text-slate-800 text-xs sm:text-sm font-bold whitespace-nowrap shadow-2xs hover:shadow-xs transition-all cursor-pointer"
-                >
-                  {sec.label}
-                </button>
-              ))}
+                { id: 'add-sec-1', coreId: 'sec-1', label: '1. Hero & Basics' },
+                { id: 'add-sec-2', coreId: 'sec-2', label: '2. Academic Facts' },
+                { id: 'add-sec-3', coreId: 'sec-3', label: '3. Overview' },
+                { id: 'add-sec-4', coreId: 'sec-4', label: '4. Training Highlights' },
+                { id: 'add-sec-5', coreId: 'sec-5', label: '5. Lab & Guarantees' },
+                { id: 'add-sec-6', coreId: 'sec-6', label: '6. Syllabus Units' },
+                { id: 'add-sec-7', coreId: 'sec-7', label: '7. Career Path' },
+                { id: 'add-sec-8', coreId: 'sec-8', label: '8. Certificate' },
+                { id: 'add-sec-9', coreId: 'sec-9', label: '9. Capstone Project' },
+                { id: 'add-sec-10', coreId: 'sec-10', label: '10. FAQs' },
+              ].map((sec) => {
+                const isHidden = (newCourse.hiddenSections || []).includes(sec.coreId);
+                return (
+                  <button
+                    key={sec.id}
+                    type="button"
+                    onClick={() => {
+                      const el = document.getElementById(sec.id);
+                      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                    className={`px-3.5 py-1.5 rounded-lg border text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer flex items-center space-x-1.5 ${
+                      isHidden
+                        ? 'bg-amber-50 border-amber-300 text-amber-800 hover:bg-amber-100 ring-1 ring-amber-300'
+                        : 'bg-white border-slate-300 hover:border-slate-800 text-slate-800 shadow-2xs hover:shadow-xs'
+                    }`}
+                  >
+                    <span>{sec.label}</span>
+                    {isHidden && (
+                      <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-200 text-amber-900 font-black uppercase">
+                        HIDDEN
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
 
             {/* Scrollable Form Body - Single Column Logical Website Order with High Visibility */}
@@ -7147,10 +7523,22 @@ export default function AdminPortalPage() {
                         </p>
                       </div>
                     </div>
-                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-red-50 text-red-700 border border-red-200 hidden sm:inline-block">
-                      Hero &amp; Catalog
-                    </span>
+                    <SectionHeaderActions
+                      secCoreId="sec-1"
+                      isEditing={false}
+                      hiddenSections={newCourse.hiddenSections}
+                      onAdd={handleSectionAdd}
+                      onEdit={handleSectionEdit}
+                      onToggleHide={handleSectionToggleHide}
+                      onDelete={handleSectionDelete}
+                    />
                   </div>
+                  <SectionHiddenNotice
+                    secCoreId="sec-1"
+                    isEditing={false}
+                    hiddenSections={newCourse.hiddenSections}
+                    onToggleHide={handleSectionToggleHide}
+                  />
 
                   {/* Title & Tagline */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -7356,10 +7744,22 @@ export default function AdminPortalPage() {
                         </p>
                       </div>
                     </div>
-                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200 hidden sm:inline-block">
-                      Section A 4 Pillars
-                    </span>
+                    <SectionHeaderActions
+                      secCoreId="sec-2"
+                      isEditing={false}
+                      hiddenSections={newCourse.hiddenSections}
+                      onAdd={handleSectionAdd}
+                      onEdit={handleSectionEdit}
+                      onToggleHide={handleSectionToggleHide}
+                      onDelete={handleSectionDelete}
+                    />
                   </div>
+                  <SectionHiddenNotice
+                    secCoreId="sec-2"
+                    isEditing={false}
+                    hiddenSections={newCourse.hiddenSections}
+                    onToggleHide={handleSectionToggleHide}
+                  />
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
@@ -7432,10 +7832,22 @@ export default function AdminPortalPage() {
                         </p>
                       </div>
                     </div>
-                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 hidden sm:inline-block">
-                      Live Overview Card
-                    </span>
+                    <SectionHeaderActions
+                      secCoreId="sec-3"
+                      isEditing={false}
+                      hiddenSections={newCourse.hiddenSections}
+                      onAdd={handleSectionAdd}
+                      onEdit={handleSectionEdit}
+                      onToggleHide={handleSectionToggleHide}
+                      onDelete={handleSectionDelete}
+                    />
                   </div>
+                  <SectionHiddenNotice
+                    secCoreId="sec-3"
+                    isEditing={false}
+                    hiddenSections={newCourse.hiddenSections}
+                    onToggleHide={handleSectionToggleHide}
+                  />
 
                   <div>
                     <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
@@ -7467,26 +7879,22 @@ export default function AdminPortalPage() {
                         </p>
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const cur = newCourse.trainingHighlights || [];
-                        setNewCourse({
-                          ...newCourse,
-                          trainingHighlights: [
-                            ...cur,
-                            {
-                              title: 'New CAD Desk Advantage',
-                              desc: 'Hands-on practical training with verified industry blueprints and placement support.',
-                            },
-                          ],
-                        });
-                      }}
-                      className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-bold uppercase transition-all shadow-sm cursor-pointer whitespace-nowrap"
-                    >
-                      + Add Highlight Card
-                    </button>
+                    <SectionHeaderActions
+                      secCoreId="sec-4"
+                      isEditing={false}
+                      hiddenSections={newCourse.hiddenSections}
+                      onAdd={handleSectionAdd}
+                      onEdit={handleSectionEdit}
+                      onToggleHide={handleSectionToggleHide}
+                      onDelete={handleSectionDelete}
+                    />
                   </div>
+                  <SectionHiddenNotice
+                    secCoreId="sec-4"
+                    isEditing={false}
+                    hiddenSections={newCourse.hiddenSections}
+                    onToggleHide={handleSectionToggleHide}
+                  />
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                     {(newCourse.trainingHighlights || []).map((thItem, thIdx) => (
@@ -7561,10 +7969,22 @@ export default function AdminPortalPage() {
                         </p>
                       </div>
                     </div>
-                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 hidden sm:inline-block">
-                      Lab &amp; Guarantees
-                    </span>
+                    <SectionHeaderActions
+                      secCoreId="sec-5"
+                      isEditing={false}
+                      hiddenSections={newCourse.hiddenSections}
+                      onAdd={handleSectionAdd}
+                      onEdit={handleSectionEdit}
+                      onToggleHide={handleSectionToggleHide}
+                      onDelete={handleSectionDelete}
+                    />
                   </div>
+                  <SectionHiddenNotice
+                    secCoreId="sec-5"
+                    isEditing={false}
+                    hiddenSections={newCourse.hiddenSections}
+                    onToggleHide={handleSectionToggleHide}
+                  />
 
                   {/* Part A: Secondary Workstation Lab Photo */}
                   <div className="p-5 bg-slate-50 rounded-2xl border-2 border-slate-200 space-y-3">
@@ -7744,31 +8164,22 @@ export default function AdminPortalPage() {
                         </p>
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const cur = newCourse.modules || [];
-                        const num = String(cur.length + 1).padStart(2, '0');
-                        const updated = [
-                          ...cur,
-                          {
-                            number: num,
-                            title: `Unit ${num} Advanced Topics & Industrial Workflows`,
-                            hours: 20,
-                            topics: ['Core engineering concepts', 'Parametric modeling & constraints', 'Practical lab drafting & validation'],
-                          },
-                        ];
-                        setNewCourse({
-                          ...newCourse,
-                          modules: updated,
-                          syllabusText: updated.map((m) => m.title).join('\n'),
-                        });
-                      }}
-                      className="px-5 py-2.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs sm:text-sm font-black uppercase tracking-wider shadow-sm transition-all cursor-pointer whitespace-nowrap"
-                    >
-                      + Add Syllabus Unit
-                    </button>
+                    <SectionHeaderActions
+                      secCoreId="sec-6"
+                      isEditing={false}
+                      hiddenSections={newCourse.hiddenSections}
+                      onAdd={handleSectionAdd}
+                      onEdit={handleSectionEdit}
+                      onToggleHide={handleSectionToggleHide}
+                      onDelete={handleSectionDelete}
+                    />
                   </div>
+                  <SectionHiddenNotice
+                    secCoreId="sec-6"
+                    isEditing={false}
+                    hiddenSections={newCourse.hiddenSections}
+                    onToggleHide={handleSectionToggleHide}
+                  />
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     {(newCourse.modules || []).map((mod, idx) => (
@@ -7864,29 +8275,22 @@ export default function AdminPortalPage() {
                         </p>
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const cur = newCourse.careerPathways || [];
-                        const nextNum = String(cur.length + 1).padStart(2, '0');
-                        setNewCourse({
-                          ...newCourse,
-                          careerPathways: [
-                            ...cur,
-                            {
-                              step: nextNum,
-                              experience: `${cur.length * 2} – ${(cur.length + 1) * 2} Yrs`,
-                              role: `Lead ${newCourse.title.split(' ')[0] || 'CAD'} Specialist`,
-                              ctc: '₹8.0L – ₹15.0L PA',
-                            },
-                          ],
-                        });
-                      }}
-                      className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold uppercase transition-all shadow-sm cursor-pointer whitespace-nowrap"
-                    >
-                      + Add Career Step
-                    </button>
+                    <SectionHeaderActions
+                      secCoreId="sec-7"
+                      isEditing={false}
+                      hiddenSections={newCourse.hiddenSections}
+                      onAdd={handleSectionAdd}
+                      onEdit={handleSectionEdit}
+                      onToggleHide={handleSectionToggleHide}
+                      onDelete={handleSectionDelete}
+                    />
                   </div>
+                  <SectionHiddenNotice
+                    secCoreId="sec-7"
+                    isEditing={false}
+                    hiddenSections={newCourse.hiddenSections}
+                    onToggleHide={handleSectionToggleHide}
+                  />
 
                   <div className="space-y-4">
                     {(newCourse.careerPathways || []).map((stepItem, sIdx) => (
@@ -7980,10 +8384,22 @@ export default function AdminPortalPage() {
                         </p>
                       </div>
                     </div>
-                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 hidden sm:inline-block">
-                      Section F Certificate
-                    </span>
+                    <SectionHeaderActions
+                      secCoreId="sec-8"
+                      isEditing={false}
+                      hiddenSections={newCourse.hiddenSections}
+                      onAdd={handleSectionAdd}
+                      onEdit={handleSectionEdit}
+                      onToggleHide={handleSectionToggleHide}
+                      onDelete={handleSectionDelete}
+                    />
                   </div>
+                  <SectionHiddenNotice
+                    secCoreId="sec-8"
+                    isEditing={false}
+                    hiddenSections={newCourse.hiddenSections}
+                    onToggleHide={handleSectionToggleHide}
+                  />
 
                   <div>
                     <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
@@ -8042,10 +8458,22 @@ export default function AdminPortalPage() {
                         </p>
                       </div>
                     </div>
-                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-teal-50 text-teal-700 border border-teal-200 hidden sm:inline-block">
-                      Section G Capstone
-                    </span>
+                    <SectionHeaderActions
+                      secCoreId="sec-9"
+                      isEditing={false}
+                      hiddenSections={newCourse.hiddenSections}
+                      onAdd={handleSectionAdd}
+                      onEdit={handleSectionEdit}
+                      onToggleHide={handleSectionToggleHide}
+                      onDelete={handleSectionDelete}
+                    />
                   </div>
+                  <SectionHiddenNotice
+                    secCoreId="sec-9"
+                    isEditing={false}
+                    hiddenSections={newCourse.hiddenSections}
+                    onToggleHide={handleSectionToggleHide}
+                  />
 
                   <div>
                     <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
@@ -8103,26 +8531,22 @@ export default function AdminPortalPage() {
                         </p>
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const cur = newCourse.faqs || [];
-                        setNewCourse({
-                          ...newCourse,
-                          faqs: [
-                            ...cur,
-                            {
-                              question: `What job placement support is provided for ${newCourse.title || 'this course'}?`,
-                              answer: 'Our placement cell conducts 3 rounds of mock technical CAD interviews and lines up direct interviews with top EPC and MNC recruiters.',
-                            },
-                          ],
-                        });
-                      }}
-                      className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold uppercase transition-all shadow-sm cursor-pointer whitespace-nowrap"
-                    >
-                      + Add FAQ Item
-                    </button>
+                    <SectionHeaderActions
+                      secCoreId="sec-10"
+                      isEditing={false}
+                      hiddenSections={newCourse.hiddenSections}
+                      onAdd={handleSectionAdd}
+                      onEdit={handleSectionEdit}
+                      onToggleHide={handleSectionToggleHide}
+                      onDelete={handleSectionDelete}
+                    />
                   </div>
+                  <SectionHiddenNotice
+                    secCoreId="sec-10"
+                    isEditing={false}
+                    hiddenSections={newCourse.hiddenSections}
+                    onToggleHide={handleSectionToggleHide}
+                  />
 
                   <div className="space-y-4">
                     {(newCourse.faqs || []).map((faqItem, fIdx) => (
@@ -8229,29 +8653,41 @@ export default function AdminPortalPage() {
                 Order-Wise Sections:
               </span>
               {[
-                { id: 'edit-sec-1', label: '1. Hero & Basics' },
-                { id: 'edit-sec-2', label: '2. Academic Facts' },
-                { id: 'edit-sec-3', label: '3. Overview' },
-                { id: 'edit-sec-4', label: '4. Training Highlights' },
-                { id: 'edit-sec-5', label: '5. Lab & Guarantees' },
-                { id: 'edit-sec-6', label: '6. Syllabus Units' },
-                { id: 'edit-sec-7', label: '7. Career Path' },
-                { id: 'edit-sec-8', label: '8. Certificate' },
-                { id: 'edit-sec-9', label: '9. Capstone Project' },
-                { id: 'edit-sec-10', label: '10. FAQs' },
-              ].map((sec) => (
-                <button
-                  key={sec.id}
-                  type="button"
-                  onClick={() => {
-                    const el = document.getElementById(sec.id);
-                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }}
-                  className="px-3.5 py-1.5 rounded-lg bg-white border border-slate-300 hover:border-slate-800 text-slate-800 text-xs sm:text-sm font-bold whitespace-nowrap shadow-2xs hover:shadow-xs transition-all cursor-pointer"
-                >
-                  {sec.label}
-                </button>
-              ))}
+                { id: 'edit-sec-1', coreId: 'sec-1', label: '1. Hero & Basics' },
+                { id: 'edit-sec-2', coreId: 'sec-2', label: '2. Academic Facts' },
+                { id: 'edit-sec-3', coreId: 'sec-3', label: '3. Overview' },
+                { id: 'edit-sec-4', coreId: 'sec-4', label: '4. Training Highlights' },
+                { id: 'edit-sec-5', coreId: 'sec-5', label: '5. Lab & Guarantees' },
+                { id: 'edit-sec-6', coreId: 'sec-6', label: '6. Syllabus Units' },
+                { id: 'edit-sec-7', coreId: 'sec-7', label: '7. Career Path' },
+                { id: 'edit-sec-8', coreId: 'sec-8', label: '8. Certificate' },
+                { id: 'edit-sec-9', coreId: 'sec-9', label: '9. Capstone Project' },
+                { id: 'edit-sec-10', coreId: 'sec-10', label: '10. FAQs' },
+              ].map((sec) => {
+                const isHidden = (editingCourse?.hiddenSections || []).includes(sec.coreId);
+                return (
+                  <button
+                    key={sec.id}
+                    type="button"
+                    onClick={() => {
+                      const el = document.getElementById(sec.id);
+                      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                    className={`px-3.5 py-1.5 rounded-lg border text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer flex items-center space-x-1.5 ${
+                      isHidden
+                        ? 'bg-amber-50 border-amber-300 text-amber-800 hover:bg-amber-100 ring-1 ring-amber-300'
+                        : 'bg-white border-slate-300 hover:border-slate-800 text-slate-800 shadow-2xs hover:shadow-xs'
+                    }`}
+                  >
+                    <span>{sec.label}</span>
+                    {isHidden && (
+                      <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-200 text-amber-900 font-black uppercase">
+                        HIDDEN
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
 
             {/* Scrollable Form Body - Single Column Logical Website Order with High Visibility */}
@@ -8274,10 +8710,22 @@ export default function AdminPortalPage() {
                         </p>
                       </div>
                     </div>
-                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 hidden sm:inline-block">
-                      Hero &amp; Catalog
-                    </span>
+                    <SectionHeaderActions
+                      secCoreId="sec-1"
+                      isEditing={true}
+                      hiddenSections={editingCourse?.hiddenSections}
+                      onAdd={handleSectionAdd}
+                      onEdit={handleSectionEdit}
+                      onToggleHide={handleSectionToggleHide}
+                      onDelete={handleSectionDelete}
+                    />
                   </div>
+                  <SectionHiddenNotice
+                    secCoreId="sec-1"
+                    isEditing={true}
+                    hiddenSections={editingCourse?.hiddenSections}
+                    onToggleHide={handleSectionToggleHide}
+                  />
 
                   {/* Title & Tagline */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -8488,10 +8936,22 @@ export default function AdminPortalPage() {
                         </p>
                       </div>
                     </div>
-                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200 hidden sm:inline-block">
-                      Section A 4 Pillars
-                    </span>
+                    <SectionHeaderActions
+                      secCoreId="sec-2"
+                      isEditing={true}
+                      hiddenSections={editingCourse?.hiddenSections}
+                      onAdd={handleSectionAdd}
+                      onEdit={handleSectionEdit}
+                      onToggleHide={handleSectionToggleHide}
+                      onDelete={handleSectionDelete}
+                    />
                   </div>
+                  <SectionHiddenNotice
+                    secCoreId="sec-2"
+                    isEditing={true}
+                    hiddenSections={editingCourse?.hiddenSections}
+                    onToggleHide={handleSectionToggleHide}
+                  />
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
@@ -8564,10 +9024,22 @@ export default function AdminPortalPage() {
                         </p>
                       </div>
                     </div>
-                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 hidden sm:inline-block">
-                      Live Overview Card
-                    </span>
+                    <SectionHeaderActions
+                      secCoreId="sec-3"
+                      isEditing={true}
+                      hiddenSections={editingCourse?.hiddenSections}
+                      onAdd={handleSectionAdd}
+                      onEdit={handleSectionEdit}
+                      onToggleHide={handleSectionToggleHide}
+                      onDelete={handleSectionDelete}
+                    />
                   </div>
+                  <SectionHiddenNotice
+                    secCoreId="sec-3"
+                    isEditing={true}
+                    hiddenSections={editingCourse?.hiddenSections}
+                    onToggleHide={handleSectionToggleHide}
+                  />
 
                   <div>
                     <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
@@ -8599,26 +9071,22 @@ export default function AdminPortalPage() {
                         </p>
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const cur = editingCourse.trainingHighlights || [];
-                        setEditingCourse({
-                          ...editingCourse,
-                          trainingHighlights: [
-                            ...cur,
-                            {
-                              title: 'New CAD Desk Advantage',
-                              desc: 'Hands-on practical training with verified industry blueprints and placement support.',
-                            },
-                          ],
-                        });
-                      }}
-                      className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-bold uppercase transition-all shadow-sm cursor-pointer whitespace-nowrap"
-                    >
-                      + Add Highlight Card
-                    </button>
+                    <SectionHeaderActions
+                      secCoreId="sec-4"
+                      isEditing={true}
+                      hiddenSections={editingCourse?.hiddenSections}
+                      onAdd={handleSectionAdd}
+                      onEdit={handleSectionEdit}
+                      onToggleHide={handleSectionToggleHide}
+                      onDelete={handleSectionDelete}
+                    />
                   </div>
+                  <SectionHiddenNotice
+                    secCoreId="sec-4"
+                    isEditing={true}
+                    hiddenSections={editingCourse?.hiddenSections}
+                    onToggleHide={handleSectionToggleHide}
+                  />
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                     {(editingCourse.trainingHighlights || []).map((thItem, thIdx) => (
@@ -8693,10 +9161,22 @@ export default function AdminPortalPage() {
                         </p>
                       </div>
                     </div>
-                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 hidden sm:inline-block">
-                      Lab &amp; Guarantees
-                    </span>
+                    <SectionHeaderActions
+                      secCoreId="sec-5"
+                      isEditing={true}
+                      hiddenSections={editingCourse?.hiddenSections}
+                      onAdd={handleSectionAdd}
+                      onEdit={handleSectionEdit}
+                      onToggleHide={handleSectionToggleHide}
+                      onDelete={handleSectionDelete}
+                    />
                   </div>
+                  <SectionHiddenNotice
+                    secCoreId="sec-5"
+                    isEditing={true}
+                    hiddenSections={editingCourse?.hiddenSections}
+                    onToggleHide={handleSectionToggleHide}
+                  />
 
                   {/* Part A: Secondary Workstation Lab Photo */}
                   <div className="p-5 bg-slate-50 rounded-2xl border-2 border-slate-200 space-y-3">
@@ -8876,31 +9356,22 @@ export default function AdminPortalPage() {
                         </p>
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const cur = editingCourse.modules || [];
-                        const num = String(cur.length + 1).padStart(2, '0');
-                        const updated = [
-                          ...cur,
-                          {
-                            number: num,
-                            title: `Unit ${num} Advanced Topics & Industrial Workflows`,
-                            hours: 20,
-                            topics: ['Core engineering concepts', 'Parametric modeling & constraints', 'Practical lab drafting & validation'],
-                          },
-                        ];
-                        setEditingCourse({
-                          ...editingCourse,
-                          modules: updated,
-                          syllabus: updated.map((m) => m.title),
-                        });
-                      }}
-                      className="px-5 py-2.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs sm:text-sm font-black uppercase tracking-wider shadow-sm transition-all cursor-pointer whitespace-nowrap"
-                    >
-                      + Add Syllabus Unit
-                    </button>
+                    <SectionHeaderActions
+                      secCoreId="sec-6"
+                      isEditing={true}
+                      hiddenSections={editingCourse?.hiddenSections}
+                      onAdd={handleSectionAdd}
+                      onEdit={handleSectionEdit}
+                      onToggleHide={handleSectionToggleHide}
+                      onDelete={handleSectionDelete}
+                    />
                   </div>
+                  <SectionHiddenNotice
+                    secCoreId="sec-6"
+                    isEditing={true}
+                    hiddenSections={editingCourse?.hiddenSections}
+                    onToggleHide={handleSectionToggleHide}
+                  />
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     {(editingCourse.modules || []).map((mod, idx) => (
@@ -8996,29 +9467,22 @@ export default function AdminPortalPage() {
                         </p>
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const cur = editingCourse.careerPathways || [];
-                        const nextNum = String(cur.length + 1).padStart(2, '0');
-                        setEditingCourse({
-                          ...editingCourse,
-                          careerPathways: [
-                            ...cur,
-                            {
-                              step: nextNum,
-                              experience: `${cur.length * 2} – ${(cur.length + 1) * 2} Yrs`,
-                              role: `Lead ${editingCourse.title.split(' ')[0] || 'CAD'} Specialist`,
-                              ctc: '₹8.0L – ₹15.0L PA',
-                            },
-                          ],
-                        });
-                      }}
-                      className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold uppercase transition-all shadow-sm cursor-pointer whitespace-nowrap"
-                    >
-                      + Add Career Step
-                    </button>
+                    <SectionHeaderActions
+                      secCoreId="sec-7"
+                      isEditing={true}
+                      hiddenSections={editingCourse?.hiddenSections}
+                      onAdd={handleSectionAdd}
+                      onEdit={handleSectionEdit}
+                      onToggleHide={handleSectionToggleHide}
+                      onDelete={handleSectionDelete}
+                    />
                   </div>
+                  <SectionHiddenNotice
+                    secCoreId="sec-7"
+                    isEditing={true}
+                    hiddenSections={editingCourse?.hiddenSections}
+                    onToggleHide={handleSectionToggleHide}
+                  />
 
                   <div className="space-y-4">
                     {(editingCourse.careerPathways || []).map((stepItem, sIdx) => (
@@ -9112,10 +9576,22 @@ export default function AdminPortalPage() {
                         </p>
                       </div>
                     </div>
-                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 hidden sm:inline-block">
-                      Section F Certificate
-                    </span>
+                    <SectionHeaderActions
+                      secCoreId="sec-8"
+                      isEditing={true}
+                      hiddenSections={editingCourse?.hiddenSections}
+                      onAdd={handleSectionAdd}
+                      onEdit={handleSectionEdit}
+                      onToggleHide={handleSectionToggleHide}
+                      onDelete={handleSectionDelete}
+                    />
                   </div>
+                  <SectionHiddenNotice
+                    secCoreId="sec-8"
+                    isEditing={true}
+                    hiddenSections={editingCourse?.hiddenSections}
+                    onToggleHide={handleSectionToggleHide}
+                  />
 
                   <div>
                     <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
@@ -9174,10 +9650,22 @@ export default function AdminPortalPage() {
                         </p>
                       </div>
                     </div>
-                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-teal-50 text-teal-700 border border-teal-200 hidden sm:inline-block">
-                      Section G Capstone
-                    </span>
+                    <SectionHeaderActions
+                      secCoreId="sec-9"
+                      isEditing={true}
+                      hiddenSections={editingCourse?.hiddenSections}
+                      onAdd={handleSectionAdd}
+                      onEdit={handleSectionEdit}
+                      onToggleHide={handleSectionToggleHide}
+                      onDelete={handleSectionDelete}
+                    />
                   </div>
+                  <SectionHiddenNotice
+                    secCoreId="sec-9"
+                    isEditing={true}
+                    hiddenSections={editingCourse?.hiddenSections}
+                    onToggleHide={handleSectionToggleHide}
+                  />
 
                   <div>
                     <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
@@ -9269,26 +9757,22 @@ export default function AdminPortalPage() {
                         </p>
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const cur = editingCourse.faqs || [];
-                        setEditingCourse({
-                          ...editingCourse,
-                          faqs: [
-                            ...cur,
-                            {
-                              question: `What job placement support is provided for ${editingCourse.title}?`,
-                              answer: 'Our placement cell conducts 3 rounds of mock technical CAD interviews and lines up direct interviews with top EPC and MNC recruiters.',
-                            },
-                          ],
-                        });
-                      }}
-                      className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold uppercase transition-all shadow-sm cursor-pointer whitespace-nowrap"
-                    >
-                      + Add FAQ Item
-                    </button>
+                    <SectionHeaderActions
+                      secCoreId="sec-10"
+                      isEditing={true}
+                      hiddenSections={editingCourse?.hiddenSections}
+                      onAdd={handleSectionAdd}
+                      onEdit={handleSectionEdit}
+                      onToggleHide={handleSectionToggleHide}
+                      onDelete={handleSectionDelete}
+                    />
                   </div>
+                  <SectionHiddenNotice
+                    secCoreId="sec-10"
+                    isEditing={true}
+                    hiddenSections={editingCourse?.hiddenSections}
+                    onToggleHide={handleSectionToggleHide}
+                  />
 
                   <div className="space-y-4">
                     {(editingCourse.faqs || []).map((faqItem, fIdx) => (
