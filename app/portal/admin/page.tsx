@@ -953,8 +953,13 @@ export default function AdminPortalPage() {
   const [reviewRatingFilter, setReviewRatingFilter] = useState<string>('all');
   const [isDeletingReviewId, setIsDeletingReviewId] = useState<string | null>(null);
 
-  // Live Classes Management State (Dynamic sync with Student Portal)
+    // Live Classes Management State (Enterprise Table & Real-Time Broadcast Pattern)
   const [liveSession, setLiveSession] = useState<LiveClassSession | null>(null);
+  const [liveHistory, setLiveHistory] = useState<LiveClassSession[]>([]);
+  const [liveSearchQuery, setLiveSearchQuery] = useState<string>('');
+  const [liveStatusFilter, setLiveStatusFilter] = useState<'all' | 'live' | 'scheduled' | 'ended'>('all');
+  const [showLiveModal, setShowLiveModal] = useState<boolean>(false);
+  const [editingLiveId, setEditingLiveId] = useState<string | null>(null);
   const [isLoadingLive, setIsLoadingLive] = useState<boolean>(false);
   const [isBroadcasting, setIsBroadcasting] = useState<boolean>(false);
   const [liveFormTitle, setLiveFormTitle] = useState<string>('Parametric Family Creation in Autodesk Revit');
@@ -1211,25 +1216,28 @@ export default function AdminPortalPage() {
   // Delete review by ID
   
   // Live Classes Fetcher & Broadcaster
-  const fetchLiveSession = async () => {
-    setIsLoadingLive(true);
+  const fetchLiveSession = async (silent = false) => {
+    if (!silent) setIsLoadingLive(true);
     try {
-      const res = await fetch('/api/live-classes');
+      const res = await fetch('/api/live-classes?t=' + Date.now());
       const data = await res.json();
-      if (data.success && data.liveClass) {
-        setLiveSession(data.liveClass);
-        setLiveFormTitle(data.liveClass.title || '');
-        setLiveFormTrainer(data.liveClass.trainer || 'Er. Swamy Naidu');
-        setLiveFormCourse(data.liveClass.course || 'Civil CADD & Master BIM');
-        setLiveFormUrl(data.liveClass.streamUrl || 'https://meet.google.com/new');
-        setLiveFormPlatform(data.liveClass.platform || 'Virtual CAD Workstation');
-        setLiveFormTiming(data.liveClass.timing || 'Live Broadcast Active');
-        setLiveFormDescription(data.liveClass.description || '');
+      if (data.success) {
+        if (data.liveClass) {
+          setLiveSession(data.liveClass);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('rnd_cadd_live_session', JSON.stringify(data.liveClass));
+          }
+        }
+        if (Array.isArray(data.history) && data.history.length > 0) {
+          setLiveHistory(data.history);
+        } else if (data.liveClass) {
+          setLiveHistory([data.liveClass]);
+        }
       }
     } catch (err) {
       console.warn('Failed to load live class details:', err);
     } finally {
-      setIsLoadingLive(false);
+      if (!silent) setIsLoadingLive(false);
     }
   };
 
@@ -1241,6 +1249,7 @@ export default function AdminPortalPage() {
     setIsBroadcasting(true);
     try {
       const payload = {
+        id: editingLiveId || undefined,
         title: liveFormTitle,
         trainer: liveFormTrainer,
         course: liveFormCourse,
@@ -1258,7 +1267,14 @@ export default function AdminPortalPage() {
       const data = await res.json();
       if (data.success) {
         setLiveSession(data.liveClass);
-        alert(status === 'Live Now' ? '🚀 Live class broadcast is active on Student Portal!' : '📅 Upcoming class scheduled on Student Portal!');
+        if (Array.isArray(data.history)) setLiveHistory(data.history);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('rnd_cadd_live_session', JSON.stringify(data.liveClass));
+          window.dispatchEvent(new Event('storage'));
+        }
+        setShowLiveModal(false);
+        setEditingLiveId(null);
+        showToast(status === 'Live Now' ? '🚀 Live class broadcast is active on Student Portal!' : '📅 Upcoming class scheduled successfully!');
       } else {
         alert(data.message || 'Failed to update live class.');
       }
@@ -1270,21 +1286,49 @@ export default function AdminPortalPage() {
     }
   };
 
-  const handleEndLiveSession = async () => {
-    if (!confirm('End current live broadcast? Students will see session ended.')) return;
+  const handleEndLiveSession = async (sessionId?: string) => {
+    if (!confirm('Are you sure you want to END the live broadcast? Students will see session ended immediately.')) return;
+    setIsBroadcasting(true);
     try {
       const res = await fetch('/api/live-classes', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'Ended' }),
+        body: JSON.stringify({ status: 'Ended', id: sessionId || liveSession?.id }),
       });
       const data = await res.json();
       if (data.success) {
         setLiveSession(data.liveClass);
-        alert('Live session has ended.');
+        if (Array.isArray(data.history)) setLiveHistory(data.history);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('rnd_cadd_live_session', JSON.stringify(data.liveClass));
+          window.dispatchEvent(new Event('storage'));
+        }
+        showToast('Live stream has ended. Student portal is now offline.');
       }
     } catch (err) {
       console.error('End session error:', err);
+      alert('Network error ending live session.');
+    } finally {
+      setIsBroadcasting(false);
+    }
+  };
+
+  const handleDeleteLiveSession = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this live session record?')) return;
+    try {
+      const res = await fetch(`/api/live-classes?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        if (data.liveClass) setLiveSession(data.liveClass);
+        if (Array.isArray(data.history)) setLiveHistory(data.history);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('rnd_cadd_live_session', JSON.stringify(data.liveClass));
+          window.dispatchEvent(new Event('storage'));
+        }
+        showToast('Live session deleted.');
+      }
+    } catch (err) {
+      console.error('Delete live session error:', err);
     }
   };
 
@@ -3510,6 +3554,25 @@ export default function AdminPortalPage() {
             </div>
 
             <div className="flex items-center space-x-3">
+              {activeTab === 'Live' && (
+                <button
+                  onClick={() => {
+                    setEditingLiveId(null);
+                    setLiveFormTitle('');
+                    setLiveFormTrainer('Er. Swamy Naidu');
+                    setLiveFormCourse('Civil CADD & Master BIM');
+                    setLiveFormUrl('https://meet.google.com/new');
+                    setLiveFormPlatform('Virtual CAD Workstation');
+                    setLiveFormTiming('Live Broadcast Active (Lab Session)');
+                    setLiveFormDescription('');
+                    setShowLiveModal(true);
+                  }}
+                  className="px-4 py-2 rounded-lg text-sm font-semibold bg-[#EE2C3C] hover:bg-[#D71E2E] text-white shadow-sm transition-all cursor-pointer flex items-center space-x-1.5"
+                >
+                  <span>+</span>
+                  <span>Broadcast / Schedule Live Class</span>
+                </button>
+              )}
               {activeTab === 'Student' && (
                 <button
                   onClick={() => setShowAddStudentModal(true)}
@@ -6453,299 +6516,333 @@ export default function AdminPortalPage() {
             </div>
           )}
 
-        </div>
-      </main>
-
-      
-          {/* TAB: LIVE CLASSES MANAGEMENT (Dynamic live broadcast to student portal) */}
+          {/* TAB: LIVE CLASSES MANAGEMENT (Enterprise Directory & Broadcast Pattern) */}
           {activeTab === 'Live' && (
             <div className="space-y-6">
-              {/* Broadcast Status Hero Bar */}
-              <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs">
-                <div className="flex items-center space-x-3.5">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                    liveSession?.status === 'Live Now'
-                      ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
-                      : liveSession?.status === 'Scheduled'
-                        ? 'bg-sky-50 text-sky-600 border border-sky-200'
-                        : 'bg-slate-100 text-slate-500 border border-slate-200'
-                  }`}>
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
-                    </svg>
+              {/* Dynamic Live Statistics Cards */}
+              <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                  <span className="text-xs sm:text-sm font-bold text-[#666666] uppercase tracking-wider block">
+                    Active Broadcast
+                  </span>
+                  <div className="flex items-center space-x-2 mt-1">
+                    <span className={`w-3 h-3 rounded-full ${liveSession?.status === 'Live Now' && liveSession?.isLive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
+                    <span className={`text-xl sm:text-2xl font-extrabold ${liveSession?.status === 'Live Now' && liveSession?.isLive ? 'text-emerald-600' : 'text-slate-700'}`}>
+                      {liveSession?.status === 'Live Now' && liveSession?.isLive ? 'LIVE NOW' : 'OFFLINE'}
+                    </span>
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className={`w-2.5 h-2.5 rounded-full ${
-                        liveSession?.status === 'Live Now'
-                          ? 'bg-emerald-500 animate-pulse'
-                          : liveSession?.status === 'Scheduled'
-                            ? 'bg-sky-500'
-                            : 'bg-slate-400'
-                      }`} />
-                      <span className={`text-xs font-bold uppercase tracking-wide ${
-                        liveSession?.status === 'Live Now'
-                          ? 'text-emerald-700'
-                          : liveSession?.status === 'Scheduled'
-                            ? 'text-sky-700'
-                            : 'text-slate-600'
-                      }`}>
-                        {liveSession?.status === 'Live Now'
-                          ? 'Live Stream Broadcast Active'
-                          : liveSession?.status === 'Scheduled'
-                            ? 'Class Scheduled for Students'
-                            : 'Broadcast Offline (No Active Session)'}
-                      </span>
-                    </div>
-                    <h3 className="text-lg font-bold text-[#131313] mt-0.5">
-                      {liveSession?.title || 'No Live Class Configured'}
-                    </h3>
-                  </div>
+                  <span className="text-xs sm:text-sm text-slate-400 block mt-0.5 font-medium">
+                    Real-time Workstation
+                  </span>
                 </div>
 
-                <div className="flex items-center gap-2 flex-wrap">
-                  {liveSession?.status === 'Live Now' ? (
+                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                  <span className="text-xs sm:text-sm font-bold text-[#666666] uppercase tracking-wider block">
+                    Total Broadcasts
+                  </span>
+                  <span className="text-2xl sm:text-3xl font-extrabold text-[#131313] block mt-1">
+                    {liveHistory.length}
+                  </span>
+                  <span className="text-xs sm:text-sm text-slate-400 block mt-0.5 font-medium">
+                    Session Records
+                  </span>
+                </div>
+
+                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                  <span className="text-xs sm:text-sm font-bold text-[#666666] uppercase tracking-wider block">
+                    Current / Next Topic
+                  </span>
+                  <span className="text-sm font-bold text-[#131313] block mt-1 truncate" title={liveSession?.title || 'No Session'}>
+                    {liveSession?.title || 'No Active Topic'}
+                  </span>
+                  <span className="text-xs sm:text-sm text-slate-400 block mt-0.5 font-medium">
+                    Curriculum Unit
+                  </span>
+                </div>
+
+                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                  <span className="text-xs sm:text-sm font-bold text-[#666666] uppercase tracking-wider block">
+                    Lead Trainer
+                  </span>
+                  <span className="text-sm font-bold text-[#131313] block mt-1 truncate">
+                    {liveSession?.trainer || 'Er. Swamy Naidu'}
+                  </span>
+                  <span className="text-xs sm:text-sm text-slate-400 block mt-0.5 font-medium">
+                    Faculty Mentor
+                  </span>
+                </div>
+
+                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm col-span-2 lg:col-span-1">
+                  <span className="text-xs sm:text-sm font-bold text-[#666666] uppercase tracking-wider block">
+                    Platform
+                  </span>
+                  <span className="text-sm font-bold text-[#131313] block mt-1 truncate">
+                    {liveSession?.platform || 'Virtual CAD Workstation'}
+                  </span>
+                  <span className="text-xs sm:text-sm text-slate-400 block mt-0.5 font-medium">
+                    CAD Lab Stream
+                  </span>
+                </div>
+              </div>
+
+              {/* Active Emergency Broadcast Alert Banner (Shown when Live) */}
+              {liveSession?.status === 'Live Now' && liveSession?.isLive && (
+                <div className="bg-emerald-50 border-2 border-emerald-300 rounded-2xl p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm animate-fadeIn">
+                  <div className="flex items-center space-x-4">
+                    <span className="relative flex h-4 w-4">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500" />
+                    </span>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-200/60 px-2 py-0.5 rounded">
+                          BROADCAST CURRENTLY LIVE ON STUDENT PORTAL
+                        </span>
+                        <span className="text-xs font-mono font-bold text-slate-600">
+                          {liveSession.platform}
+                        </span>
+                      </div>
+                      <h3 className="text-lg font-bold text-slate-900 mt-1">
+                        {liveSession.title}
+                      </h3>
+                      <p className="text-xs text-slate-600 mt-0.5">
+                        Trainer: <span className="font-bold text-slate-900">{liveSession.trainer}</span> &bull; Audience: {liveSession.course}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <a
+                      href={liveSession.streamUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2.5 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 text-xs sm:text-sm font-bold transition-all shadow-2xs inline-flex items-center space-x-1.5"
+                    >
+                      <span>Join Screen</span>
+                      <span>↗</span>
+                    </a>
                     <button
-                      onClick={handleEndLiveSession}
-                      className="px-4 py-2.5 rounded-xl bg-white border border-rose-300 text-rose-600 hover:bg-rose-50 text-xs sm:text-sm font-bold transition-all shadow-xs cursor-pointer flex items-center space-x-1.5"
+                      onClick={() => handleEndLiveSession(liveSession.id)}
+                      disabled={isBroadcasting}
+                      className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-bold transition-all shadow-sm cursor-pointer flex items-center space-x-1.5"
                     >
                       <span>⏹</span>
-                      <span>End Live Stream</span>
+                      <span>{isBroadcasting ? 'Ending...' : 'End Live Stream Immediately'}</span>
                     </button>
-                  ) : (
+                  </div>
+                </div>
+              )}
+
+              {/* Table Directory Controls (Search + Filters + Sync) */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+                  {[
+                    { id: 'all', label: 'All Sessions', count: liveHistory.length },
+                    { id: 'live', label: 'Live Now', count: liveHistory.filter((s) => s.status === 'Live Now' && s.isLive).length },
+                    { id: 'scheduled', label: 'Scheduled', count: liveHistory.filter((s) => s.status === 'Scheduled' && !s.isLive).length },
+                    { id: 'ended', label: 'Ended / Offline', count: liveHistory.filter((s) => s.status === 'Ended' || !s.isLive).length },
+                  ].map((filterTab) => (
                     <button
-                      onClick={() => handleBroadcastLive('Live Now')}
-                      disabled={isBroadcasting}
-                      className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold transition-all shadow-xs cursor-pointer flex items-center space-x-1.5"
+                      key={filterTab.id}
+                      onClick={() => setLiveStatusFilter(filterTab.id as any)}
+                      className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                        liveStatusFilter === filterTab.id
+                          ? 'bg-[#131313] text-white shadow-xs'
+                          : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                      }`}
                     >
-                      <span>●</span>
-                      <span>{isBroadcasting ? 'Broadcasting...' : 'Go Live Now'}</span>
+                      {filterTab.label} ({filterTab.count})
                     </button>
-                  )}
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1 sm:w-64">
+                    <input
+                      type="text"
+                      value={liveSearchQuery}
+                      onChange={(e) => setLiveSearchQuery(e.target.value)}
+                      placeholder="Search live sessions..."
+                      className="w-full px-3.5 py-1.5 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:border-[#EE2C3C] shadow-2xs"
+                    />
+                  </div>
                   <button
-                    onClick={fetchLiveSession}
+                    onClick={() => fetchLiveSession(false)}
                     disabled={isLoadingLive}
-                    className="px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold transition-all shadow-2xs cursor-pointer"
+                    className="px-3 py-1.5 text-xs font-semibold rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition-all shadow-2xs cursor-pointer"
                   >
-                    ↻ Sync Status
+                    ↻ Sync
                   </button>
                 </div>
               </div>
 
-              {/* 2-Column Grid: Left Broadcast Form, Right Real-Time Student Preview */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                
-                {/* LEFT COLUMN: Broadcast Controls (7 cols) */}
-                <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-6 sm:p-7 space-y-5 shadow-xs">
-                  <div className="border-b border-slate-100 pb-4">
-                    <h4 className="text-base font-bold text-[#131313]">
-                      Configure Live Class Broadcast
-                    </h4>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Enter session details below. When you broadcast, these will instantly reflect inside the student portal live section.
-                    </p>
-                  </div>
+              {/* Live Sessions Enterprise Data Table */}
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-xs sm:text-sm">
+                    <thead>
+                      <tr className="bg-slate-50/80 border-b border-slate-200 text-[#666666] font-bold text-[11px] sm:text-xs uppercase tracking-wider">
+                        <th className="py-3.5 px-4 sm:px-6">Session Topic &amp; Platform</th>
+                        <th className="py-3.5 px-4">Instructor</th>
+                        <th className="py-3.5 px-4">Target Course</th>
+                        <th className="py-3.5 px-4">Timing &amp; Schedule</th>
+                        <th className="py-3.5 px-4">Status</th>
+                        <th className="py-3.5 px-4 sm:px-6 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {(() => {
+                        const filtered = liveHistory.filter((s) => {
+                          const matchesQuery =
+                            s.title.toLowerCase().includes(liveSearchQuery.toLowerCase()) ||
+                            s.trainer.toLowerCase().includes(liveSearchQuery.toLowerCase()) ||
+                            s.course.toLowerCase().includes(liveSearchQuery.toLowerCase());
+                          if (!matchesQuery) return false;
+                          if (liveStatusFilter === 'live') return s.status === 'Live Now' && s.isLive;
+                          if (liveStatusFilter === 'scheduled') return s.status === 'Scheduled' && !s.isLive;
+                          if (liveStatusFilter === 'ended') return s.status === 'Ended' || !s.isLive;
+                          return true;
+                        });
 
-                  <div className="space-y-4">
-                    {/* Session Title */}
-                    <div>
-                      <label className="text-xs font-bold text-slate-700 block mb-1">
-                        Live Class Topic / Session Title *
-                      </label>
-                      <input
-                        type="text"
-                        value={liveFormTitle}
-                        onChange={(e) => setLiveFormTitle(e.target.value)}
-                        placeholder="e.g. Parametric Family Creation & Advanced Modeling in Autodesk Revit"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-[#131313] focus:outline-none focus:border-[#EE2C3C] bg-white transition-all shadow-2xs"
-                      />
-                    </div>
+                        if (filtered.length === 0) {
+                          return (
+                            <tr>
+                              <td colSpan={6} className="py-12 text-center text-slate-400">
+                                <div className="max-w-sm mx-auto space-y-2">
+                                  <p className="font-semibold text-slate-600">No live sessions found</p>
+                                  <p className="text-xs">Click &quot;Broadcast / Schedule Live Class&quot; above to create an active workstation stream.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        }
 
-                    {/* Trainer & Target Course */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-xs font-bold text-slate-700 block mb-1">
-                          Instructor / Lead Trainer
-                        </label>
-                        <input
-                          type="text"
-                          value={liveFormTrainer}
-                          onChange={(e) => setLiveFormTrainer(e.target.value)}
-                          placeholder="e.g. Er. Swamy Naidu"
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-[#131313] focus:outline-none focus:border-[#EE2C3C] bg-white transition-all shadow-2xs"
-                        />
-                      </div>
+                        return filtered.map((session) => {
+                          const isCurrentlyLive = session.status === 'Live Now' && session.isLive;
+                          return (
+                            <tr key={session.id} className="hover:bg-slate-50/60 transition-colors">
+                              <td className="py-4 px-4 sm:px-6">
+                                <div className="space-y-1">
+                                  <span className="font-bold text-[#131313] block leading-snug">
+                                    {session.title}
+                                  </span>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-[10px] font-mono font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
+                                      {session.platform}
+                                    </span>
+                                    <a
+                                      href={session.streamUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-[11px] text-[#EE2C3C] hover:underline font-medium truncate max-w-[200px] inline-block"
+                                    >
+                                      {session.streamUrl}
+                                    </a>
+                                  </div>
+                                </div>
+                              </td>
 
-                      <div>
-                        <label className="text-xs font-bold text-slate-700 block mb-1">
-                          Target Course / Audience
-                        </label>
-                        <select
-                          value={liveFormCourse}
-                          onChange={(e) => setLiveFormCourse(e.target.value)}
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-[#131313] focus:outline-none focus:border-[#EE2C3C] bg-white transition-all shadow-2xs"
-                        >
-                          <option value="All Enrolled Students">All Enrolled Students</option>
-                          {courses.map((c) => (
-                            <option key={c.id || c.code} value={c.title}>
-                              {c.title}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
+                              <td className="py-4 px-4 font-semibold text-slate-800">
+                                {session.trainer}
+                              </td>
 
-                    {/* Stream URL & Platform */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-xs font-bold text-slate-700 block mb-1">
-                          Stream / Meeting Link (URL) *
-                        </label>
-                        <input
-                          type="url"
-                          value={liveFormUrl}
-                          onChange={(e) => setLiveFormUrl(e.target.value)}
-                          placeholder="https://meet.google.com/..."
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-[#131313] focus:outline-none focus:border-[#EE2C3C] bg-white transition-all shadow-2xs font-mono"
-                        />
-                      </div>
+                              <td className="py-4 px-4">
+                                <span className="inline-block text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200">
+                                  {session.course}
+                                </span>
+                              </td>
 
-                      <div>
-                        <label className="text-xs font-bold text-slate-700 block mb-1">
-                          Streaming Platform
-                        </label>
-                        <select
-                          value={liveFormPlatform}
-                          onChange={(e) => setLiveFormPlatform(e.target.value as any)}
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-[#131313] focus:outline-none focus:border-[#EE2C3C] bg-white transition-all shadow-2xs"
-                        >
-                          <option value="Virtual CAD Workstation">Virtual CAD Workstation</option>
-                          <option value="Google Meet">Google Meet</option>
-                          <option value="Zoom">Zoom</option>
-                          <option value="YouTube Live">YouTube Live</option>
-                          <option value="Microsoft Teams">Microsoft Teams</option>
-                        </select>
-                      </div>
-                    </div>
+                              <td className="py-4 px-4 font-mono text-xs text-slate-600">
+                                {session.timing}
+                              </td>
 
-                    {/* Timing Label */}
-                    <div>
-                      <label className="text-xs font-bold text-slate-700 block mb-1">
-                        Timing / Schedule Display Label
-                      </label>
-                      <input
-                        type="text"
-                        value={liveFormTiming}
-                        onChange={(e) => setLiveFormTiming(e.target.value)}
-                        placeholder="e.g. Today, 10:00 AM - 12:30 PM (Lab Session)"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-[#131313] focus:outline-none focus:border-[#EE2C3C] bg-white transition-all shadow-2xs"
-                      />
-                    </div>
+                              <td className="py-4 px-4">
+                                {isCurrentlyLive ? (
+                                  <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                    <span>Live Now</span>
+                                  </span>
+                                ) : session.status === 'Scheduled' ? (
+                                  <span className="inline-flex items-center gap-1.5 text-xs font-bold text-sky-700 bg-sky-50 px-2.5 py-1 rounded-full border border-sky-200">
+                                    <span>Scheduled</span>
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full border border-slate-200">
+                                    <span>Ended</span>
+                                  </span>
+                                )}
+                              </td>
 
-                    {/* Instructions / Description */}
-                    <div>
-                      <label className="text-xs font-bold text-slate-700 block mb-1">
-                        Student Guidelines &amp; Lab Instructions
-                      </label>
-                      <textarea
-                        rows={3}
-                        value={liveFormDescription}
-                        onChange={(e) => setLiveFormDescription(e.target.value)}
-                        placeholder="e.g. Trainer Er. Swamy Naidu is demonstrating Parametric Revit Families. Connect to workstation screen."
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm text-[#131313] focus:outline-none focus:border-[#EE2C3C] bg-white transition-all shadow-2xs resize-none"
-                      />
-                    </div>
+                              <td className="py-4 px-4 sm:px-6 text-right whitespace-nowrap">
+                                <div className="flex items-center justify-end space-x-2">
+                                  {isCurrentlyLive ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleEndLiveSession(session.id)}
+                                      className="px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-100 transition-all cursor-pointer"
+                                    >
+                                      End Stream
+                                    </button>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setEditingLiveId(session.id);
+                                        setLiveFormTitle(session.title);
+                                        setLiveFormTrainer(session.trainer);
+                                        setLiveFormCourse(session.course);
+                                        setLiveFormUrl(session.streamUrl);
+                                        setLiveFormPlatform(session.platform);
+                                        setLiveFormTiming('Live Broadcast Active');
+                                        setLiveFormDescription(session.description);
+                                        handleBroadcastLive('Live Now');
+                                      }}
+                                      className="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-all cursor-pointer"
+                                    >
+                                      Go Live
+                                    </button>
+                                  )}
 
-                    {/* Action Buttons */}
-                    <div className="pt-3 border-t border-slate-100 flex items-center gap-3 flex-wrap">
-                      <button
-                        type="button"
-                        onClick={() => handleBroadcastLive('Live Now')}
-                        disabled={isBroadcasting}
-                        className="px-6 py-2.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs sm:text-sm font-bold shadow-xs hover:shadow-md transition-all cursor-pointer flex items-center space-x-2"
-                      >
-                        <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                        <span>{isBroadcasting ? 'Broadcasting...' : 'Broadcast Live to Students →'}</span>
-                      </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setEditingLiveId(session.id);
+                                      setLiveFormTitle(session.title);
+                                      setLiveFormTrainer(session.trainer);
+                                      setLiveFormCourse(session.course);
+                                      setLiveFormUrl(session.streamUrl);
+                                      setLiveFormPlatform(session.platform);
+                                      setLiveFormTiming(session.timing);
+                                      setLiveFormDescription(session.description);
+                                      setShowLiveModal(true);
+                                    }}
+                                    className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 border border-slate-200 hover:bg-slate-100 transition-all cursor-pointer"
+                                  >
+                                    Edit
+                                  </button>
 
-                      <button
-                        type="button"
-                        onClick={() => handleBroadcastLive('Scheduled')}
-                        disabled={isBroadcasting}
-                        className="px-5 py-2.5 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-bold transition-all shadow-2xs cursor-pointer"
-                      >
-                        Schedule for Later
-                      </button>
-                    </div>
-                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteLiveSession(session.id)}
+                                    className="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-rose-500 hover:bg-rose-50 transition-all cursor-pointer"
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        });
+                      })()}
+                    </tbody>
+                  </table>
                 </div>
-
-                {/* RIGHT COLUMN: Real-Time Student Portal Preview (5 cols) */}
-                <div className="lg:col-span-5 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">
-                      Student Portal Live Preview
-                    </span>
-                    <span className="text-[11px] font-mono text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-bold">
-                      Live Dynamic Sync
-                    </span>
-                  </div>
-
-                  {/* Preview Card (Mirrors student portal view) */}
-                  <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-5">
-                    <div>
-                      <div className="flex items-center space-x-2 mb-2">
-                        <span className={`w-2.5 h-2.5 rounded-full ${liveFormTitle ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
-                        <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">
-                          Live Now
-                        </span>
-                        <span className="text-xs font-mono text-slate-500 font-semibold">
-                          {liveFormPlatform}
-                        </span>
-                      </div>
-                      <h4 className="text-lg font-bold text-[#131313] leading-snug">
-                        {liveFormTitle || 'Session Title'}
-                      </h4>
-                      <p className="text-xs text-slate-500 font-medium mt-1">
-                        Trainer: <span className="text-slate-800 font-bold">{liveFormTrainer || 'Trainer Name'}</span> &bull; {liveFormCourse}
-                      </p>
-                      <span className="inline-block mt-2 text-[11px] font-mono font-bold text-slate-600 bg-slate-50 px-2.5 py-1 rounded border border-slate-200">
-                        {liveFormTiming || 'Timing Label'}
-                      </span>
-                    </div>
-
-                    {liveFormDescription && (
-                      <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 leading-relaxed">
-                        <span className="font-bold text-slate-900 block mb-0.5">Instructions:</span>
-                        {liveFormDescription}
-                      </div>
-                    )}
-
-                    <div className="p-6 rounded-xl bg-slate-50/80 border border-slate-200 text-center space-y-3">
-                      <span className="text-xs font-bold text-slate-500 block uppercase tracking-wide">
-                        CAD Workstation Stream Ready
-                      </span>
-                      <a
-                        href={liveFormUrl || '#'}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center space-x-2 px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#EE2C3C] text-white shadow-xs"
-                      >
-                        <span>Connect to Live Workstation Screen</span>
-                        <span>&rarr;</span>
-                      </a>
-                    </div>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-500 leading-relaxed">
-                    <span className="font-bold text-slate-700 block mb-1">ℹ Real-time Portal Sync:</span>
-                    When you click &quot;Broadcast Live to Students&quot;, this session immediately shows on the Student Portal with the active link. Students will be able to join with a single click.
-                  </div>
-                </div>
-
               </div>
             </div>
           )}
+
+        </div>
+      </main>
 
       {/* MODAL 1: FULL-SCREEN EDIT COURSE & ACCESS MODAL */}
       {assignModalStudent && (
@@ -11605,6 +11702,173 @@ export default function AdminPortalPage() {
           </div>
         </div>
       )}
+
+      {/* MODAL: BROADCAST / SCHEDULE LIVE CLASS */}
+      {showLiveModal && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden animate-fadeIn">
+            <div className="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-[#131313]">
+                  {editingLiveId ? 'Edit Live Class Details' : 'Broadcast / Schedule Live Class'}
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Configure real-time workstation screen broadcasting directly to the student portal.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLiveModal(false);
+                  setEditingLiveId(null);
+                }}
+                className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center text-lg font-bold cursor-pointer transition-colors"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Live Class Topic / Session Title *
+                </label>
+                <input
+                  type="text"
+                  value={liveFormTitle}
+                  onChange={(e) => setLiveFormTitle(e.target.value)}
+                  placeholder="e.g. Parametric Family Creation in Autodesk Revit"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#EE2C3C] shadow-2xs"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">
+                    Instructor / Lead Trainer *
+                  </label>
+                  <input
+                    type="text"
+                    value={liveFormTrainer}
+                    onChange={(e) => setLiveFormTrainer(e.target.value)}
+                    placeholder="e.g. Er. Swamy Naidu"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#EE2C3C] shadow-2xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">
+                    Target Course / Audience
+                  </label>
+                  <select
+                    value={liveFormCourse}
+                    onChange={(e) => setLiveFormCourse(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#EE2C3C] shadow-2xs"
+                  >
+                    <option value="All Enrolled Students">All Enrolled Students</option>
+                    {courses.map((c) => (
+                      <option key={c.id || c.code} value={c.title}>
+                        {c.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">
+                    Stream / Meeting Link (URL) *
+                  </label>
+                  <input
+                    type="url"
+                    value={liveFormUrl}
+                    onChange={(e) => setLiveFormUrl(e.target.value)}
+                    placeholder="https://meet.google.com/..."
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#EE2C3C] font-mono shadow-2xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">
+                    Streaming Platform
+                  </label>
+                  <select
+                    value={liveFormPlatform}
+                    onChange={(e) => setLiveFormPlatform(e.target.value as any)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#EE2C3C] shadow-2xs"
+                  >
+                    <option value="Virtual CAD Workstation">Virtual CAD Workstation</option>
+                    <option value="Google Meet">Google Meet</option>
+                    <option value="Zoom">Zoom</option>
+                    <option value="YouTube Live">YouTube Live</option>
+                    <option value="Microsoft Teams">Microsoft Teams</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Timing / Schedule Display Label
+                </label>
+                <input
+                  type="text"
+                  value={liveFormTiming}
+                  onChange={(e) => setLiveFormTiming(e.target.value)}
+                  placeholder="e.g. Today, 10:00 AM - 12:30 PM (Lab Session)"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#EE2C3C] shadow-2xs"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Student Guidelines &amp; Lab Instructions
+                </label>
+                <textarea
+                  rows={3}
+                  value={liveFormDescription}
+                  onChange={(e) => setLiveFormDescription(e.target.value)}
+                  placeholder="e.g. Trainer Er. Swamy Naidu is demonstrating Parametric Revit Families. Connect to workstation screen."
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:border-[#EE2C3C] shadow-2xs resize-none"
+                />
+              </div>
+            </div>
+
+            <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3 flex-wrap">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLiveModal(false);
+                  setEditingLiveId(null);
+                }}
+                className="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleBroadcastLive('Scheduled')}
+                disabled={isBroadcasting}
+                className="px-4 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs sm:text-sm font-bold transition-all shadow-2xs cursor-pointer"
+              >
+                Schedule for Later
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleBroadcastLive('Live Now')}
+                disabled={isBroadcasting}
+                className="px-5 py-2 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs sm:text-sm font-bold transition-all shadow-sm cursor-pointer flex items-center space-x-1.5"
+              >
+                <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                <span>{isBroadcasting ? 'Broadcasting...' : '🔴 Start Live Broadcast Now →'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

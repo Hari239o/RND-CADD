@@ -518,20 +518,35 @@ export default function StudentPortalPage() {
   const [isLoadingLive, setIsLoadingLive] = useState<boolean>(false);
 
   // Fetch live class broadcast from admin
-  const fetchLiveClass = async () => {
-    setIsLoadingLive(true);
+  const fetchLiveClass = async (silent = false) => {
+    if (!silent) setIsLoadingLive(true);
     try {
-      const res = await fetch('/api/live-classes');
+      if (typeof window !== 'undefined') {
+        const local = localStorage.getItem('rnd_cadd_live_session');
+        if (local) {
+          try {
+            const parsed = JSON.parse(local);
+            if (parsed && typeof parsed === 'object') {
+              setLiveClass(parsed);
+            }
+          } catch {}
+        }
+      }
+
+      const res = await fetch('/api/live-classes?t=' + Date.now());
       const data = await res.json();
       if (data && data.success && data.liveClass) {
         setLiveClass(data.liveClass);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('rnd_cadd_live_session', JSON.stringify(data.liveClass));
+        }
       } else {
         setLiveClass(null);
       }
     } catch (err) {
       console.error('Failed to fetch live class session:', err);
     } finally {
-      setIsLoadingLive(false);
+      if (!silent) setIsLoadingLive(false);
     }
   };
 
@@ -1130,13 +1145,32 @@ export default function StudentPortalPage() {
     fetchLiveClass();
   }, []);
 
-  // Poll live classes status when on Live tab or periodically
+  // Real-time live classes sync & cross-tab storage listener
   useEffect(() => {
-    fetchLiveClass();
+    fetchLiveClass(true);
+
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'rnd_cadd_live_session' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          setLiveClass(parsed);
+        } catch {}
+      }
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', handleStorage);
+    }
+
     const interval = setInterval(() => {
-      fetchLiveClass();
-    }, 20000); // 20s auto-refresh for real-time live sync
-    return () => clearInterval(interval);
+      fetchLiveClass(true);
+    }, activeTab === 'Live' ? 4000 : 15000);
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('storage', handleStorage);
+      }
+      clearInterval(interval);
+    };
   }, [activeTab]);
 
   // Load and persist watched classes for the current student
@@ -1961,7 +1995,7 @@ export default function StudentPortalPage() {
                   )}
                   {item.id === 'Live' && (
                     <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
-                      liveClass?.status === 'Live Now' ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'
+                      liveClass?.status === 'Live Now' && liveClass?.isLive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'
                     }`} />
                   )}
                   {item.id === 'Chat' && studentTickets.filter((t) => t.status === 'Resolved').length > 0 && (
@@ -3768,7 +3802,7 @@ export default function StudentPortalPage() {
                   <div className="w-8 h-8 border-3 border-[#EE2C3C] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
                   <p className="text-sm font-semibold text-slate-600">Connecting to live workstation session...</p>
                 </div>
-              ) : liveClass && liveClass.status === 'Live Now' ? (
+              ) : liveClass && liveClass.status === 'Live Now' && liveClass.isLive ? (
                 <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 sm:p-8 space-y-6">
                   {/* Active Header */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
@@ -3823,14 +3857,14 @@ export default function StudentPortalPage() {
                   {/* Quick Refresh */}
                   <div className="pt-2 text-center">
                     <button
-                      onClick={fetchLiveClass}
+                      onClick={() => fetchLiveClass(false)}
                       className="text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
                     >
                       ↻ Check for stream updates
                     </button>
                   </div>
                 </div>
-              ) : liveClass && liveClass.status === 'Scheduled' ? (
+              ) : liveClass && liveClass.status === 'Scheduled' && !liveClass.isLive ? (
                 <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-8 text-center space-y-4">
                   <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 border border-sky-200 flex items-center justify-center mx-auto">
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3855,7 +3889,7 @@ export default function StudentPortalPage() {
                     Faculty mentors will start the live stream at the scheduled time. Return to this screen to join the workstation session.
                   </p>
                   <button
-                    onClick={fetchLiveClass}
+                    onClick={() => fetchLiveClass(false)}
                     className="px-4 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-all cursor-pointer"
                   >
                     ↻ Check if Live Stream has Started
@@ -3875,7 +3909,7 @@ export default function StudentPortalPage() {
                     Faculty mentors broadcast live CAD workstation classes according to the batch schedule. Check back at your scheduled lab timing or contact administration for private workstation access.
                   </p>
                   <button
-                    onClick={fetchLiveClass}
+                    onClick={() => fetchLiveClass(false)}
                     className="px-4 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
                   >
                     ↻ Check for Live Stream
