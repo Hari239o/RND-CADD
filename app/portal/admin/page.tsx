@@ -48,6 +48,25 @@ export interface StudentCertificate {
 }
 
 
+export interface OfferItem {
+  id: string;
+  type: 'referral' | 'course_discount';
+  title: string;
+  code: string;
+  targetCourse: string;
+  discountType: 'percentage' | 'flat';
+  discountValue: number;
+  referrerReward?: string;
+  refereeReward?: string;
+  shareUrl: string;
+  expiryDate?: string;
+  description?: string;
+  status: 'Active' | 'Inactive';
+  redemptionsCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface LiveClassSession {
   id: string;
   title: string;
@@ -954,6 +973,27 @@ export default function AdminPortalPage() {
   const [isDeletingReviewId, setIsDeletingReviewId] = useState<string | null>(null);
 
     // Live Classes Management State (Enterprise Table & Real-Time Broadcast Pattern)
+  
+  // Offers & Discounts Management State (Dynamic DB + Student Portal Sync)
+  const [adminOffers, setAdminOffers] = useState<OfferItem[]>([]);
+  const [isLoadingOffers, setIsLoadingOffers] = useState<boolean>(false);
+  const [offersSearchQuery, setOffersSearchQuery] = useState<string>('');
+  const [offersTypeFilter, setOffersTypeFilter] = useState<'all' | 'referral' | 'course_discount' | 'active' | 'inactive'>('all');
+  const [showOfferModal, setShowOfferModal] = useState<boolean>(false);
+  const [editingOfferId, setEditingOfferId] = useState<string | null>(null);
+  const [offerFormType, setOfferFormType] = useState<'referral' | 'course_discount'>('course_discount');
+  const [offerFormTitle, setOfferFormTitle] = useState<string>('');
+  const [offerFormCode, setOfferFormCode] = useState<string>('');
+  const [offerFormCourse, setOfferFormCourse] = useState<string>('All Engineering Courses');
+  const [offerFormDiscountType, setOfferFormDiscountType] = useState<'percentage' | 'flat'>('percentage');
+  const [offerFormDiscountValue, setOfferFormDiscountValue] = useState<number>(15);
+  const [offerFormReferrerReward, setOfferFormReferrerReward] = useState<string>('Rs 1,500 Voucher');
+  const [offerFormRefereeReward, setOfferFormRefereeReward] = useState<string>('15% Course Fee Waiver');
+  const [offerFormExpiry, setOfferFormExpiry] = useState<string>('2026-12-31');
+  const [offerFormDescription, setOfferFormDescription] = useState<string>('');
+  const [isSubmittingOffer, setIsSubmittingOffer] = useState<boolean>(false);
+  const [copiedOfferId, setCopiedOfferId] = useState<string | null>(null);
+
   const [liveSession, setLiveSession] = useState<LiveClassSession | null>(null);
   const [liveHistory, setLiveHistory] = useState<LiveClassSession[]>([]);
   const [liveSearchQuery, setLiveSearchQuery] = useState<string>('');
@@ -1215,6 +1255,113 @@ export default function AdminPortalPage() {
 
   // Delete review by ID
   
+  
+  // Offers & Discounts CRUD Operations
+  const fetchAdminOffers = async (silent = false) => {
+    if (!silent) setIsLoadingOffers(true);
+    try {
+      const res = await fetch('/api/offers?t=' + Date.now());
+      const data = await res.json();
+      if (data.success && Array.isArray(data.offers)) {
+        setAdminOffers(data.offers);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('rnd_cadd_offers', JSON.stringify(data.offers));
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch offers:', err);
+    } finally {
+      if (!silent) setIsLoadingOffers(false);
+    }
+  };
+
+  const handleSaveOffer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!offerFormTitle.trim() || !offerFormCode.trim()) {
+      alert('Please provide an offer title and promo/referral code.');
+      return;
+    }
+
+    setIsSubmittingOffer(true);
+    try {
+      const payload = {
+        id: editingOfferId || undefined,
+        type: offerFormType,
+        title: offerFormTitle.trim(),
+        code: offerFormCode.trim().toUpperCase(),
+        targetCourse: offerFormCourse,
+        discountType: offerFormDiscountType,
+        discountValue: Number(offerFormDiscountValue) || 10,
+        referrerReward: offerFormType === 'referral' ? offerFormReferrerReward : '',
+        refereeReward: offerFormRefereeReward,
+        expiryDate: offerFormExpiry,
+        description: offerFormDescription,
+        status: 'Active',
+      };
+
+      const res = await fetch('/api/offers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.success) {
+        fetchAdminOffers(true);
+        setShowOfferModal(false);
+        setEditingOfferId(null);
+        showToast('Offer campaign created & referral link generated successfully!');
+      } else {
+        alert(data.message || 'Failed to save offer');
+      }
+    } catch (err) {
+      console.error('Save offer error:', err);
+      alert('Network error saving offer.');
+    } finally {
+      setIsSubmittingOffer(false);
+    }
+  };
+
+  const handleToggleOfferStatus = async (id: string, currentStatus: string) => {
+    const nextStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
+    try {
+      const res = await fetch('/api/offers', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status: nextStatus }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAdminOffers((prev) => prev.map((o) => (o.id === id ? { ...o, status: nextStatus as any } : o)));
+        showToast(`Offer marked as ${nextStatus}`);
+      }
+    } catch (err) {
+      console.error('Toggle offer status error:', err);
+    }
+  };
+
+  const handleDeleteOffer = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this offer campaign?')) return;
+    try {
+      const res = await fetch(`/api/offers?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        setAdminOffers((prev) => prev.filter((o) => o.id !== id));
+        showToast('Offer deleted successfully.');
+      }
+    } catch (err) {
+      console.error('Delete offer error:', err);
+    }
+  };
+
+  const handleCopyOfferLink = (link: string, id: string) => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(link);
+      setCopiedOfferId(id);
+      setTimeout(() => setCopiedOfferId(null), 2500);
+      showToast('Referral / Promo link copied to clipboard!');
+    }
+  };
+
   // Live Classes Fetcher & Broadcaster
   const fetchLiveSession = async (silent = false) => {
     if (!silent) setIsLoadingLive(true);
@@ -1619,6 +1766,7 @@ export default function AdminPortalPage() {
     fetchAdminAssignments();
     fetchAdminReviews();
     fetchLiveSession();
+    fetchAdminOffers();
 
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('rnd_cadd_user');
@@ -3184,6 +3332,16 @@ export default function AdminPortalPage() {
       ),
     },
     {
+      id: 'Offers',
+      label: 'Offers & Discounts',
+      icon: (
+        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6z" />
+        </svg>
+      ),
+    },
+    {
       id: 'Live',
       label: 'Live Classes',
       icon: (
@@ -3502,7 +3660,14 @@ export default function AdminPortalPage() {
                       {adminAssignments.length}
                     </span>
                   )}
-                                    {item.id === 'Live' && (
+                                    {item.id === 'Offers' && (
+                    <span className={`text-xs font-mono px-2 py-0.5 rounded-md font-black ${
+                      isActive ? 'bg-[#FFFFFF]/20 text-[#FFFFFF]' : 'bg-[#FEF3C7] text-[#92400E]'
+                    }`}>
+                      {adminOffers.filter((o) => o.status === 'Active').length}
+                    </span>
+                  )}
+                  {item.id === 'Live' && (
                     <span className={`text-xs font-mono px-2 py-0.5 rounded-md font-bold ${
                       liveSession?.status === 'Live Now'
                         ? 'bg-emerald-500 text-white animate-pulse'
@@ -3554,6 +3719,28 @@ export default function AdminPortalPage() {
             </div>
 
             <div className="flex items-center space-x-3">
+              {activeTab === 'Offers' && (
+                <button
+                  onClick={() => {
+                    setEditingOfferId(null);
+                    setOfferFormType('course_discount');
+                    setOfferFormTitle('');
+                    setOfferFormCode('CAD' + Math.floor(1000 + Math.random() * 9000));
+                    setOfferFormCourse('All Engineering Courses');
+                    setOfferFormDiscountType('percentage');
+                    setOfferFormDiscountValue(20);
+                    setOfferFormReferrerReward('Rs 1,500 Voucher');
+                    setOfferFormRefereeReward('20% Fee Waiver');
+                    setOfferFormExpiry('2026-12-31');
+                    setOfferFormDescription('');
+                    setShowOfferModal(true);
+                  }}
+                  className="px-4 py-2 rounded-lg text-sm font-semibold bg-[#EE2C3C] hover:bg-[#D71E2E] text-white shadow-sm transition-all cursor-pointer flex items-center space-x-1.5"
+                >
+                  <span>+</span>
+                  <span>Create New Offer / Referral</span>
+                </button>
+              )}
               {activeTab === 'Live' && (
                 <button
                   onClick={() => {
@@ -6513,6 +6700,292 @@ export default function AdminPortalPage() {
                   </div>
                 );
               })()}
+            </div>
+          )}
+
+          
+          {/* TAB: OFFERS & DISCOUNTS MANAGEMENT (Enterprise Directory & Referral Generator) */}
+          {activeTab === 'Offers' && (
+            <div className="space-y-6">
+              {/* Dynamic Statistics Cards */}
+              <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                  <span className="text-xs sm:text-sm font-bold text-[#666666] uppercase tracking-wider block">
+                    Active Offers
+                  </span>
+                  <div className="flex items-center space-x-2 mt-1">
+                    <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-2xl sm:text-3xl font-extrabold text-[#131313]">
+                      {adminOffers.filter((o) => o.status === 'Active').length}
+                    </span>
+                  </div>
+                  <span className="text-xs sm:text-sm text-slate-400 block mt-0.5 font-medium">
+                    Live Promos &amp; Referrals
+                  </span>
+                </div>
+
+                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                  <span className="text-xs sm:text-sm font-bold text-[#666666] uppercase tracking-wider block">
+                    Course Discounts
+                  </span>
+                  <span className="text-2xl sm:text-3xl font-extrabold text-[#131313] block mt-1">
+                    {adminOffers.filter((o) => o.type === 'course_discount').length}
+                  </span>
+                  <span className="text-xs sm:text-sm text-slate-400 block mt-0.5 font-medium">
+                    Tuition Fee Waivers
+                  </span>
+                </div>
+
+                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                  <span className="text-xs sm:text-sm font-bold text-[#666666] uppercase tracking-wider block">
+                    Student Referrals
+                  </span>
+                  <span className="text-2xl sm:text-3xl font-extrabold text-[#131313] block mt-1">
+                    {adminOffers.filter((o) => o.type === 'referral').length}
+                  </span>
+                  <span className="text-xs sm:text-sm text-slate-400 block mt-0.5 font-medium">
+                    Peer Invite Links
+                  </span>
+                </div>
+
+                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                  <span className="text-xs sm:text-sm font-bold text-[#666666] uppercase tracking-wider block">
+                    Max Discount
+                  </span>
+                  <span className="text-xl sm:text-2xl font-extrabold text-emerald-600 block mt-1">
+                    {(() => {
+                      const maxPct = Math.max(0, ...adminOffers.filter((o) => o.discountType === 'percentage').map((o) => o.discountValue));
+                      return maxPct > 0 ? `${maxPct}% OFF` : 'Flat Rs 1,500';
+                    })()}
+                  </span>
+                  <span className="text-xs sm:text-sm text-slate-400 block mt-0.5 font-medium">
+                    Best Active Value
+                  </span>
+                </div>
+
+                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm col-span-2 lg:col-span-1">
+                  <span className="text-xs sm:text-sm font-bold text-[#666666] uppercase tracking-wider block">
+                    Total Redemptions
+                  </span>
+                  <span className="text-2xl sm:text-3xl font-extrabold text-[#131313] block mt-1">
+                    {adminOffers.reduce((acc, o) => acc + (o.redemptionsCount || 0), 0)}
+                  </span>
+                  <span className="text-xs sm:text-sm text-slate-400 block mt-0.5 font-medium">
+                    Claimed by Trainees
+                  </span>
+                </div>
+              </div>
+
+              {/* Table Directory Controls (Filters + Search + Sync) */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+                  {[
+                    { id: 'all', label: 'All Offers', count: adminOffers.length },
+                    { id: 'course_discount', label: 'Course Discounts', count: adminOffers.filter((o) => o.type === 'course_discount').length },
+                    { id: 'referral', label: 'Student Referrals', count: adminOffers.filter((o) => o.type === 'referral').length },
+                    { id: 'active', label: 'Active', count: adminOffers.filter((o) => o.status === 'Active').length },
+                    { id: 'inactive', label: 'Inactive', count: adminOffers.filter((o) => o.status === 'Inactive').length },
+                  ].map((filterTab) => (
+                    <button
+                      key={filterTab.id}
+                      onClick={() => setOffersTypeFilter(filterTab.id as any)}
+                      className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                        offersTypeFilter === filterTab.id
+                          ? 'bg-[#131313] text-white shadow-xs'
+                          : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                      }`}
+                    >
+                      {filterTab.label} ({filterTab.count})
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1 sm:w-64">
+                    <input
+                      type="text"
+                      value={offersSearchQuery}
+                      onChange={(e) => setOffersSearchQuery(e.target.value)}
+                      placeholder="Search offers or coupon code..."
+                      className="w-full px-3.5 py-1.5 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:border-[#EE2C3C] shadow-2xs"
+                    />
+                  </div>
+                  <button
+                    onClick={() => fetchAdminOffers(false)}
+                    disabled={isLoadingOffers}
+                    className="px-3 py-1.5 text-xs font-semibold rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition-all shadow-2xs cursor-pointer"
+                  >
+                    ↻ Sync
+                  </button>
+                </div>
+              </div>
+
+              {/* Offers Enterprise Data Table */}
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-xs sm:text-sm">
+                    <thead>
+                      <tr className="bg-slate-50/80 border-b border-slate-200 text-[#666666] font-bold text-[11px] sm:text-xs uppercase tracking-wider">
+                        <th className="py-3.5 px-4 sm:px-6">Campaign / Offer &amp; Code</th>
+                        <th className="py-3.5 px-4">Offer Type</th>
+                        <th className="py-3.5 px-4">Discount / Benefit</th>
+                        <th className="py-3.5 px-4">Target Course</th>
+                        <th className="py-3.5 px-4">Generated Referral / Promo Link</th>
+                        <th className="py-3.5 px-4">Status</th>
+                        <th className="py-3.5 px-4 sm:px-6 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {(() => {
+                        const filtered = adminOffers.filter((o) => {
+                          const matchesQuery =
+                            o.title.toLowerCase().includes(offersSearchQuery.toLowerCase()) ||
+                            o.code.toLowerCase().includes(offersSearchQuery.toLowerCase()) ||
+                            o.targetCourse.toLowerCase().includes(offersSearchQuery.toLowerCase());
+                          if (!matchesQuery) return false;
+                          if (offersTypeFilter === 'course_discount') return o.type === 'course_discount';
+                          if (offersTypeFilter === 'referral') return o.type === 'referral';
+                          if (offersTypeFilter === 'active') return o.status === 'Active';
+                          if (offersTypeFilter === 'inactive') return o.status === 'Inactive';
+                          return true;
+                        });
+
+                        if (filtered.length === 0) {
+                          return (
+                            <tr>
+                              <td colSpan={7} className="py-12 text-center text-slate-400">
+                                <div className="max-w-sm mx-auto space-y-2">
+                                  <p className="font-semibold text-slate-600">No offers found</p>
+                                  <p className="text-xs">Click &quot;Create New Offer / Referral&quot; above to launch a discount code or student referral link.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        }
+
+                        return filtered.map((offer) => {
+                          const isCopied = copiedOfferId === offer.id;
+                          return (
+                            <tr key={offer.id} className="hover:bg-slate-50/60 transition-colors">
+                              <td className="py-4 px-4 sm:px-6">
+                                <div className="space-y-1">
+                                  <span className="font-bold text-[#131313] block leading-snug">
+                                    {offer.title}
+                                  </span>
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-mono text-xs font-black tracking-wider text-[#EE2C3C] bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-md">
+                                      {offer.code}
+                                    </span>
+                                    {offer.expiryDate && (
+                                      <span className="text-[11px] text-slate-500 font-medium">
+                                        Valid till: {offer.expiryDate}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </td>
+
+                              <td className="py-4 px-4">
+                                <span className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-md border ${
+                                  offer.type === 'referral'
+                                    ? 'bg-purple-50 text-purple-700 border-purple-200'
+                                    : 'bg-sky-50 text-sky-700 border-sky-200'
+                                }`}>
+                                  {offer.type === 'referral' ? 'Peer Referral' : 'Course Discount'}
+                                </span>
+                              </td>
+
+                              <td className="py-4 px-4">
+                                <span className="font-bold text-slate-900 block">
+                                  {offer.discountType === 'percentage' ? `${offer.discountValue}% OFF` : `Rs ${offer.discountValue.toLocaleString()} Flat`}
+                                </span>
+                                {offer.type === 'referral' && offer.referrerReward && (
+                                  <span className="text-[11px] text-emerald-600 font-semibold block mt-0.5">
+                                    Referrer: {offer.referrerReward}
+                                  </span>
+                                )}
+                              </td>
+
+                              <td className="py-4 px-4">
+                                <span className="inline-block text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200 truncate max-w-[180px]">
+                                  {offer.targetCourse}
+                                </span>
+                              </td>
+
+                              <td className="py-4 px-4">
+                                <div className="flex items-center space-x-2">
+                                  <span className="font-mono text-[11px] text-slate-600 truncate max-w-[200px]" title={offer.shareUrl}>
+                                    {offer.shareUrl}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleCopyOfferLink(offer.shareUrl, offer.id)}
+                                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap shadow-2xs ${
+                                      isCopied
+                                        ? 'bg-emerald-600 text-white'
+                                        : 'bg-[#EE2C3C] hover:bg-[#D71E2E] text-white'
+                                    }`}
+                                  >
+                                    {isCopied ? 'Copied!' : 'Copy'}
+                                  </button>
+                                </div>
+                              </td>
+
+                              <td className="py-4 px-4">
+                                <button
+                                  type="button"
+                                  onClick={() => handleToggleOfferStatus(offer.id, offer.status)}
+                                  className={`inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full border cursor-pointer transition-all ${
+                                    offer.status === 'Active'
+                                      ? 'text-emerald-700 bg-emerald-50 border-emerald-200 hover:bg-emerald-100'
+                                      : 'text-slate-500 bg-slate-100 border-slate-200 hover:bg-slate-200'
+                                  }`}
+                                >
+                                  <span className={`w-2 h-2 rounded-full ${offer.status === 'Active' ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
+                                  <span>{offer.status}</span>
+                                </button>
+                              </td>
+
+                              <td className="py-4 px-4 sm:px-6 text-right whitespace-nowrap">
+                                <div className="flex items-center justify-end space-x-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setEditingOfferId(offer.id);
+                                      setOfferFormType(offer.type);
+                                      setOfferFormTitle(offer.title);
+                                      setOfferFormCode(offer.code);
+                                      setOfferFormCourse(offer.targetCourse);
+                                      setOfferFormDiscountType(offer.discountType);
+                                      setOfferFormDiscountValue(offer.discountValue);
+                                      setOfferFormReferrerReward(offer.referrerReward || '');
+                                      setOfferFormRefereeReward(offer.refereeReward || '');
+                                      setOfferFormExpiry(offer.expiryDate || '');
+                                      setOfferFormDescription(offer.description || '');
+                                      setShowOfferModal(true);
+                                    }}
+                                    className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 border border-slate-200 hover:bg-slate-100 transition-all cursor-pointer"
+                                  >
+                                    Edit
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteOffer(offer.id)}
+                                    className="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-rose-500 hover:bg-rose-50 transition-all cursor-pointer"
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        });
+                      })()}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           )}
 
@@ -11699,6 +12172,281 @@ export default function AdminPortalPage() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      
+      {/* MODAL: CREATE / EDIT OFFER & REFERRAL PROGRAM */}
+      {showOfferModal && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden animate-fadeIn">
+            <div className="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-[#131313]">
+                  {editingOfferId ? 'Edit Offer Campaign' : 'Create New Offer / Referral Program'}
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Generate promotional discount codes and peer referral links that sync dynamically to the student portal.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowOfferModal(false);
+                  setEditingOfferId(null);
+                }}
+                className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center text-lg font-bold cursor-pointer transition-colors"
+              >
+                &times;
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveOffer}>
+              <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+                {/* Offer Type Selector */}
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1.5">
+                    Campaign / Offer Type *
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOfferFormType('course_discount');
+                        setOfferFormRefereeReward(`${offerFormDiscountValue}% Course Fee Waiver`);
+                      }}
+                      className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
+                        offerFormType === 'course_discount'
+                          ? 'border-[#EE2C3C] bg-rose-50/50 text-[#EE2C3C] ring-2 ring-[#EE2C3C]/20'
+                          : 'border-slate-200 hover:bg-slate-50 text-slate-700'
+                      }`}
+                    >
+                      <span className="font-bold text-sm block">Course Discount Offer</span>
+                      <span className="text-[11px] text-slate-500">Promotional % or flat tuition discount</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOfferFormType('referral');
+                        setOfferFormReferrerReward('Rs 1,500 Voucher');
+                        setOfferFormRefereeReward('Rs 1,500 Discount');
+                      }}
+                      className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
+                        offerFormType === 'referral'
+                          ? 'border-[#EE2C3C] bg-rose-50/50 text-[#EE2C3C] ring-2 ring-[#EE2C3C]/20'
+                          : 'border-slate-200 hover:bg-slate-50 text-slate-700'
+                      }`}
+                    >
+                      <span className="font-bold text-sm block">Student Referral Link</span>
+                      <span className="text-[11px] text-slate-500">Peer reward voucher &amp; enrollee benefit</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Title */}
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">
+                    Campaign / Offer Title *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={offerFormTitle}
+                    onChange={(e) => setOfferFormTitle(e.target.value)}
+                    placeholder="e.g. BIM Specialist Early Bird Scholarship or Engineering Peer Referral"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#EE2C3C] shadow-2xs"
+                  />
+                </div>
+
+                {/* Promo Code & Auto-Generate */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                      Coupon / Referral Code *
+                    </label>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="text"
+                        required
+                        value={offerFormCode}
+                        onChange={(e) => setOfferFormCode(e.target.value.toUpperCase().replace(/[^A-Z0-9_-]/g, ''))}
+                        placeholder="e.g. BIM20, CADDPEER"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-mono font-bold uppercase focus:outline-none focus:border-[#EE2C3C] shadow-2xs"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setOfferFormCode('CAD' + Math.floor(1000 + Math.random() * 9000))}
+                        className="px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors shrink-0 cursor-pointer"
+                      >
+                        Generate
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                      Applicable Course / Audience
+                    </label>
+                    <select
+                      value={offerFormCourse}
+                      onChange={(e) => setOfferFormCourse(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#EE2C3C] shadow-2xs"
+                    >
+                      <option value="All Engineering Courses">All Engineering Courses</option>
+                      {courses.map((c) => (
+                        <option key={c.id || c.code} value={c.title}>
+                          {c.title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Discount Type & Value */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                      Discount Calculation Model
+                    </label>
+                    <div className="flex rounded-xl border border-slate-200 overflow-hidden">
+                      <button
+                        type="button"
+                        onClick={() => setOfferFormDiscountType('percentage')}
+                        className={`flex-1 py-2 text-xs font-bold transition-all ${
+                          offerFormDiscountType === 'percentage'
+                            ? 'bg-[#131313] text-white'
+                            : 'bg-white text-slate-600 hover:bg-slate-50'
+                        }`}
+                      >
+                        % Percentage Off
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setOfferFormDiscountType('flat')}
+                        className={`flex-1 py-2 text-xs font-bold transition-all ${
+                          offerFormDiscountType === 'flat'
+                            ? 'bg-[#131313] text-white'
+                            : 'bg-white text-slate-600 hover:bg-slate-50'
+                        }`}
+                      >
+                        Flat Rs Amount
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                      Discount Value ({offerFormDiscountType === 'percentage' ? '%' : 'Rs'}) *
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      min={1}
+                      max={offerFormDiscountType === 'percentage' ? 100 : 50000}
+                      value={offerFormDiscountValue}
+                      onChange={(e) => {
+                        const val = Number(e.target.value) || 0;
+                        setOfferFormDiscountValue(val);
+                        if (offerFormType === 'course_discount') {
+                          setOfferFormRefereeReward(offerFormDiscountType === 'percentage' ? `${val}% Fee Waiver` : `Rs ${val} Discount`);
+                        }
+                      }}
+                      className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm font-bold focus:outline-none focus:border-[#EE2C3C] shadow-2xs"
+                    />
+                  </div>
+                </div>
+
+                {/* Referral Specific Inputs */}
+                {offerFormType === 'referral' && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl bg-purple-50/50 border border-purple-200">
+                    <div>
+                      <label className="text-xs font-bold text-purple-900 block mb-1">
+                        Existing Student Reward (Referrer)
+                      </label>
+                      <input
+                        type="text"
+                        value={offerFormReferrerReward}
+                        onChange={(e) => setOfferFormReferrerReward(e.target.value)}
+                        placeholder="e.g. Rs 1,500 Voucher"
+                        className="w-full px-3 py-2 rounded-xl border border-purple-200 text-xs sm:text-sm bg-white focus:outline-none focus:border-purple-600"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-purple-900 block mb-1">
+                        New Trainee Benefit (Referee)
+                      </label>
+                      <input
+                        type="text"
+                        value={offerFormRefereeReward}
+                        onChange={(e) => setOfferFormRefereeReward(e.target.value)}
+                        placeholder="e.g. Rs 1,500 Enrollment Discount"
+                        className="w-full px-3 py-2 rounded-xl border border-purple-200 text-xs sm:text-sm bg-white focus:outline-none focus:border-purple-600"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Expiry Date */}
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">
+                    Offer Expiry Date
+                  </label>
+                  <input
+                    type="date"
+                    value={offerFormExpiry}
+                    onChange={(e) => setOfferFormExpiry(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#EE2C3C] shadow-2xs"
+                  />
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">
+                    Offer Description &amp; Terms
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={offerFormDescription}
+                    onChange={(e) => setOfferFormDescription(e.target.value)}
+                    placeholder="e.g. Applicable on all professional certification programs. Valid on one-time fee payment."
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:border-[#EE2C3C] shadow-2xs resize-none"
+                  />
+                </div>
+
+                {/* Live Link Preview */}
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                  <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wide block">
+                    Live Generated Share Link Preview:
+                  </span>
+                  <div className="font-mono text-xs text-[#EE2C3C] break-all font-semibold">
+                    {`https://rnd-cadd.vercel.app/enroll?${offerFormType === 'referral' ? 'ref=' : 'coupon='}${offerFormCode || 'PROMO'}`}
+                  </div>
+                </div>
+              </div>
+
+              <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3 flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowOfferModal(false);
+                    setEditingOfferId(null);
+                  }}
+                  className="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={isSubmittingOffer}
+                  className="px-6 py-2.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs sm:text-sm font-bold transition-all shadow-sm cursor-pointer flex items-center space-x-1.5"
+                >
+                  <span>{isSubmittingOffer ? 'Saving...' : 'Save & Publish Offer →'}</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
