@@ -517,6 +517,24 @@ export default function StudentPortalPage() {
   const [liveClass, setLiveClass] = useState<LiveClassSession | null>(null);
   const [isLoadingLive, setIsLoadingLive] = useState<boolean>(false);
 
+  // Fetch live class broadcast from admin
+  const fetchLiveClass = async () => {
+    setIsLoadingLive(true);
+    try {
+      const res = await fetch('/api/live-classes');
+      const data = await res.json();
+      if (data && data.success && data.liveClass) {
+        setLiveClass(data.liveClass);
+      } else {
+        setLiveClass(null);
+      }
+    } catch (err) {
+      console.error('Failed to fetch live class session:', err);
+    } finally {
+      setIsLoadingLive(false);
+    }
+  };
+
 
   // Fetch reviews submitted by this student
   const fetchStudentReviews = async (userEmail?: string) => {
@@ -1109,7 +1127,17 @@ export default function StudentPortalPage() {
     fetchCourses();
     fetchStudentJobs();
     fetchStudentReviews(emailToUse);
+    fetchLiveClass();
   }, []);
+
+  // Poll live classes status when on Live tab or periodically
+  useEffect(() => {
+    fetchLiveClass();
+    const interval = setInterval(() => {
+      fetchLiveClass();
+    }, 20000); // 20s auto-refresh for real-time live sync
+    return () => clearInterval(interval);
+  }, [activeTab]);
 
   // Load and persist watched classes for the current student
   useEffect(() => {
