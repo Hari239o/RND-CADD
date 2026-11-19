@@ -7038,14 +7038,14 @@ export default function AdminPortalPage() {
             {/* Modal Header */}
             <div className="flex justify-between items-center px-6 sm:px-10 py-4 bg-[#FFFFFF] border-b-2 border-[#E2E8F0] shadow-sm flex-shrink-0">
               <div className="flex items-center space-x-3.5">
-                <div className="w-10 h-10 rounded-xl bg-[#EE2C3C] text-[#FFFFFF] flex items-center justify-center shadow-md">
-                  
+                <div className="w-10 h-10 rounded-xl bg-[#EE2C3C] text-[#FFFFFF] flex items-center justify-center shadow-md font-black text-xl">
+                  +
                 </div>
                 <div>
-                  <span className="text-sm font-semibold font-black text-[#EE2C3C] uppercase tracking-wider block">
+                  <span className="text-xs sm:text-sm font-black text-[#EE2C3C] uppercase tracking-wider block">
                     CURRICULUM SPECIFICATION BUILDER &bull; REAL-TIME LIVE SYNC
                   </span>
-                  <h3 className="text-xl sm:text-2xl font-black text-[#131313]">
+                  <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
                     Create New CAD Course Blueprint
                   </h3>
                 </div>
@@ -7053,30 +7053,95 @@ export default function AdminPortalPage() {
               <RedCrossCloseButton onClick={() => setShowAddCourseModal(false)} />
             </div>
 
-            {/* Scrollable Form Body */}
-            <form onSubmit={handleAddNewCourse} className="flex-1 overflow-y-auto p-6 sm:p-10 space-y-8 bg-[#F8FAFC]">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* 1. Identification & Stream */}
-                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
-                  <span className="text-xs font-black text-[#131313] uppercase tracking-wider block border-b pb-2 border-[#CBD5E1]">
-                    1. Course Identification &amp; Academic Placement
-                  </span>
+            {/* Sticky Order-Wise Quick Jump Navigation Bar */}
+            <div className="bg-slate-100 border-b border-slate-200 px-6 sm:px-10 py-2.5 flex items-center space-x-2 overflow-x-auto no-scrollbar flex-shrink-0">
+              <span className="text-xs font-black text-slate-500 uppercase tracking-wider whitespace-nowrap mr-2">
+                Order-Wise Sections:
+              </span>
+              {[
+                { id: 'add-sec-1', label: '1. Hero & Basics' },
+                { id: 'add-sec-2', label: '2. Academic Facts' },
+                { id: 'add-sec-3', label: '3. Overview' },
+                { id: 'add-sec-4', label: '4. Highlights & Lab' },
+                { id: 'add-sec-5', label: '5. Syllabus Units' },
+                { id: 'add-sec-6', label: '6. Career Path' },
+                { id: 'add-sec-7', label: '7. Certificate' },
+                { id: 'add-sec-8', label: '8. Capstone Project' },
+                { id: 'add-sec-9', label: '9. FAQs' },
+              ].map((sec) => (
+                <button
+                  key={sec.id}
+                  type="button"
+                  onClick={() => {
+                    const el = document.getElementById(sec.id);
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
+                  className="px-3.5 py-1.5 rounded-lg bg-white border border-slate-300 hover:border-slate-800 text-slate-800 text-xs sm:text-sm font-bold whitespace-nowrap shadow-2xs hover:shadow-xs transition-all cursor-pointer"
+                >
+                  {sec.label}
+                </button>
+              ))}
+            </div>
 
-                  <div>
-                    <label className="block font-bold text-[#334155] mb-1">Course Title *</label>
-                    <input
-                      type="text"
-                      required
-                      value={newCourse.title}
-                      onChange={(e) => setNewCourse({ ...newCourse, title: e.target.value })}
-                      placeholder="e.g. Mechanical CAD/CAM/CAE Diploma"
-                      className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-semibold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
-                    />
+            {/* Scrollable Form Body - Single Column Logical Website Order with High Visibility */}
+            <form onSubmit={handleAddNewCourse} className="flex-1 overflow-y-auto p-6 sm:p-10 space-y-8 bg-[#F8FAFC]">
+              <div className="max-w-[1440px] mx-auto space-y-8">
+                
+                {/* 1. HERO & BASIC COURSE IDENTIFICATION */}
+                <div id="add-sec-1" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                  <div className="flex items-center justify-between pb-3 border-b-2 border-slate-200">
+                    <div className="flex items-center space-x-3">
+                      <span className="w-8 h-8 rounded-lg bg-[#EE2C3C] text-white flex items-center justify-center font-mono font-black text-sm">
+                        01
+                      </span>
+                      <div>
+                        <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                          Course Identification, Commercials &amp; Hero Banner
+                        </h4>
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                          Controls the course card on catalog pages, sticky header, and top hero banner on the live website.
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-red-50 text-red-700 border border-red-200 hidden sm:inline-block">
+                      Hero &amp; Catalog
+                    </span>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Title & Tagline */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                     <div>
-                      <label className="block font-bold text-[#334155] mb-1">Folder / Discipline *</label>
+                      <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
+                        Course Title <span className="text-[#EE2C3C]">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={newCourse.title}
+                        onChange={(e) => setNewCourse({ ...newCourse, title: e.target.value })}
+                        placeholder="e.g. Mechanical CAD/CAM/CAE Diploma"
+                        className="w-full p-3.5 sm:p-4 rounded-xl border-2 border-slate-300 font-bold text-base sm:text-lg text-slate-900 bg-white focus:outline-none focus:border-slate-900 shadow-2xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
+                        Tagline / Hero Subtitle <span className="text-slate-400 font-normal">(Shown directly under title)</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={newCourse.tagline || ''}
+                        onChange={(e) => setNewCourse({ ...newCourse, tagline: e.target.value })}
+                        placeholder="e.g. Autodesk Authorized Revit BIM Professional Certification"
+                        className="w-full p-3.5 sm:p-4 rounded-xl border-2 border-slate-300 font-semibold text-base text-slate-900 bg-white focus:outline-none focus:border-slate-900 shadow-2xs"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Folder, Code, Category, Level */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                      <label className="block text-sm font-bold text-slate-800 mb-1.5">Discipline / Folder *</label>
                       <select
                         value={newCourse.folder}
                         onChange={(e) => {
@@ -7088,7 +7153,7 @@ export default function AdminPortalPage() {
                             domain: chosenFolderObj?.name || newCourse.domain,
                           });
                         }}
-                        className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-bold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                        className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-bold text-sm sm:text-base bg-white focus:outline-none focus:border-slate-900"
                       >
                         {foldersList.map((folder) => (
                           <option key={folder.id} value={folder.id}>
@@ -7099,35 +7164,33 @@ export default function AdminPortalPage() {
                     </div>
 
                     <div>
-                      <label className="block font-bold text-[#334155] mb-1">Course Code</label>
+                      <label className="block text-sm font-bold text-slate-800 mb-1.5">Course Code</label>
                       <input
                         type="text"
                         value={newCourse.code}
                         onChange={(e) => setNewCourse({ ...newCourse, code: e.target.value })}
                         placeholder="e.g. CAD-MEC-90"
-                        className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-semibold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                        className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-bold font-mono text-sm sm:text-base bg-white focus:outline-none focus:border-slate-900"
                       />
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block font-bold text-[#334155] mb-1">Category Badge</label>
+                      <label className="block text-sm font-bold text-slate-800 mb-1.5">Category Badge</label>
                       <input
                         type="text"
-                        value={newCourse.category}
+                        value={newCourse.category || ''}
                         onChange={(e) => setNewCourse({ ...newCourse, category: e.target.value })}
-                        placeholder="e.g. MECHANICAL CAE"
-                        className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-semibold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                        placeholder="e.g. PARAMETRIC BIM"
+                        className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-bold text-sm sm:text-base bg-white focus:outline-none focus:border-slate-900"
                       />
                     </div>
 
                     <div>
-                      <label className="block font-bold text-[#334155] mb-1">Course Level</label>
+                      <label className="block text-sm font-bold text-slate-800 mb-1.5">Course Level</label>
                       <select
-                        value={newCourse.level}
+                        value={newCourse.level || 'Professional'}
                         onChange={(e) => setNewCourse({ ...newCourse, level: e.target.value })}
-                        className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-bold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                        className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-bold text-sm sm:text-base bg-white focus:outline-none focus:border-slate-900"
                       >
                         <option value="Professional">Professional</option>
                         <option value="Diploma">Diploma</option>
@@ -7136,130 +7199,75 @@ export default function AdminPortalPage() {
                       </select>
                     </div>
                   </div>
-                </div>
 
-                {/* 2. Commercial & Academic Key Facts */}
-                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
-                  <span className="text-xs font-black text-[#131313] uppercase tracking-wider block border-b pb-2 border-[#CBD5E1]">
-                    2. Commercial &amp; Academic Key Facts (Stats Matrix)
-                  </span>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {/* Commercial Stats Matrix */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
                     <div>
-                      <label className="block font-bold text-[#334155] mb-1">Tuition Fee (Rs) *</label>
+                      <label className="block text-sm font-bold text-slate-800 mb-1.5">Standard Tuition Fee (₹) *</label>
                       <input
                         type="number"
                         required
                         value={newCourse.fee}
                         onChange={(e) => setNewCourse({ ...newCourse, fee: Number(e.target.value) })}
-                        className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-black text-[#16A34A] bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                        className="w-full p-3.5 rounded-xl border-2 border-emerald-300 font-black text-lg text-emerald-700 bg-emerald-50/20 focus:outline-none focus:border-emerald-600 shadow-2xs"
                       />
                     </div>
 
                     <div>
-                      <label className="block font-bold text-[#334155] mb-1">Duration Label</label>
+                      <label className="block text-sm font-bold text-slate-800 mb-1.5">Duration Label</label>
                       <input
                         type="text"
                         value={newCourse.duration}
                         onChange={(e) => setNewCourse({ ...newCourse, duration: e.target.value })}
-                        placeholder="e.g. 90 Days (180 Hours)"
-                        className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-semibold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                        placeholder="e.g. 12 Weeks (120 Hours)"
+                        className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-semibold text-sm sm:text-base text-slate-900 bg-white"
                       />
                     </div>
 
                     <div>
-                      <label className="block font-bold text-[#334155] mb-1">Total Lab Hours</label>
+                      <label className="block text-sm font-bold text-slate-800 mb-1.5">Total Lab Hours</label>
                       <input
                         type="number"
-                        value={newCourse.totalHours}
+                        value={newCourse.totalHours || 120}
                         onChange={(e) => setNewCourse({ ...newCourse, totalHours: Number(e.target.value) || 120 })}
-                        className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-bold text-[#0F172A] bg-[#FFFFFF]"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block font-bold text-[#334155] mb-1">Prerequisite</label>
-                      <input
-                        type="text"
-                        value={newCourse.prerequisites}
-                        onChange={(e) => setNewCourse({ ...newCourse, prerequisites: e.target.value })}
-                        placeholder="e.g. Diploma / B.Tech / Working Professional"
-                        className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-semibold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                        className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-bold text-sm sm:text-base text-slate-900 bg-white"
                       />
                     </div>
 
                     <div>
-                      <label className="block font-bold text-[#334155] mb-1">Certification Authority</label>
-                      <input
-                        type="text"
-                        value={newCourse.certification}
-                        onChange={(e) => setNewCourse({ ...newCourse, certification: e.target.value })}
-                        placeholder="e.g. Autodesk & Dassault Certificate"
-                        className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-semibold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block font-bold text-[#334155] mb-1">Awarded Credential Title (Pillar 2)</label>
-                    <input
-                      type="text"
-                      value={newCourse.awardedCredential || newCourse.certification || ''}
-                      onChange={(e) => setNewCourse({ ...newCourse, awardedCredential: e.target.value })}
-                      placeholder="e.g. Autodesk Certified Professional: Revit Architecture & BIM Specialist"
-                      className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-semibold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block font-bold text-[#334155] mb-1">Training Schedule / Mode</label>
-                      <input
-                        type="text"
-                        value={newCourse.mode}
-                        onChange={(e) => setNewCourse({ ...newCourse, mode: e.target.value })}
-                        placeholder="e.g. Classroom & Dedicated CAD Workstation Lab"
-                        className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-semibold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block font-bold text-[#334155] mb-1">Course Status</label>
+                      <label className="block text-sm font-bold text-slate-800 mb-1.5">Course Visibility Status</label>
                       <select
                         value={newCourse.status}
-                        onChange={(e) => setNewCourse({ ...newCourse, status: e.target.value as any })}
-                        className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-bold bg-[#FFFFFF]"
+                        onChange={(e) =>
+                          setNewCourse({ ...newCourse, status: e.target.value as 'Active' | 'Inactive' })
+                        }
+                        className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-bold text-sm sm:text-base bg-white"
                       >
                         <option value="Active">Active (Visible on Website)</option>
                         <option value="Inactive">Inactive (Hidden)</option>
                       </select>
                     </div>
                   </div>
-                </div>
 
-                {/* 3. Media, Workstation Lab & Certificate Imagery */}
-                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-5">
-                  <span className="text-xs font-black text-[#131313] uppercase tracking-wider block border-b pb-2 border-[#CBD5E1]">
-                    3. Course Visual Assets, Workstation Lab &amp; Certificate Images
-                  </span>
-
-                  {/* Primary Course Banner */}
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="block font-bold text-[#334155]">Primary Course Banner Image *</label>
-                      <span className="text-[11px] font-bold text-slate-500 uppercase">Hero &amp; Catalog</span>
+                  {/* Primary Course Banner Image */}
+                  <div className="pt-2">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-sm sm:text-base font-bold text-slate-800">
+                        Primary Course Banner Image (Hero Banner &amp; Catalog) <span className="text-[#EE2C3C]">*</span>
+                      </label>
+                      <span className="text-xs font-bold text-blue-600 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded">
+                        High-Resolution Architectural/Engineering Specimen
+                      </span>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-3">
                       <input
                         type="text"
-                        value={newCourse.image}
+                        value={newCourse.image || ''}
                         onChange={(e) => setNewCourse({ ...newCourse, image: e.target.value })}
                         placeholder="https://images.unsplash.com/..."
-                        className="flex-1 p-2.5 rounded-xl border-2 border-[#CBD5E1] font-semibold text-xs bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                        className="flex-1 p-3.5 rounded-xl border-2 border-slate-300 font-semibold text-sm sm:text-base text-slate-900 bg-white focus:outline-none focus:border-slate-900 shadow-2xs"
                       />
-                      <label className="px-4 py-2.5 bg-[#131313] hover:bg-[#262626] text-[#FFFFFF] text-xs font-bold rounded-xl cursor-pointer flex items-center justify-center whitespace-nowrap shadow-sm">
+                      <label className="px-6 py-3.5 bg-slate-900 hover:bg-black text-white text-sm font-bold rounded-xl cursor-pointer flex items-center justify-center whitespace-nowrap shadow-sm transition-all">
                         <span>{isUploadingMedia ? 'Uploading...' : 'Upload Image'}</span>
                         <input
                           type="file"
@@ -7274,30 +7282,171 @@ export default function AdminPortalPage() {
                     </div>
 
                     {newCourse.image && (
-                      <div className="mt-2.5 h-36 w-full rounded-xl overflow-hidden border-2 border-[#CBD5E1] bg-[#000000] relative shadow-inner">
-                        <img src={newCourse.image} alt="Course Preview" className="w-full h-full object-cover" />
-                        <div className="absolute bottom-2 right-2 bg-black/75 text-[#FFFFFF] text-xs font-bold px-2.5 py-1 rounded font-mono">
-                          Banner Preview
+                      <div className="mt-3 h-48 w-full rounded-2xl overflow-hidden border-2 border-slate-300 bg-slate-950 relative shadow-inner">
+                        <img
+                          src={newCourse.image}
+                          alt="Primary Course Banner"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute bottom-3 right-3 bg-black/80 backdrop-blur-xs text-white text-xs font-bold px-3 py-1.5 rounded-lg font-mono">
+                          Live Hero Banner Preview
                         </div>
                       </div>
                     )}
                   </div>
+                </div>
+
+                {/* 2. ACADEMIC FACTS & 4 PILLARS */}
+                <div id="add-sec-2" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                  <div className="flex items-center justify-between pb-3 border-b-2 border-slate-200">
+                    <div className="flex items-center space-x-3">
+                      <span className="w-8 h-8 rounded-lg bg-purple-600 text-white flex items-center justify-center font-mono font-black text-sm">
+                        02
+                      </span>
+                      <div>
+                        <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                          Academic Facts &amp; Eligibility (4 Live Pillars)
+                        </h4>
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                          Matches Section A &ldquo;Course Academic Facts &amp; Eligibility&rdquo; 4-pillar cards on the live website.
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200 hidden sm:inline-block">
+                      Section A 4 Pillars
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                      <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
+                        Pillar 1: Eligibility &amp; Prerequisites
+                      </label>
+                      <input
+                        type="text"
+                        value={newCourse.prerequisites || ''}
+                        onChange={(e) => setNewCourse({ ...newCourse, prerequisites: e.target.value })}
+                        placeholder="e.g. Basic understanding of architectural floor plans and building layouts"
+                        className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-semibold text-sm sm:text-base text-slate-900 bg-white shadow-2xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
+                        Pillar 2: Awarded Credential Title
+                      </label>
+                      <input
+                        type="text"
+                        value={newCourse.awardedCredential || newCourse.certification || ''}
+                        onChange={(e) => setNewCourse({ ...newCourse, awardedCredential: e.target.value })}
+                        placeholder="e.g. Autodesk Certified Professional: Revit Architecture (ACP)"
+                        className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-bold text-sm sm:text-base text-slate-900 bg-white shadow-2xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
+                        Pillar 3: Training Mode &amp; Lab Access
+                      </label>
+                      <input
+                        type="text"
+                        value={newCourse.mode || ''}
+                        onChange={(e) => setNewCourse({ ...newCourse, mode: e.target.value })}
+                        placeholder="e.g. Classroom & Dedicated CAD Workstation Lab"
+                        className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-semibold text-sm sm:text-base text-slate-900 bg-white shadow-2xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
+                        Pillar 4: Software Tools &amp; Authorized Toolchain
+                      </label>
+                      <input
+                        type="text"
+                        value={newCourse.software}
+                        onChange={(e) => setNewCourse({ ...newCourse, software: e.target.value })}
+                        placeholder="e.g. Autodesk Revit 2026, Navisworks Manage, BIM 360, Enscape"
+                        className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-semibold text-sm sm:text-base text-slate-900 bg-white shadow-2xs"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. COURSE OVERVIEW & LEARNING OBJECTIVES */}
+                <div id="add-sec-3" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                  <div className="flex items-center justify-between pb-3 border-b-2 border-slate-200">
+                    <div className="flex items-center space-x-3">
+                      <span className="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center font-mono font-black text-sm">
+                        03
+                      </span>
+                      <div>
+                        <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                          Course Overview &amp; Learning Objectives
+                        </h4>
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                          Matches the dedicated narrative card with the red indicator pill on the live website.
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 hidden sm:inline-block">
+                      Live Overview Card
+                    </span>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
+                      Comprehensive Syllabus Overview &amp; Project Description
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={newCourse.overview || ''}
+                      onChange={(e) => setNewCourse({ ...newCourse, overview: e.target.value })}
+                      placeholder="Master end-to-end architectural BIM workflows from parametric floor layout generation, structural walls, and curtain systems to multi-disciplinary clash detection and construction sequencing."
+                      className="w-full p-4 rounded-xl border-2 border-slate-300 font-medium text-base text-slate-900 bg-white focus:outline-none focus:border-slate-900 leading-relaxed shadow-2xs"
+                    />
+                  </div>
+                </div>
+
+                {/* 4. COURSE HIGHLIGHTS & CORE COMPETENCIES (WITH WORKSTATION LAB PHOTO) */}
+                <div id="add-sec-4" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                  <div className="flex items-center justify-between pb-3 border-b-2 border-slate-200">
+                    <div className="flex items-center space-x-3">
+                      <span className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-mono font-black text-sm">
+                        04
+                      </span>
+                      <div>
+                        <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                          Course Highlights &amp; Core Competencies (With Workstation Lab Photo)
+                        </h4>
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                          Matches Section C split card (Left: Ameerpet Lab Workstation Photo, Right: 6 Core Competencies Checklist with green checkmarks).
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 hidden sm:inline-block">
+                      Section C Split Card
+                    </span>
+                  </div>
 
                   {/* Secondary Workstation Lab Photo */}
-                  <div className="pt-3 border-t border-slate-100">
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="block font-bold text-[#334155]">Secondary Lab Image (Ameerpet Workstation Lab)</label>
-                      <span className="text-[11px] font-bold text-blue-600 uppercase">Section C Lab Showcase</span>
+                  <div className="p-5 bg-slate-50 rounded-2xl border-2 border-slate-200 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-sm sm:text-base font-bold text-slate-800">
+                        Secondary Lab Image (Ameerpet Workstation Lab Photo)
+                      </label>
+                      <span className="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded">
+                        Workstation Showcase
+                      </span>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-3">
                       <input
                         type="text"
                         value={newCourse.labImage || ''}
                         onChange={(e) => setNewCourse({ ...newCourse, labImage: e.target.value })}
-                        placeholder="https://images.unsplash.com/..."
-                        className="flex-1 p-2.5 rounded-xl border-2 border-[#CBD5E1] font-semibold text-xs bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                        placeholder="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80"
+                        className="flex-1 p-3.5 rounded-xl border-2 border-slate-300 font-semibold text-sm sm:text-base text-slate-900 bg-white"
                       />
-                      <label className="px-4 py-2.5 bg-[#15304C] hover:bg-[#0f2338] text-[#FFFFFF] text-xs font-bold rounded-xl cursor-pointer flex items-center justify-center whitespace-nowrap shadow-sm">
+                      <label className="px-6 py-3.5 bg-[#15304C] hover:bg-[#0f2338] text-white text-sm font-bold rounded-xl cursor-pointer flex items-center justify-center whitespace-nowrap shadow-sm transition-all">
                         <span>{isUploadingMedia ? 'Uploading...' : 'Upload Lab Image'}</span>
                         <input
                           type="file"
@@ -7312,159 +7461,213 @@ export default function AdminPortalPage() {
                     </div>
 
                     {newCourse.labImage && (
-                      <div className="mt-2.5 h-36 w-full rounded-xl overflow-hidden border-2 border-[#CBD5E1] bg-[#000000] relative shadow-inner">
+                      <div className="mt-2 h-44 w-full rounded-xl overflow-hidden border-2 border-slate-300 bg-slate-900 relative shadow-inner">
                         <img
                           src={newCourse.labImage}
-                          alt="Workstation Lab Preview"
+                          alt="Ameerpet Workstation Lab"
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute bottom-2 left-2 bg-[#15304C]/95 text-[#FFFFFF] text-xs font-bold px-2.5 py-1 rounded font-mono shadow-md">
-                          Ameerpet Workstation Lab Preview
+                        <div className="absolute bottom-3 left-3 bg-[#15304C]/95 backdrop-blur-xs text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-md">
+                          Ameerpet Workstation Lab Photo Preview
                         </div>
                       </div>
                     )}
                   </div>
 
-                  {/* Certificate Sample Specimen */}
-                  <div className="pt-3 border-t border-slate-100">
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="block font-bold text-[#334155]">Certificate Sample Specimen Image</label>
-                      <span className="text-[11px] font-bold text-amber-600 uppercase">Section F Certificate</span>
-                    </div>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={newCourse.certificateImage || ''}
-                        onChange={(e) => setNewCourse({ ...newCourse, certificateImage: e.target.value })}
-                        placeholder="Leave blank to use generated official ISO certificate specimen, or paste image URL / upload custom"
-                        className="flex-1 p-2.5 rounded-xl border-2 border-[#CBD5E1] font-semibold text-xs bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
-                      />
-                      <label className="px-4 py-2.5 bg-[#D97706] hover:bg-[#B45309] text-[#FFFFFF] text-xs font-bold rounded-xl cursor-pointer flex items-center justify-center whitespace-nowrap shadow-sm">
-                        <span>{isUploadingMedia ? 'Uploading...' : 'Upload Certificate'}</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) handleFileUpload(file, 'certificateImage');
-                          }}
-                        />
-                      </label>
-                    </div>
-
-                    {newCourse.certificateImage && (
-                      <div className="mt-2.5 h-36 w-full rounded-xl overflow-hidden border-2 border-amber-300 bg-[#FFFFFF] relative shadow-inner flex items-center justify-center p-1">
-                        <img
-                          src={newCourse.certificateImage}
-                          alt="Certificate Specimen Preview"
-                          className="w-full h-full object-contain"
-                        />
-                        <div className="absolute bottom-2 right-2 bg-amber-600 text-[#FFFFFF] text-xs font-bold px-2.5 py-1 rounded font-mono shadow-md">
-                          Certificate Specimen Preview
-                        </div>
+                  {/* Core Competencies Checklist Builder */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+                      <div>
+                        <span className="text-sm sm:text-base font-bold text-slate-800">
+                          Core Competencies Checklist ({newCourse.highlights?.length || 0} Items)
+                        </span>
+                        <p className="text-xs text-slate-500">
+                          These items render with green checkmarks (✓) next to the lab workstation photo on the live website.
+                        </p>
                       </div>
-                    )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const cur = newCourse.highlights || [];
+                          setNewCourse({
+                            ...newCourse,
+                            highlights: [...cur, `Live industrial modeling with ${newCourse.software?.split(',')[0] || 'CAD Suite'}`],
+                          });
+                        }}
+                        className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold uppercase transition-all shadow-sm cursor-pointer"
+                      >
+                        + Add Core Competency
+                      </button>
+                    </div>
+
+                    <div className="space-y-3">
+                      {(newCourse.highlights || []).map((highlight, hIdx) => (
+                        <div key={hIdx} className="flex items-center space-x-3 bg-slate-50 p-3 sm:p-3.5 rounded-xl border border-slate-200">
+                          <span className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-sm flex-shrink-0">
+                            ✓
+                          </span>
+                          <input
+                            type="text"
+                            value={highlight}
+                            onChange={(e) => {
+                              const list = [...(newCourse.highlights || [])];
+                              list[hIdx] = e.target.value;
+                              setNewCourse({ ...newCourse, highlights: list });
+                            }}
+                            className="flex-1 p-2.5 sm:p-3 text-sm sm:text-base font-bold text-slate-900 bg-white rounded-xl border border-slate-300 focus:outline-none focus:border-emerald-600 shadow-2xs"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const list = (newCourse.highlights || []).filter((_, i) => i !== hIdx);
+                              setNewCourse({ ...newCourse, highlights: list });
+                            }}
+                            className="text-sm font-bold text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-3 py-2 rounded-lg cursor-pointer transition-colors whitespace-nowrap"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
-                {/* 4. Authorized Toolchain & Course Overview */}
-                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
-                  <span className="text-xs font-black text-[#131313] uppercase tracking-wider block border-b pb-2 border-[#CBD5E1]">
-                    4. Authorized Toolchain &amp; Course Overview
-                  </span>
-
-                  <div>
-                    <label className="block font-bold text-[#334155] mb-1">Authorized Toolchain (Comma Separated)</label>
-                    <input
-                      type="text"
-                      value={newCourse.software}
-                      onChange={(e) => setNewCourse({ ...newCourse, software: e.target.value })}
-                      placeholder="e.g. Dassault CATIA V5, SolidWorks 2026, ANSYS Workbench"
-                      className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-semibold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block font-bold text-[#334155] mb-1">Tagline (Hero Subtitle)</label>
-                    <input
-                      type="text"
-                      value={newCourse.tagline}
-                      onChange={(e) => setNewCourse({ ...newCourse, tagline: e.target.value })}
-                      placeholder="e.g. Parametric Solid Modeling, Generative Surfacing, and Multi-Physics Simulation"
-                      className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-semibold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block font-bold text-[#334155] mb-1">Course Overview &amp; Learning Objectives</label>
-                    <textarea
-                      rows={3}
-                      value={newCourse.overview}
-                      onChange={(e) => setNewCourse({ ...newCourse, overview: e.target.value })}
-                      className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-medium bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
-                    />
-                  </div>
-                </div>
-
-                {/* 5. Course Highlights & Core Competencies (Live Checklist Builder) */}
-                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
-                  <div className="flex items-center justify-between pb-2 border-b border-[#CBD5E1]">
-                    <span className="text-xs font-black text-[#059669] uppercase tracking-wider">
-                      5. Course Highlights &amp; Core Competencies ({newCourse.highlights?.length || 0} Items)
-                    </span>
+                {/* 5. COURSE CONTENTS & MODULE SYLLABUS BREAKDOWN */}
+                <div id="add-sec-5" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b-2 border-slate-200 gap-3">
+                    <div className="flex items-center space-x-3">
+                      <span className="w-8 h-8 rounded-lg bg-[#EE2C3C] text-white flex items-center justify-center font-mono font-black text-sm">
+                        05
+                      </span>
+                      <div>
+                        <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                          Course Contents &amp; Units Breakdown ({newCourse.modules?.length || 0} Units)
+                        </h4>
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                          Matches Section D interactive syllabus accordions with lab hours and bullet topics.
+                        </p>
+                      </div>
+                    </div>
                     <button
                       type="button"
                       onClick={() => {
-                        const cur = newCourse.highlights || [];
+                        const cur = newCourse.modules || [];
+                        const num = String(cur.length + 1).padStart(2, '0');
+                        const updated = [
+                          ...cur,
+                          {
+                            number: num,
+                            title: `Unit ${num} Advanced Topics & Industrial Workflows`,
+                            hours: 20,
+                            topics: ['Core engineering concepts', 'Parametric modeling & constraints', 'Practical lab drafting & validation'],
+                          },
+                        ];
                         setNewCourse({
                           ...newCourse,
-                          highlights: [...cur, `Industrial modeling & project validation with ${newCourse.software?.split(',')[0] || 'CAD Suite'}`],
+                          modules: updated,
+                          syllabusText: updated.map((m) => m.title).join('\n'),
                         });
                       }}
-                      className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase transition-all shadow-xs cursor-pointer"
+                      className="px-5 py-2.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs sm:text-sm font-black uppercase tracking-wider shadow-sm transition-all cursor-pointer whitespace-nowrap"
                     >
-                      + Add Competency
+                      + Add Syllabus Unit
                     </button>
                   </div>
 
-                  <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
-                    {(newCourse.highlights || []).map((highlight, hIdx) => (
-                      <div key={hIdx} className="flex items-center space-x-2 bg-slate-50 p-2 rounded-xl border border-slate-200">
-                        <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs flex-shrink-0">
-                          ✓
-                        </span>
-                        <input
-                          type="text"
-                          value={highlight}
-                          onChange={(e) => {
-                            const list = [...(newCourse.highlights || [])];
-                            list[hIdx] = e.target.value;
-                            setNewCourse({ ...newCourse, highlights: list });
-                          }}
-                          className="flex-1 p-1.5 text-xs font-semibold bg-white rounded-lg border border-slate-200 focus:outline-none focus:border-emerald-600"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const list = (newCourse.highlights || []).filter((_, i) => i !== hIdx);
-                            setNewCourse({ ...newCourse, highlights: list });
-                          }}
-                          className="text-xs text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-2 py-1 rounded font-bold cursor-pointer transition-colors"
-                        >
-                          Remove
-                        </button>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    {(newCourse.modules || []).map((mod, idx) => (
+                      <div key={idx} className="p-5 bg-slate-50 border-2 border-slate-200 rounded-2xl space-y-3.5 shadow-xs">
+                        <div className="flex items-center justify-between flex-wrap gap-2">
+                          <span className="px-3 py-1 rounded-lg bg-[#EE2C3C] text-white font-mono font-black text-sm">
+                            MODULE {mod.number}
+                          </span>
+                          <div className="flex items-center space-x-2">
+                            <input
+                              type="number"
+                              value={mod.hours}
+                              onChange={(e) => {
+                                const updated = [...(newCourse.modules || [])];
+                                updated[idx] = { ...updated[idx], hours: Number(e.target.value) || 20 };
+                                setNewCourse({ ...newCourse, modules: updated });
+                              }}
+                              className="w-20 p-2 border-2 border-slate-300 rounded-lg text-sm text-center font-black bg-white"
+                              title="Lab Hours"
+                            />
+                            <span className="text-xs font-bold text-slate-700">LAB HRS</span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const updated = (newCourse.modules || []).filter((_, i) => i !== idx);
+                                setNewCourse({
+                                  ...newCourse,
+                                  modules: updated,
+                                  syllabusText: updated.map((m) => m.title).join('\n'),
+                                });
+                              }}
+                              className="text-sm font-bold text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-2.5 py-1 rounded-lg cursor-pointer ml-2 transition-colors"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-1">Module / Unit Title</label>
+                          <input
+                            type="text"
+                            value={mod.title}
+                            onChange={(e) => {
+                              const updated = [...(newCourse.modules || [])];
+                              updated[idx] = { ...updated[idx], title: e.target.value };
+                              setNewCourse({
+                                ...newCourse,
+                                modules: updated,
+                                syllabusText: updated.map((m) => m.title).join('\n'),
+                              });
+                            }}
+                            placeholder="Module Title"
+                            className="w-full p-3 rounded-xl border-2 border-slate-300 text-sm sm:text-base font-bold text-slate-900 bg-white shadow-2xs"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-1">Topics Covered (Comma Separated)</label>
+                          <input
+                            type="text"
+                            value={(mod.topics || []).join(', ')}
+                            onChange={(e) => {
+                              const updated = [...(newCourse.modules || [])];
+                              updated[idx] = {
+                                ...updated[idx],
+                                topics: e.target.value.split(',').map((s) => s.trim()).filter(Boolean),
+                              };
+                              setNewCourse({ ...newCourse, modules: updated });
+                            }}
+                            placeholder="Topics separated by comma"
+                            className="w-full p-3 rounded-xl border-2 border-slate-300 text-sm font-medium text-slate-800 bg-white shadow-2xs"
+                          />
+                        </div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* 6. Career Progression Path (Career Pathways Step Builder) */}
-                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
-                  <div className="flex items-center justify-between pb-2 border-b border-[#CBD5E1]">
-                    <span className="text-xs font-black text-[#EE2C3C] uppercase tracking-wider">
-                      6. Career Progression Path ({newCourse.careerPathways?.length || 0} Steps)
-                    </span>
+                {/* 6. CAREER PROGRESSION PATH (FAN INFOGRAPHIC STEP BUILDER) */}
+                <div id="add-sec-6" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b-2 border-slate-200 gap-3">
+                    <div className="flex items-center space-x-3">
+                      <span className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-mono font-black text-sm">
+                        06
+                      </span>
+                      <div>
+                        <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                          Career Progression Path ({newCourse.careerPathways?.length || 0} Steps)
+                        </h4>
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                          Matches Section E Career Infographic Fan Cards (Experience Range, Job Role, and Expected Compensation CTC).
+                        </p>
+                      </div>
+                    </div>
                     <button
                       type="button"
                       onClick={() => {
@@ -7483,17 +7686,17 @@ export default function AdminPortalPage() {
                           ],
                         });
                       }}
-                      className="px-3 py-1 rounded-lg bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs font-bold uppercase transition-all shadow-xs cursor-pointer"
+                      className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold uppercase transition-all shadow-sm cursor-pointer whitespace-nowrap"
                     >
                       + Add Career Step
                     </button>
                   </div>
 
-                  <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+                  <div className="space-y-4">
                     {(newCourse.careerPathways || []).map((stepItem, sIdx) => (
-                      <div key={sIdx} className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                      <div key={sIdx} className="p-4 sm:p-5 bg-slate-50 border-2 border-slate-200 rounded-xl space-y-3">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-black text-slate-800">
+                          <span className="px-3 py-1 rounded-lg bg-[#15304C] text-white font-mono font-black text-sm">
                             STEP {stepItem.step || String(sIdx + 1).padStart(2, '0')}
                           </span>
                           <button
@@ -7502,15 +7705,17 @@ export default function AdminPortalPage() {
                               const cur = (newCourse.careerPathways || []).filter((_, i) => i !== sIdx);
                               setNewCourse({ ...newCourse, careerPathways: cur });
                             }}
-                            className="text-xs text-rose-600 hover:text-rose-800 font-bold px-1.5 py-0.5 rounded cursor-pointer"
+                            className="text-sm font-bold text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-2.5 py-1 rounded-lg cursor-pointer transition-colors"
                           >
-                            Remove
+                            Remove Step
                           </button>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                           <div>
-                            <label className="block text-[10px] font-bold text-slate-500 uppercase">Experience</label>
+                            <label className="block text-xs sm:text-sm font-bold text-slate-700 uppercase tracking-wider mb-1">
+                              Experience Range
+                            </label>
                             <input
                               type="text"
                               value={stepItem.experience}
@@ -7520,12 +7725,14 @@ export default function AdminPortalPage() {
                                 setNewCourse({ ...newCourse, careerPathways: cur });
                               }}
                               placeholder="e.g. 0 – 2 Yrs"
-                              className="w-full p-1.5 text-xs font-semibold bg-white rounded border border-slate-200"
+                              className="w-full p-3 text-sm sm:text-base font-bold text-slate-900 bg-white rounded-xl border-2 border-slate-300 shadow-2xs"
                             />
                           </div>
 
                           <div>
-                            <label className="block text-[10px] font-bold text-slate-500 uppercase">Job Role Title</label>
+                            <label className="block text-xs sm:text-sm font-bold text-slate-700 uppercase tracking-wider mb-1">
+                              Job Role Title
+                            </label>
                             <input
                               type="text"
                               value={stepItem.role}
@@ -7535,12 +7742,14 @@ export default function AdminPortalPage() {
                                 setNewCourse({ ...newCourse, careerPathways: cur });
                               }}
                               placeholder="e.g. BIM Architectural Modeler"
-                              className="w-full p-1.5 text-xs font-bold text-slate-900 bg-white rounded border border-slate-200"
+                              className="w-full p-3 text-sm sm:text-base font-black text-slate-900 bg-white rounded-xl border-2 border-slate-300 shadow-2xs"
                             />
                           </div>
 
                           <div>
-                            <label className="block text-[10px] font-bold text-slate-500 uppercase">Expected CTC</label>
+                            <label className="block text-xs sm:text-sm font-bold text-emerald-800 uppercase tracking-wider mb-1">
+                              Expected CTC Range
+                            </label>
                             <input
                               type="text"
                               value={stepItem.ctc}
@@ -7550,7 +7759,7 @@ export default function AdminPortalPage() {
                                 setNewCourse({ ...newCourse, careerPathways: cur });
                               }}
                               placeholder="e.g. ₹4.5L – ₹9.0L PA"
-                              className="w-full p-1.5 text-xs font-bold text-emerald-700 bg-white rounded border border-slate-200"
+                              className="w-full p-3 text-sm sm:text-base font-black text-emerald-700 bg-emerald-50/50 rounded-xl border-2 border-emerald-300 shadow-2xs"
                             />
                           </div>
                         </div>
@@ -7559,51 +7768,145 @@ export default function AdminPortalPage() {
                   </div>
                 </div>
 
-                {/* 7. Dual Certification & Industry Capstone Project Blueprint */}
-                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
-                  <span className="text-xs font-black text-[#00873D] uppercase tracking-wider block border-b pb-2 border-[#CBD5E1]">
-                    7. Dual Certification &amp; Industry Capstone Project (Mandatory Portfolio)
-                  </span>
+                {/* 7. OFFICIAL CERTIFICATE OF COMPLETION */}
+                <div id="add-sec-7" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                  <div className="flex items-center justify-between pb-3 border-b-2 border-slate-200">
+                    <div className="flex items-center space-x-3">
+                      <span className="w-8 h-8 rounded-lg bg-amber-600 text-white flex items-center justify-center font-mono font-black text-sm">
+                        07
+                      </span>
+                      <div>
+                        <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                          Official Certificate of Completion Specimen
+                        </h4>
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                          Matches Section F &ldquo;How will you get your certificate?&rdquo; on the live website. Leave blank to show the ISO certificate specimen, or upload custom.
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 hidden sm:inline-block">
+                      Section F Certificate
+                    </span>
+                  </div>
 
                   <div>
-                    <label className="block font-bold text-[#334155] mb-1">Portfolio Project Title</label>
+                    <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
+                      Certificate Sample Specimen Image URL / File Upload
+                    </label>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <input
+                        type="text"
+                        value={newCourse.certificateImage || ''}
+                        onChange={(e) => setNewCourse({ ...newCourse, certificateImage: e.target.value })}
+                        placeholder="Leave blank to use generated official ISO certificate specimen, or paste image URL"
+                        className="flex-1 p-3.5 rounded-xl border-2 border-slate-300 font-semibold text-sm sm:text-base text-slate-900 bg-white"
+                      />
+                      <label className="px-6 py-3.5 bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold rounded-xl cursor-pointer flex items-center justify-center whitespace-nowrap shadow-sm transition-all">
+                        <span>{isUploadingMedia ? 'Uploading...' : 'Upload Certificate'}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleFileUpload(file, 'certificateImage');
+                          }}
+                        />
+                      </label>
+                    </div>
+
+                    {newCourse.certificateImage && (
+                      <div className="mt-3 h-52 w-full rounded-2xl overflow-hidden border-2 border-amber-300 bg-white relative shadow-inner flex items-center justify-center p-2">
+                        <img
+                          src={newCourse.certificateImage}
+                          alt="Certificate Specimen"
+                          className="w-full h-full object-contain"
+                        />
+                        <div className="absolute bottom-3 right-3 bg-amber-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-md font-mono">
+                          Live Certificate Specimen Preview
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* 8. DUAL CERTIFICATION & INDUSTRY CAPSTONE PROJECT */}
+                <div id="add-sec-8" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                  <div className="flex items-center justify-between pb-3 border-b-2 border-slate-200">
+                    <div className="flex items-center space-x-3">
+                      <span className="w-8 h-8 rounded-lg bg-teal-600 text-white flex items-center justify-center font-mono font-black text-sm">
+                        08
+                      </span>
+                      <div>
+                        <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                          Dual Certification &amp; Industry Capstone Project (Mandatory Portfolio)
+                        </h4>
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                          Matches Section G &ldquo;Dual Certification &amp; Industry Capstone Project&rdquo; on the live website.
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-teal-50 text-teal-700 border border-teal-200 hidden sm:inline-block">
+                      Section G Capstone
+                    </span>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
+                      Portfolio Project Title
+                    </label>
                     <input
                       type="text"
-                      value={newCourse.capstoneTitle}
+                      value={newCourse.capstoneTitle || ''}
                       onChange={(e) => setNewCourse({ ...newCourse, capstoneTitle: e.target.value })}
                       placeholder="e.g. Commercial Complex 5-Story BIM Model with Multi-Trade Clash Report"
-                      className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-bold text-[#0F172A] bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                      className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-bold text-base text-slate-900 bg-white"
                     />
                   </div>
 
                   <div>
-                    <label className="block font-bold text-[#334155] mb-1">Project Description</label>
+                    <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
+                      Project Description
+                    </label>
                     <textarea
-                      rows={2}
-                      value={newCourse.capstoneDescription}
+                      rows={3}
+                      value={newCourse.capstoneDescription || ''}
                       onChange={(e) => setNewCourse({ ...newCourse, capstoneDescription: e.target.value })}
-                      className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-medium bg-[#FFFFFF]"
+                      placeholder="Detailed project requirements, scope of work, and engineering criteria."
+                      className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-medium text-base text-slate-900 bg-white leading-relaxed"
                     />
                   </div>
 
                   <div>
-                    <label className="block font-bold text-[#334155] mb-1">Verified Deliverables (Comma Separated)</label>
+                    <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
+                      Verified Deliverables (Comma Separated)
+                    </label>
                     <input
                       type="text"
-                      value={newCourse.capstoneDeliverablesText}
+                      value={newCourse.capstoneDeliverablesText || ''}
                       onChange={(e) => setNewCourse({ ...newCourse, capstoneDeliverablesText: e.target.value })}
                       placeholder="e.g. Central BIM Model (.rvt), Automated Bill of Quantities, Navisworks Clash Matrix"
-                      className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-semibold text-xs bg-[#FFFFFF]"
+                      className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-semibold text-sm sm:text-base text-slate-900 bg-white"
                     />
                   </div>
                 </div>
 
-                {/* 8. Frequently Asked Questions (FAQ Accordion Builder) */}
-                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
-                  <div className="flex items-center justify-between pb-2 border-b border-[#CBD5E1]">
-                    <span className="text-xs font-black text-[#2563EB] uppercase tracking-wider">
-                      8. Frequently Asked Questions (FAQ) ({newCourse.faqs?.length || 0} Questions)
-                    </span>
+                {/* 9. FREQUENTLY ASKED QUESTIONS (FAQ ACCORDION BUILDER) */}
+                <div id="add-sec-9" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b-2 border-slate-200 gap-3">
+                    <div className="flex items-center space-x-3">
+                      <span className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-mono font-black text-sm">
+                        09
+                      </span>
+                      <div>
+                        <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                          Frequently Asked Questions (FAQ) ({newCourse.faqs?.length || 0} Questions)
+                        </h4>
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                          Matches Section H expandable FAQ accordions at the bottom of the live website modal.
+                        </p>
+                      </div>
+                    </div>
                     <button
                       type="button"
                       onClick={() => {
@@ -7613,36 +7916,39 @@ export default function AdminPortalPage() {
                           faqs: [
                             ...cur,
                             {
-                              question: `What job assistance is provided for ${newCourse.title || 'this program'}?`,
-                              answer: 'Our placement cell conducts mock technical CAD interviews and coordinates direct hiring with top EPC firms.',
+                              question: `What job placement support is provided for ${newCourse.title || 'this course'}?`,
+                              answer: 'Our placement cell conducts 3 rounds of mock technical CAD interviews and lines up direct interviews with top EPC and MNC recruiters.',
                             },
                           ],
                         });
                       }}
-                      className="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold uppercase transition-all shadow-xs cursor-pointer"
+                      className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold uppercase transition-all shadow-sm cursor-pointer whitespace-nowrap"
                     >
                       + Add FAQ Item
                     </button>
                   </div>
 
-                  <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+                  <div className="space-y-4">
                     {(newCourse.faqs || []).map((faqItem, fIdx) => (
-                      <div key={fIdx} className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                      <div key={fIdx} className="p-4 sm:p-5 bg-slate-50 border-2 border-slate-200 rounded-xl space-y-3">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-slate-700">FAQ #{fIdx + 1}</span>
+                          <span className="px-3 py-1 rounded-md bg-blue-100 text-blue-800 font-bold text-xs uppercase tracking-wider">
+                            FAQ #{fIdx + 1}
+                          </span>
                           <button
                             type="button"
                             onClick={() => {
                               const cur = (newCourse.faqs || []).filter((_, i) => i !== fIdx);
                               setNewCourse({ ...newCourse, faqs: cur });
                             }}
-                            className="text-xs text-rose-600 hover:text-rose-800 font-bold px-1.5 py-0.5 rounded cursor-pointer"
+                            className="text-sm font-bold text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-2.5 py-1 rounded-lg cursor-pointer transition-colors"
                           >
-                            Remove
+                            Remove FAQ
                           </button>
                         </div>
 
                         <div>
+                          <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-1">Question</label>
                           <input
                             type="text"
                             value={faqItem.question}
@@ -7651,149 +7957,45 @@ export default function AdminPortalPage() {
                               cur[fIdx] = { ...cur[fIdx], question: e.target.value };
                               setNewCourse({ ...newCourse, faqs: cur });
                             }}
-                            placeholder="Question"
-                            className="w-full p-2 text-xs font-bold text-slate-900 bg-white rounded border border-slate-200"
+                            placeholder="e.g. Is there any prerequisite for this course in Hyderabad?"
+                            className="w-full p-3 text-sm sm:text-base font-bold text-slate-900 bg-white rounded-xl border-2 border-slate-300 shadow-2xs"
                           />
                         </div>
 
                         <div>
+                          <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-1">Counseling Answer</label>
                           <textarea
-                            rows={2}
+                            rows={3}
                             value={faqItem.answer}
                             onChange={(e) => {
                               const cur = [...(newCourse.faqs || [])];
                               cur[fIdx] = { ...cur[fIdx], answer: e.target.value };
                               setNewCourse({ ...newCourse, faqs: cur });
                             }}
-                            placeholder="Answer"
-                            className="w-full p-2 text-xs text-slate-700 bg-white rounded border border-slate-200"
+                            placeholder="Enter detailed counseling answer"
+                            className="w-full p-3 text-sm sm:text-base font-medium text-slate-800 bg-white rounded-xl border-2 border-slate-300 shadow-2xs leading-relaxed"
                           />
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
-              </div>
 
-              {/* 9. Interactive Module Syllabus Builder (Full Width) */}
-              <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-[#CBD5E1] gap-2">
-                  <span className="text-xs font-black text-[#131313] uppercase tracking-wider">
-                    9. Course Contents &amp; Module Syllabus Breakdown ({newCourse.modules?.length || 0} Units)
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const cur = newCourse.modules || [];
-                      const num = String(cur.length + 1).padStart(2, '0');
-                      const updated = [
-                        ...cur,
-                        {
-                          number: num,
-                          title: `Module ${num} Advanced Topics`,
-                          hours: 20,
-                          topics: ['Core engineering concepts', 'Practical lab drafting & validation'],
-                        },
-                      ];
-                      setNewCourse({
-                        ...newCourse,
-                        modules: updated,
-                        syllabusText: updated.map((m) => m.title).join('\n'),
-                      });
-                    }}
-                    className="px-4 py-1.5 rounded-lg bg-[#131313] hover:bg-[#262626] text-[#FFFFFF] text-sm font-bold uppercase transition-all shadow-sm"
-                  >
-                    + ADD SYLLABUS UNIT
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {(newCourse.modules || []).map((mod, idx) => (
-                    <div key={idx} className="p-4 bg-[#F8FAFC] border-2 border-[#CBD5E1] rounded-xl space-y-2.5 shadow-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-black text-[#EE2C3C]">MODULE {mod.number}</span>
-                        <div className="flex items-center space-x-2">
-                          <input
-                            type="number"
-                            value={mod.hours}
-                            onChange={(e) => {
-                              const updated = [...(newCourse.modules || [])];
-                              updated[idx] = { ...updated[idx], hours: Number(e.target.value) || 20 };
-                              setNewCourse({ ...newCourse, modules: updated });
-                            }}
-                            className="w-16 p-1 border rounded text-xs text-center font-bold bg-[#FFFFFF]"
-                            title="Lab Hours"
-                          />
-                          <span className="text-xs font-bold font-bold text-[#64748B]">LAB HRS</span>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const updated = (newCourse.modules || []).filter((_, i) => i !== idx);
-                              setNewCourse({
-                                ...newCourse,
-                                modules: updated,
-                                syllabusText: updated.map((m) => m.title).join('\n'),
-                              });
-                            }}
-                            className="text-xs text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-2 py-0.5 rounded cursor-pointer font-medium ml-2 transition-colors"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      </div>
-
-                      <div>
-                        <input
-                          type="text"
-                          value={mod.title}
-                          onChange={(e) => {
-                            const updated = [...(newCourse.modules || [])];
-                            updated[idx] = { ...updated[idx], title: e.target.value };
-                            setNewCourse({
-                              ...newCourse,
-                              modules: updated,
-                              syllabusText: updated.map((m) => m.title).join('\n'),
-                            });
-                          }}
-                          placeholder="Module Title"
-                          className="w-full p-2 rounded-lg border text-xs font-bold text-[#0F172A] bg-[#FFFFFF]"
-                        />
-                      </div>
-
-                      <div>
-                        <input
-                          type="text"
-                          value={(mod.topics || []).join(', ')}
-                          onChange={(e) => {
-                            const updated = [...(newCourse.modules || [])];
-                            updated[idx] = {
-                              ...updated[idx],
-                              topics: e.target.value.split(',').map((s) => s.trim()).filter(Boolean),
-                            };
-                            setNewCourse({ ...newCourse, modules: updated });
-                          }}
-                          placeholder="Topics separated by comma"
-                          className="w-full p-2 rounded-lg border text-xs text-[#475569] bg-[#FFFFFF]"
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
               </div>
 
               {/* Bottom Sticky Modal Actions */}
-              <div className="pt-4 flex justify-end space-x-4 border-t-2 border-[#E2E8F0]">
+              <div className="max-w-[1440px] mx-auto pt-6 flex justify-end space-x-4 border-t-2 border-slate-200">
                 <button
                   type="button"
                   onClick={() => setShowAddCourseModal(false)}
-                  className="px-8 py-3 rounded-xl border-2 border-[#CBD5E1] text-sm sm:text-base font-bold hover:bg-[#FFFFFF] transition-all"
+                  className="px-8 py-3.5 rounded-xl border-2 border-slate-300 text-sm sm:text-base font-bold text-slate-700 hover:bg-slate-100 transition-all cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSavingCourse}
-                  className="px-10 py-3 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-[#FFFFFF] text-sm sm:text-base font-black uppercase tracking-wider shadow-md transition-all"
+                  className="px-10 py-3.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-sm sm:text-base font-black uppercase tracking-wider shadow-lg transition-all cursor-pointer"
                 >
                   {isSavingCourse ? 'PUBLISHING...' : 'PUBLISH & SYNC TO WEBSITE'}
                 </button>
@@ -7810,44 +8012,109 @@ export default function AdminPortalPage() {
             {/* Modal Header */}
             <div className="flex justify-between items-center px-6 sm:px-10 py-4 bg-[#FFFFFF] border-b-2 border-[#E2E8F0] shadow-sm flex-shrink-0">
               <div className="flex items-center space-x-3.5">
-                <div className="w-10 h-10 rounded-xl bg-[#131313] text-[#FFFFFF] flex items-center justify-center shadow-md">
-                  
+                <div className="w-10 h-10 rounded-xl bg-[#2563EB] text-[#FFFFFF] flex items-center justify-center shadow-md font-black text-lg">
+                  ✎
                 </div>
                 <div>
-                  <span className="text-sm font-semibold font-black text-[#2563EB] uppercase tracking-wider block">
+                  <span className="text-xs sm:text-sm font-black text-[#2563EB] uppercase tracking-wider block">
                     COURSE MANAGEMENT EDITOR &bull; REAL-TIME LIVE SYNC
                   </span>
-                  <h3 className="text-xl sm:text-2xl font-black text-[#131313]">
-                    Edit Course Blueprint: {editingCourse.title}
+                  <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                    Edit Course: {editingCourse.title}
                   </h3>
                 </div>
               </div>
               <RedCrossCloseButton onClick={() => setEditingCourse(null)} />
             </div>
 
-            {/* Scrollable Form Body */}
-            <form onSubmit={handleEditCourseSubmit} className="flex-1 overflow-y-auto p-6 sm:p-10 space-y-8 bg-[#F8FAFC]">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* 1. Identification & Stream */}
-                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
-                  <span className="text-xs font-black text-[#131313] uppercase tracking-wider block border-b pb-2 border-[#CBD5E1]">
-                    1. Course Identification &amp; Academic Placement
-                  </span>
+            {/* Sticky Order-Wise Quick Jump Navigation Bar */}
+            <div className="bg-slate-100 border-b border-slate-200 px-6 sm:px-10 py-2.5 flex items-center space-x-2 overflow-x-auto no-scrollbar flex-shrink-0">
+              <span className="text-xs font-black text-slate-500 uppercase tracking-wider whitespace-nowrap mr-2">
+                Order-Wise Sections:
+              </span>
+              {[
+                { id: 'edit-sec-1', label: '1. Hero & Basics' },
+                { id: 'edit-sec-2', label: '2. Academic Facts' },
+                { id: 'edit-sec-3', label: '3. Overview' },
+                { id: 'edit-sec-4', label: '4. Highlights & Lab' },
+                { id: 'edit-sec-5', label: '5. Syllabus Units' },
+                { id: 'edit-sec-6', label: '6. Career Path' },
+                { id: 'edit-sec-7', label: '7. Certificate' },
+                { id: 'edit-sec-8', label: '8. Capstone Project' },
+                { id: 'edit-sec-9', label: '9. FAQs' },
+              ].map((sec) => (
+                <button
+                  key={sec.id}
+                  type="button"
+                  onClick={() => {
+                    const el = document.getElementById(sec.id);
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
+                  className="px-3.5 py-1.5 rounded-lg bg-white border border-slate-300 hover:border-slate-800 text-slate-800 text-xs sm:text-sm font-bold whitespace-nowrap shadow-2xs hover:shadow-xs transition-all cursor-pointer"
+                >
+                  {sec.label}
+                </button>
+              ))}
+            </div>
 
-                  <div>
-                    <label className="block font-bold text-[#334155] mb-1">Course Title *</label>
-                    <input
-                      type="text"
-                      required
-                      value={editingCourse.title}
-                      onChange={(e) => setEditingCourse({ ...editingCourse, title: e.target.value })}
-                      className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-semibold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
-                    />
+            {/* Scrollable Form Body - Single Column Logical Website Order with High Visibility */}
+            <form onSubmit={handleEditCourseSubmit} className="flex-1 overflow-y-auto p-6 sm:p-10 space-y-8 bg-[#F8FAFC]">
+              <div className="max-w-[1440px] mx-auto space-y-8">
+                
+                {/* 1. HERO & BASIC COURSE IDENTIFICATION */}
+                <div id="edit-sec-1" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                  <div className="flex items-center justify-between pb-3 border-b-2 border-slate-200">
+                    <div className="flex items-center space-x-3">
+                      <span className="w-8 h-8 rounded-lg bg-[#2563EB] text-white flex items-center justify-center font-mono font-black text-sm">
+                        01
+                      </span>
+                      <div>
+                        <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                          Course Identification, Commercials &amp; Hero Banner
+                        </h4>
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                          Controls the course card on catalog pages, sticky header, and top hero banner on the live website.
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 hidden sm:inline-block">
+                      Hero &amp; Catalog
+                    </span>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Title & Tagline */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                     <div>
-                      <label className="block font-bold text-[#334155] mb-1">Folder / Discipline *</label>
+                      <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
+                        Course Title <span className="text-[#EE2C3C]">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={editingCourse.title}
+                        onChange={(e) => setEditingCourse({ ...editingCourse, title: e.target.value })}
+                        className="w-full p-3.5 sm:p-4 rounded-xl border-2 border-slate-300 font-bold text-base sm:text-lg text-slate-900 bg-white focus:outline-none focus:border-slate-900 shadow-2xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
+                        Tagline / Hero Subtitle <span className="text-slate-400 font-normal">(Shown directly under title)</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={editingCourse.tagline || ''}
+                        onChange={(e) => setEditingCourse({ ...editingCourse, tagline: e.target.value })}
+                        placeholder="e.g. Autodesk Authorized Revit BIM Professional Certification"
+                        className="w-full p-3.5 sm:p-4 rounded-xl border-2 border-slate-300 font-semibold text-base text-slate-900 bg-white focus:outline-none focus:border-slate-900 shadow-2xs"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Folder, Code, Category, Level */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                      <label className="block text-sm font-bold text-slate-800 mb-1.5">Discipline / Folder *</label>
                       <select
                         value={editingCourse.folder}
                         onChange={(e) => {
@@ -7859,7 +8126,7 @@ export default function AdminPortalPage() {
                             domain: chosenFolderObj?.name || editingCourse.domain,
                           });
                         }}
-                        className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-bold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                        className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-bold text-sm sm:text-base bg-white focus:outline-none focus:border-slate-900"
                       >
                         {foldersList.map((folder) => (
                           <option key={folder.id} value={folder.id}>
@@ -7870,34 +8137,32 @@ export default function AdminPortalPage() {
                     </div>
 
                     <div>
-                      <label className="block font-bold text-[#334155] mb-1">Course Code</label>
+                      <label className="block text-sm font-bold text-slate-800 mb-1.5">Course Code</label>
                       <input
                         type="text"
                         value={editingCourse.code}
                         onChange={(e) => setEditingCourse({ ...editingCourse, code: e.target.value })}
-                        className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-semibold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                        className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-bold font-mono text-sm sm:text-base bg-white focus:outline-none focus:border-slate-900"
                       />
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block font-bold text-[#334155] mb-1">Category Badge</label>
+                      <label className="block text-sm font-bold text-slate-800 mb-1.5">Category Badge</label>
                       <input
                         type="text"
                         value={editingCourse.category || ''}
                         onChange={(e) => setEditingCourse({ ...editingCourse, category: e.target.value })}
-                        placeholder="e.g. MECHANICAL CAE"
-                        className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-semibold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                        placeholder="e.g. PARAMETRIC BIM"
+                        className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-bold text-sm sm:text-base bg-white focus:outline-none focus:border-slate-900"
                       />
                     </div>
 
                     <div>
-                      <label className="block font-bold text-[#334155] mb-1">Course Level</label>
+                      <label className="block text-sm font-bold text-slate-800 mb-1.5">Course Level</label>
                       <select
                         value={editingCourse.level || 'Professional'}
                         onChange={(e) => setEditingCourse({ ...editingCourse, level: e.target.value })}
-                        className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-bold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                        className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-bold text-sm sm:text-base bg-white focus:outline-none focus:border-slate-900"
                       >
                         <option value="Professional">Professional</option>
                         <option value="Diploma">Diploma</option>
@@ -7906,131 +8171,75 @@ export default function AdminPortalPage() {
                       </select>
                     </div>
                   </div>
-                </div>
 
-                {/* 2. Commercial & Academic Key Facts */}
-                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
-                  <span className="text-xs font-black text-[#131313] uppercase tracking-wider block border-b pb-2 border-[#CBD5E1]">
-                    2. Commercial &amp; Academic Key Facts (Stats Matrix)
-                  </span>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {/* Commercial Stats Matrix */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
                     <div>
-                      <label className="block font-bold text-[#334155] mb-1">Standard Fee (Rs) *</label>
+                      <label className="block text-sm font-bold text-slate-800 mb-1.5">Standard Tuition Fee (₹) *</label>
                       <input
                         type="number"
                         required
                         value={editingCourse.fee}
                         onChange={(e) => setEditingCourse({ ...editingCourse, fee: Number(e.target.value) })}
-                        className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-black text-[#16A34A] bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                        className="w-full p-3.5 rounded-xl border-2 border-emerald-300 font-black text-lg text-emerald-700 bg-emerald-50/20 focus:outline-none focus:border-emerald-600 shadow-2xs"
                       />
                     </div>
 
                     <div>
-                      <label className="block font-bold text-[#334155] mb-1">Duration Label</label>
+                      <label className="block text-sm font-bold text-slate-800 mb-1.5">Duration Label</label>
                       <input
                         type="text"
                         value={editingCourse.duration}
                         onChange={(e) => setEditingCourse({ ...editingCourse, duration: e.target.value })}
-                        className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-semibold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                        placeholder="e.g. 12 Weeks (120 Hours)"
+                        className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-semibold text-sm sm:text-base text-slate-900 bg-white"
                       />
                     </div>
 
                     <div>
-                      <label className="block font-bold text-[#334155] mb-1">Total Lab Hours</label>
+                      <label className="block text-sm font-bold text-slate-800 mb-1.5">Total Lab Hours</label>
                       <input
                         type="number"
                         value={editingCourse.totalHours || 120}
                         onChange={(e) => setEditingCourse({ ...editingCourse, totalHours: Number(e.target.value) || 120 })}
-                        className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-bold text-[#0F172A] bg-[#FFFFFF]"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block font-bold text-[#334155] mb-1">Prerequisite</label>
-                      <input
-                        type="text"
-                        value={editingCourse.prerequisites || ''}
-                        onChange={(e) => setEditingCourse({ ...editingCourse, prerequisites: e.target.value })}
-                        placeholder="e.g. Diploma / B.Tech / Working Professional"
-                        className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-semibold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                        className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-bold text-sm sm:text-base text-slate-900 bg-white"
                       />
                     </div>
 
                     <div>
-                      <label className="block font-bold text-[#334155] mb-1">Certification Authority</label>
-                      <input
-                        type="text"
-                        value={editingCourse.certification || ''}
-                        onChange={(e) => setEditingCourse({ ...editingCourse, certification: e.target.value })}
-                        placeholder="e.g. Autodesk & Dassault Certificate"
-                        className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-semibold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block font-bold text-[#334155] mb-1">Awarded Credential Title (Pillar 2)</label>
-                    <input
-                      type="text"
-                      value={editingCourse.awardedCredential || editingCourse.certification || ''}
-                      onChange={(e) => setEditingCourse({ ...editingCourse, awardedCredential: e.target.value })}
-                      placeholder="e.g. Autodesk Certified Professional: Revit Architecture & BIM Specialist"
-                      className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-semibold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block font-bold text-[#334155] mb-1">Training Schedule / Mode</label>
-                      <input
-                        type="text"
-                        value={editingCourse.mode || ''}
-                        onChange={(e) => setEditingCourse({ ...editingCourse, mode: e.target.value })}
-                        placeholder="e.g. Classroom & Dedicated CAD Workstation Lab"
-                        className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-semibold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block font-bold text-[#334155] mb-1">Course Status</label>
+                      <label className="block text-sm font-bold text-slate-800 mb-1.5">Course Visibility Status</label>
                       <select
                         value={editingCourse.status}
                         onChange={(e) =>
                           setEditingCourse({ ...editingCourse, status: e.target.value as 'Active' | 'Inactive' })
                         }
-                        className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-bold bg-[#FFFFFF]"
+                        className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-bold text-sm sm:text-base bg-white"
                       >
                         <option value="Active">Active (Visible on Website)</option>
                         <option value="Inactive">Inactive (Hidden)</option>
                       </select>
                     </div>
                   </div>
-                </div>
 
-                {/* 3. Media, Workstation Lab & Certificate Imagery */}
-                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-5">
-                  <span className="text-xs font-black text-[#131313] uppercase tracking-wider block border-b pb-2 border-[#CBD5E1]">
-                    3. Course Visual Assets, Workstation Lab &amp; Certificate Images
-                  </span>
-
-                  {/* Primary Course Banner */}
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="block font-bold text-[#334155]">Primary Course Banner Image *</label>
-                      <span className="text-[11px] font-bold text-slate-500 uppercase">Hero &amp; Catalog</span>
+                  {/* Primary Course Banner Image */}
+                  <div className="pt-2">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-sm sm:text-base font-bold text-slate-800">
+                        Primary Course Banner Image (Hero Banner &amp; Catalog) <span className="text-[#EE2C3C]">*</span>
+                      </label>
+                      <span className="text-xs font-bold text-blue-600 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded">
+                        High-Resolution Architectural/Engineering Specimen
+                      </span>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-3">
                       <input
                         type="text"
                         value={editingCourse.image || ''}
                         onChange={(e) => setEditingCourse({ ...editingCourse, image: e.target.value })}
                         placeholder="https://images.unsplash.com/..."
-                        className="flex-1 p-2.5 rounded-xl border-2 border-[#CBD5E1] font-semibold text-xs bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                        className="flex-1 p-3.5 rounded-xl border-2 border-slate-300 font-semibold text-sm sm:text-base text-slate-900 bg-white focus:outline-none focus:border-slate-900 shadow-2xs"
                       />
-                      <label className="px-4 py-2.5 bg-[#131313] hover:bg-[#262626] text-[#FFFFFF] text-xs font-bold rounded-xl cursor-pointer flex items-center justify-center whitespace-nowrap shadow-sm">
+                      <label className="px-6 py-3.5 bg-slate-900 hover:bg-black text-white text-sm font-bold rounded-xl cursor-pointer flex items-center justify-center whitespace-nowrap shadow-sm transition-all">
                         <span>{isUploadingMedia ? 'Uploading...' : 'Upload Image'}</span>
                         <input
                           type="file"
@@ -8045,10 +8254,10 @@ export default function AdminPortalPage() {
                     </div>
 
                     {editingCourse.image && (
-                      <div className="mt-2.5 h-36 w-full rounded-xl overflow-hidden border-2 border-[#CBD5E1] bg-[#000000] relative shadow-inner">
+                      <div className="mt-3 h-48 w-full rounded-2xl overflow-hidden border-2 border-slate-300 bg-slate-950 relative shadow-inner">
                         <img
                           src={editingCourse.image}
-                          alt="Banner Preview"
+                          alt="Primary Course Banner"
                           onError={(e) => {
                             const fallback = COURSES.find((c) => c.id.toLowerCase() === editingCourse.id.toLowerCase() || c.title.toLowerCase().trim() === editingCourse.title.toLowerCase().trim())?.image
                               || 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=80';
@@ -8058,28 +8267,165 @@ export default function AdminPortalPage() {
                           }}
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute bottom-2 right-2 bg-black/75 text-[#FFFFFF] text-xs font-bold px-2.5 py-1 rounded font-mono">
-                          Primary Banner Preview
+                        <div className="absolute bottom-3 right-3 bg-black/80 backdrop-blur-xs text-white text-xs font-bold px-3 py-1.5 rounded-lg font-mono">
+                          Live Hero Banner Preview
                         </div>
                       </div>
                     )}
                   </div>
+                </div>
+
+                {/* 2. ACADEMIC FACTS & 4 PILLARS */}
+                <div id="edit-sec-2" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                  <div className="flex items-center justify-between pb-3 border-b-2 border-slate-200">
+                    <div className="flex items-center space-x-3">
+                      <span className="w-8 h-8 rounded-lg bg-purple-600 text-white flex items-center justify-center font-mono font-black text-sm">
+                        02
+                      </span>
+                      <div>
+                        <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                          Academic Facts &amp; Eligibility (4 Live Pillars)
+                        </h4>
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                          Matches Section A &ldquo;Course Academic Facts &amp; Eligibility&rdquo; 4-pillar cards on the live website.
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200 hidden sm:inline-block">
+                      Section A 4 Pillars
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                      <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
+                        Pillar 1: Eligibility &amp; Prerequisites
+                      </label>
+                      <input
+                        type="text"
+                        value={editingCourse.prerequisites || ''}
+                        onChange={(e) => setEditingCourse({ ...editingCourse, prerequisites: e.target.value })}
+                        placeholder="e.g. Basic understanding of architectural floor plans and building layouts"
+                        className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-semibold text-sm sm:text-base text-slate-900 bg-white shadow-2xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
+                        Pillar 2: Awarded Credential Title
+                      </label>
+                      <input
+                        type="text"
+                        value={editingCourse.awardedCredential || editingCourse.certification || ''}
+                        onChange={(e) => setEditingCourse({ ...editingCourse, awardedCredential: e.target.value })}
+                        placeholder="e.g. Autodesk Certified Professional: Revit Architecture (ACP)"
+                        className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-bold text-sm sm:text-base text-slate-900 bg-white shadow-2xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
+                        Pillar 3: Training Mode &amp; Lab Access
+                      </label>
+                      <input
+                        type="text"
+                        value={editingCourse.mode || ''}
+                        onChange={(e) => setEditingCourse({ ...editingCourse, mode: e.target.value })}
+                        placeholder="e.g. Classroom & Dedicated CAD Workstation Lab"
+                        className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-semibold text-sm sm:text-base text-slate-900 bg-white shadow-2xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
+                        Pillar 4: Software Tools &amp; Authorized Toolchain
+                      </label>
+                      <input
+                        type="text"
+                        value={editingCourse.software}
+                        onChange={(e) => setEditingCourse({ ...editingCourse, software: e.target.value })}
+                        placeholder="e.g. Autodesk Revit 2026, Navisworks Manage, BIM 360, Enscape"
+                        className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-semibold text-sm sm:text-base text-slate-900 bg-white shadow-2xs"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. COURSE OVERVIEW & LEARNING OBJECTIVES */}
+                <div id="edit-sec-3" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                  <div className="flex items-center justify-between pb-3 border-b-2 border-slate-200">
+                    <div className="flex items-center space-x-3">
+                      <span className="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center font-mono font-black text-sm">
+                        03
+                      </span>
+                      <div>
+                        <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                          Course Overview &amp; Learning Objectives
+                        </h4>
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                          Matches the dedicated narrative card with the red indicator pill on the live website.
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 hidden sm:inline-block">
+                      Live Overview Card
+                    </span>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
+                      Comprehensive Syllabus Overview &amp; Project Description
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={editingCourse.overview || ''}
+                      onChange={(e) => setEditingCourse({ ...editingCourse, overview: e.target.value })}
+                      placeholder="Master end-to-end architectural BIM workflows from parametric floor layout generation, structural walls, and curtain systems to multi-disciplinary clash detection and construction sequencing."
+                      className="w-full p-4 rounded-xl border-2 border-slate-300 font-medium text-base text-slate-900 bg-white focus:outline-none focus:border-slate-900 leading-relaxed shadow-2xs"
+                    />
+                  </div>
+                </div>
+
+                {/* 4. COURSE HIGHLIGHTS & CORE COMPETENCIES (WITH WORKSTATION LAB PHOTO) */}
+                <div id="edit-sec-4" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                  <div className="flex items-center justify-between pb-3 border-b-2 border-slate-200">
+                    <div className="flex items-center space-x-3">
+                      <span className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-mono font-black text-sm">
+                        04
+                      </span>
+                      <div>
+                        <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                          Course Highlights &amp; Core Competencies (With Workstation Lab Photo)
+                        </h4>
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                          Matches Section C split card (Left: Ameerpet Lab Workstation Photo, Right: 6 Core Competencies Checklist with green checkmarks).
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 hidden sm:inline-block">
+                      Section C Split Card
+                    </span>
+                  </div>
 
                   {/* Secondary Workstation Lab Photo */}
-                  <div className="pt-3 border-t border-slate-100">
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="block font-bold text-[#334155]">Secondary Lab Image (Ameerpet Workstation Lab)</label>
-                      <span className="text-[11px] font-bold text-blue-600 uppercase">Section C Lab Showcase</span>
+                  <div className="p-5 bg-slate-50 rounded-2xl border-2 border-slate-200 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-sm sm:text-base font-bold text-slate-800">
+                        Secondary Lab Image (Ameerpet Workstation Lab Photo)
+                      </label>
+                      <span className="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded">
+                        Workstation Showcase
+                      </span>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-3">
                       <input
                         type="text"
                         value={editingCourse.labImage || ''}
                         onChange={(e) => setEditingCourse({ ...editingCourse, labImage: e.target.value })}
-                        placeholder="https://images.unsplash.com/..."
-                        className="flex-1 p-2.5 rounded-xl border-2 border-[#CBD5E1] font-semibold text-xs bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                        placeholder="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80"
+                        className="flex-1 p-3.5 rounded-xl border-2 border-slate-300 font-semibold text-sm sm:text-base text-slate-900 bg-white"
                       />
-                      <label className="px-4 py-2.5 bg-[#15304C] hover:bg-[#0f2338] text-[#FFFFFF] text-xs font-bold rounded-xl cursor-pointer flex items-center justify-center whitespace-nowrap shadow-sm">
+                      <label className="px-6 py-3.5 bg-[#15304C] hover:bg-[#0f2338] text-white text-sm font-bold rounded-xl cursor-pointer flex items-center justify-center whitespace-nowrap shadow-sm transition-all">
                         <span>{isUploadingMedia ? 'Uploading...' : 'Upload Lab Image'}</span>
                         <input
                           type="file"
@@ -8094,34 +8440,347 @@ export default function AdminPortalPage() {
                     </div>
 
                     {editingCourse.labImage && (
-                      <div className="mt-2.5 h-36 w-full rounded-xl overflow-hidden border-2 border-[#CBD5E1] bg-[#000000] relative shadow-inner">
+                      <div className="mt-2 h-44 w-full rounded-xl overflow-hidden border-2 border-slate-300 bg-slate-900 relative shadow-inner">
                         <img
                           src={editingCourse.labImage}
-                          alt="Workstation Lab Preview"
+                          alt="Ameerpet Workstation Lab"
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute bottom-2 left-2 bg-[#15304C]/95 text-[#FFFFFF] text-xs font-bold px-2.5 py-1 rounded font-mono shadow-md">
-                          Ameerpet Workstation Lab Preview
+                        <div className="absolute bottom-3 left-3 bg-[#15304C]/95 backdrop-blur-xs text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-md">
+                          Ameerpet Workstation Lab Photo Preview
                         </div>
                       </div>
                     )}
                   </div>
 
-                  {/* Certificate Sample Specimen */}
-                  <div className="pt-3 border-t border-slate-100">
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="block font-bold text-[#334155]">Certificate Sample Specimen Image</label>
-                      <span className="text-[11px] font-bold text-amber-600 uppercase">Section F Certificate</span>
+                  {/* Core Competencies Checklist Builder */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+                      <div>
+                        <span className="text-sm sm:text-base font-bold text-slate-800">
+                          Core Competencies Checklist ({editingCourse.highlights?.length || 0} Items)
+                        </span>
+                        <p className="text-xs text-slate-500">
+                          These items render with green checkmarks (✓) next to the lab workstation photo on the live website.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const cur = editingCourse.highlights || [];
+                          setEditingCourse({
+                            ...editingCourse,
+                            highlights: [...cur, `Live industrial modeling with ${editingCourse.software?.split(',')[0] || 'CAD Suite'}`],
+                          });
+                        }}
+                        className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold uppercase transition-all shadow-sm cursor-pointer"
+                      >
+                        + Add Core Competency
+                      </button>
                     </div>
-                    <div className="flex gap-2">
+
+                    <div className="space-y-3">
+                      {(editingCourse.highlights || []).map((highlight, hIdx) => (
+                        <div key={hIdx} className="flex items-center space-x-3 bg-slate-50 p-3 sm:p-3.5 rounded-xl border border-slate-200">
+                          <span className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-sm flex-shrink-0">
+                            ✓
+                          </span>
+                          <input
+                            type="text"
+                            value={highlight}
+                            onChange={(e) => {
+                              const list = [...(editingCourse.highlights || [])];
+                              list[hIdx] = e.target.value;
+                              setEditingCourse({ ...editingCourse, highlights: list });
+                            }}
+                            className="flex-1 p-2.5 sm:p-3 text-sm sm:text-base font-bold text-slate-900 bg-white rounded-xl border border-slate-300 focus:outline-none focus:border-emerald-600 shadow-2xs"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const list = (editingCourse.highlights || []).filter((_, i) => i !== hIdx);
+                              setEditingCourse({ ...editingCourse, highlights: list });
+                            }}
+                            className="text-sm font-bold text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-3 py-2 rounded-lg cursor-pointer transition-colors whitespace-nowrap"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 5. COURSE CONTENTS & MODULE SYLLABUS BREAKDOWN */}
+                <div id="edit-sec-5" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b-2 border-slate-200 gap-3">
+                    <div className="flex items-center space-x-3">
+                      <span className="w-8 h-8 rounded-lg bg-[#EE2C3C] text-white flex items-center justify-center font-mono font-black text-sm">
+                        05
+                      </span>
+                      <div>
+                        <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                          Course Contents &amp; Units Breakdown ({editingCourse.modules?.length || 0} Units)
+                        </h4>
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                          Matches Section D interactive syllabus accordions with lab hours and bullet topics.
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const cur = editingCourse.modules || [];
+                        const num = String(cur.length + 1).padStart(2, '0');
+                        const updated = [
+                          ...cur,
+                          {
+                            number: num,
+                            title: `Unit ${num} Advanced Topics & Industrial Workflows`,
+                            hours: 20,
+                            topics: ['Core engineering concepts', 'Parametric modeling & constraints', 'Practical lab drafting & validation'],
+                          },
+                        ];
+                        setEditingCourse({
+                          ...editingCourse,
+                          modules: updated,
+                          syllabus: updated.map((m) => m.title),
+                        });
+                      }}
+                      className="px-5 py-2.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs sm:text-sm font-black uppercase tracking-wider shadow-sm transition-all cursor-pointer whitespace-nowrap"
+                    >
+                      + Add Syllabus Unit
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    {(editingCourse.modules || []).map((mod, idx) => (
+                      <div key={idx} className="p-5 bg-slate-50 border-2 border-slate-200 rounded-2xl space-y-3.5 shadow-xs">
+                        <div className="flex items-center justify-between flex-wrap gap-2">
+                          <span className="px-3 py-1 rounded-lg bg-[#EE2C3C] text-white font-mono font-black text-sm">
+                            MODULE {mod.number}
+                          </span>
+                          <div className="flex items-center space-x-2">
+                            <input
+                              type="number"
+                              value={mod.hours}
+                              onChange={(e) => {
+                                const updated = [...(editingCourse.modules || [])];
+                                updated[idx] = { ...updated[idx], hours: Number(e.target.value) || 20 };
+                                setEditingCourse({ ...editingCourse, modules: updated });
+                              }}
+                              className="w-20 p-2 border-2 border-slate-300 rounded-lg text-sm text-center font-black bg-white"
+                              title="Lab Hours"
+                            />
+                            <span className="text-xs font-bold text-slate-700">LAB HRS</span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const updated = (editingCourse.modules || []).filter((_, i) => i !== idx);
+                                setEditingCourse({
+                                  ...editingCourse,
+                                  modules: updated,
+                                  syllabus: updated.map((m) => m.title),
+                                });
+                              }}
+                              className="text-sm font-bold text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-2.5 py-1 rounded-lg cursor-pointer ml-2 transition-colors"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-1">Module / Unit Title</label>
+                          <input
+                            type="text"
+                            value={mod.title}
+                            onChange={(e) => {
+                              const updated = [...(editingCourse.modules || [])];
+                              updated[idx] = { ...updated[idx], title: e.target.value };
+                              setEditingCourse({
+                                ...editingCourse,
+                                modules: updated,
+                                syllabus: updated.map((m) => m.title),
+                              });
+                            }}
+                            placeholder="Module Title"
+                            className="w-full p-3 rounded-xl border-2 border-slate-300 text-sm sm:text-base font-bold text-slate-900 bg-white shadow-2xs"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-1">Topics Covered (Comma Separated)</label>
+                          <input
+                            type="text"
+                            value={(mod.topics || []).join(', ')}
+                            onChange={(e) => {
+                              const updated = [...(editingCourse.modules || [])];
+                              updated[idx] = {
+                                ...updated[idx],
+                                topics: e.target.value.split(',').map((s) => s.trim()).filter(Boolean),
+                              };
+                              setEditingCourse({ ...editingCourse, modules: updated });
+                            }}
+                            placeholder="Topics separated by comma"
+                            className="w-full p-3 rounded-xl border-2 border-slate-300 text-sm font-medium text-slate-800 bg-white shadow-2xs"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 6. CAREER PROGRESSION PATH (FAN INFOGRAPHIC STEP BUILDER) */}
+                <div id="edit-sec-6" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b-2 border-slate-200 gap-3">
+                    <div className="flex items-center space-x-3">
+                      <span className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-mono font-black text-sm">
+                        06
+                      </span>
+                      <div>
+                        <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                          Career Progression Path ({editingCourse.careerPathways?.length || 0} Steps)
+                        </h4>
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                          Matches Section E Career Infographic Fan Cards (Experience Range, Job Role, and Expected Compensation CTC).
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const cur = editingCourse.careerPathways || [];
+                        const nextNum = String(cur.length + 1).padStart(2, '0');
+                        setEditingCourse({
+                          ...editingCourse,
+                          careerPathways: [
+                            ...cur,
+                            {
+                              step: nextNum,
+                              experience: `${cur.length * 2} – ${(cur.length + 1) * 2} Yrs`,
+                              role: `Lead ${editingCourse.title.split(' ')[0] || 'CAD'} Specialist`,
+                              ctc: '₹8.0L – ₹15.0L PA',
+                            },
+                          ],
+                        });
+                      }}
+                      className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold uppercase transition-all shadow-sm cursor-pointer whitespace-nowrap"
+                    >
+                      + Add Career Step
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    {(editingCourse.careerPathways || []).map((stepItem, sIdx) => (
+                      <div key={sIdx} className="p-4 sm:p-5 bg-slate-50 border-2 border-slate-200 rounded-xl space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="px-3 py-1 rounded-lg bg-[#15304C] text-white font-mono font-black text-sm">
+                            STEP {stepItem.step || String(sIdx + 1).padStart(2, '0')}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const cur = (editingCourse.careerPathways || []).filter((_, i) => i !== sIdx);
+                              setEditingCourse({ ...editingCourse, careerPathways: cur });
+                            }}
+                            className="text-sm font-bold text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-2.5 py-1 rounded-lg cursor-pointer transition-colors"
+                          >
+                            Remove Step
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                          <div>
+                            <label className="block text-xs sm:text-sm font-bold text-slate-700 uppercase tracking-wider mb-1">
+                              Experience Range
+                            </label>
+                            <input
+                              type="text"
+                              value={stepItem.experience}
+                              onChange={(e) => {
+                                const cur = [...(editingCourse.careerPathways || [])];
+                                cur[sIdx] = { ...cur[sIdx], experience: e.target.value };
+                                setEditingCourse({ ...editingCourse, careerPathways: cur });
+                              }}
+                              placeholder="e.g. 0 – 2 Yrs"
+                              className="w-full p-3 text-sm sm:text-base font-bold text-slate-900 bg-white rounded-xl border-2 border-slate-300 shadow-2xs"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-xs sm:text-sm font-bold text-slate-700 uppercase tracking-wider mb-1">
+                              Job Role Title
+                            </label>
+                            <input
+                              type="text"
+                              value={stepItem.role}
+                              onChange={(e) => {
+                                const cur = [...(editingCourse.careerPathways || [])];
+                                cur[sIdx] = { ...cur[sIdx], role: e.target.value };
+                                setEditingCourse({ ...editingCourse, careerPathways: cur });
+                              }}
+                              placeholder="e.g. BIM Architectural Modeler"
+                              className="w-full p-3 text-sm sm:text-base font-black text-slate-900 bg-white rounded-xl border-2 border-slate-300 shadow-2xs"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-xs sm:text-sm font-bold text-emerald-800 uppercase tracking-wider mb-1">
+                              Expected CTC Range
+                            </label>
+                            <input
+                              type="text"
+                              value={stepItem.ctc}
+                              onChange={(e) => {
+                                const cur = [...(editingCourse.careerPathways || [])];
+                                cur[sIdx] = { ...cur[sIdx], ctc: e.target.value };
+                                setEditingCourse({ ...editingCourse, careerPathways: cur });
+                              }}
+                              placeholder="e.g. ₹4.5L – ₹9.0L PA"
+                              className="w-full p-3 text-sm sm:text-base font-black text-emerald-700 bg-emerald-50/50 rounded-xl border-2 border-emerald-300 shadow-2xs"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 7. OFFICIAL CERTIFICATE OF COMPLETION */}
+                <div id="edit-sec-7" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                  <div className="flex items-center justify-between pb-3 border-b-2 border-slate-200">
+                    <div className="flex items-center space-x-3">
+                      <span className="w-8 h-8 rounded-lg bg-amber-600 text-white flex items-center justify-center font-mono font-black text-sm">
+                        07
+                      </span>
+                      <div>
+                        <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                          Official Certificate of Completion Specimen
+                        </h4>
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                          Matches Section F &ldquo;How will you get your certificate?&rdquo; on the live website. Leave blank to show the ISO certificate specimen, or upload custom.
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 hidden sm:inline-block">
+                      Section F Certificate
+                    </span>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
+                      Certificate Sample Specimen Image URL / File Upload
+                    </label>
+                    <div className="flex flex-col sm:flex-row gap-3">
                       <input
                         type="text"
                         value={editingCourse.certificateImage || ''}
                         onChange={(e) => setEditingCourse({ ...editingCourse, certificateImage: e.target.value })}
-                        placeholder="Leave blank to use generated official ISO certificate specimen, or paste image URL / upload custom"
-                        className="flex-1 p-2.5 rounded-xl border-2 border-[#CBD5E1] font-semibold text-xs bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                        placeholder="Leave blank to use generated official ISO certificate specimen, or paste image URL"
+                        className="flex-1 p-3.5 rounded-xl border-2 border-slate-300 font-semibold text-sm sm:text-base text-slate-900 bg-white"
                       />
-                      <label className="px-4 py-2.5 bg-[#D97706] hover:bg-[#B45309] text-[#FFFFFF] text-xs font-bold rounded-xl cursor-pointer flex items-center justify-center whitespace-nowrap shadow-sm">
+                      <label className="px-6 py-3.5 bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold rounded-xl cursor-pointer flex items-center justify-center whitespace-nowrap shadow-sm transition-all">
                         <span>{isUploadingMedia ? 'Uploading...' : 'Upload Certificate'}</span>
                         <input
                           type="file"
@@ -8136,219 +8795,45 @@ export default function AdminPortalPage() {
                     </div>
 
                     {editingCourse.certificateImage && (
-                      <div className="mt-2.5 h-36 w-full rounded-xl overflow-hidden border-2 border-amber-300 bg-[#FFFFFF] relative shadow-inner flex items-center justify-center p-1">
+                      <div className="mt-3 h-52 w-full rounded-2xl overflow-hidden border-2 border-amber-300 bg-white relative shadow-inner flex items-center justify-center p-2">
                         <img
                           src={editingCourse.certificateImage}
-                          alt="Certificate Specimen Preview"
+                          alt="Certificate Specimen"
                           className="w-full h-full object-contain"
                         />
-                        <div className="absolute bottom-2 right-2 bg-amber-600 text-[#FFFFFF] text-xs font-bold px-2.5 py-1 rounded font-mono shadow-md">
-                          Certificate Specimen Preview
+                        <div className="absolute bottom-3 right-3 bg-amber-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-md font-mono">
+                          Live Certificate Specimen Preview
                         </div>
                       </div>
                     )}
                   </div>
                 </div>
 
-                {/* 4. Authorized Toolchain & Course Overview */}
-                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
-                  <span className="text-xs font-black text-[#131313] uppercase tracking-wider block border-b pb-2 border-[#CBD5E1]">
-                    4. Authorized Toolchain &amp; Course Overview
-                  </span>
-
-                  <div>
-                    <label className="block font-bold text-[#334155] mb-1">Authorized Toolchain (Comma Separated)</label>
-                    <input
-                      type="text"
-                      value={editingCourse.software}
-                      onChange={(e) => setEditingCourse({ ...editingCourse, software: e.target.value })}
-                      placeholder="e.g. Autodesk Revit 2026, Navisworks Manage, BIM 360, Enscape"
-                      className="w-full p-3 rounded-xl border-2 border-[#CBD5E1] font-semibold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block font-bold text-[#334155] mb-1">Tagline (Hero Subtitle)</label>
-                    <input
-                      type="text"
-                      value={editingCourse.tagline || ''}
-                      onChange={(e) => setEditingCourse({ ...editingCourse, tagline: e.target.value })}
-                      placeholder="e.g. Autodesk Authorized Revit BIM Professional Certification"
-                      className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-semibold bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block font-bold text-[#334155] mb-1">Course Overview &amp; Learning Objectives</label>
-                    <textarea
-                      rows={3}
-                      value={editingCourse.overview || ''}
-                      onChange={(e) => setEditingCourse({ ...editingCourse, overview: e.target.value })}
-                      className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-medium bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
-                    />
-                  </div>
-                </div>
-
-                {/* 5. Course Highlights & Core Competencies (Live Checklist Builder) */}
-                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
-                  <div className="flex items-center justify-between pb-2 border-b border-[#CBD5E1]">
-                    <span className="text-xs font-black text-[#059669] uppercase tracking-wider">
-                      5. Course Highlights &amp; Core Competencies ({editingCourse.highlights?.length || 0} Items)
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const cur = editingCourse.highlights || [];
-                        setEditingCourse({
-                          ...editingCourse,
-                          highlights: [...cur, `Industrial modeling & project validation with ${editingCourse.software?.split(',')[0] || 'CAD Suite'}`],
-                        });
-                      }}
-                      className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase transition-all shadow-xs cursor-pointer"
-                    >
-                      + Add Competency
-                    </button>
-                  </div>
-
-                  <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
-                    {(editingCourse.highlights || []).map((highlight, hIdx) => (
-                      <div key={hIdx} className="flex items-center space-x-2 bg-slate-50 p-2 rounded-xl border border-slate-200">
-                        <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs flex-shrink-0">
-                          ✓
-                        </span>
-                        <input
-                          type="text"
-                          value={highlight}
-                          onChange={(e) => {
-                            const list = [...(editingCourse.highlights || [])];
-                            list[hIdx] = e.target.value;
-                            setEditingCourse({ ...editingCourse, highlights: list });
-                          }}
-                          className="flex-1 p-1.5 text-xs font-semibold bg-white rounded-lg border border-slate-200 focus:outline-none focus:border-emerald-600"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const list = (editingCourse.highlights || []).filter((_, i) => i !== hIdx);
-                            setEditingCourse({ ...editingCourse, highlights: list });
-                          }}
-                          className="text-xs text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-2 py-1 rounded font-bold cursor-pointer transition-colors"
-                        >
-                          Remove
-                        </button>
+                {/* 8. DUAL CERTIFICATION & INDUSTRY CAPSTONE PROJECT */}
+                <div id="edit-sec-8" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                  <div className="flex items-center justify-between pb-3 border-b-2 border-slate-200">
+                    <div className="flex items-center space-x-3">
+                      <span className="w-8 h-8 rounded-lg bg-teal-600 text-white flex items-center justify-center font-mono font-black text-sm">
+                        08
+                      </span>
+                      <div>
+                        <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                          Dual Certification &amp; Industry Capstone Project (Mandatory Portfolio)
+                        </h4>
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                          Matches Section G &ldquo;Dual Certification &amp; Industry Capstone Project&rdquo; on the live website.
+                        </p>
                       </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* 6. Career Progression Path (Career Pathways Step Builder) */}
-                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
-                  <div className="flex items-center justify-between pb-2 border-b border-[#CBD5E1]">
-                    <span className="text-xs font-black text-[#EE2C3C] uppercase tracking-wider">
-                      6. Career Progression Path ({editingCourse.careerPathways?.length || 0} Steps)
+                    </div>
+                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-teal-50 text-teal-700 border border-teal-200 hidden sm:inline-block">
+                      Section G Capstone
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const cur = editingCourse.careerPathways || [];
-                        const nextNum = String(cur.length + 1).padStart(2, '0');
-                        setEditingCourse({
-                          ...editingCourse,
-                          careerPathways: [
-                            ...cur,
-                            {
-                              step: nextNum,
-                              experience: `${cur.length * 2} – ${(cur.length + 1) * 2} Yrs`,
-                              role: `Lead ${editingCourse.title.split(' ')[0]} Specialist`,
-                              ctc: '₹8.0L – ₹15.0L PA',
-                            },
-                          ],
-                        });
-                      }}
-                      className="px-3 py-1 rounded-lg bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs font-bold uppercase transition-all shadow-xs cursor-pointer"
-                    >
-                      + Add Career Step
-                    </button>
                   </div>
-
-                  <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
-                    {(editingCourse.careerPathways || []).map((stepItem, sIdx) => (
-                      <div key={sIdx} className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-black text-slate-800">
-                            STEP {stepItem.step || String(sIdx + 1).padStart(2, '0')}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const cur = (editingCourse.careerPathways || []).filter((_, i) => i !== sIdx);
-                              setEditingCourse({ ...editingCourse, careerPathways: cur });
-                            }}
-                            className="text-xs text-rose-600 hover:text-rose-800 font-bold px-1.5 py-0.5 rounded cursor-pointer"
-                          >
-                            Remove
-                          </button>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                          <div>
-                            <label className="block text-[10px] font-bold text-slate-500 uppercase">Experience</label>
-                            <input
-                              type="text"
-                              value={stepItem.experience}
-                              onChange={(e) => {
-                                const cur = [...(editingCourse.careerPathways || [])];
-                                cur[sIdx] = { ...cur[sIdx], experience: e.target.value };
-                                setEditingCourse({ ...editingCourse, careerPathways: cur });
-                              }}
-                              placeholder="e.g. 0 – 2 Yrs"
-                              className="w-full p-1.5 text-xs font-semibold bg-white rounded border border-slate-200"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-[10px] font-bold text-slate-500 uppercase">Job Role Title</label>
-                            <input
-                              type="text"
-                              value={stepItem.role}
-                              onChange={(e) => {
-                                const cur = [...(editingCourse.careerPathways || [])];
-                                cur[sIdx] = { ...cur[sIdx], role: e.target.value };
-                                setEditingCourse({ ...editingCourse, careerPathways: cur });
-                              }}
-                              placeholder="e.g. BIM Architectural Modeler"
-                              className="w-full p-1.5 text-xs font-bold text-slate-900 bg-white rounded border border-slate-200"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-[10px] font-bold text-slate-500 uppercase">Expected CTC</label>
-                            <input
-                              type="text"
-                              value={stepItem.ctc}
-                              onChange={(e) => {
-                                const cur = [...(editingCourse.careerPathways || [])];
-                                cur[sIdx] = { ...cur[sIdx], ctc: e.target.value };
-                                setEditingCourse({ ...editingCourse, careerPathways: cur });
-                              }}
-                              placeholder="e.g. ₹4.5L – ₹9.0L PA"
-                              className="w-full p-1.5 text-xs font-bold text-emerald-700 bg-white rounded border border-slate-200"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* 7. Dual Certification & Industry Capstone Project Blueprint */}
-                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
-                  <span className="text-xs font-black text-[#00873D] uppercase tracking-wider block border-b pb-2 border-[#CBD5E1]">
-                    7. Dual Certification &amp; Industry Capstone Project (Mandatory Portfolio)
-                  </span>
 
                   <div>
-                    <label className="block font-bold text-[#334155] mb-1">Portfolio Project Title</label>
+                    <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
+                      Portfolio Project Title
+                    </label>
                     <input
                       type="text"
                       value={editingCourse.capstoneProject?.title || ''}
@@ -8365,14 +8850,16 @@ export default function AdminPortalPage() {
                         })
                       }
                       placeholder="e.g. Commercial Complex 5-Story BIM Model with Multi-Trade Clash Report"
-                      className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-bold text-[#0F172A] bg-[#FFFFFF] focus:outline-none focus:border-[#131313]"
+                      className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-bold text-base text-slate-900 bg-white"
                     />
                   </div>
 
                   <div>
-                    <label className="block font-bold text-[#334155] mb-1">Project Description</label>
+                    <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
+                      Project Description
+                    </label>
                     <textarea
-                      rows={2}
+                      rows={3}
                       value={editingCourse.capstoneProject?.description || ''}
                       onChange={(e) =>
                         setEditingCourse({
@@ -8386,12 +8873,15 @@ export default function AdminPortalPage() {
                           },
                         })
                       }
-                      className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-medium bg-[#FFFFFF]"
+                      placeholder="Detailed project requirements, scope of work, and engineering criteria."
+                      className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-medium text-base text-slate-900 bg-white leading-relaxed"
                     />
                   </div>
 
                   <div>
-                    <label className="block font-bold text-[#334155] mb-1">Verified Deliverables (Comma Separated)</label>
+                    <label className="block text-sm sm:text-base font-bold text-slate-800 mb-1.5">
+                      Verified Deliverables (Comma Separated)
+                    </label>
                     <input
                       type="text"
                       value={editingCourse.capstoneProject?.deliverables?.join(', ') || ''}
@@ -8409,17 +8899,27 @@ export default function AdminPortalPage() {
                         });
                       }}
                       placeholder="e.g. Central BIM Model (.rvt), Automated Bill of Quantities, Navisworks Clash Matrix"
-                      className="w-full p-2.5 rounded-xl border-2 border-[#CBD5E1] font-semibold text-xs bg-[#FFFFFF]"
+                      className="w-full p-3.5 rounded-xl border-2 border-slate-300 font-semibold text-sm sm:text-base text-slate-900 bg-white"
                     />
                   </div>
                 </div>
 
-                {/* 8. Frequently Asked Questions (FAQ Accordion Builder) */}
-                <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
-                  <div className="flex items-center justify-between pb-2 border-b border-[#CBD5E1]">
-                    <span className="text-xs font-black text-[#2563EB] uppercase tracking-wider">
-                      8. Frequently Asked Questions (FAQ) ({editingCourse.faqs?.length || 0} Questions)
-                    </span>
+                {/* 9. FREQUENTLY ASKED QUESTIONS (FAQ ACCORDION BUILDER) */}
+                <div id="edit-sec-9" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b-2 border-slate-200 gap-3">
+                    <div className="flex items-center space-x-3">
+                      <span className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-mono font-black text-sm">
+                        09
+                      </span>
+                      <div>
+                        <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                          Frequently Asked Questions (FAQ) ({editingCourse.faqs?.length || 0} Questions)
+                        </h4>
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                          Matches Section H expandable FAQ accordions at the bottom of the live website modal.
+                        </p>
+                      </div>
+                    </div>
                     <button
                       type="button"
                       onClick={() => {
@@ -8429,36 +8929,39 @@ export default function AdminPortalPage() {
                           faqs: [
                             ...cur,
                             {
-                              question: `What job assistance is provided for ${editingCourse.title}?`,
-                              answer: 'Our placement cell conducts mock technical CAD interviews and coordinates direct hiring with top EPC firms.',
+                              question: `What job placement support is provided for ${editingCourse.title}?`,
+                              answer: 'Our placement cell conducts 3 rounds of mock technical CAD interviews and lines up direct interviews with top EPC and MNC recruiters.',
                             },
                           ],
                         });
                       }}
-                      className="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold uppercase transition-all shadow-xs cursor-pointer"
+                      className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold uppercase transition-all shadow-sm cursor-pointer whitespace-nowrap"
                     >
                       + Add FAQ Item
                     </button>
                   </div>
 
-                  <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+                  <div className="space-y-4">
                     {(editingCourse.faqs || []).map((faqItem, fIdx) => (
-                      <div key={fIdx} className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                      <div key={fIdx} className="p-4 sm:p-5 bg-slate-50 border-2 border-slate-200 rounded-xl space-y-3">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-slate-700">FAQ #{fIdx + 1}</span>
+                          <span className="px-3 py-1 rounded-md bg-blue-100 text-blue-800 font-bold text-xs uppercase tracking-wider">
+                            FAQ #{fIdx + 1}
+                          </span>
                           <button
                             type="button"
                             onClick={() => {
                               const cur = (editingCourse.faqs || []).filter((_, i) => i !== fIdx);
                               setEditingCourse({ ...editingCourse, faqs: cur });
                             }}
-                            className="text-xs text-rose-600 hover:text-rose-800 font-bold px-1.5 py-0.5 rounded cursor-pointer"
+                            className="text-sm font-bold text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-2.5 py-1 rounded-lg cursor-pointer transition-colors"
                           >
-                            Remove
+                            Remove FAQ
                           </button>
                         </div>
 
                         <div>
+                          <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-1">Question</label>
                           <input
                             type="text"
                             value={faqItem.question}
@@ -8467,149 +8970,45 @@ export default function AdminPortalPage() {
                               cur[fIdx] = { ...cur[fIdx], question: e.target.value };
                               setEditingCourse({ ...editingCourse, faqs: cur });
                             }}
-                            placeholder="Question"
-                            className="w-full p-2 text-xs font-bold text-slate-900 bg-white rounded border border-slate-200"
+                            placeholder="e.g. Is there any prerequisite for this course in Hyderabad?"
+                            className="w-full p-3 text-sm sm:text-base font-bold text-slate-900 bg-white rounded-xl border-2 border-slate-300 shadow-2xs"
                           />
                         </div>
 
                         <div>
+                          <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-1">Counseling Answer</label>
                           <textarea
-                            rows={2}
+                            rows={3}
                             value={faqItem.answer}
                             onChange={(e) => {
                               const cur = [...(editingCourse.faqs || [])];
                               cur[fIdx] = { ...cur[fIdx], answer: e.target.value };
                               setEditingCourse({ ...editingCourse, faqs: cur });
                             }}
-                            placeholder="Answer"
-                            className="w-full p-2 text-xs text-slate-700 bg-white rounded border border-slate-200"
+                            placeholder="Enter detailed counseling answer"
+                            className="w-full p-3 text-sm sm:text-base font-medium text-slate-800 bg-white rounded-xl border-2 border-slate-300 shadow-2xs leading-relaxed"
                           />
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
-              </div>
 
-              {/* 9. Interactive Module Syllabus Builder (Full Width) */}
-              <div className="p-6 bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-[#CBD5E1] gap-2">
-                  <span className="text-xs font-black text-[#131313] uppercase tracking-wider">
-                    9. Course Contents &amp; Module Syllabus Breakdown ({editingCourse.modules?.length || 0} Units)
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const cur = editingCourse.modules || [];
-                      const num = String(cur.length + 1).padStart(2, '0');
-                      const updated = [
-                        ...cur,
-                        {
-                          number: num,
-                          title: `Module ${num} Advanced Topics`,
-                          hours: 20,
-                          topics: ['Core engineering concepts', 'Practical lab drafting & validation'],
-                        },
-                      ];
-                      setEditingCourse({
-                        ...editingCourse,
-                        modules: updated,
-                        syllabus: updated.map((m) => m.title),
-                      });
-                    }}
-                    className="px-4 py-1.5 rounded-lg bg-[#131313] hover:bg-[#262626] text-[#FFFFFF] text-sm font-bold uppercase transition-all shadow-sm"
-                  >
-                    + ADD SYLLABUS UNIT
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {(editingCourse.modules || []).map((mod, idx) => (
-                    <div key={idx} className="p-4 bg-[#F8FAFC] border-2 border-[#CBD5E1] rounded-xl space-y-2.5 shadow-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-black text-[#EE2C3C]">MODULE {mod.number}</span>
-                        <div className="flex items-center space-x-2">
-                          <input
-                            type="number"
-                            value={mod.hours}
-                            onChange={(e) => {
-                              const updated = [...(editingCourse.modules || [])];
-                              updated[idx] = { ...updated[idx], hours: Number(e.target.value) || 20 };
-                              setEditingCourse({ ...editingCourse, modules: updated });
-                            }}
-                            className="w-16 p-1 border rounded text-xs text-center font-bold bg-[#FFFFFF]"
-                            title="Lab Hours"
-                          />
-                          <span className="text-xs font-bold font-bold text-[#64748B]">LAB HRS</span>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const updated = (editingCourse.modules || []).filter((_, i) => i !== idx);
-                              setEditingCourse({
-                                ...editingCourse,
-                                modules: updated,
-                                syllabus: updated.map((m) => m.title),
-                              });
-                            }}
-                            className="text-xs text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-2 py-0.5 rounded cursor-pointer font-medium ml-2 transition-colors"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      </div>
-
-                      <div>
-                        <input
-                          type="text"
-                          value={mod.title}
-                          onChange={(e) => {
-                            const updated = [...(editingCourse.modules || [])];
-                            updated[idx] = { ...updated[idx], title: e.target.value };
-                            setEditingCourse({
-                              ...editingCourse,
-                              modules: updated,
-                              syllabus: updated.map((m) => m.title),
-                            });
-                          }}
-                          placeholder="Module Title"
-                          className="w-full p-2 rounded-lg border text-xs font-bold text-[#0F172A] bg-[#FFFFFF]"
-                        />
-                      </div>
-
-                      <div>
-                        <input
-                          type="text"
-                          value={(mod.topics || []).join(', ')}
-                          onChange={(e) => {
-                            const updated = [...(editingCourse.modules || [])];
-                            updated[idx] = {
-                              ...updated[idx],
-                              topics: e.target.value.split(',').map((s) => s.trim()).filter(Boolean),
-                            };
-                            setEditingCourse({ ...editingCourse, modules: updated });
-                          }}
-                          placeholder="Topics separated by comma"
-                          className="w-full p-2 rounded-lg border text-xs text-[#475569] bg-[#FFFFFF]"
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
               </div>
 
               {/* Bottom Sticky Modal Actions */}
-              <div className="pt-4 flex justify-end space-x-4 border-t-2 border-[#E2E8F0]">
+              <div className="max-w-[1440px] mx-auto pt-6 flex justify-end space-x-4 border-t-2 border-slate-200">
                 <button
                   type="button"
                   onClick={() => setEditingCourse(null)}
-                  className="px-8 py-3 rounded-xl border-2 border-[#CBD5E1] text-sm sm:text-base font-bold hover:bg-[#FFFFFF] transition-all"
+                  className="px-8 py-3.5 rounded-xl border-2 border-slate-300 text-sm sm:text-base font-bold text-slate-700 hover:bg-slate-100 transition-all cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSavingCourse}
-                  className="px-10 py-3 rounded-xl bg-[#131313] hover:bg-[#262626] text-[#FFFFFF] text-sm sm:text-base font-black uppercase tracking-wider shadow-md transition-all"
+                  className="px-10 py-3.5 rounded-xl bg-slate-900 hover:bg-black text-white text-sm sm:text-base font-black uppercase tracking-wider shadow-lg transition-all cursor-pointer"
                 >
                   {isSavingCourse ? 'SAVING CHANGES...' : 'SAVE & SYNC TO WEBSITE'}
                 </button>
