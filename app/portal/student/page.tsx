@@ -117,6 +117,22 @@ export interface EbookItem {
   isUnlocked?: boolean;
 }
 
+
+export interface LiveClassSession {
+  id: string;
+  title: string;
+  trainer: string;
+  course: string;
+  status: 'Live Now' | 'Scheduled' | 'Ended';
+  isLive: boolean;
+  streamUrl: string;
+  platform: 'Virtual CAD Workstation' | 'Google Meet' | 'Zoom' | 'YouTube Live' | 'Microsoft Teams';
+  timing: string;
+  description: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface CourseReview {
   id: string;
   studentId: string;
@@ -496,6 +512,11 @@ export default function StudentPortalPage() {
   const [reviewSuccessMsg, setReviewSuccessMsg] = useState<string | null>(null);
   const [mySubmittedReviews, setMySubmittedReviews] = useState<CourseReview[]>([]);
   const [isLoadingReviews, setIsLoadingReviews] = useState<boolean>(false);
+
+  // Dynamic Live Class State from Admin Broadcast
+  const [liveClass, setLiveClass] = useState<LiveClassSession | null>(null);
+  const [isLoadingLive, setIsLoadingLive] = useState<boolean>(false);
+
 
   // Fetch reviews submitted by this student
   const fetchStudentReviews = async (userEmail?: string) => {
@@ -1911,7 +1932,9 @@ export default function StudentPortalPage() {
                     </span>
                   )}
                   {item.id === 'Live' && (
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 flex-shrink-0 animate-pulse" />
+                    <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
+                      liveClass?.status === 'Live Now' ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'
+                    }`} />
                   )}
                   {item.id === 'Chat' && studentTickets.filter((t) => t.status === 'Resolved').length > 0 && (
                     <span className={`text-xs font-mono px-2 py-0.5 rounded-full font-bold ${
@@ -3709,30 +3732,128 @@ export default function StudentPortalPage() {
             </div>
           )}
 
-          {/* TAB 3: LIVE */}
+          {/* TAB 3: LIVE (Dynamic sync with Admin Broadcast) */}
           {activeTab === 'Live' && (
-            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 sm:p-8 space-y-6">
-              <div>
-                <h3 className="text-xl sm:text-2xl font-bold text-[#131313] tracking-tight">
-                  Active Virtual CAD Lab &amp; Live Sessions
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
-                  Trainer Er. Swamy Naidu is currently live demonstrating Parametric Family Creation in Autodesk Revit.
-                </p>
-              </div>
-              <div className="p-8 rounded-2xl bg-slate-50/70 border border-slate-200 text-center space-y-4">
-                <span className="text-xs font-semibold text-slate-500 block uppercase tracking-wide">CAD Workstation Stream Ready</span>
-                <button
-                  disabled={isAccessRevoked}
-                  className={`px-8 py-3.5 rounded-xl text-sm font-bold shadow-xs transition-all cursor-pointer ${
-                    isAccessRevoked
-                      ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                      : 'bg-[#EE2C3C] hover:bg-[#D71E2E] text-white'
-                  }`}
-                >
-                  {isAccessRevoked ? 'Workstation Access Suspended' : 'Connect to Live Workstation Screen →'}
-                </button>
-              </div>
+            <div className="space-y-6">
+              {isLoadingLive ? (
+                <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-3">
+                  <div className="w-8 h-8 border-3 border-[#EE2C3C] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                  <p className="text-sm font-semibold text-slate-600">Connecting to live workstation session...</p>
+                </div>
+              ) : liveClass && liveClass.status === 'Live Now' ? (
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 sm:p-8 space-y-6">
+                  {/* Active Header */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+                    <div>
+                      <div className="flex items-center space-x-2 mb-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
+                          Live Streaming Now
+                        </span>
+                        <span className="text-xs font-semibold text-slate-500 font-mono">
+                          {liveClass.platform}
+                        </span>
+                      </div>
+                      <h3 className="text-xl sm:text-2xl font-bold text-[#131313] tracking-tight">
+                        {liveClass.title}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+                        Trainer: <span className="text-slate-900 font-bold">{liveClass.trainer}</span> &bull; {liveClass.course}
+                      </p>
+                    </div>
+                    <div className="text-left sm:text-right">
+                      <span className="text-xs font-mono font-bold text-slate-600 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 inline-block">
+                        {liveClass.timing}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Agenda / Instructions */}
+                  {liveClass.description && (
+                    <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed">
+                      <span className="font-bold text-slate-900 block mb-1">Session Agenda &amp; Guidelines:</span>
+                      {liveClass.description}
+                    </div>
+                  )}
+
+                  {/* Live Stream Action Box */}
+                  <div className="p-8 sm:p-10 rounded-2xl bg-slate-50/70 border border-slate-200 text-center space-y-4">
+                    <span className="text-xs font-bold text-slate-500 block uppercase tracking-wide">
+                      CAD Workstation Stream Ready
+                    </span>
+                    <a
+                      href={liveClass.streamUrl || 'https://meet.google.com/new'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center space-x-2 px-8 py-3.5 rounded-xl text-sm font-bold bg-[#EE2C3C] hover:bg-[#D71E2E] text-white shadow-sm hover:shadow-md transition-all cursor-pointer"
+                    >
+                      <span>Connect to Live Workstation Screen</span>
+                      <span>&rarr;</span>
+                    </a>
+                  </div>
+
+                  {/* Quick Refresh */}
+                  <div className="pt-2 text-center">
+                    <button
+                      onClick={fetchLiveClass}
+                      className="text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
+                    >
+                      ↻ Check for stream updates
+                    </button>
+                  </div>
+                </div>
+              ) : liveClass && liveClass.status === 'Scheduled' ? (
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-8 text-center space-y-4">
+                  <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 border border-sky-200 flex items-center justify-center mx-auto">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold uppercase tracking-wider text-sky-700 bg-sky-50 px-2.5 py-1 rounded-md border border-sky-200">
+                      Upcoming Class Scheduled
+                    </span>
+                    <h3 className="text-xl font-bold text-[#131313] mt-2">
+                      {liveClass.title}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                      Trainer: <span className="text-slate-900 font-bold">{liveClass.trainer}</span> &bull; {liveClass.course}
+                    </p>
+                    <span className="inline-block mt-2 text-xs font-mono font-bold text-slate-700 bg-slate-100 px-3 py-1 rounded-md">
+                      {liveClass.timing}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+                    Faculty mentors will start the live stream at the scheduled time. Return to this screen to join the workstation session.
+                  </p>
+                  <button
+                    onClick={fetchLiveClass}
+                    className="px-4 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-all cursor-pointer"
+                  >
+                    ↻ Check if Live Stream has Started
+                  </button>
+                </div>
+              ) : (
+                <div className="bg-white rounded-2xl border border-dashed border-slate-300 p-12 text-center space-y-3">
+                  <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-500 flex items-center justify-center mx-auto">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
+                    </svg>
+                  </div>
+                  <h4 className="text-base font-bold text-[#131313]">
+                    No Live Class in Session
+                  </h4>
+                  <p className="text-xs text-slate-500 max-w-md mx-auto">
+                    Faculty mentors broadcast live CAD workstation classes according to the batch schedule. Check back at your scheduled lab timing or contact administration for private workstation access.
+                  </p>
+                  <button
+                    onClick={fetchLiveClass}
+                    className="px-4 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+                  >
+                    ↻ Check for Live Stream
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
