@@ -59,6 +59,8 @@ interface StoredCourse {
   certification?: string;
   awardedCredential?: string;
   highlights?: string[];
+  trainingHighlights?: { title: string; desc: string }[];
+  labGuarantees?: string[];
   careerRoles?: string[];
   careerPathways?: { step: string; experience: string; role: string; ctc: string }[];
   faqs?: { question: string; answer: string }[];
@@ -1054,6 +1056,42 @@ function normalizeCourse(raw: any): StoredCourse {
     certification: raw.certification || 'Autodesk & Dassault Certificate',
     awardedCredential,
     highlights,
+    trainingHighlights: Array.isArray(raw.trainingHighlights) && raw.trainingHighlights.length > 0
+      ? raw.trainingHighlights
+      : [
+          {
+            title: 'Instructor Led Training',
+            desc: 'Expert CAD trainers with 10+ years EPC project experience.',
+          },
+          {
+            title: 'Weekly Doubt Clearing Session',
+            desc: 'One-on-one lab guidance for complex modeling problems.',
+          },
+          {
+            title: 'Lifetime Assistance for Revision',
+            desc: 'Repeat any module or tool training anytime at zero cost.',
+          },
+          {
+            title: 'Lifetime Login to Student Dashboard',
+            desc: '24/7 access to video recordings, project files & e-books.',
+          },
+          {
+            title: 'World-Wide Valid Certification',
+            desc: 'Official accredited certificate verifiable online with QR code.',
+          },
+          {
+            title: 'Study Material, Assignments & Projects',
+            desc: 'Real industrial CAD drawing dossiers & portfolio capstones.',
+          },
+        ],
+    labGuarantees: Array.isArray(raw.labGuarantees) && raw.labGuarantees.length > 0
+      ? raw.labGuarantees
+      : [
+          'Dedicated NVIDIA RTX GPU Workstation',
+          '1:1 Lab Seat • No Computer Sharing',
+          'Lab Open 7 Days: 07:00 AM to 09:30 PM',
+          'Continuous High-Speed Fiber Internet',
+        ],
     careerRoles,
     careerPathways,
     faqs,

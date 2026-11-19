@@ -151,63 +151,87 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
   const trainingMode = course.mode || 'Classroom & Dedicated CAD Workstation Lab';
 
   // CAD DESK Hallmark: Training Highlights 6 items (Exact CAD DESK Reference)
-  const trainingHighlights = [
+  const defaultTrainingHighlights = [
     {
       title: 'Instructor Led Training',
       desc: 'Expert CAD trainers with 10+ years EPC project experience.',
-      icon: (
-        <svg className="w-6 h-6 text-[#15304C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-        </svg>
-      )
     },
     {
       title: 'Weekly Doubt Clearing Session',
       desc: 'One-on-one lab guidance for complex modeling problems.',
-      icon: (
-        <svg className="w-6 h-6 text-[#15304C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-        </svg>
-      )
     },
     {
       title: 'Lifetime Assistance for Revision',
       desc: 'Repeat any module or tool training anytime at zero cost.',
-      icon: (
-        <svg className="w-6 h-6 text-[#15304C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-        </svg>
-      )
     },
     {
       title: 'Lifetime Login to Student Dashboard',
       desc: '24/7 access to video recordings, project files & e-books.',
-      icon: (
-        <svg className="w-6 h-6 text-[#15304C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-        </svg>
-      )
     },
     {
       title: 'World-Wide Valid Certification',
       desc: 'Official accredited certificate verifiable online with QR code.',
-      icon: (
-        <svg className="w-6 h-6 text-[#15304C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-        </svg>
-      )
     },
     {
       title: 'Study Material, Assignments & Projects',
       desc: 'Real industrial CAD drawing dossiers & portfolio capstones.',
-      icon: (
-        <svg className="w-6 h-6 text-[#15304C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-        </svg>
-      )
-    }
+    },
   ];
+
+  const highlightIcons = [
+    (
+      <svg className="w-6 h-6 text-[#15304C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+      </svg>
+    ),
+    (
+      <svg className="w-6 h-6 text-[#15304C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+      </svg>
+    ),
+    (
+      <svg className="w-6 h-6 text-[#15304C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+      </svg>
+    ),
+    (
+      <svg className="w-6 h-6 text-[#15304C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+      </svg>
+    ),
+    (
+      <svg className="w-6 h-6 text-[#15304C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+      </svg>
+    ),
+    (
+      <svg className="w-6 h-6 text-[#15304C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+      </svg>
+    ),
+  ];
+
+  const rawTrainingHighlights = (course as any).trainingHighlights && (course as any).trainingHighlights.length > 0
+    ? (course as any).trainingHighlights
+    : defaultTrainingHighlights;
+
+  const trainingHighlights = rawTrainingHighlights.map((item: any, idx: number) => ({
+    title: item.title,
+    desc: item.desc,
+    icon: highlightIcons[idx % highlightIcons.length],
+  }));
+
+  const defaultLabGuarantees = [
+    'Dedicated NVIDIA RTX GPU Workstation',
+    '1:1 Lab Seat • No Computer Sharing',
+    'Lab Open 7 Days: 07:00 AM to 09:30 PM',
+    'Continuous High-Speed Fiber Internet',
+  ];
+
+  const labGuarantees: string[] = (course as any).labGuarantees && (course as any).labGuarantees.length > 0
+    ? (course as any).labGuarantees
+    : defaultLabGuarantees;
 
   // Course Highlights specific to this exact software
   const courseHighlights = [
@@ -1055,22 +1079,12 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                   Lab &amp; Workstation Guarantee
                 </h4>
                 <div className="space-y-2.5 text-slate-700 font-medium">
-                  <div className="flex items-center space-x-2.5">
-                    <span className="text-emerald-600 font-bold text-base">✓</span>
-                    <span>Dedicated NVIDIA RTX GPU Workstation</span>
-                  </div>
-                  <div className="flex items-center space-x-2.5">
-                    <span className="text-emerald-600 font-bold text-base">✓</span>
-                    <span>1:1 Lab Seat &bull; No Computer Sharing</span>
-                  </div>
-                  <div className="flex items-center space-x-2.5">
-                    <span className="text-emerald-600 font-bold text-base">✓</span>
-                    <span>Lab Open 7 Days: 07:00 AM to 09:30 PM</span>
-                  </div>
-                  <div className="flex items-center space-x-2.5">
-                    <span className="text-emerald-600 font-bold text-base">✓</span>
-                    <span>Continuous High-Speed Fiber Internet</span>
-                  </div>
+                  {labGuarantees.map((guarantee: string, gIdx: number) => (
+                    <div key={gIdx} className="flex items-center space-x-2.5">
+                      <span className="text-emerald-600 font-bold text-base flex-shrink-0">✓</span>
+                      <span>{guarantee}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 

@@ -153,6 +153,11 @@ interface CourseFaqItem {
   answer: string;
 }
 
+interface TrainingHighlightItem {
+  title: string;
+  desc: string;
+}
+
 interface CourseItem {
   id: string;
   code: string;
@@ -181,6 +186,8 @@ interface CourseItem {
   certification?: string;
   awardedCredential?: string;
   highlights?: string[];
+  trainingHighlights?: TrainingHighlightItem[];
+  labGuarantees?: string[];
   careerRoles?: string[];
   careerPathways?: CareerPathwayStep[];
   faqs?: CourseFaqItem[];
@@ -576,6 +583,20 @@ export default function AdminPortalPage() {
     certification: 'Autodesk & Dassault Certificate',
     awardedCredential: 'Autodesk Certified Professional: Revit Architecture & BIM Specialist',
     careerRolesText: 'BIM Modeler, CAD Design Engineer, Architectural Draftsman, Project Coordinator',
+    trainingHighlights: [
+      { title: 'Instructor Led Training', desc: 'Expert CAD trainers with 10+ years EPC project experience.' },
+      { title: 'Weekly Doubt Clearing Session', desc: 'One-on-one lab guidance for complex modeling problems.' },
+      { title: 'Lifetime Assistance for Revision', desc: 'Repeat any module or tool training anytime at zero cost.' },
+      { title: 'Lifetime Login to Student Dashboard', desc: '24/7 access to video recordings, project files & e-books.' },
+      { title: 'World-Wide Valid Certification', desc: 'Official accredited certificate verifiable online with QR code.' },
+      { title: 'Study Material, Assignments & Projects', desc: 'Real industrial CAD drawing dossiers & portfolio capstones.' },
+    ] as TrainingHighlightItem[],
+    labGuarantees: [
+      'Dedicated NVIDIA RTX GPU Workstation',
+      '1:1 Lab Seat • No Computer Sharing',
+      'Lab Open 7 Days: 07:00 AM to 09:30 PM',
+      'Continuous High-Speed Fiber Internet',
+    ],
     highlights: [
       '3D Modeling & Parametric Assembly in Industrial Toolsuite',
       'Learn to create live industrial projects with real-scale models',
@@ -1634,6 +1655,22 @@ export default function AdminPortalPage() {
     const labImage = course.labImage || (liveSource as any)?.labImage || 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80';
     const certificateImage = course.certificateImage || (liveSource as any)?.certificateImage || '';
     const awardedCredential = course.awardedCredential || (liveSource as any)?.awardedCredential || cert;
+    const defaultTrainingHighlights: TrainingHighlightItem[] = [
+      { title: 'Instructor Led Training', desc: 'Expert CAD trainers with 10+ years EPC project experience.' },
+      { title: 'Weekly Doubt Clearing Session', desc: 'One-on-one lab guidance for complex modeling problems.' },
+      { title: 'Lifetime Assistance for Revision', desc: 'Repeat any module or tool training anytime at zero cost.' },
+      { title: 'Lifetime Login to Student Dashboard', desc: '24/7 access to video recordings, project files & e-books.' },
+      { title: 'World-Wide Valid Certification', desc: 'Official accredited certificate verifiable online with QR code.' },
+      { title: 'Study Material, Assignments & Projects', desc: 'Real industrial CAD drawing dossiers & portfolio capstones.' },
+    ];
+    const defaultLabGuarantees: string[] = [
+      'Dedicated NVIDIA RTX GPU Workstation',
+      '1:1 Lab Seat • No Computer Sharing',
+      'Lab Open 7 Days: 07:00 AM to 09:30 PM',
+      'Continuous High-Speed Fiber Internet',
+    ];
+    const trainingHighlights = Array.isArray(course.trainingHighlights) && course.trainingHighlights.length > 0 ? course.trainingHighlights : (liveSource as any)?.trainingHighlights || defaultTrainingHighlights;
+    const labGuarantees = Array.isArray(course.labGuarantees) && course.labGuarantees.length > 0 ? course.labGuarantees : (liveSource as any)?.labGuarantees || defaultLabGuarantees;
     const highlights = Array.isArray(course.highlights) && course.highlights.length > 0 ? course.highlights : (liveSource as any)?.highlights || defaultHighlights;
     const careerPathways = Array.isArray(course.careerPathways) && course.careerPathways.length > 0 ? course.careerPathways : (liveSource as any)?.careerPathways || defaultCareerPathways;
     const faqs = Array.isArray(course.faqs) && course.faqs.length > 0 ? course.faqs : (liveSource as any)?.faqs || defaultFaqs;
@@ -1656,6 +1693,8 @@ export default function AdminPortalPage() {
       tagline,
       overview,
       highlights,
+      trainingHighlights,
+      labGuarantees,
       careerPathways,
       faqs,
       capstoneProject: capstoneObj,
@@ -1736,6 +1775,8 @@ export default function AdminPortalPage() {
       certification: newCourse.certification || 'Autodesk & Dassault Certificate',
       awardedCredential: newCourse.awardedCredential || newCourse.certification || 'Autodesk Certified Professional: Revit Architecture & BIM Specialist',
       highlights: newCourse.highlights || [],
+      trainingHighlights: newCourse.trainingHighlights || [],
+      labGuarantees: newCourse.labGuarantees || [],
       careerRoles,
       careerPathways: newCourse.careerPathways || [],
       faqs: newCourse.faqs || [],
@@ -1856,6 +1897,8 @@ export default function AdminPortalPage() {
             ? 'eee'
             : 'civil',
         tools,
+        trainingHighlights: editingCourse.trainingHighlights || [],
+        labGuarantees: editingCourse.labGuarantees || [],
         modules,
         syllabus,
         fee: Number(editingCourse.fee) || 30000,
@@ -7053,7 +7096,7 @@ export default function AdminPortalPage() {
               <RedCrossCloseButton onClick={() => setShowAddCourseModal(false)} />
             </div>
 
-            {/* Sticky Order-Wise Quick Jump Navigation Bar */}
+            {/* Sticky Order-Wise Quick Jump Navigation Bar (10 Sections) */}
             <div className="bg-slate-100 border-b border-slate-200 px-6 sm:px-10 py-2.5 flex items-center space-x-2 overflow-x-auto no-scrollbar flex-shrink-0">
               <span className="text-xs font-black text-slate-500 uppercase tracking-wider whitespace-nowrap mr-2">
                 Order-Wise Sections:
@@ -7062,12 +7105,13 @@ export default function AdminPortalPage() {
                 { id: 'add-sec-1', label: '1. Hero & Basics' },
                 { id: 'add-sec-2', label: '2. Academic Facts' },
                 { id: 'add-sec-3', label: '3. Overview' },
-                { id: 'add-sec-4', label: '4. Highlights & Lab' },
-                { id: 'add-sec-5', label: '5. Syllabus Units' },
-                { id: 'add-sec-6', label: '6. Career Path' },
-                { id: 'add-sec-7', label: '7. Certificate' },
-                { id: 'add-sec-8', label: '8. Capstone Project' },
-                { id: 'add-sec-9', label: '9. FAQs' },
+                { id: 'add-sec-4', label: '4. Training Highlights' },
+                { id: 'add-sec-5', label: '5. Lab & Guarantees' },
+                { id: 'add-sec-6', label: '6. Syllabus Units' },
+                { id: 'add-sec-7', label: '7. Career Path' },
+                { id: 'add-sec-8', label: '8. Certificate' },
+                { id: 'add-sec-9', label: '9. Capstone Project' },
+                { id: 'add-sec-10', label: '10. FAQs' },
               ].map((sec) => (
                 <button
                   key={sec.id}
@@ -7407,28 +7451,122 @@ export default function AdminPortalPage() {
                   </div>
                 </div>
 
-                {/* 4. COURSE HIGHLIGHTS & CORE COMPETENCIES (WITH WORKSTATION LAB PHOTO) */}
+                {/* 4. TRAINING HIGHLIGHTS (6 CARDS: TITLE & DESCRIPTION) */}
                 <div id="add-sec-4" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
-                  <div className="flex items-center justify-between pb-3 border-b-2 border-slate-200">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b-2 border-slate-200 gap-3">
                     <div className="flex items-center space-x-3">
-                      <span className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-mono font-black text-sm">
+                      <span className="w-8 h-8 rounded-lg bg-rose-600 text-white flex items-center justify-center font-mono font-black text-sm">
                         04
                       </span>
                       <div>
                         <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                          Course Highlights &amp; Core Competencies (With Workstation Lab Photo)
+                          Training Highlights (Hallmark Value Props &bull; {newCourse.trainingHighlights?.length || 0} Cards)
                         </h4>
                         <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                          Matches Section C split card (Left: Ameerpet Lab Workstation Photo, Right: 6 Core Competencies Checklist with green checkmarks).
+                          Matches Section B &ldquo;Training Highlights&rdquo; 6-card grid with red indicator pill on the live website.
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const cur = newCourse.trainingHighlights || [];
+                        setNewCourse({
+                          ...newCourse,
+                          trainingHighlights: [
+                            ...cur,
+                            {
+                              title: 'New CAD Desk Advantage',
+                              desc: 'Hands-on practical training with verified industry blueprints and placement support.',
+                            },
+                          ],
+                        });
+                      }}
+                      className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-bold uppercase transition-all shadow-sm cursor-pointer whitespace-nowrap"
+                    >
+                      + Add Highlight Card
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {(newCourse.trainingHighlights || []).map((thItem, thIdx) => (
+                      <div key={thIdx} className="p-5 bg-slate-50 border-2 border-slate-200 rounded-2xl space-y-3 shadow-xs flex flex-col justify-between">
+                        <div className="flex items-center justify-between">
+                          <span className="px-3 py-1 rounded-lg bg-rose-100 text-rose-800 font-mono font-bold text-xs">
+                            CARD 0{thIdx + 1}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const list = (newCourse.trainingHighlights || []).filter((_, i) => i !== thIdx);
+                              setNewCourse({ ...newCourse, trainingHighlights: list });
+                            }}
+                            className="text-xs sm:text-sm font-bold text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-2.5 py-1 rounded-lg cursor-pointer transition-colors"
+                          >
+                            Remove Card
+                          </button>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs sm:text-sm font-bold text-slate-800 mb-1">
+                            Card Title
+                          </label>
+                          <input
+                            type="text"
+                            value={thItem.title}
+                            onChange={(e) => {
+                              const list = [...(newCourse.trainingHighlights || [])];
+                              list[thIdx] = { ...list[thIdx], title: e.target.value };
+                              setNewCourse({ ...newCourse, trainingHighlights: list });
+                            }}
+                            placeholder="e.g. Instructor Led Training"
+                            className="w-full p-3 text-sm sm:text-base font-bold text-slate-900 bg-white rounded-xl border border-slate-300 shadow-2xs"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs sm:text-sm font-bold text-slate-800 mb-1">
+                            Card Description
+                          </label>
+                          <textarea
+                            rows={3}
+                            value={thItem.desc}
+                            onChange={(e) => {
+                              const list = [...(newCourse.trainingHighlights || [])];
+                              list[thIdx] = { ...list[thIdx], desc: e.target.value };
+                              setNewCourse({ ...newCourse, trainingHighlights: list });
+                            }}
+                            placeholder="e.g. Expert CAD trainers with 10+ years EPC project experience."
+                            className="w-full p-3 text-xs sm:text-sm font-medium text-slate-700 bg-white rounded-xl border border-slate-300 shadow-2xs leading-relaxed"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 5. WORKSTATION LAB PHOTO, LAB GUARANTEES & CORE COMPETENCIES */}
+                <div id="add-sec-5" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                  <div className="flex items-center justify-between pb-3 border-b-2 border-slate-200">
+                    <div className="flex items-center space-x-3">
+                      <span className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-mono font-black text-sm">
+                        05
+                      </span>
+                      <div>
+                        <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                          Workstation Lab Photo, Lab Guarantees &amp; Core Competencies
+                        </h4>
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                          Matches Section C split card (Ameerpet Lab Workstation Photo &amp; Core Competencies) and the &ldquo;Lab &amp; Workstation Guarantee&rdquo; sidebar card.
                         </p>
                       </div>
                     </div>
                     <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 hidden sm:inline-block">
-                      Section C Split Card
+                      Lab &amp; Guarantees
                     </span>
                   </div>
 
-                  {/* Secondary Workstation Lab Photo */}
+                  {/* Part A: Secondary Workstation Lab Photo */}
                   <div className="p-5 bg-slate-50 rounded-2xl border-2 border-slate-200 space-y-3">
                     <div className="flex items-center justify-between">
                       <label className="block text-sm sm:text-base font-bold text-slate-800">
@@ -7474,8 +7612,66 @@ export default function AdminPortalPage() {
                     )}
                   </div>
 
-                  {/* Core Competencies Checklist Builder */}
-                  <div className="space-y-4">
+                  {/* Part B: Lab & Workstation Guarantee (Sidebar 4 Key Points) */}
+                  <div className="p-5 bg-emerald-50/50 rounded-2xl border-2 border-emerald-200 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-emerald-200 gap-3">
+                      <div>
+                        <span className="text-sm sm:text-base font-bold text-emerald-900 flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                          Lab &amp; Workstation Guarantee ({newCourse.labGuarantees?.length || 0} Checkpoints)
+                        </span>
+                        <p className="text-xs text-emerald-700">
+                          These items render in the &ldquo;Lab &amp; Workstation Guarantee&rdquo; card on the live website sidebar.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const cur = newCourse.labGuarantees || [];
+                          setNewCourse({
+                            ...newCourse,
+                            labGuarantees: [...cur, 'Dedicated RTX Workstation & High-Speed Internet'],
+                          });
+                        }}
+                        className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold uppercase transition-all shadow-sm cursor-pointer whitespace-nowrap"
+                      >
+                        + Add Guarantee Point
+                      </button>
+                    </div>
+
+                    <div className="space-y-3">
+                      {(newCourse.labGuarantees || []).map((guarantee, gIdx) => (
+                        <div key={gIdx} className="flex items-center space-x-3 bg-white p-3 rounded-xl border border-emerald-200">
+                          <span className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-sm flex-shrink-0">
+                            ✓
+                          </span>
+                          <input
+                            type="text"
+                            value={guarantee}
+                            onChange={(e) => {
+                              const list = [...(newCourse.labGuarantees || [])];
+                              list[gIdx] = e.target.value;
+                              setNewCourse({ ...newCourse, labGuarantees: list });
+                            }}
+                            className="flex-1 p-2.5 sm:p-3 text-sm sm:text-base font-bold text-slate-900 bg-white rounded-xl border border-slate-300 focus:outline-none focus:border-emerald-600 shadow-2xs"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const list = (newCourse.labGuarantees || []).filter((_, i) => i !== gIdx);
+                              setNewCourse({ ...newCourse, labGuarantees: list });
+                            }}
+                            className="text-sm font-bold text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-3 py-2 rounded-lg cursor-pointer transition-colors whitespace-nowrap"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Part C: Core Competencies Checklist Builder */}
+                  <div className="space-y-4 pt-2">
                     <div className="flex items-center justify-between pb-2 border-b border-slate-200">
                       <div>
                         <span className="text-sm sm:text-base font-bold text-slate-800">
@@ -7494,7 +7690,7 @@ export default function AdminPortalPage() {
                             highlights: [...cur, `Live industrial modeling with ${newCourse.software?.split(',')[0] || 'CAD Suite'}`],
                           });
                         }}
-                        className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold uppercase transition-all shadow-sm cursor-pointer"
+                        className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs sm:text-sm font-bold uppercase transition-all shadow-sm cursor-pointer"
                       >
                         + Add Core Competency
                       </button>
@@ -7532,12 +7728,12 @@ export default function AdminPortalPage() {
                   </div>
                 </div>
 
-                {/* 5. COURSE CONTENTS & MODULE SYLLABUS BREAKDOWN */}
-                <div id="add-sec-5" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                {/* 6. COURSE CONTENTS & MODULE SYLLABUS BREAKDOWN */}
+                <div id="add-sec-6" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b-2 border-slate-200 gap-3">
                     <div className="flex items-center space-x-3">
                       <span className="w-8 h-8 rounded-lg bg-[#EE2C3C] text-white flex items-center justify-center font-mono font-black text-sm">
-                        05
+                        06
                       </span>
                       <div>
                         <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
@@ -7652,12 +7848,12 @@ export default function AdminPortalPage() {
                   </div>
                 </div>
 
-                {/* 6. CAREER PROGRESSION PATH (FAN INFOGRAPHIC STEP BUILDER) */}
-                <div id="add-sec-6" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                {/* 7. CAREER PROGRESSION PATH (FAN INFOGRAPHIC STEP BUILDER) */}
+                <div id="add-sec-7" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b-2 border-slate-200 gap-3">
                     <div className="flex items-center space-x-3">
                       <span className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-mono font-black text-sm">
-                        06
+                        07
                       </span>
                       <div>
                         <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
@@ -7768,12 +7964,12 @@ export default function AdminPortalPage() {
                   </div>
                 </div>
 
-                {/* 7. OFFICIAL CERTIFICATE OF COMPLETION */}
-                <div id="add-sec-7" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                {/* 8. OFFICIAL CERTIFICATE OF COMPLETION */}
+                <div id="add-sec-8" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
                   <div className="flex items-center justify-between pb-3 border-b-2 border-slate-200">
                     <div className="flex items-center space-x-3">
                       <span className="w-8 h-8 rounded-lg bg-amber-600 text-white flex items-center justify-center font-mono font-black text-sm">
-                        07
+                        08
                       </span>
                       <div>
                         <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
@@ -7830,12 +8026,12 @@ export default function AdminPortalPage() {
                   </div>
                 </div>
 
-                {/* 8. DUAL CERTIFICATION & INDUSTRY CAPSTONE PROJECT */}
-                <div id="add-sec-8" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                {/* 9. DUAL CERTIFICATION & INDUSTRY CAPSTONE PROJECT */}
+                <div id="add-sec-9" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
                   <div className="flex items-center justify-between pb-3 border-b-2 border-slate-200">
                     <div className="flex items-center space-x-3">
                       <span className="w-8 h-8 rounded-lg bg-teal-600 text-white flex items-center justify-center font-mono font-black text-sm">
-                        08
+                        09
                       </span>
                       <div>
                         <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
@@ -7891,12 +8087,12 @@ export default function AdminPortalPage() {
                   </div>
                 </div>
 
-                {/* 9. FREQUENTLY ASKED QUESTIONS (FAQ ACCORDION BUILDER) */}
-                <div id="add-sec-9" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                {/* 10. FREQUENTLY ASKED QUESTIONS (FAQ ACCORDION BUILDER) */}
+                <div id="add-sec-10" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b-2 border-slate-200 gap-3">
                     <div className="flex items-center space-x-3">
                       <span className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-mono font-black text-sm">
-                        09
+                        10
                       </span>
                       <div>
                         <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
@@ -8027,7 +8223,7 @@ export default function AdminPortalPage() {
               <RedCrossCloseButton onClick={() => setEditingCourse(null)} />
             </div>
 
-            {/* Sticky Order-Wise Quick Jump Navigation Bar */}
+            {/* Sticky Order-Wise Quick Jump Navigation Bar (10 Sections) */}
             <div className="bg-slate-100 border-b border-slate-200 px-6 sm:px-10 py-2.5 flex items-center space-x-2 overflow-x-auto no-scrollbar flex-shrink-0">
               <span className="text-xs font-black text-slate-500 uppercase tracking-wider whitespace-nowrap mr-2">
                 Order-Wise Sections:
@@ -8036,12 +8232,13 @@ export default function AdminPortalPage() {
                 { id: 'edit-sec-1', label: '1. Hero & Basics' },
                 { id: 'edit-sec-2', label: '2. Academic Facts' },
                 { id: 'edit-sec-3', label: '3. Overview' },
-                { id: 'edit-sec-4', label: '4. Highlights & Lab' },
-                { id: 'edit-sec-5', label: '5. Syllabus Units' },
-                { id: 'edit-sec-6', label: '6. Career Path' },
-                { id: 'edit-sec-7', label: '7. Certificate' },
-                { id: 'edit-sec-8', label: '8. Capstone Project' },
-                { id: 'edit-sec-9', label: '9. FAQs' },
+                { id: 'edit-sec-4', label: '4. Training Highlights' },
+                { id: 'edit-sec-5', label: '5. Lab & Guarantees' },
+                { id: 'edit-sec-6', label: '6. Syllabus Units' },
+                { id: 'edit-sec-7', label: '7. Career Path' },
+                { id: 'edit-sec-8', label: '8. Certificate' },
+                { id: 'edit-sec-9', label: '9. Capstone Project' },
+                { id: 'edit-sec-10', label: '10. FAQs' },
               ].map((sec) => (
                 <button
                   key={sec.id}
@@ -8386,28 +8583,122 @@ export default function AdminPortalPage() {
                   </div>
                 </div>
 
-                {/* 4. COURSE HIGHLIGHTS & CORE COMPETENCIES (WITH WORKSTATION LAB PHOTO) */}
+                {/* 4. TRAINING HIGHLIGHTS (6 CARDS: TITLE & DESCRIPTION) */}
                 <div id="edit-sec-4" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
-                  <div className="flex items-center justify-between pb-3 border-b-2 border-slate-200">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b-2 border-slate-200 gap-3">
                     <div className="flex items-center space-x-3">
-                      <span className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-mono font-black text-sm">
+                      <span className="w-8 h-8 rounded-lg bg-rose-600 text-white flex items-center justify-center font-mono font-black text-sm">
                         04
                       </span>
                       <div>
                         <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                          Course Highlights &amp; Core Competencies (With Workstation Lab Photo)
+                          Training Highlights (Hallmark Value Props &bull; {editingCourse.trainingHighlights?.length || 0} Cards)
                         </h4>
                         <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                          Matches Section C split card (Left: Ameerpet Lab Workstation Photo, Right: 6 Core Competencies Checklist with green checkmarks).
+                          Matches Section B &ldquo;Training Highlights&rdquo; 6-card grid with red indicator pill on the live website.
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const cur = editingCourse.trainingHighlights || [];
+                        setEditingCourse({
+                          ...editingCourse,
+                          trainingHighlights: [
+                            ...cur,
+                            {
+                              title: 'New CAD Desk Advantage',
+                              desc: 'Hands-on practical training with verified industry blueprints and placement support.',
+                            },
+                          ],
+                        });
+                      }}
+                      className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-bold uppercase transition-all shadow-sm cursor-pointer whitespace-nowrap"
+                    >
+                      + Add Highlight Card
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {(editingCourse.trainingHighlights || []).map((thItem, thIdx) => (
+                      <div key={thIdx} className="p-5 bg-slate-50 border-2 border-slate-200 rounded-2xl space-y-3 shadow-xs flex flex-col justify-between">
+                        <div className="flex items-center justify-between">
+                          <span className="px-3 py-1 rounded-lg bg-rose-100 text-rose-800 font-mono font-bold text-xs">
+                            CARD 0{thIdx + 1}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const list = (editingCourse.trainingHighlights || []).filter((_, i) => i !== thIdx);
+                              setEditingCourse({ ...editingCourse, trainingHighlights: list });
+                            }}
+                            className="text-xs sm:text-sm font-bold text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-2.5 py-1 rounded-lg cursor-pointer transition-colors"
+                          >
+                            Remove Card
+                          </button>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs sm:text-sm font-bold text-slate-800 mb-1">
+                            Card Title
+                          </label>
+                          <input
+                            type="text"
+                            value={thItem.title}
+                            onChange={(e) => {
+                              const list = [...(editingCourse.trainingHighlights || [])];
+                              list[thIdx] = { ...list[thIdx], title: e.target.value };
+                              setEditingCourse({ ...editingCourse, trainingHighlights: list });
+                            }}
+                            placeholder="e.g. Instructor Led Training"
+                            className="w-full p-3 text-sm sm:text-base font-bold text-slate-900 bg-white rounded-xl border border-slate-300 shadow-2xs"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs sm:text-sm font-bold text-slate-800 mb-1">
+                            Card Description
+                          </label>
+                          <textarea
+                            rows={3}
+                            value={thItem.desc}
+                            onChange={(e) => {
+                              const list = [...(editingCourse.trainingHighlights || [])];
+                              list[thIdx] = { ...list[thIdx], desc: e.target.value };
+                              setEditingCourse({ ...editingCourse, trainingHighlights: list });
+                            }}
+                            placeholder="e.g. Expert CAD trainers with 10+ years EPC project experience."
+                            className="w-full p-3 text-xs sm:text-sm font-medium text-slate-700 bg-white rounded-xl border border-slate-300 shadow-2xs leading-relaxed"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 5. WORKSTATION LAB PHOTO, LAB GUARANTEES & CORE COMPETENCIES */}
+                <div id="edit-sec-5" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                  <div className="flex items-center justify-between pb-3 border-b-2 border-slate-200">
+                    <div className="flex items-center space-x-3">
+                      <span className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-mono font-black text-sm">
+                        05
+                      </span>
+                      <div>
+                        <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                          Workstation Lab Photo, Lab Guarantees &amp; Core Competencies
+                        </h4>
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                          Matches Section C split card (Ameerpet Lab Workstation Photo &amp; Core Competencies) and the &ldquo;Lab &amp; Workstation Guarantee&rdquo; sidebar card.
                         </p>
                       </div>
                     </div>
                     <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 hidden sm:inline-block">
-                      Section C Split Card
+                      Lab &amp; Guarantees
                     </span>
                   </div>
 
-                  {/* Secondary Workstation Lab Photo */}
+                  {/* Part A: Secondary Workstation Lab Photo */}
                   <div className="p-5 bg-slate-50 rounded-2xl border-2 border-slate-200 space-y-3">
                     <div className="flex items-center justify-between">
                       <label className="block text-sm sm:text-base font-bold text-slate-800">
@@ -8453,8 +8744,66 @@ export default function AdminPortalPage() {
                     )}
                   </div>
 
-                  {/* Core Competencies Checklist Builder */}
-                  <div className="space-y-4">
+                  {/* Part B: Lab & Workstation Guarantee (Sidebar 4 Key Points) */}
+                  <div className="p-5 bg-emerald-50/50 rounded-2xl border-2 border-emerald-200 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-emerald-200 gap-3">
+                      <div>
+                        <span className="text-sm sm:text-base font-bold text-emerald-900 flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                          Lab &amp; Workstation Guarantee ({editingCourse.labGuarantees?.length || 0} Checkpoints)
+                        </span>
+                        <p className="text-xs text-emerald-700">
+                          These items render in the &ldquo;Lab &amp; Workstation Guarantee&rdquo; card on the live website sidebar.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const cur = editingCourse.labGuarantees || [];
+                          setEditingCourse({
+                            ...editingCourse,
+                            labGuarantees: [...cur, 'Dedicated RTX Workstation & High-Speed Internet'],
+                          });
+                        }}
+                        className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold uppercase transition-all shadow-sm cursor-pointer whitespace-nowrap"
+                      >
+                        + Add Guarantee Point
+                      </button>
+                    </div>
+
+                    <div className="space-y-3">
+                      {(editingCourse.labGuarantees || []).map((guarantee, gIdx) => (
+                        <div key={gIdx} className="flex items-center space-x-3 bg-white p-3 rounded-xl border border-emerald-200">
+                          <span className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-sm flex-shrink-0">
+                            ✓
+                          </span>
+                          <input
+                            type="text"
+                            value={guarantee}
+                            onChange={(e) => {
+                              const list = [...(editingCourse.labGuarantees || [])];
+                              list[gIdx] = e.target.value;
+                              setEditingCourse({ ...editingCourse, labGuarantees: list });
+                            }}
+                            className="flex-1 p-2.5 sm:p-3 text-sm sm:text-base font-bold text-slate-900 bg-white rounded-xl border border-slate-300 focus:outline-none focus:border-emerald-600 shadow-2xs"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const list = (editingCourse.labGuarantees || []).filter((_, i) => i !== gIdx);
+                              setEditingCourse({ ...editingCourse, labGuarantees: list });
+                            }}
+                            className="text-sm font-bold text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-3 py-2 rounded-lg cursor-pointer transition-colors whitespace-nowrap"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Part C: Core Competencies Checklist Builder */}
+                  <div className="space-y-4 pt-2">
                     <div className="flex items-center justify-between pb-2 border-b border-slate-200">
                       <div>
                         <span className="text-sm sm:text-base font-bold text-slate-800">
@@ -8473,7 +8822,7 @@ export default function AdminPortalPage() {
                             highlights: [...cur, `Live industrial modeling with ${editingCourse.software?.split(',')[0] || 'CAD Suite'}`],
                           });
                         }}
-                        className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold uppercase transition-all shadow-sm cursor-pointer"
+                        className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs sm:text-sm font-bold uppercase transition-all shadow-sm cursor-pointer"
                       >
                         + Add Core Competency
                       </button>
@@ -8511,12 +8860,12 @@ export default function AdminPortalPage() {
                   </div>
                 </div>
 
-                {/* 5. COURSE CONTENTS & MODULE SYLLABUS BREAKDOWN */}
-                <div id="edit-sec-5" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                {/* 6. COURSE CONTENTS & MODULE SYLLABUS BREAKDOWN */}
+                <div id="edit-sec-6" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b-2 border-slate-200 gap-3">
                     <div className="flex items-center space-x-3">
                       <span className="w-8 h-8 rounded-lg bg-[#EE2C3C] text-white flex items-center justify-center font-mono font-black text-sm">
-                        05
+                        06
                       </span>
                       <div>
                         <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
@@ -8631,12 +8980,12 @@ export default function AdminPortalPage() {
                   </div>
                 </div>
 
-                {/* 6. CAREER PROGRESSION PATH (FAN INFOGRAPHIC STEP BUILDER) */}
-                <div id="edit-sec-6" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                {/* 7. CAREER PROGRESSION PATH (FAN INFOGRAPHIC STEP BUILDER) */}
+                <div id="edit-sec-7" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b-2 border-slate-200 gap-3">
                     <div className="flex items-center space-x-3">
                       <span className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-mono font-black text-sm">
-                        06
+                        07
                       </span>
                       <div>
                         <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
@@ -8747,12 +9096,12 @@ export default function AdminPortalPage() {
                   </div>
                 </div>
 
-                {/* 7. OFFICIAL CERTIFICATE OF COMPLETION */}
-                <div id="edit-sec-7" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                {/* 8. OFFICIAL CERTIFICATE OF COMPLETION */}
+                <div id="edit-sec-8" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
                   <div className="flex items-center justify-between pb-3 border-b-2 border-slate-200">
                     <div className="flex items-center space-x-3">
                       <span className="w-8 h-8 rounded-lg bg-amber-600 text-white flex items-center justify-center font-mono font-black text-sm">
-                        07
+                        08
                       </span>
                       <div>
                         <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
@@ -8809,12 +9158,12 @@ export default function AdminPortalPage() {
                   </div>
                 </div>
 
-                {/* 8. DUAL CERTIFICATION & INDUSTRY CAPSTONE PROJECT */}
-                <div id="edit-sec-8" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                {/* 9. DUAL CERTIFICATION & INDUSTRY CAPSTONE PROJECT */}
+                <div id="edit-sec-9" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
                   <div className="flex items-center justify-between pb-3 border-b-2 border-slate-200">
                     <div className="flex items-center space-x-3">
                       <span className="w-8 h-8 rounded-lg bg-teal-600 text-white flex items-center justify-center font-mono font-black text-sm">
-                        08
+                        09
                       </span>
                       <div>
                         <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
@@ -8904,12 +9253,12 @@ export default function AdminPortalPage() {
                   </div>
                 </div>
 
-                {/* 9. FREQUENTLY ASKED QUESTIONS (FAQ ACCORDION BUILDER) */}
-                <div id="edit-sec-9" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
+                {/* 10. FREQUENTLY ASKED QUESTIONS (FAQ ACCORDION BUILDER) */}
+                <div id="edit-sec-10" className="p-6 sm:p-8 bg-white rounded-2xl border-2 border-slate-200 shadow-sm space-y-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b-2 border-slate-200 gap-3">
                     <div className="flex items-center space-x-3">
                       <span className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-mono font-black text-sm">
-                        09
+                        10
                       </span>
                       <div>
                         <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">

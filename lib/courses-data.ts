@@ -28,6 +28,8 @@ export interface Course {
   certification: string;
   awardedCredential?: string;
   highlights?: string[];
+  trainingHighlights?: { title: string; desc: string }[];
+  labGuarantees?: string[];
   careerRoles: string[];
   careerPathways?: { step: string; experience: string; role: string; ctc: string }[];
   faqs?: { question: string; answer: string }[];
