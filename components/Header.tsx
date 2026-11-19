@@ -116,19 +116,19 @@ export const Header: React.FC<HeaderProps> = ({
     <>
       <header className="fixed top-0 left-0 right-0 z-50 transition-all pointer-events-none">
         {/* Expanded Width & Luxurious Length Container */}
-        <div className="w-full px-3 sm:px-6 lg:px-8 max-w-[1600px] mx-auto pt-3 sm:pt-4.5 pointer-events-auto">
+        <div className="w-full px-2.5 sm:px-6 lg:px-8 max-w-[1600px] mx-auto pt-2 sm:pt-4.5 pointer-events-auto">
           <motion.div
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="bg-white/95 backdrop-blur-md rounded-full border border-slate-200/90 shadow-[0_10px_35px_-8px_rgba(15,23,42,0.08),0_2px_8px_rgba(15,23,42,0.03)] px-4 sm:px-6 lg:px-8 py-2 sm:py-2.5 flex items-center justify-between gap-3 sm:gap-4 xl:gap-8 transition-all min-h-[58px] sm:min-h-[64px] lg:min-h-[68px]"
+            className="bg-white/95 backdrop-blur-md rounded-full border border-slate-200/90 shadow-[0_10px_35px_-8px_rgba(15,23,42,0.08),0_2px_8px_rgba(15,23,42,0.03)] px-3.5 sm:px-6 lg:px-8 py-1.5 sm:py-2.5 flex items-center justify-between gap-2 sm:gap-4 xl:gap-8 transition-all min-h-[50px] sm:min-h-[64px] lg:min-h-[68px]"
           >
             {/* Prominent Official RND CADD Logo */}
             <Link href="/" className="flex items-center shrink-0 group py-0.5" aria-label="RND CADD Home">
               <img
                 src="/logo.png"
                 alt="RND CADD"
-                className="h-8 sm:h-9 md:h-10 lg:h-11 w-auto object-contain transition-transform duration-200 group-hover:scale-102 drop-shadow-xs"
+                className="h-7 sm:h-9 md:h-10 lg:h-11 w-auto object-contain transition-transform duration-200 group-hover:scale-102 drop-shadow-xs"
               />
             </Link>
 
@@ -257,22 +257,22 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
 
             {/* Mobile / Tablet Controls (< lg) */}
-            <div className="flex lg:hidden items-center gap-2.5 shrink-0">
+            <div className="flex lg:hidden items-center gap-2 shrink-0">
               {/* Quick Jobs Badge Link on Mobile */}
               <Link
                 href="/jobs"
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full bg-slate-900 text-white text-xs font-bold tracking-tight uppercase shadow-xs active:scale-95"
+                className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full bg-slate-900 text-white text-[11px] sm:text-xs font-bold tracking-tight uppercase shadow-xs active:scale-95"
                 title="Jobs Portal"
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse"></span>
                 <span>Jobs</span>
               </Link>
 
-              {/* Hamburger Button (44px touch target) */}
+              {/* Hamburger Button */}
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="w-11 h-11 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center transition-colors focus:outline-none cursor-pointer border border-slate-200"
+                className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center transition-colors focus:outline-none cursor-pointer border border-slate-200"
                 aria-label={mobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
                 aria-expanded={mobileMenuOpen}
               >

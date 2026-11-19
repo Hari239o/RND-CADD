@@ -253,8 +253,8 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
           </div>
         </div>
 
-        {/* Filter Switcher Tabs across all 6 main folders - Utilizing full width without clipping */}
-        <div className="flex flex-wrap items-center gap-2.5 sm:gap-3.5 pb-2 mb-10 w-full">
+        {/* Filter Switcher Tabs across all 6 main folders - Smooth Swipeable Bar on Mobile, Clean Wrap on Desktop */}
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-3 mb-6 sm:mb-10 w-full -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap sm:gap-2.5 sm:overflow-visible">
           {folderTabs.map((tab) => {
             const count =
               tab.id === 'all'
@@ -272,7 +272,7 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
               <button
                 key={tab.id}
                 onClick={() => onSelectStream(tab.id)}
-                className={`px-4 sm:px-5 py-2.5 rounded-full text-xs sm:text-[13px] font-semibold tracking-tight transition-all duration-200 flex items-center gap-2.5 cursor-pointer select-none whitespace-nowrap ${
+                className={`shrink-0 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-[13px] font-semibold tracking-tight transition-all duration-200 flex items-center gap-2 sm:gap-2.5 cursor-pointer select-none whitespace-nowrap ${
                   isSelected
                     ? 'bg-[#D20A0B] text-white border border-[#D20A0B] shadow-md font-bold'
                     : 'bg-white text-[#15304C] border border-[#CBD5E1] hover:border-[#D20A0B] hover:text-[#D20A0B] hover:bg-[#FFF5F5] shadow-sm'
@@ -280,7 +280,7 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
               >
                 <span>{tab.label}</span>
                 <span
-                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition-colors ${
+                  className={`text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-full transition-colors ${
                     isSelected ? 'bg-white text-[#D20A0B]' : 'bg-[#F1F5F9] text-[#64748B]'
                   }`}
                 >
@@ -299,7 +299,7 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
               whileInView={{ opacity: 1 }}
               viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.5 }}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mx-auto w-full"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mx-auto w-full"
             >
               {(showAllCourses ? filteredCourses : filteredCourses.slice(0, 8)).map((course, idx) => (
                 <motion.div
