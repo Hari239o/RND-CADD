@@ -896,9 +896,6 @@ export default function AdminPortalPage() {
   });
 
   // Interactive States with ZERO hardcoded/dummy entries
-  const [quizSubject, setQuizSubject] = useState<'Revit' | 'AutoCAD' | 'SolidWorks'>('Revit');
-  const [quizAnswers, setQuizAnswers] = useState<Record<number, number>>({});
-  const [quizScore, setQuizScore] = useState<number | null>(null);
   const [broadcastTitle, setBroadcastTitle] = useState('');
   const [broadcastMessage, setBroadcastMessage] = useState('');
   const [broadcastSent, setBroadcastSent] = useState(false);
@@ -3014,15 +3011,7 @@ export default function AdminPortalPage() {
         </svg>
       ),
     },
-    {
-      id: 'Software Quiz',
-      label: 'Software Quiz',
-      icon: (
-        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-11.25-9h11.25" />
-        </svg>
-      ),
-    },
+    
     {
       id: 'Ebook',
       label: 'Ebook',
@@ -4315,86 +4304,6 @@ export default function AdminPortalPage() {
                         );
                       })}
                   </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* TAB 4: SOFTWARE QUIZ */}
-          {activeTab === 'Software Quiz' && (
-            <div className="bg-[#FFFFFF] rounded-2xl border-2 border-[#E2E8F0] shadow-sm p-6 sm:p-8 space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
-                  <h3 className="text-xl font-bold text-[#131313]">Software Quiz</h3>
-                </div>
-                <div className="flex space-x-2">
-                  {(['Revit', 'AutoCAD', 'SolidWorks'] as const).map((sub) => (
-                    <button
-                      key={sub}
-                      onClick={() => {
-                        setQuizSubject(sub);
-                        setQuizAnswers({});
-                        setQuizScore(null);
-                      }}
-                      className={`px-4 py-2 rounded-xl text-sm sm:text-base font-bold ${
-                        quizSubject === sub
-                          ? 'bg-[#131313] text-[#FFFFFF]'
-                          : 'bg-[#F1F5F9] text-[#131313]'
-                      }`}
-                    >
-                      {sub} Quiz
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Questions */}
-              <div className="space-y-4">
-                {[
-                  { id: 1, q: 'In Autodesk Revit, which element is host-dependent and cannot exist without a wall?', opts: ['Floor slab', 'Door', 'Level', 'Grid line'], ans: 1 },
-                  { id: 2, q: 'What is the primary file extension for an Autodesk Revit project file?', opts: ['.rfa', '.rte', '.rvt', '.dwg'], ans: 2 },
-                  { id: 3, q: 'Which tool allows checking geometrical intersections between MEP pipes and structural beams?', opts: ['Purge Unused', 'Clash Detection / Interference Check', 'Audit Tool', 'Visibility Graphics'], ans: 1 },
-                ].map((qObj) => (
-                  <div key={qObj.id} className="p-5 rounded-xl border-2 border-[#E2E8F0] bg-[#F8FAFC]">
-                    <span className="text-sm sm:text-base font-black text-[#131313] block mb-3">
-                      Q{qObj.id}: {qObj.q}
-                    </span>
-                    <div className="space-y-2">
-                      {qObj.opts.map((opt, optIdx) => (
-                        <label key={optIdx} className="flex items-center space-x-3 cursor-pointer text-sm font-semibold text-[#334155]">
-                          <input
-                            type="radio"
-                            name={`quiz_q_${qObj.id}`}
-                            checked={quizAnswers[qObj.id] === optIdx}
-                            onChange={() => setQuizAnswers({ ...quizAnswers, [qObj.id]: optIdx })}
-                            className="w-4 h-4 text-[#131313]"
-                          />
-                          <span>{opt}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex items-center space-x-4">
-                <button
-                  onClick={() => {
-                    const score = Object.keys(quizAnswers).reduce((acc, qId) => {
-                      const idNum = Number(qId);
-                      const expected = idNum === 1 ? 1 : idNum === 2 ? 2 : 1;
-                      return quizAnswers[idNum] === expected ? acc + 1 : acc;
-                    }, 0);
-                    setQuizScore(score);
-                  }}
-                  className="px-6 py-3 rounded-xl bg-[#131313] hover:bg-[#262626] text-[#FFFFFF] text-sm font-bold uppercase tracking-wider"
-                >
-                  SUBMIT QUIZ
-                </button>
-                {quizScore !== null && (
-                  <span className="text-sm font-black text-[#16A34A] bg-[#DCFCE7] px-4 py-2 rounded-xl border border-[#86EFAC]">
-                    Score: {quizScore} / 3 Correct ({Math.round((quizScore / 3) * 100)}%)
-                  </span>
                 )}
               </div>
             </div>
