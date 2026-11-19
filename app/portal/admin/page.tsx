@@ -3759,14 +3759,14 @@ export default function AdminPortalPage() {
       <main className="flex-1 md:ml-80 flex flex-col min-h-0 md:h-screen overflow-y-auto">
         {/* Top Header Bar - Clean & Professional */}
         {activeTab !== 'Courses' && (
-          <header className="bg-white border-b border-slate-200 px-6 sm:px-8 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <header className="bg-white border-b border-slate-200 px-4 sm:px-8 py-4 sm:py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <div className="flex items-center space-x-2 text-xs font-medium text-[#666666] mb-1">
                 <span>Admin Console</span>
                 <span>/</span>
                 <span className="text-[#131313] font-semibold">{activeTab}</span>
               </div>
-              <h1 className="text-2xl font-bold text-[#131313] tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-bold text-[#131313] tracking-tight">
                 {activeTab} Management
               </h1>
             </div>
@@ -3843,13 +3843,13 @@ export default function AdminPortalPage() {
         )}
 
         {/* Dynamic Body Content */}
-        <div className="p-6 sm:p-8 flex-1 space-y-6">
+        <div className="p-3.5 sm:p-8 flex-1 space-y-5 sm:space-y-6">
 
           {/* TAB 1: STUDENT (Clean Enterprise Data Table, Stats & Pleasant Buttons) */}
           {activeTab === 'Student' && (
             <div className="space-y-6">
               {/* Dynamic Live Statistics Cards */}
-              <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
                 <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                   <span className="text-xs sm:text-sm font-bold text-[#666666] uppercase tracking-wider block">
                     Total Students
@@ -5122,7 +5122,7 @@ export default function AdminPortalPage() {
               </div>
 
               {/* 4 Metric Summary Cards */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs">
                   <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">
                     Active Openings
@@ -6761,7 +6761,7 @@ export default function AdminPortalPage() {
           {activeTab === 'Offers' && (
             <div className="space-y-6">
               {/* Dynamic Statistics Cards */}
-              <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
                 <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                   <span className="text-xs sm:text-sm font-bold text-[#666666] uppercase tracking-wider block">
                     Active Offers
@@ -7046,7 +7046,7 @@ export default function AdminPortalPage() {
           {activeTab === 'Live' && (
             <div className="space-y-6">
               {/* Dynamic Live Statistics Cards */}
-              <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
                 <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                   <span className="text-xs sm:text-sm font-bold text-[#666666] uppercase tracking-wider block">
                     Active Broadcast

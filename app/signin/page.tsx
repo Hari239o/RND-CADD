@@ -426,7 +426,7 @@ export default function SignInPage() {
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-2.5 text-center">
                 Quick 1-Click Login (Independent Window Sessions)
               </span>
-              <div className="grid grid-cols-2 gap-2 text-left">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-left">
                 <button
                   type="button"
                   onClick={() => handleQuickDemoLogin('student1@gmail.com')}

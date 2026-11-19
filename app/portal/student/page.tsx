@@ -2201,7 +2201,7 @@ export default function StudentPortalPage() {
 
         {/* REVOKED ACCESS NOTIFICATION BANNER */}
         {isAccessRevoked && (
-          <div className="mx-6 sm:mx-8 mt-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 shadow-xs flex items-center justify-between">
+          <div className="mx-3.5 sm:mx-8 mt-4 sm:mt-6 p-3.5 sm:p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center space-x-3">
               <span className="w-3 h-3 rounded-full bg-rose-600 inline-block flex-shrink-0" />
               <div>
@@ -2213,20 +2213,20 @@ export default function StudentPortalPage() {
                 </span>
               </div>
             </div>
-            <span className="px-3 py-1 rounded-lg bg-rose-600 text-white text-xs font-bold">
+            <span className="self-start sm:self-center px-3 py-1 rounded-lg bg-rose-600 text-white text-xs font-bold">
               Suspended
             </span>
           </div>
         )}
 
         {/* Dynamic Body Content */}
-        <div className="px-6 pb-6 pt-7 sm:px-8 sm:pb-8 sm:pt-8 flex-1 space-y-6">
+        <div className="px-3.5 pb-6 pt-5 sm:px-8 sm:pb-8 sm:pt-8 flex-1 space-y-5 sm:space-y-6">
           {/* TAB 1: HOME */}
           {activeTab === 'Home' && (
             <div className="space-y-6">
               {/* Quick Stat Metric Cards */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md transition-all">
+              <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md transition-all">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                       Syllabus Progress
@@ -5656,8 +5656,8 @@ export default function StudentPortalPage() {
               </div>
 
               {/* Financial Calculation Table */}
-              <div className="border border-slate-200 rounded-xl overflow-hidden">
-                <table className="w-full text-xs text-left">
+              <div className="border border-slate-200 rounded-xl overflow-hidden overflow-x-auto">
+                <table className="w-full text-xs text-left min-w-[320px]">
                   <thead className="bg-slate-100 text-slate-700 font-bold uppercase text-[11px] border-b border-slate-200">
                     <tr>
                       <th className="px-4 py-2.5">Billing Item Description</th>

@@ -74,7 +74,7 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
       <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,1)_0%,transparent_30%,transparent_70%,rgba(255,255,255,1)_100%)] pointer-events-none z-0" />
 
       {/* Full-Screen Edge-to-Edge Container: Comfortably utilizes the left side space */}
-      <div className="relative z-10 w-full px-6 sm:px-12 md:px-16 lg:px-20 xl:px-28 2xl:px-36 pt-32 sm:pt-40 lg:pt-44 xl:pt-48 pb-16 sm:pb-24 lg:pb-28">
+      <div className="relative z-10 w-full px-4 sm:px-8 md:px-12 lg:px-20 xl:px-28 2xl:px-36 pt-28 sm:pt-40 lg:pt-44 xl:pt-48 pb-14 sm:pb-24 lg:pb-28">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 xl:gap-20 items-center w-full">
           {/* Left Column: Occupies Left Side Naturally (UNLOX Full Screen Style) */}
           <div className="lg:col-span-7 flex flex-col justify-center text-left">
@@ -83,12 +83,12 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
               initial={{ opacity: 0, y: shouldReduceMotion ? 0 : -8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, ease: 'easeOut' }}
-              className="inline-flex items-center gap-2 self-start border border-blue-200/90 bg-blue-50/70 px-4 py-1.5 rounded-full text-xs sm:text-[13px] font-medium text-[#15304C] shadow-2xs mb-5 sm:mb-6"
+              className="inline-flex items-center gap-2 self-start border border-blue-200/90 bg-blue-50/70 px-3.5 sm:px-4 py-1.5 rounded-full text-xs sm:text-[13px] font-medium text-[#15304C] shadow-2xs mb-4 sm:mb-6"
             >
-              <svg className="w-4 h-4 text-[#D20A0B]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className="w-4 h-4 text-[#D20A0B] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
               </svg>
-              <span>Industry 4.0 CAD &amp; BIM Academy</span>
+              <span className="truncate">Industry 4.0 CAD &amp; BIM Academy</span>
             </motion.div>
 
             {/* Headline with Decreased, Balanced Font Size */}
@@ -96,7 +96,7 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
               initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.05, ease: 'easeOut' }}
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#15304C] tracking-tight leading-[1.14]"
+              className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#15304C] tracking-tight leading-[1.14]"
             >
               Master Industrial CAD. <br />
               <span className="text-[#D20A0B]">Build Your Future.</span>
@@ -107,12 +107,12 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
               initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
-              className="mt-6 sm:mt-8 flex flex-wrap items-center gap-3 sm:gap-4"
+              className="mt-6 sm:mt-8 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 w-full"
             >
               <button
                 type="button"
                 onClick={scrollToExperience}
-                className="px-7 sm:px-8 py-3 sm:py-3.5 bg-[#D20A0B] hover:bg-[#B50809] text-white text-xs sm:text-sm font-bold rounded-xl transition-all duration-150 shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 cursor-pointer text-center"
+                className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 bg-[#D20A0B] hover:bg-[#B50809] text-white text-xs sm:text-sm font-bold rounded-xl transition-all duration-150 shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 cursor-pointer text-center"
               >
                 Explore Programs
               </button>
@@ -122,7 +122,7 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
                   const el = document.getElementById('enrollment');
                   if (el) el.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="px-7 sm:px-8 py-3 sm:py-3.5 bg-white hover:bg-slate-50 border border-slate-300 hover:border-slate-400 text-[#15304C] text-xs sm:text-sm font-bold rounded-xl transition-all duration-150 shadow-2xs hover:shadow-xs cursor-pointer text-center"
+                className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 bg-white hover:bg-slate-50 border border-slate-300 hover:border-slate-400 text-[#15304C] text-xs sm:text-sm font-bold rounded-xl transition-all duration-150 shadow-2xs hover:shadow-xs cursor-pointer text-center"
               >
                 Reserve Workstation
               </button>
@@ -131,7 +131,7 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
 
           {/* Right Column: LARGE TRANSPARENT LOGO (Image 2 style) */}
           <div
-            className="lg:col-span-5 flex items-center justify-center relative mt-8 lg:mt-0 py-8 select-none z-10"
+            className="lg:col-span-5 flex items-center justify-center relative mt-6 lg:mt-0 py-4 sm:py-8 select-none z-10"
             style={{ perspective: 1200 }}
           >
             {/* Interactive Mouse-Tracking Animated Logo */}
@@ -154,7 +154,7 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
                   ease: 'easeInOut',
                 },
               }}
-              className="relative flex items-center justify-center will-change-transform cursor-pointer"
+              className="relative flex items-center justify-center will-change-transform cursor-pointer max-w-full"
             >
               <img
                 src="/logo_mark.png"
@@ -162,7 +162,7 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
                   e.currentTarget.src = '/logo.png';
                 }}
                 alt="RND CADD Logo"
-                className="w-72 sm:w-96 md:w-[460px] lg:w-[540px] xl:w-[620px] 2xl:w-[680px] h-auto object-contain transition-transform duration-200 hover:scale-105"
+                className="w-[min(280px,80vw)] sm:w-96 md:w-[460px] lg:w-[540px] xl:w-[620px] 2xl:w-[680px] max-w-full h-auto object-contain transition-transform duration-200 hover:scale-105"
                 draggable={false}
               />
             </motion.div>
