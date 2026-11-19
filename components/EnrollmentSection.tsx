@@ -108,7 +108,7 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
       // Persist enrolled course strictly to this specific student (NOT globally shared)
       try {
         if (typeof window !== 'undefined') {
-          const userStr = localStorage.getItem('rnd_cadd_user');
+          const userStr = sessionStorage.getItem('rnd_cadd_user') || localStorage.getItem('rnd_cadd_user');
           const currentLoggedIn = userStr ? JSON.parse(userStr) : null;
           const targetEmail = (email || currentLoggedIn?.email || '').toLowerCase().trim();
 
@@ -129,6 +129,7 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
               userCourses.push(selectedCourse);
             }
             currentLoggedIn.assignedCourses = userCourses;
+            sessionStorage.setItem('rnd_cadd_user', JSON.stringify(currentLoggedIn));
             localStorage.setItem('rnd_cadd_user', JSON.stringify(currentLoggedIn));
             window.dispatchEvent(new Event('storage'));
           }

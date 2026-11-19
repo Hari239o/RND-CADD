@@ -41,7 +41,7 @@ export default function HomePage() {
       try {
         if (typeof window !== 'undefined') {
           const list: string[] = [];
-          const userStr = localStorage.getItem('rnd_cadd_user');
+          const userStr = sessionStorage.getItem('rnd_cadd_user') || localStorage.getItem('rnd_cadd_user');
           if (userStr) {
             const user = JSON.parse(userStr);
             if (user.role === 'student') {

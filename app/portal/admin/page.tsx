@@ -1791,28 +1791,59 @@ export default function AdminPortalPage() {
     fetchAdminOffers();
 
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('rnd_cadd_user');
-      if (saved) {
+      let savedUser: any = null;
+      try {
+        const sessionRaw = sessionStorage.getItem('rnd_cadd_user');
+        if (sessionRaw) savedUser = JSON.parse(sessionRaw);
+      } catch {}
+
+      if (!savedUser) {
         try {
-          const parsed = JSON.parse(saved);
-          if (parsed.name) {
-            setAdminUser((prev) => ({
-              ...prev,
-              name: parsed.name,
-              email: parsed.email || prev.email,
-            }));
-          }
-        } catch {
-          // ignore
-        }
+          const localRaw = localStorage.getItem('rnd_cadd_user');
+          if (localRaw) savedUser = JSON.parse(localRaw);
+        } catch {}
+      }
+
+      // Only accept admin sessions, never let a student session overwrite the admin portal
+      if (savedUser && (savedUser.role === 'admin' || savedUser.email?.includes('admin') || savedUser.email?.includes('harikishore'))) {
+        setAdminUser((prev) => ({
+          ...prev,
+          name: savedUser.name || 'Hari Kishore Reddy',
+          email: savedUser.email || 'harikishorereddy9908@gmail.com',
+        }));
+        sessionStorage.setItem('rnd_cadd_user', JSON.stringify({
+          name: savedUser.name || 'Hari Kishore Reddy',
+          email: savedUser.email || 'harikishorereddy9908@gmail.com',
+          role: 'admin',
+        }));
+        sessionStorage.setItem('rnd_cadd_role', 'admin');
+      } else {
+        // Default clean admin session for this window
+        sessionStorage.setItem('rnd_cadd_user', JSON.stringify({
+          name: 'Hari Kishore Reddy',
+          email: 'harikishorereddy9908@gmail.com',
+          role: 'admin',
+        }));
+        sessionStorage.setItem('rnd_cadd_role', 'admin');
       }
     }
   }, []);
 
   const handleLogout = () => {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('rnd_cadd_user');
-      localStorage.removeItem('rnd_cadd_role');
+      sessionStorage.removeItem('rnd_cadd_user');
+      sessionStorage.removeItem('rnd_cadd_role');
+      sessionStorage.removeItem('rnd_cadd_admin_session');
+      try {
+        const local = localStorage.getItem('rnd_cadd_user');
+        if (local) {
+          const parsed = JSON.parse(local);
+          if (parsed.role === 'admin' || parsed.email?.includes('admin') || parsed.email?.includes('harikishore')) {
+            localStorage.removeItem('rnd_cadd_user');
+            localStorage.removeItem('rnd_cadd_role');
+          }
+        }
+      } catch {}
       window.location.href = '/signin';
     }
   };

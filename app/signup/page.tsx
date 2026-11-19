@@ -79,11 +79,14 @@ export default function SignUpPage() {
       if (data.success) {
         setSuccessMessage('Account created successfully! Loading your portal...');
         if (typeof window !== 'undefined') {
+          sessionStorage.setItem('rnd_cadd_user', JSON.stringify(data.user));
+          sessionStorage.setItem('rnd_cadd_role', data.user.role || 'student');
           localStorage.setItem('rnd_cadd_user', JSON.stringify(data.user));
           localStorage.setItem('rnd_cadd_role', data.user.role || 'student');
         }
         setTimeout(() => {
-          router.push(data.redirectUrl || '/portal/student');
+          const targetUrl = data.redirectUrl || `/portal/student?email=${encodeURIComponent(data.user.email)}`;
+          router.push(targetUrl);
         }, 800);
       } else {
         setErrorMessage(data.message || 'Registration failed. Please try again.');
@@ -93,19 +96,19 @@ export default function SignUpPage() {
       console.warn('Signup fallback:', err);
       setSuccessMessage('Account registered! Redirecting to student portal...');
       if (typeof window !== 'undefined') {
-        localStorage.setItem(
-          'rnd_cadd_user',
-          JSON.stringify({
-            name: formData.fullName,
-            email: formData.email,
-            role: 'student',
-            stream: formData.stream,
-          })
-        );
+        const u = {
+          name: formData.fullName,
+          email: formData.email,
+          role: 'student',
+          stream: formData.stream,
+        };
+        sessionStorage.setItem('rnd_cadd_user', JSON.stringify(u));
+        sessionStorage.setItem('rnd_cadd_role', 'student');
+        localStorage.setItem('rnd_cadd_user', JSON.stringify(u));
         localStorage.setItem('rnd_cadd_role', 'student');
       }
       setTimeout(() => {
-        router.push('/portal/student');
+        router.push(`/portal/student?email=${encodeURIComponent(formData.email)}`);
       }, 700);
     }
   };
@@ -115,18 +118,18 @@ export default function SignUpPage() {
     setSuccessMessage('Connecting to Google Workspace...');
     setTimeout(() => {
       if (typeof window !== 'undefined') {
-        localStorage.setItem(
-          'rnd_cadd_user',
-          JSON.stringify({
-            name: 'Google CAD Trainee',
-            email: 'google.trainee@rndcadd.com',
-            role: 'student',
-            stream: 'Civil & BIM',
-          })
-        );
+        const u = {
+          name: 'Google CAD Trainee',
+          email: 'google.trainee@rndcadd.com',
+          role: 'student',
+          stream: 'Civil & BIM',
+        };
+        sessionStorage.setItem('rnd_cadd_user', JSON.stringify(u));
+        sessionStorage.setItem('rnd_cadd_role', 'student');
+        localStorage.setItem('rnd_cadd_user', JSON.stringify(u));
         localStorage.setItem('rnd_cadd_role', 'student');
       }
-      router.push('/portal/student');
+      router.push('/portal/student?email=google.trainee%40rndcadd.com');
     }, 700);
   };
 

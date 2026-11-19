@@ -17,10 +17,12 @@ export async function POST(request: NextRequest) {
     const trimmedPassword = String(password).trim();
 
     // 1. Direct Verification for User's Designated Admin
-    // Admin: harikishorereddy9908@gmial.com (or @gmail.com) / 9908
+    // Admin: harikishorereddy9908@gmial.com (or @gmail.com) / admin@rndcadd.com / admin@gmail.com / 9908
     if (
-      (normalizedEmail === 'harikishorereddy9908@gmial.com' ||
-       normalizedEmail === 'harikishorereddy9908@gmail.com')
+      normalizedEmail === 'harikishorereddy9908@gmial.com' ||
+      normalizedEmail === 'harikishorereddy9908@gmail.com' ||
+      normalizedEmail === 'admin@rndcadd.com' ||
+      normalizedEmail === 'admin@gmail.com'
     ) {
       if (trimmedPassword === '9908') {
         return NextResponse.json({
@@ -43,14 +45,15 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 2. Direct Verification for User-1 Test Account (student1@gmail.com / 9908)
+    // 2. Direct Verification for Student Accounts (student1, student2, student3 / 9908)
     if (normalizedEmail === 'student1@gmail.com') {
       if (trimmedPassword === '9908') {
         return NextResponse.json({
           success: true,
           message: 'Signed in as Student 1',
           user: {
-            id: 'stu_master_01',
+            id: 'stu_001',
+            studentId: 'STU-001',
             name: 'Student 1',
             email: normalizedEmail,
             role: 'student',
@@ -59,7 +62,59 @@ export async function POST(request: NextRequest) {
             stream: 'Civil CADD & Master BIM',
             assignedCourses: ['Civil CADD & Master BIM', 'Interior Architecture & 3D Visualization']
           },
-          redirectUrl: '/portal/student'
+          redirectUrl: '/portal/student?email=student1%40gmail.com'
+        });
+      } else {
+        return NextResponse.json(
+          { success: false, message: 'Invalid password for student account.' },
+          { status: 401 }
+        );
+      }
+    }
+
+    if (normalizedEmail === 'student2@gmail.com') {
+      if (trimmedPassword === '9908') {
+        return NextResponse.json({
+          success: true,
+          message: 'Signed in as Student 2',
+          user: {
+            id: 'stu_002',
+            studentId: 'STU-002',
+            name: 'Student 2',
+            email: normalizedEmail,
+            role: 'student',
+            mobile: '',
+            officialMobile: '',
+            stream: 'Mechanical CAD & SolidWorks Expert',
+            assignedCourses: ['Mechanical CAD & SolidWorks Expert', 'Ansys Simulation & FEA']
+          },
+          redirectUrl: '/portal/student?email=student2%40gmail.com'
+        });
+      } else {
+        return NextResponse.json(
+          { success: false, message: 'Invalid password for student account.' },
+          { status: 401 }
+        );
+      }
+    }
+
+    if (normalizedEmail === 'student3@gmail.com') {
+      if (trimmedPassword === '9908') {
+        return NextResponse.json({
+          success: true,
+          message: 'Signed in as Student 3',
+          user: {
+            id: 'stu_003',
+            studentId: 'STU-003',
+            name: 'Student 3',
+            email: normalizedEmail,
+            role: 'student',
+            mobile: '',
+            officialMobile: '',
+            stream: 'Electrical CADD & Control Systems',
+            assignedCourses: ['Electrical CADD & Control Systems', 'AutoCAD Electrical & Panel Design']
+          },
+          redirectUrl: '/portal/student?email=student3%40gmail.com'
         });
       } else {
         return NextResponse.json(

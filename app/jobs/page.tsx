@@ -631,7 +631,7 @@ export default function JobsPortalPage() {
     const syncUser = () => {
       try {
         if (typeof window !== 'undefined') {
-          const stored = localStorage.getItem('rnd_cadd_user');
+          const stored = sessionStorage.getItem('rnd_cadd_user') || localStorage.getItem('rnd_cadd_user');
           if (stored) {
             const parsed = JSON.parse(stored);
             if (parsed && (parsed.email || parsed.role)) {

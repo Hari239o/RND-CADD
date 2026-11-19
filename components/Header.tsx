@@ -33,6 +33,12 @@ export const Header: React.FC<HeaderProps> = ({
     const syncUser = () => {
       try {
         if (typeof window !== 'undefined') {
+          // Check this window's isolated session first!
+          const sessionStored = sessionStorage.getItem('rnd_cadd_user');
+          if (sessionStored) {
+            setCurrentUser(JSON.parse(sessionStored));
+            return;
+          }
           const stored = localStorage.getItem('rnd_cadd_user');
           if (stored) {
             setCurrentUser(JSON.parse(stored));
@@ -82,12 +88,18 @@ export const Header: React.FC<HeaderProps> = ({
   const handleSignOut = () => {
     try {
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('rnd_cadd_user');
-        localStorage.removeItem('rnd_cadd_role');
-        localStorage.removeItem('rnd_cadd_enrolled_courses');
-        localStorage.removeItem('rnd_cadd_enrolled_course');
+        sessionStorage.removeItem('rnd_cadd_user');
+        sessionStorage.removeItem('rnd_cadd_role');
+        sessionStorage.removeItem('rnd_cadd_student_session');
+        sessionStorage.removeItem('rnd_cadd_admin_session');
+        try {
+          const local = localStorage.getItem('rnd_cadd_user');
+          if (local && JSON.parse(local).email === currentUser?.email) {
+            localStorage.removeItem('rnd_cadd_user');
+            localStorage.removeItem('rnd_cadd_role');
+          }
+        } catch {}
         setCurrentUser(null);
-        window.dispatchEvent(new Event('storage'));
         window.location.href = '/signin';
       }
     } catch {
@@ -186,7 +198,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                   {/* Logged-in Student Portal Link */}
                   <Link
-                    href="/portal/student"
+                    href={currentUser?.email ? `/portal/student?email=${encodeURIComponent(currentUser.email)}` : '/portal/student'}
                     className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold text-slate-800 hover:text-[#EE2C3C] border border-slate-200 hover:border-[#EE2C3C] bg-white transition-all shadow-2xs hover:shadow-xs"
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
@@ -342,7 +354,7 @@ export const Header: React.FC<HeaderProps> = ({
                         </span>
                       </div>
                       <Link
-                        href={isAdmin ? '/portal/admin' : '/portal/student'}
+                        href={isAdmin ? '/portal/admin' : (currentUser?.email ? `/portal/student?email=${encodeURIComponent(currentUser.email)}` : '/portal/student')}
                         onClick={() => setMobileMenuOpen(false)}
                         className="px-3.5 py-1.5 rounded-xl bg-[#15304C] text-white text-xs font-bold shrink-0 hover:bg-[#EE2C3C] transition-colors"
                       >

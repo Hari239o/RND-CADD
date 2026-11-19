@@ -61,7 +61,7 @@ export const JobsPortalShowcase: React.FC<JobsPortalShowcaseProps> = ({
       try {
         if (typeof window !== 'undefined') {
           const list: string[] = [];
-          const user = localStorage.getItem('rnd_cadd_user');
+          const user = sessionStorage.getItem('rnd_cadd_user') || localStorage.getItem('rnd_cadd_user');
           if (user) {
             const parsedUser = JSON.parse(user);
             if (parsedUser.role === 'student') {
@@ -175,9 +175,9 @@ export const JobsPortalShowcase: React.FC<JobsPortalShowcaseProps> = ({
     setApplicantStream(job.discipline.toUpperCase());
     setApplySuccessMsg('');
 
-    // Pre-fill from localStorage if student logged in
+    // Pre-fill from session/localStorage if student logged in
     if (typeof window !== 'undefined') {
-      const savedUser = localStorage.getItem('rnd_cadd_user');
+      const savedUser = sessionStorage.getItem('rnd_cadd_user') || localStorage.getItem('rnd_cadd_user');
       if (savedUser) {
         try {
           const parsed = JSON.parse(savedUser);

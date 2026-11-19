@@ -17,64 +17,76 @@ export async function GET() {
         }
       });
 
-      // 2. Ensure student1@gmail.com exists cleanly for test signin without fake/dummy data
-      const student1 = await db.collection('users').findOne({ email: 'student1@gmail.com' });
-      if (!student1) {
-        await db.collection('users').insertOne({
+      // 2. Ensure student1@gmail.com, student2@gmail.com, and student3@gmail.com exist cleanly for test signin
+      const defaultStudents = [
+        {
           name: 'Student 1',
           studentId: 'STU-001',
           email: 'student1@gmail.com',
           password: '9908',
           role: 'student',
-          admissionDate: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
           courseName: 'Civil CADD & Master BIM',
           stream: 'Civil CADD & Master BIM',
           software: 'AutoCAD, Revit Architecture',
-          qualification: '',
-          college: '',
-          residence: '',
-          officialMobile: '',
-          mobile: '',
-          courseFee: 0,
-          paidFee: 0,
-          balanceFee: 0,
-          accessStatus: 'active',
           assignedCourses: ['Civil CADD & Master BIM', 'Interior Architecture & 3D Visualization'],
-          designs: [],
-          createdAt: new Date()
-        });
-      } else {
-        // Ensure student1 has both accredited assigned courses
-        if (!Array.isArray(student1.assignedCourses) || student1.assignedCourses.length < 2) {
-          await db.collection('users').updateOne(
-            { email: 'student1@gmail.com' },
-            {
-              $set: {
-                assignedCourses: ['Civil CADD & Master BIM', 'Interior Architecture & 3D Visualization']
-              }
-            }
-          );
-        }
-        // Clean any residual dummy values from student1 if they were previously seeded
-        if (student1.residence === 'KPHB Colony, Hyderabad' || student1.college === 'JNTU Hyderabad (College of Engg)' || student1.paidFee === 35000) {
-          await db.collection('users').updateOne(
-            { email: 'student1@gmail.com' },
-            {
-              $set: {
-                name: 'Student 1',
-                studentId: 'STU-001',
-                qualification: '',
-                college: '',
-                officialMobile: '',
-                mobile: '',
-                residence: '',
-                courseFee: 0,
-                paidFee: 0,
-                balanceFee: 0,
-                designs: []
-              }
-            }
-          );
+        },
+        {
+          name: 'Student 2',
+          studentId: 'STU-002',
+          email: 'student2@gmail.com',
+          password: '9908',
+          role: 'student',
+          courseName: 'Mechanical CAD & SolidWorks Expert',
+          stream: 'Mechanical CAD & SolidWorks Expert',
+          software: 'SolidWorks, Ansys, AutoCAD Mechanical',
+          assignedCourses: ['Mechanical CAD & SolidWorks Expert', 'Ansys Simulation & FEA'],
+        },
+        {
+          name: 'Student 3',
+          studentId: 'STU-003',
+          email: 'student3@gmail.com',
+          password: '9908',
+          role: 'student',
+          courseName: 'Electrical CADD & Control Systems',
+          stream: 'Electrical CADD & Control Systems',
+          software: 'AutoCAD Electrical, EPLAN',
+          assignedCourses: ['Electrical CADD & Control Systems', 'AutoCAD Electrical & Panel Design'],
+        },
+      ];
+
+      for (const defStu of defaultStudents) {
+        const existing = await db.collection('users').findOne({ email: defStu.email });
+        if (!existing) {
+          await db.collection('users').insertOne({
+            name: defStu.name,
+            studentId: defStu.studentId,
+            email: defStu.email,
+            password: defStu.password,
+            role: 'student',
+            admissionDate: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+            courseName: defStu.courseName,
+            stream: defStu.stream,
+            software: defStu.software,
+            qualification: '',
+            college: '',
+            residence: '',
+            officialMobile: '',
+            mobile: '',
+            courseFee: 0,
+            paidFee: 0,
+            balanceFee: 0,
+            accessStatus: 'active',
+            assignedCourses: defStu.assignedCourses,
+            designs: [],
+            createdAt: new Date()
+          });
+        } else {
+          if (!Array.isArray(existing.assignedCourses) || existing.assignedCourses.length === 0) {
+            await db.collection('users').updateOne(
+              { email: defStu.email },
+              { $set: { assignedCourses: defStu.assignedCourses } }
+            );
+          }
         }
       }
 
@@ -126,7 +138,7 @@ export async function GET() {
           officialMobile: '',
           admissionDate: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
           courseName: 'Civil CADD & Master BIM',
-          software: 'AutoCAD, Revit',
+          software: 'AutoCAD, Revit Architecture',
           qualification: '',
           college: '',
           residence: '',
@@ -135,6 +147,46 @@ export async function GET() {
           balanceFee: 0,
           accessStatus: 'active',
           assignedCourses: ['Civil CADD & Master BIM', 'Interior Architecture & 3D Visualization'],
+          designs: [],
+        },
+        {
+          id: 'stu_002',
+          studentId: 'STU-002',
+          name: 'Student 2',
+          email: 'student2@gmail.com',
+          mobile: '',
+          officialMobile: '',
+          admissionDate: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+          courseName: 'Mechanical CAD & SolidWorks Expert',
+          software: 'SolidWorks, Ansys, AutoCAD Mechanical',
+          qualification: '',
+          college: '',
+          residence: '',
+          courseFee: 0,
+          paidFee: 0,
+          balanceFee: 0,
+          accessStatus: 'active',
+          assignedCourses: ['Mechanical CAD & SolidWorks Expert', 'Ansys Simulation & FEA'],
+          designs: [],
+        },
+        {
+          id: 'stu_003',
+          studentId: 'STU-003',
+          name: 'Student 3',
+          email: 'student3@gmail.com',
+          mobile: '',
+          officialMobile: '',
+          admissionDate: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+          courseName: 'Electrical CADD & Control Systems',
+          software: 'AutoCAD Electrical, EPLAN',
+          qualification: '',
+          college: '',
+          residence: '',
+          courseFee: 0,
+          paidFee: 0,
+          balanceFee: 0,
+          accessStatus: 'active',
+          assignedCourses: ['Electrical CADD & Control Systems', 'AutoCAD Electrical & Panel Design'],
           designs: [],
         }
       ]

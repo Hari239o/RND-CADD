@@ -1128,8 +1128,8 @@ export default function StudentPortalPage() {
 
   useEffect(() => {
     setMounted(true);
-    let emailToUse = 'student1@gmail.com';
-    let idToUse = 'STU-001';
+    let emailToUse = '';
+    let idToUse = '';
     if (typeof window !== 'undefined') {
       try {
         const cached = localStorage.getItem('rnd_cadd_cached_courses');
@@ -1141,42 +1141,123 @@ export default function StudentPortalPage() {
         // ignore
       }
 
-      const saved = localStorage.getItem('rnd_cadd_user');
-      if (saved) {
+      // 1. Check URL query params first (e.g. /portal/student?email=student2@gmail.com)
+      const urlParams = new URLSearchParams(window.location.search);
+      const queryEmail = urlParams.get('email')?.toLowerCase().trim();
+      const queryId = urlParams.get('id')?.trim();
+
+      // 2. Check window-isolated sessionStorage!
+      let sessionUser: any = null;
+      try {
+        const sessionRaw = sessionStorage.getItem('rnd_cadd_user');
+        if (sessionRaw) sessionUser = JSON.parse(sessionRaw);
+      } catch {}
+
+      // Filter out admin users from student portal
+      if (sessionUser && (sessionUser.role === 'admin' || sessionUser.email?.includes('admin') || sessionUser.email?.includes('harikishore'))) {
+        sessionUser = null;
+      }
+
+      // 3. Fallback to localStorage only if sessionStorage is empty AND queryEmail is not provided
+      let localUser: any = null;
+      if (!sessionUser && !queryEmail) {
         try {
-          const parsed = JSON.parse(saved);
-          if (parsed.email) {
-            emailToUse = parsed.email.toLowerCase().trim();
-            if (parsed.studentId) idToUse = parsed.studentId;
-
-            // Load this specific student's enrolled courses from per-student storage
-            let studentLocalCourses: string[] = [];
-            const studentKey = `rnd_cadd_enrolled_${emailToUse}`;
-            const localStored = localStorage.getItem(studentKey);
-            if (localStored) {
-              try {
-                const parsedList = JSON.parse(localStored);
-                if (Array.isArray(parsedList)) studentLocalCourses = parsedList;
-              } catch {}
+          const localRaw = localStorage.getItem('rnd_cadd_user');
+          if (localRaw) {
+            const parsed = JSON.parse(localRaw);
+            if (parsed && parsed.role !== 'admin' && !parsed.email?.includes('admin') && !parsed.email?.includes('harikishore')) {
+              localUser = parsed;
             }
-
-            const initialCourses = Array.isArray(parsed.assignedCourses) && parsed.assignedCourses.length > 0
-              ? parsed.assignedCourses
-              : (studentLocalCourses.length > 0 ? studentLocalCourses : (parsed.stream ? [parsed.stream] : []));
-
-            setStudentUser((prev) => ({
-              ...prev,
-              name: parsed.name || parsed.fullName || prev.name,
-              email: emailToUse,
-              stream: parsed.stream || (initialCourses[0] || prev.stream),
-              id: parsed.studentId || parsed.id || prev.id,
-              photo: parsed.photo || parsed.image || prev.photo,
-              assignedCourses: initialCourses,
-            }));
           }
-        } catch {
-          // ignore
+        } catch {}
+      }
+
+      let activeUser = queryEmail
+        ? (sessionUser?.email?.toLowerCase().trim() === queryEmail ? sessionUser : null)
+        : (sessionUser || localUser);
+
+      // Resolve standard predefined student accounts if matching query or session
+      let targetEmail = queryEmail || activeUser?.email || 'student1@gmail.com';
+      if (targetEmail.includes('admin') || targetEmail.includes('harikishore')) {
+        targetEmail = 'student1@gmail.com';
+      }
+
+      if (!activeUser || activeUser.email?.toLowerCase().trim() !== targetEmail || activeUser.name?.toLowerCase().includes('harikishore')) {
+        if (targetEmail === 'student2@gmail.com') {
+          activeUser = {
+            name: 'Student 2',
+            email: 'student2@gmail.com',
+            role: 'student',
+            id: 'STU-002',
+            studentId: 'STU-002',
+            stream: 'Mechanical CAD & SolidWorks Expert',
+            assignedCourses: ['Mechanical CAD & SolidWorks Expert', 'Ansys Simulation & FEA'],
+          };
+        } else if (targetEmail === 'student3@gmail.com') {
+          activeUser = {
+            name: 'Student 3',
+            email: 'student3@gmail.com',
+            role: 'student',
+            id: 'STU-003',
+            studentId: 'STU-003',
+            stream: 'Electrical CADD & Control Systems',
+            assignedCourses: ['Electrical CADD & Control Systems', 'AutoCAD Electrical & Panel Design'],
+          };
+        } else if (targetEmail === 'student1@gmail.com') {
+          activeUser = {
+            name: 'Student 1',
+            email: 'student1@gmail.com',
+            role: 'student',
+            id: 'STU-001',
+            studentId: 'STU-001',
+            stream: 'Civil CADD & Master BIM',
+            assignedCourses: ['Civil CADD & Master BIM', 'Interior Architecture & 3D Visualization'],
+          };
+        } else {
+          activeUser = {
+            name: targetEmail.split('@')[0],
+            email: targetEmail,
+            role: 'student',
+            id: queryId || 'STU-NEW',
+            studentId: queryId || 'STU-NEW',
+            stream: 'Civil CADD & Master BIM',
+            assignedCourses: ['Civil CADD & Master BIM'],
+          };
         }
+      }
+
+      if (activeUser && activeUser.email) {
+        emailToUse = activeUser.email.toLowerCase().trim();
+        idToUse = activeUser.studentId || activeUser.id || 'STU-001';
+
+        // Isolate this window's session exclusively
+        sessionStorage.setItem('rnd_cadd_user', JSON.stringify(activeUser));
+        sessionStorage.setItem('rnd_cadd_role', 'student');
+
+        // Load this specific student's enrolled courses from per-student storage
+        let studentLocalCourses: string[] = [];
+        const studentKey = `rnd_cadd_enrolled_${emailToUse}`;
+        const localStored = localStorage.getItem(studentKey);
+        if (localStored) {
+          try {
+            const parsedList = JSON.parse(localStored);
+            if (Array.isArray(parsedList)) studentLocalCourses = parsedList;
+          } catch {}
+        }
+
+        const initialCourses = Array.isArray(activeUser.assignedCourses) && activeUser.assignedCourses.length > 0
+          ? activeUser.assignedCourses
+          : (studentLocalCourses.length > 0 ? studentLocalCourses : (activeUser.stream ? [activeUser.stream] : []));
+
+        setStudentUser((prev) => ({
+          ...prev,
+          name: activeUser.name || activeUser.fullName || prev.name,
+          email: emailToUse,
+          stream: activeUser.stream || (initialCourses[0] || prev.stream),
+          id: idToUse,
+          photo: activeUser.photo || activeUser.image || prev.photo,
+          assignedCourses: initialCourses,
+        }));
       }
     }
 
@@ -1666,10 +1747,19 @@ export default function StudentPortalPage() {
 
   const handleLogout = () => {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('rnd_cadd_user');
-      localStorage.removeItem('rnd_cadd_role');
-      localStorage.removeItem('rnd_cadd_enrolled_courses');
-      localStorage.removeItem('rnd_cadd_enrolled_course');
+      sessionStorage.removeItem('rnd_cadd_user');
+      sessionStorage.removeItem('rnd_cadd_role');
+      sessionStorage.removeItem('rnd_cadd_student_session');
+      try {
+        const local = localStorage.getItem('rnd_cadd_user');
+        if (local) {
+          const parsed = JSON.parse(local);
+          if (parsed.email === studentUser.email) {
+            localStorage.removeItem('rnd_cadd_user');
+            localStorage.removeItem('rnd_cadd_role');
+          }
+        }
+      } catch {}
       window.location.href = '/signin';
     }
   };
