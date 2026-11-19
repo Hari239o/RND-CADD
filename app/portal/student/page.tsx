@@ -131,7 +131,8 @@ export interface OfferItem {
   shareUrl: string;
   expiryDate?: string;
   description?: string;
-  status: 'Active' | 'Inactive';
+  status: 'Active' | 'Inactive' | 'Hidden';
+  hidden?: boolean;
   redemptionsCount: number;
   createdAt: string;
   updatedAt: string;
@@ -4270,83 +4271,85 @@ export default function StudentPortalPage() {
 
           {/* TAB 7: REFER & EARN (Dynamic Admin Synced Referral & Course Offers) */}
           {activeTab === 'Refer & Earn' && (() => {
+            const activeStudentOffers = studentOffers.filter(
+              (o) => (o.status === 'Active' || !o.status) && !o.hidden && o.status !== 'Hidden' && o.status !== 'Inactive'
+            );
             const studentRefCode = studentUser.id ? `REF-${studentUser.id.replace(/[^A-Z0-9]/gi, '').toUpperCase()}` : 'RAMG8492';
-            const referralProgram = studentOffers.find((o) => o.type === 'referral') || {
-              title: 'Engineering Peer Referral Program',
-              referrerReward: 'Rs 1,500 software voucher credit',
-              refereeReward: 'Rs 1,500 enrollment fee discount',
-              description: 'Share your unique student referral link with friends enrolling in Civil, Mechanical, or Electrical CADD. You both receive Rs 1,500 software voucher credit.',
-            };
+            const referralProgram = activeStudentOffers.find((o) => o.type === 'referral');
             const referralLink = `https://rnd-cadd.vercel.app/enroll?ref=${studentRefCode}`;
-            const courseDiscounts = studentOffers.filter((o) => o.type === 'course_discount');
+            const courseDiscounts = activeStudentOffers.filter((o) => o.type === 'course_discount');
 
             return (
               <div className="space-y-6">
-                {/* Main Student Referral Card */}
-                <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 sm:p-8 space-y-5">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
-                    <div>
-                      <span className="text-xs font-bold uppercase tracking-wider text-purple-700 bg-purple-50 px-2.5 py-1 rounded-md border border-purple-200 inline-block mb-2">
-                        Official Student Referral Program
+                {/* Main Student Referral Card (shown only if not hidden by Admin) */}
+                {referralProgram ? (
+                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                      <div>
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-700 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200 inline-block mb-2">
+                          Official Student Referral Program
+                        </span>
+                        <h3 className="text-xl sm:text-2xl font-bold text-[#131313] tracking-tight">
+                          {referralProgram.title || 'Refer Engineering Peers & Earn Benefits'}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+                          {referralProgram.description || 'Share your unique student referral link with friends enrolling in Civil, Mechanical, or Electrical CADD. You both receive software voucher credits.'}
+                        </p>
+                      </div>
+
+                      {referralProgram.referrerReward && (
+                        <div className="bg-slate-50 rounded-xl p-3.5 sm:text-right border border-slate-200 shrink-0">
+                          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wide block">Your Benefit</span>
+                          <span className="text-sm font-extrabold text-[#131313] font-mono">
+                            {referralProgram.referrerReward}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Referral Link Box with Working 1-Click Copy */}
+                    <div className="p-4 sm:p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                      <span className="text-xs font-bold text-slate-700 block uppercase tracking-wider">
+                        Your Unique Referral Link:
                       </span>
-                      <h3 className="text-xl sm:text-2xl font-bold text-[#131313] tracking-tight">
-                        Refer Engineering Peers &amp; Earn Benefits
-                      </h3>
-                      <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
-                        {referralProgram.description || 'Share your unique student referral link with friends enrolling in Civil, Mechanical, or Electrical CADD. You both receive Rs 1,500 voucher credit.'}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 rounded-lg border border-slate-200 shadow-xs">
+                        <span className="font-mono text-xs sm:text-sm font-bold text-[#131313] break-all select-all">
+                          {referralLink}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                              navigator.clipboard.writeText(referralLink);
+                              setCopiedReferral(true);
+                              setTimeout(() => setCopiedReferral(false), 3000);
+                            }
+                          }}
+                          className={`px-6 py-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-xs whitespace-nowrap self-start sm:self-auto ${
+                            copiedReferral
+                              ? 'bg-emerald-600 text-white'
+                              : 'bg-[#EE2C3C] hover:bg-[#D71E2E] text-white'
+                          }`}
+                        >
+                          {copiedReferral ? 'Copied to Clipboard! ✓' : 'Copy Link'}
+                        </button>
+                      </div>
+                      <p className="text-[11px] text-slate-500 font-medium">
+                        Your referral code is embedded as <span className="font-mono font-bold text-slate-800">{studentRefCode}</span>. When friends enroll through this link, benefits are credited to your student ledger.
                       </p>
                     </div>
-
-                    <div className="bg-purple-50 rounded-xl p-3 sm:text-right border border-purple-200 shrink-0">
-                      <span className="text-[11px] font-bold text-purple-700 uppercase tracking-wide block">Your Benefit</span>
-                      <span className="text-sm font-extrabold text-purple-950 font-mono">
-                        {referralProgram.referrerReward || 'Rs 1,500 Voucher'}
-                      </span>
-                    </div>
                   </div>
+                ) : null}
 
-                  {/* Referral Link Box with Working 1-Click Copy */}
-                  <div className="p-4 sm:p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
-                    <span className="text-xs font-bold text-slate-700 block uppercase tracking-wider">
-                      Your Unique Referral Link:
-                    </span>
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
-                      <span className="font-mono text-xs sm:text-sm font-bold text-[#131313] break-all select-all">
-                        {referralLink}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (typeof navigator !== 'undefined' && navigator.clipboard) {
-                            navigator.clipboard.writeText(referralLink);
-                            setCopiedReferral(true);
-                            setTimeout(() => setCopiedReferral(false), 3000);
-                          }
-                        }}
-                        className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-xs whitespace-nowrap self-start sm:self-auto ${
-                          copiedReferral
-                            ? 'bg-emerald-600 text-white'
-                            : 'bg-[#EE2C3C] hover:bg-[#D71E2E] text-white'
-                        }`}
-                      >
-                        {copiedReferral ? 'Copied to Clipboard! ✓' : 'Copy Link'}
-                      </button>
-                    </div>
-                    <p className="text-[11px] text-slate-500 font-medium">
-                      Your referral code is embedded as <span className="font-mono font-bold text-slate-800">{studentRefCode}</span>. When friends enroll through this link, benefits are credited to your student ledger.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Active Promotional Discounts & Course Offers */}
+                {/* Active Promotional Discounts & Course Offers (only active, unhidden offers) */}
                 {courseDiscounts.length > 0 && (
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <h4 className="text-base font-bold text-[#131313]">
-                        Active Course Offers &amp; Scholarships You Can Share
+                        Active Course Offers &amp; Discounts You Can Share
                       </h4>
                       <span className="text-xs font-semibold text-slate-500 font-mono">
-                        {courseDiscounts.length} Active Discounts
+                        {courseDiscounts.length} Active {courseDiscounts.length === 1 ? 'Discount' : 'Discounts'}
                       </span>
                     </div>
 
@@ -4356,7 +4359,7 @@ export default function StudentPortalPage() {
                         return (
                           <div
                             key={offer.id}
-                            className="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-5 flex flex-col justify-between space-y-4 hover:border-slate-300 transition-all"
+                            className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col justify-between space-y-4 hover:border-slate-300 transition-all"
                           >
                             <div>
                               <div className="flex items-center justify-between gap-2 mb-2">
@@ -4398,7 +4401,7 @@ export default function StudentPortalPage() {
                                     setTimeout(() => setCopiedOfferCode(null), 2500);
                                   }
                                 }}
-                                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-2xs whitespace-nowrap ${
+                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-2xs whitespace-nowrap ${
                                   isCopied
                                     ? 'bg-emerald-600 text-white'
                                     : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
@@ -4413,11 +4416,19 @@ export default function StudentPortalPage() {
                     </div>
                   </div>
                 )}
+
+                {/* If all offers & referral are hidden by Admin */}
+                {!referralProgram && courseDiscounts.length === 0 && (
+                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-12 text-center space-y-2">
+                    <p className="text-base font-bold text-slate-700">No active offers or referral campaigns right now.</p>
+                    <p className="text-xs text-slate-400">Please check back later or contact your training coordinator.</p>
+                  </div>
+                )}
               </div>
             );
           })()}
 
-          {/* TAB 8: RATE */}}
+          {/* TAB 8: RATE */}
           {activeTab === 'Rate' && (
             <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 sm:p-8 space-y-6">
               <div>

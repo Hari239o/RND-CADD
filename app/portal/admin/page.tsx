@@ -61,7 +61,8 @@ export interface OfferItem {
   shareUrl: string;
   expiryDate?: string;
   description?: string;
-  status: 'Active' | 'Inactive';
+  status: 'Active' | 'Inactive' | 'Hidden';
+  hidden?: boolean;
   redemptionsCount: number;
   createdAt: string;
   updatedAt: string;
@@ -1318,6 +1319,27 @@ export default function AdminPortalPage() {
       alert('Network error saving offer.');
     } finally {
       setIsSubmittingOffer(false);
+    }
+  };
+
+  const handleToggleOfferHide = async (id: string, currentlyHidden: boolean) => {
+    const nextHidden = !currentlyHidden;
+    const nextStatus = nextHidden ? 'Hidden' : 'Active';
+    try {
+      setAdminOffers((prev) =>
+        prev.map((o) => (o.id === id ? { ...o, hidden: nextHidden, status: nextStatus as any } : o))
+      );
+      const res = await fetch('/api/offers', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, hidden: nextHidden, status: nextStatus }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(nextHidden ? 'Offer hidden from students' : 'Offer unhidden and live for students');
+      }
+    } catch (err) {
+      console.error('Toggle offer hide error:', err);
     }
   };
 

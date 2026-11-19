@@ -19,7 +19,8 @@ export interface OfferItem {
   shareUrl: string;
   expiryDate?: string;
   description?: string;
-  status: 'Active' | 'Inactive';
+  status: 'Active' | 'Inactive' | 'Hidden';
+  hidden?: boolean;
   redemptionsCount: number;
   createdAt: string;
   updatedAt: string;
@@ -40,6 +41,7 @@ const INITIAL_OFFERS: OfferItem[] = [
     expiryDate: '2026-12-31',
     description: 'Share your unique referral link with friends enrolling in Civil, Mechanical, or Electrical CADD. You both receive Rs 1,500 voucher credit.',
     status: 'Active',
+    hidden: false,
     redemptionsCount: 8,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -58,6 +60,7 @@ const INITIAL_OFFERS: OfferItem[] = [
     expiryDate: '2026-12-31',
     description: 'Special seasonal scholarship discount for students registering for Revit Architecture and Navisworks BIM programs.',
     status: 'Active',
+    hidden: false,
     redemptionsCount: 14,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -76,6 +79,7 @@ const INITIAL_OFFERS: OfferItem[] = [
     expiryDate: '2026-12-31',
     description: '15% instant reduction on Civil CADD & Master BIM 90-day comprehensive workstation lab program.',
     status: 'Active',
+    hidden: false,
     redemptionsCount: 6,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -147,7 +151,8 @@ export async function GET(request: NextRequest) {
             shareUrl: d.shareUrl || `https://rnd-cadd.vercel.app/enroll?coupon=${d.code || 'CADPRO'}`,
             expiryDate: d.expiryDate || '2026-12-31',
             description: d.description || '',
-            status: d.status || 'Active',
+            status: d.status || (d.hidden ? 'Hidden' : 'Active'),
+            hidden: Boolean(d.hidden || d.status === 'Hidden'),
             redemptionsCount: Number(d.redemptionsCount) || 0,
             createdAt: d.createdAt || new Date().toISOString(),
             updatedAt: d.updatedAt || new Date().toISOString(),
@@ -165,14 +170,21 @@ export async function GET(request: NextRequest) {
       result = result.filter((o) => o.type === type);
     }
     if (status && status !== 'all') {
-      result = result.filter((o) => o.status === status);
+      if (status === 'Active') {
+        result = result.filter((o) => (o.status === 'Active' || !o.status) && o.status !== 'Hidden' && o.status !== 'Inactive' && !o.hidden);
+      } else if (status === 'Hidden' || status === 'Inactive') {
+        result = result.filter((o) => o.status === 'Hidden' || o.status === 'Inactive' || o.hidden === true);
+      } else {
+        result = result.filter((o) => o.status === status);
+      }
     }
 
     return NextResponse.json({
       success: true,
       offers: result,
       totalCount: result.length,
-      activeCount: result.filter((o) => o.status === 'Active').length,
+      activeCount: result.filter((o) => o.status === 'Active' && !o.hidden).length,
+      hiddenCount: result.filter((o) => o.status === 'Hidden' || o.status === 'Inactive' || o.hidden).length,
     });
   } catch (error: any) {
     console.error('[Offers GET Error]:', error);
@@ -197,6 +209,7 @@ export async function POST(request: NextRequest) {
       expiryDate,
       description,
       status,
+      hidden,
     } = body;
 
     if (!title || !title.trim()) {
@@ -213,6 +226,9 @@ export async function POST(request: NextRequest) {
       ? `${baseUrl}/enroll?ref=${cleanCode}`
       : `${baseUrl}/enroll?coupon=${cleanCode}`;
 
+    const isHidden = Boolean(hidden || status === 'Hidden');
+    const finalStatus: 'Active' | 'Inactive' | 'Hidden' = isHidden ? 'Hidden' : (status === 'Inactive' ? 'Inactive' : 'Active');
+
     const newOffer: OfferItem = {
       id: id || `off-${Date.now()}`,
       type: offerType,
@@ -226,7 +242,8 @@ export async function POST(request: NextRequest) {
       shareUrl,
       expiryDate: expiryDate?.trim() || '2026-12-31',
       description: description?.trim() || '',
-      status: status === 'Inactive' ? 'Inactive' : 'Active',
+      status: finalStatus,
+      hidden: isHidden,
       redemptionsCount: Number(body.redemptionsCount) || 0,
       createdAt: body.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -257,7 +274,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Offer created and referral link generated successfully!',
+      message: 'Offer saved successfully!',
       offer: newOffer,
       offers: memoryOffers,
     });
@@ -267,11 +284,11 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PATCH: Toggle Status or Redemptions
+// PATCH: Toggle Status, Hidden State, or Redemptions
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, status, incrementRedemption } = body;
+    const { id, status, hidden, incrementRedemption } = body;
 
     if (!id) {
       return NextResponse.json({ success: false, message: 'Offer ID is required.' }, { status: 400 });
@@ -283,9 +300,14 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ success: false, message: 'Offer not found.' }, { status: 404 });
     }
 
-    if (status) {
+    if (typeof hidden === 'boolean') {
+      offer.hidden = hidden;
+      offer.status = hidden ? 'Hidden' : 'Active';
+    } else if (status) {
       offer.status = status;
+      offer.hidden = status === 'Hidden' || status === 'Inactive';
     }
+
     if (incrementRedemption) {
       offer.redemptionsCount = (offer.redemptionsCount || 0) + 1;
     }
@@ -298,17 +320,17 @@ export async function PATCH(request: NextRequest) {
       if (isConnected && db) {
         const collection = db.collection('offers');
         await collection.updateOne(
-          { $or: [{ id }, { _id: id }] },
-          { $set: { status: offer.status, redemptionsCount: offer.redemptionsCount, updatedAt: offer.updatedAt } }
+          { id: offer.id },
+          { $set: { status: offer.status, hidden: offer.hidden, redemptionsCount: offer.redemptionsCount, updatedAt: offer.updatedAt } }
         );
       }
     } catch (dbErr) {
-      console.warn('[Offers API] DB patch fallback:', dbErr);
+      console.warn('[Offers API] DB update fallback:', dbErr);
     }
 
     return NextResponse.json({
       success: true,
-      message: 'Offer updated successfully.',
+      message: `Offer updated successfully.`,
       offer,
       offers: memoryOffers,
     });
@@ -318,7 +340,7 @@ export async function PATCH(request: NextRequest) {
   }
 }
 
-// DELETE: Delete an Offer
+// DELETE: Remove an Offer
 export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -335,7 +357,7 @@ export async function DELETE(request: NextRequest) {
       const { db, isConnected } = await connectToDatabase();
       if (isConnected && db) {
         const collection = db.collection('offers');
-        await collection.deleteOne({ $or: [{ id }, { _id: id }] });
+        await collection.deleteOne({ id });
       }
     } catch (dbErr) {
       console.warn('[Offers API] DB delete fallback:', dbErr);
