@@ -9,12 +9,14 @@ interface CourseCatalogProps {
   activeStream: 'all' | 'civil' | 'mechanical' | 'eee';
   onSelectStream: (stream: 'all' | 'civil' | 'mechanical' | 'eee') => void;
   onOpenCourseModal: (course: Course) => void;
+  onEnroll?: (course: Course) => void;
 }
 
 export const CourseCatalog: React.FC<CourseCatalogProps> = ({
   activeStream,
   onSelectStream,
-  onOpenCourseModal
+  onOpenCourseModal,
+  onEnroll,
 }) => {
   const [coursesList, setCoursesList] = useState<Course[]>(COURSES);
   const [searchQuery, setSearchQuery] = useState('');
@@ -152,6 +154,7 @@ export const CourseCatalog: React.FC<CourseCatalogProps> = ({
                 key={course.id}
                 course={course}
                 onOpenDetails={onOpenCourseModal}
+                onEnroll={onEnroll}
               />
             ))}
           </div>

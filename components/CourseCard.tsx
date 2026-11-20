@@ -7,10 +7,31 @@ import { getCourseDynamicImage } from './CourseModal';
 interface CourseCardProps {
   course: Course;
   onOpenDetails: (course: Course) => void;
+  onEnroll?: (course: Course) => void;
 }
 
-export const CourseCard: React.FC<CourseCardProps> = ({ course, onOpenDetails }) => {
+export const CourseCard: React.FC<CourseCardProps> = ({ course, onOpenDetails, onEnroll }) => {
   const [imageError, setImageError] = useState(false);
+
+  const handleEnrollClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onEnroll) {
+      onEnroll(course);
+    }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('rnd_cadd_select_enroll_course', {
+          detail: { courseTitle: course.title },
+        })
+      );
+      const enrollSection = document.getElementById('enrollment');
+      if (enrollSection) {
+        enrollSection.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        window.location.href = `/#enrollment?course=${encodeURIComponent(course.title)}`;
+      }
+    }
+  };
 
   const getPartnerInfo = (stream: string) => {
     const s = (stream || '').toLowerCase();
@@ -140,7 +161,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onOpenDetails })
         </div>
       </div>
 
-      {/* Card Bottom Buttons Row (Matches Image 2: "View Program" & "↓ Syllabus") */}
+      {/* Card Bottom Buttons Row: "View Program" & "Book / Enroll Now" */}
       <div className="p-5 pt-0 flex items-center gap-2.5">
         <button
           type="button"
@@ -154,13 +175,14 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onOpenDetails })
         </button>
         <button
           type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onOpenDetails(course);
-          }}
-          className="flex-1 py-2.5 px-3 rounded-full bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs font-bold text-center transition-colors shadow-sm flex items-center justify-center space-x-1 cursor-pointer active:scale-95"
+          onClick={handleEnrollClick}
+          className="flex-1 py-2.5 px-2.5 sm:px-3 rounded-full bg-[#EE2C3C] hover:bg-[#D20A0B] text-white text-xs font-bold text-center transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 group"
+          title={`Enroll in ${course.title}`}
         >
-          <span>&darr; Syllabus</span>
+          <svg className="w-3.5 h-3.5 shrink-0 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+          </svg>
+          <span className="truncate">Book / Enroll Now</span>
         </button>
       </div>
     </div>

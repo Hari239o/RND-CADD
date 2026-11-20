@@ -10,12 +10,14 @@ interface DisciplineCourseHubProps {
   activeStream: string;
   onSelectStream: (stream: string) => void;
   onOpenCourseModal: (course: Course) => void;
+  onEnroll?: (course: Course) => void;
 }
 
 export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
   activeStream,
   onSelectStream,
   onOpenCourseModal,
+  onEnroll,
 }) => {
   const [coursesList, setCoursesList] = useState<Course[]>(COURSES);
   const [searchQuery, setSearchQuery] = useState('');
@@ -313,6 +315,7 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
                   <CourseCard
                     course={course}
                     onOpenDetails={onOpenCourseModal}
+                    onEnroll={onEnroll}
                   />
                 </motion.div>
               ))}

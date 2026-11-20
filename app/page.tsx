@@ -140,6 +140,7 @@ export default function HomePage() {
           activeStream={activeStream}
           onSelectStream={setActiveStream}
           onOpenCourseModal={(course) => setSelectedCourse(course)}
+          onEnroll={(course) => handleOpenEnrollSection(course.title)}
         />
 
         {/* Top Hiring EPC Partners Infinite Marquee */}

@@ -69,12 +69,24 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
     };
   }, []);
 
-  // Sync preselectedCourse prop
+  // Sync preselectedCourse prop and listen for external course selections
   useEffect(() => {
     if (preselectedCourse) {
       setSelectedCourse(preselectedCourse);
     }
   }, [preselectedCourse]);
+
+  useEffect(() => {
+    const handleSelectCourse = (e: any) => {
+      if (e.detail?.courseTitle) {
+        setSelectedCourse(e.detail.courseTitle);
+      }
+    };
+    window.addEventListener('rnd_cadd_select_enroll_course', handleSelectCourse);
+    return () => {
+      window.removeEventListener('rnd_cadd_select_enroll_course', handleSelectCourse);
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -362,6 +374,9 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
                     onChange={(e) => setSelectedCourse(e.target.value)}
                     className="w-full px-4 py-2.5 sm:py-3 bg-slate-50/60 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium text-slate-800 focus:bg-white focus:border-[#EE2C3C] focus:ring-2 focus:ring-red-500/15 focus:outline-none transition-all cursor-pointer"
                   >
+                    {!coursesList.some((c) => c.title === selectedCourse) && selectedCourse && (
+                      <option value={selectedCourse}>{selectedCourse}</option>
+                    )}
                     <optgroup label="Civil & BIM Architecture">
                       {coursesList
                         .filter((c) => ['civil', 'bim'].includes((c.folder || c.stream).toLowerCase()))
