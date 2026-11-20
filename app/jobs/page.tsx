@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { JobPost } from '@/lib/jobs-data';
 import { INITIAL_JOBS } from '@/lib/jobs-data';
+import { Header } from '@/components/Header';
 
 // ============================================================
 // ANIMATION GRAPHIC 1: Diverse Student Community (Orbital Rings)
@@ -593,7 +594,6 @@ export default function JobsPortalPage() {
   const [selectedWorkMode, setSelectedWorkMode] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<'carousel' | 'grid'>('carousel');
 
   // Application & Details Modal State
@@ -797,183 +797,11 @@ export default function JobsPortalPage() {
         </div>
       )}
 
-      {/* TOP NAVIGATION BAR (Pleasant modern clean theme) */}
-      <nav className="fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-[#E2E8F0] shadow-xs px-4 sm:px-8 py-3.5 flex items-center justify-between transition-all">
-        {/* Left: Brand Logo & Title */}
-        <div className="flex items-center gap-3">
-          <Link href="/" className="flex items-center group">
-            <img
-              src="/logo.png"
-              alt="RND CADD"
-              className="h-9 sm:h-10 w-auto object-contain transition-transform group-hover:scale-105"
-            />
-          </Link>
-          <span className="hidden sm:inline-block text-slate-300 font-light">|</span>
-          <span className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#0066ff] bg-[#E7F0FF] px-3 py-1 rounded-full border border-[#C7DEFF]">
-            <span className="w-2 h-2 rounded-full bg-[#0066ff] animate-pulse"></span>
-            Job Portal
-          </span>
-        </div>
-
-        {/* Center / Desktop Links */}
-        <div className="hidden lg:flex items-center gap-6 text-sm font-medium text-[#1D1D1F]/80">
-          <a href="#openings" className="hover:text-[#0066ff] transition">
-            All Openings
-          </a>
-          <a href="#why-hire" className="hover:text-[#0066ff] transition">
-            Why Hire From Us
-          </a>
-          <a href="#community" className="hover:text-[#0066ff] transition">
-            Student Community
-          </a>
-        </div>
-
-        {/* Right Navigation & Auth Buttons */}
-        <div className="hidden md:flex items-center gap-3">
-          {currentUser ? (
-            <>
-              <Link
-                href={isAdmin ? '/portal/admin' : '/portal/student'}
-                className="inline-flex items-center gap-2 bg-[#0066ff] hover:bg-[#0055e6] text-white px-5 py-2 rounded-md font-medium text-sm transition shadow-sm"
-              >
-                <span className="w-2 h-2 rounded-full bg-white"></span>
-                <span>{currentUser.name || 'Dashboard'}</span>
-              </Link>
-              <button
-                type="button"
-                onClick={handleSignOut}
-                className="border border-slate-300 px-4 py-2 rounded-md text-slate-600 hover:text-red-600 hover:border-red-300 text-sm font-medium transition cursor-pointer"
-              >
-                Sign Out
-              </button>
-            </>
-          ) : (
-            <>
-              <Link
-                href="/signin?redirect=/jobs"
-                className="bg-[#0066ff] hover:bg-[#0055e6] text-white px-6 py-2 rounded-md text-sm font-medium transition shadow-sm"
-              >
-                Login
-              </Link>
-              <Link
-                href="/signup"
-                className="border border-[#0066ff] text-[#0066ff] hover:bg-blue-50 px-6 py-2 rounded-md text-sm font-medium transition"
-              >
-                Register
-              </Link>
-            </>
-          )}
-        </div>
-
-        {/* Mobile Hamburger Button */}
-        <div
-          className="md:hidden cursor-pointer p-1"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label="Toggle Menu"
-        >
-          <svg viewBox="0 0 100 60" width="28" height="28">
-            <rect
-              width="80"
-              height="10"
-              rx="5"
-              className={`fill-[#1D1D1F] transition-all duration-300 origin-center ${
-                mobileMenuOpen ? 'rotate-45 translate-y-[25px]' : 'rotate-0 translate-y-0'
-              }`}
-            />
-            <rect
-              y="20"
-              width="80"
-              height="10"
-              rx="5"
-              className={`fill-[#1D1D1F] transition-all duration-300 ${
-                mobileMenuOpen ? 'opacity-0' : 'opacity-100'
-              }`}
-            />
-            <rect
-              y="40"
-              width="80"
-              height="10"
-              rx="5"
-              className={`fill-[#1D1D1F] transition-all duration-300 origin-center ${
-                mobileMenuOpen ? '-rotate-45 -translate-y-[20px] translate-x-[5px]' : 'rotate-0 translate-y-0'
-              }`}
-            />
-          </svg>
-        </div>
-
-        {/* Mobile Slide-out Menu */}
-        <div
-          className={`fixed inset-0 z-40 bg-white flex flex-col items-start justify-start pt-24 px-6 pb-8 gap-5 transition-transform duration-300 md:hidden shadow-2xl overflow-y-auto ${
-            mobileMenuOpen ? 'translate-x-0 pointer-events-auto' : 'translate-x-full pointer-events-none'
-          }`}
-        >
-          <a
-            href="#openings"
-            onClick={() => setMobileMenuOpen(false)}
-            className="text-lg font-semibold text-[#1D1D1F] hover:text-[#0066ff]"
-          >
-            All Openings
-          </a>
-          <a
-            href="#why-hire"
-            onClick={() => setMobileMenuOpen(false)}
-            className="text-lg font-semibold text-[#1D1D1F] hover:text-[#0066ff]"
-          >
-            Why Hire From Us
-          </a>
-          <a
-            href="#community"
-            onClick={() => setMobileMenuOpen(false)}
-            className="text-lg font-semibold text-[#1D1D1F] hover:text-[#0066ff]"
-          >
-            Student Community
-          </a>
-
-          <div className="w-full pt-4 border-t border-slate-200 flex flex-col gap-3">
-            {currentUser ? (
-              <>
-                <Link
-                  href={isAdmin ? '/portal/admin' : '/portal/student'}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="bg-[#0066ff] w-full py-3 rounded-md text-white font-medium text-center hover:bg-[#0055e6] transition"
-                >
-                  Dashboard
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => {
-                    handleSignOut();
-                    setMobileMenuOpen(false);
-                  }}
-                  className="border border-slate-300 w-full py-3 rounded-md text-slate-700 font-medium text-center"
-                >
-                  Sign Out
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  href="/signin?redirect=/jobs"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="bg-[#0066ff] w-full py-3 rounded-md text-white font-medium text-center hover:bg-[#0055e6] transition"
-                >
-                  Login
-                </Link>
-                <Link
-                  href="/signup"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="border border-[#0066ff] w-full py-3 rounded-md text-[#0066ff] font-medium text-center hover:bg-blue-50 transition"
-                >
-                  Register
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </nav>
+      {/* UNIFIED GLOBAL HEADER */}
+      <Header />
 
       {/* HERO SECTION (Pleasant Blue Gradient with Radial Glow Orbs) */}
-      <section className="relative w-full min-h-[580px] bg-[linear-gradient(to_bottom,_#FFFFFF_0%,_#FFFFFF_30%,_#C0DCFF_100%)] flex items-center pt-28 pb-16 overflow-hidden">
+      <section className="relative w-full min-h-[580px] bg-[linear-gradient(to_bottom,_#FFFFFF_0%,_#FFFFFF_30%,_#C0DCFF_100%)] flex items-center pt-32 sm:pt-36 lg:pt-40 pb-12 sm:pb-16 overflow-hidden">
         {/* Soft Radial Gradient Glow Circles */}
         <div className="w-[850px] h-[850px] absolute top-[-70%] left-[45%] max-sm:left-[-60%] max-sm:top-[-40%] rounded-full pointer-events-none">
           <div className="w-full h-full rounded-full bg-[radial-gradient(circle,_rgba(0,0,0,0)_30%,_rgba(145,194,255,0.45)_100%)]" />

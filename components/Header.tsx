@@ -5,9 +5,9 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface HeaderProps {
-  activeStream: string;
-  onSelectStream: (stream: any) => void;
-  onOpenEnrollModal: () => void;
+  activeStream?: string;
+  onSelectStream?: (stream: any) => void;
+  onOpenEnrollModal?: () => void;
 }
 
 const NAV_ITEMS = [
@@ -21,7 +21,7 @@ const NAV_ITEMS = [
 ];
 
 export const Header: React.FC<HeaderProps> = ({
-  activeStream,
+  activeStream = 'all',
   onSelectStream,
   onOpenEnrollModal,
 }) => {
@@ -108,27 +108,40 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   const handleStreamClick = (streamId: string) => {
-    onSelectStream(streamId);
+    if (onSelectStream) {
+      onSelectStream(streamId);
+    } else if (typeof window !== 'undefined') {
+      window.location.href = `/?stream=${streamId}#revealed-courses`;
+    }
     setMobileMenuOpen(false);
+  };
+
+  const handleEnrollClick = () => {
+    setMobileMenuOpen(false);
+    if (onOpenEnrollModal) {
+      onOpenEnrollModal();
+    } else if (typeof window !== 'undefined') {
+      window.location.href = '/#enrollment';
+    }
   };
 
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-50 transition-all pointer-events-none">
         {/* Expanded Width & Luxurious Length Container */}
-        <div className="w-full px-2.5 sm:px-6 lg:px-8 max-w-[1600px] mx-auto pt-2 sm:pt-4.5 pointer-events-auto">
+        <div className="w-full px-3 sm:px-6 lg:px-8 max-w-[1600px] mx-auto pt-3 sm:pt-4.5 pointer-events-auto">
           <motion.div
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="bg-white/95 backdrop-blur-md rounded-full border border-slate-200/90 shadow-[0_10px_35px_-8px_rgba(15,23,42,0.08),0_2px_8px_rgba(15,23,42,0.03)] px-3.5 sm:px-6 lg:px-8 py-1.5 sm:py-2.5 flex items-center justify-between gap-2 sm:gap-4 xl:gap-8 transition-all min-h-[50px] sm:min-h-[64px] lg:min-h-[68px]"
+            className="bg-white/95 backdrop-blur-md rounded-full border border-slate-200/90 shadow-[0_12px_36px_-6px_rgba(15,23,42,0.1),0_2px_8px_rgba(15,23,42,0.04)] px-4 sm:px-6 lg:px-8 py-2.5 sm:py-2.5 flex items-center justify-between gap-3 sm:gap-4 xl:gap-8 transition-all min-h-[66px] sm:min-h-[68px] lg:min-h-[72px]"
           >
-            {/* Prominent Official RND CADD Logo */}
+            {/* Prominent Official RND CADD Logo - Increased Size on Mobile */}
             <Link href="/" className="flex items-center shrink-0 group py-0.5" aria-label="RND CADD Home">
               <img
                 src="/logo.png"
                 alt="RND CADD"
-                className="h-7 sm:h-9 md:h-10 lg:h-11 w-auto object-contain transition-transform duration-200 group-hover:scale-102 drop-shadow-xs"
+                className="h-10 sm:h-10 md:h-11 lg:h-12 w-auto object-contain transition-transform duration-200 group-hover:scale-102 drop-shadow-xs"
               />
             </Link>
 
@@ -256,27 +269,27 @@ export const Header: React.FC<HeaderProps> = ({
               )}
             </div>
 
-            {/* Mobile / Tablet Controls (< lg) */}
-            <div className="flex lg:hidden items-center gap-2 shrink-0">
+            {/* Mobile / Tablet Controls (< lg) - Increased Size on Mobile */}
+            <div className="flex lg:hidden items-center gap-2.5 shrink-0">
               {/* Quick Jobs Badge Link on Mobile */}
               <Link
                 href="/jobs"
-                className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full bg-slate-900 text-white text-[11px] sm:text-xs font-bold tracking-tight uppercase shadow-xs active:scale-95"
+                className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full bg-slate-900 text-white text-xs font-black tracking-wide uppercase shadow-sm active:scale-95"
                 title="Jobs Portal"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse"></span>
+                <span className="w-2 h-2 rounded-full bg-[#EE2C3C] animate-pulse"></span>
                 <span>Jobs</span>
               </Link>
 
-              {/* Hamburger Button */}
+              {/* Hamburger Button - Prominent & Comfortable Touch Target */}
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center transition-colors focus:outline-none cursor-pointer border border-slate-200"
+                className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center transition-colors focus:outline-none cursor-pointer border border-slate-200 shadow-2xs active:scale-95"
                 aria-label={mobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
                 aria-expanded={mobileMenuOpen}
               >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
                   {mobileMenuOpen ? (
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                   ) : (
@@ -310,13 +323,13 @@ export const Header: React.FC<HeaderProps> = ({
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-              className="absolute top-0 right-0 bottom-0 w-full max-w-sm bg-white shadow-2xl flex flex-col justify-between overflow-y-auto safe-pt safe-pb p-5 sm:p-6"
+              className="absolute top-0 right-0 bottom-0 w-full max-w-[340px] sm:max-w-sm bg-white shadow-2xl flex flex-col justify-between overflow-y-auto safe-pt safe-pb p-5 sm:p-6"
             >
               <div>
                 {/* Drawer Header */}
                 <div className="flex items-center justify-between pb-4 border-b border-slate-200">
                   <div className="flex items-center gap-2.5">
-                    <img src="/logo.png" alt="RND CADD" className="h-9 w-auto object-contain" />
+                    <img src="/logo.png" alt="RND CADD" className="h-10 w-auto object-contain" />
                     <div>
                       <span className="text-xs font-black text-[#15304C] uppercase tracking-wide block">
                         RND CADD
@@ -329,7 +342,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <button
                     type="button"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
+                    className="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-colors cursor-pointer active:scale-95"
                     aria-label="Close Menu"
                   >
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -366,14 +379,14 @@ export const Header: React.FC<HeaderProps> = ({
                       <Link
                         href="/signin"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex-1 py-2 text-center rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-2xs transition-colors"
+                        className="flex-1 py-2.5 text-center rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-2xs transition-colors"
                       >
                         Sign In
                       </Link>
                       <Link
                         href="/signup"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex-1 py-2 text-center rounded-xl bg-[#EE2C3C] hover:bg-[#D20A0B] text-white text-xs font-semibold shadow-xs transition-colors"
+                        className="flex-1 py-2.5 text-center rounded-xl bg-[#EE2C3C] hover:bg-[#D20A0B] text-white text-xs font-bold shadow-xs transition-colors"
                       >
                         Sign Up
                       </Link>
@@ -389,7 +402,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <Link
                     href="/jobs"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-100 text-xs font-bold text-slate-900 transition-colors"
+                    className="flex items-center justify-between px-3.5 py-3 rounded-xl hover:bg-slate-100 text-xs font-bold text-slate-900 transition-colors"
                   >
                     <span className="flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-[#EE2C3C]"></span>
@@ -402,11 +415,8 @@ export const Header: React.FC<HeaderProps> = ({
 
                   <button
                     type="button"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      onOpenEnrollModal();
-                    }}
-                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-100 text-xs font-bold text-slate-900 transition-colors text-left"
+                    onClick={handleEnrollClick}
+                    className="w-full flex items-center justify-between px-3.5 py-3 rounded-xl hover:bg-slate-100 text-xs font-bold text-slate-900 transition-colors text-left"
                   >
                     <span className="flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-blue-500"></span>
