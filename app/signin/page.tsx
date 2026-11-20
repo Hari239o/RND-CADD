@@ -152,65 +152,6 @@ export default function SignInPage() {
     }
   };
 
-  const handleQuickDemoLogin = (emailToUse: string) => {
-    setEmail(emailToUse);
-    setPassword('9908');
-    const formEvent = { preventDefault: () => {} } as React.FormEvent;
-    setTimeout(() => {
-      // Direct trigger
-      if (emailToUse === 'student1@gmail.com') {
-        const userObj = {
-          name: 'Student 1',
-          email: 'student1@gmail.com',
-          role: 'student',
-          id: 'STU-001',
-          studentId: 'STU-001',
-          stream: 'Civil CADD & Master BIM',
-          assignedCourses: ['Civil CADD & Master BIM', 'Interior Architecture & 3D Visualization'],
-        };
-        sessionStorage.setItem('rnd_cadd_user', JSON.stringify(userObj));
-        sessionStorage.setItem('rnd_cadd_role', 'student');
-        window.location.href = '/portal/student?email=student1%40gmail.com';
-      } else if (emailToUse === 'student2@gmail.com') {
-        const userObj = {
-          name: 'Student 2',
-          email: 'student2@gmail.com',
-          role: 'student',
-          id: 'STU-002',
-          studentId: 'STU-002',
-          stream: 'Mechanical CAD & SolidWorks Expert',
-          assignedCourses: ['Mechanical CAD & SolidWorks Expert', 'Ansys Simulation & FEA'],
-        };
-        sessionStorage.setItem('rnd_cadd_user', JSON.stringify(userObj));
-        sessionStorage.setItem('rnd_cadd_role', 'student');
-        window.location.href = '/portal/student?email=student2%40gmail.com';
-      } else if (emailToUse === 'student3@gmail.com') {
-        const userObj = {
-          name: 'Student 3',
-          email: 'student3@gmail.com',
-          role: 'student',
-          id: 'STU-003',
-          studentId: 'STU-003',
-          stream: 'Electrical CADD & Control Systems',
-          assignedCourses: ['Electrical CADD & Control Systems', 'AutoCAD Electrical & Panel Design'],
-        };
-        sessionStorage.setItem('rnd_cadd_user', JSON.stringify(userObj));
-        sessionStorage.setItem('rnd_cadd_role', 'student');
-        window.location.href = '/portal/student?email=student3%40gmail.com';
-      } else {
-        const userObj = {
-          name: 'Hari Kishore Reddy',
-          email: 'harikishorereddy9908@gmail.com',
-          role: 'admin',
-          stream: 'Executive Administration',
-        };
-        sessionStorage.setItem('rnd_cadd_user', JSON.stringify(userObj));
-        sessionStorage.setItem('rnd_cadd_role', 'admin');
-        window.location.href = '/portal/admin';
-      }
-    }, 50);
-  };
-
   const handleGoogleSignIn = () => {
     setLoading(true);
     if (typeof window !== 'undefined') {
@@ -420,54 +361,6 @@ export default function SignInPage() {
               </svg>
               <span>Sign in with Google</span>
             </button>
-
-            {/* Quick 1-Click Multi-Window Test Accounts */}
-            <div className="mt-6 pt-5 border-t border-slate-100">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-2.5 text-center">
-                Quick 1-Click Login (Independent Window Sessions)
-              </span>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-left">
-                <button
-                  type="button"
-                  onClick={() => handleQuickDemoLogin('student1@gmail.com')}
-                  className="p-2.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-all text-left cursor-pointer"
-                >
-                  <span className="text-[10px] font-bold text-slate-400 block uppercase">Student 1 (BIM)</span>
-                  <span className="text-xs font-bold text-slate-800 block truncate">student1@gmail.com</span>
-                  <span className="text-[10px] text-slate-500 font-mono">pwd: 9908</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleQuickDemoLogin('student2@gmail.com')}
-                  className="p-2.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-all text-left cursor-pointer"
-                >
-                  <span className="text-[10px] font-bold text-slate-400 block uppercase">Student 2 (SolidWorks)</span>
-                  <span className="text-xs font-bold text-slate-800 block truncate">student2@gmail.com</span>
-                  <span className="text-[10px] text-slate-500 font-mono">pwd: 9908</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleQuickDemoLogin('student3@gmail.com')}
-                  className="p-2.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-all text-left cursor-pointer"
-                >
-                  <span className="text-[10px] font-bold text-slate-400 block uppercase">Student 3 (Electrical)</span>
-                  <span className="text-xs font-bold text-slate-800 block truncate">student3@gmail.com</span>
-                  <span className="text-[10px] text-slate-500 font-mono">pwd: 9908</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleQuickDemoLogin('harikishorereddy9908@gmail.com')}
-                  className="p-2.5 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 transition-all text-left cursor-pointer"
-                >
-                  <span className="text-[10px] font-bold text-[#EE2C3C] block uppercase">Admin Console</span>
-                  <span className="text-xs font-bold text-slate-900 block truncate">Hari Kishore Reddy</span>
-                  <span className="text-[10px] text-slate-500 font-mono">pwd: 9908</span>
-                </button>
-              </div>
-            </div>
 
             {/* Bottom Links */}
             <div className="mt-6 text-center">
