@@ -390,6 +390,34 @@ const BookCoverGraphic = ({ book, onClick }: { book: EbookItem; onClick?: () => 
   );
 };
 
+
+const DEFAULT_STUDENT_AVATARS = [
+  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&auto=format&fit=crop&q=80',
+];
+
+const getStudentAvatar = (photo?: string | null, name?: string, email?: string, id?: string): string => {
+  if (photo && typeof photo === 'string' && photo.trim().length > 0) {
+    return photo.trim();
+  }
+  const key = (email || id || name || 'student').toLowerCase();
+  if (key.includes('student1')) return DEFAULT_STUDENT_AVATARS[0];
+  if (key.includes('student2')) return DEFAULT_STUDENT_AVATARS[1];
+  if (key.includes('student3')) return DEFAULT_STUDENT_AVATARS[2];
+
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) {
+    hash = (hash << 5) - hash + key.charCodeAt(i);
+    hash |= 0;
+  }
+  const index = Math.abs(hash) % DEFAULT_STUDENT_AVATARS.length;
+  return DEFAULT_STUDENT_AVATARS[index];
+};
+
 export default function StudentPortalPage() {
   const [mounted, setMounted] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('Home');
@@ -418,6 +446,55 @@ export default function StudentPortalPage() {
   });
 
   // Profile Edit & Security States
+  
+  const handleDirectPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const dataUrl = event.target?.result as string;
+      if (dataUrl) {
+        setStudentUser((prev) => ({ ...prev, photo: dataUrl }));
+        setEditPhoto(dataUrl);
+
+        if (typeof window !== 'undefined') {
+          try {
+            const emailKey = (studentUser.email || 'student').toLowerCase().trim();
+            localStorage.setItem(`rnd_cadd_student_photo_${emailKey}`, dataUrl);
+            const saved = sessionStorage.getItem('rnd_cadd_user') || localStorage.getItem('rnd_cadd_user');
+            const parsed = saved ? JSON.parse(saved) : {};
+            parsed.photo = dataUrl;
+            sessionStorage.setItem('rnd_cadd_user', JSON.stringify(parsed));
+            localStorage.setItem('rnd_cadd_user', JSON.stringify(parsed));
+          } catch {}
+        }
+      }
+    };
+    reader.readAsDataURL(file);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.success && data.url) {
+        setStudentUser((prev) => ({ ...prev, photo: data.url }));
+        setEditPhoto(data.url);
+        if (studentUser.email) {
+          fetch('/api/student/profile', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: studentUser.email, photo: data.url }),
+          }).catch(() => {});
+        }
+      }
+    } catch {}
+  };
+
   const [isEditingProfile, setIsEditingProfile] = useState<boolean>(false);
   const [editName, setEditName] = useState<string>('Student');
   const [editPhone, setEditPhone] = useState<string>('');
@@ -1190,6 +1267,7 @@ export default function StudentPortalPage() {
             role: 'student',
             id: 'STU-002',
             studentId: 'STU-002',
+            photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80',
             stream: 'Mechanical CAD & SolidWorks Expert',
             assignedCourses: ['Mechanical CAD & SolidWorks Expert', 'Ansys Simulation & FEA'],
           };
@@ -1200,6 +1278,7 @@ export default function StudentPortalPage() {
             role: 'student',
             id: 'STU-003',
             studentId: 'STU-003',
+            photo: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=80',
             stream: 'Electrical CADD & Control Systems',
             assignedCourses: ['Electrical CADD & Control Systems', 'AutoCAD Electrical & Panel Design'],
           };
@@ -1210,6 +1289,7 @@ export default function StudentPortalPage() {
             role: 'student',
             id: 'STU-001',
             studentId: 'STU-001',
+            photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
             stream: 'Civil CADD & Master BIM',
             assignedCourses: ['Civil CADD & Master BIM', 'Interior Architecture & 3D Visualization'],
           };
@@ -1249,13 +1329,17 @@ export default function StudentPortalPage() {
           ? activeUser.assignedCourses
           : (studentLocalCourses.length > 0 ? studentLocalCourses : (activeUser.stream ? [activeUser.stream] : []));
 
+        const savedPhoto = typeof window !== 'undefined'
+          ? (localStorage.getItem(`rnd_cadd_student_photo_${emailToUse}`) || '')
+          : '';
+
         setStudentUser((prev) => ({
           ...prev,
           name: activeUser.name || activeUser.fullName || prev.name,
           email: emailToUse,
           stream: activeUser.stream || (initialCourses[0] || prev.stream),
           id: idToUse,
-          photo: activeUser.photo || activeUser.image || prev.photo,
+          photo: savedPhoto || activeUser.photo || activeUser.image || prev.photo,
           assignedCourses: initialCourses,
         }));
       }
@@ -1885,18 +1969,16 @@ export default function StudentPortalPage() {
       {/* MOBILE STICKY TOP BAR (< md) */}
       <div className="md:hidden sticky top-0 z-40 bg-white border-b border-slate-200 px-3.5 py-2.5 flex items-center justify-between shadow-xs">
         <div className="flex items-center space-x-2.5 min-w-0">
-          <div className="w-9 h-9 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 flex-shrink-0">
-            {studentUser.photo ? (
-              <img
-                src={studentUser.photo}
-                alt={studentUser.name}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <span className="font-black text-xs text-slate-700">
-                {studentUser.name ? studentUser.name.charAt(0).toUpperCase() : 'S'}
-              </span>
-            )}
+          <div
+            onClick={() => setActiveTab('Profile')}
+            className="w-9 h-9 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 flex-shrink-0 cursor-pointer shadow-2xs"
+            title="Profile"
+          >
+            <img
+              src={getStudentAvatar(studentUser.photo, studentUser.name, studentUser.email, studentUser.id)}
+              alt={studentUser.name}
+              className="w-full h-full object-cover"
+            />
           </div>
           <div className="min-w-0">
             <span className="text-xs font-black text-slate-900 block truncate leading-tight">
@@ -1978,10 +2060,25 @@ export default function StudentPortalPage() {
               </div>
 
               {/* Student Info */}
-              <div className="p-3 my-4 rounded-xl bg-slate-50 border border-slate-200">
-                <h4 className="text-xs font-extrabold text-slate-900">{studentUser.name}</h4>
-                <p className="text-[11px] text-slate-500 font-mono mt-0.5">ID: {studentUser.id}</p>
-                <p className="text-[10px] text-slate-600 truncate mt-0.5">{studentUser.stream}</p>
+              <div
+                onClick={() => {
+                  setActiveTab('Profile');
+                  setIsMobileNavOpen(false);
+                }}
+                className="p-3 my-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-3 cursor-pointer hover:bg-slate-100 transition-colors"
+              >
+                <div className="w-12 h-12 rounded-xl overflow-hidden border border-slate-200 shrink-0 shadow-2xs">
+                  <img
+                    src={getStudentAvatar(studentUser.photo, studentUser.name, studentUser.email, studentUser.id)}
+                    alt={studentUser.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="min-w-0">
+                  <h4 className="text-xs font-extrabold text-slate-900 truncate">{studentUser.name}</h4>
+                  <p className="text-[11px] text-slate-500 font-mono mt-0.5 truncate">ID: {studentUser.id}</p>
+                  <p className="text-[10px] text-slate-600 truncate mt-0.5">{studentUser.stream}</p>
+                </div>
               </div>
 
               {/* Nav links */}
@@ -2038,21 +2135,28 @@ export default function StudentPortalPage() {
           {/* Student Profile Identity */}
           <div className="px-5 pt-7 pb-5 sm:pt-8 sm:pb-5 border-b border-slate-200 bg-white flex-shrink-0">
             <div className="flex items-center space-x-3.5">
-              <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl overflow-hidden bg-slate-100 border-2 border-slate-200 shadow-sm flex items-center justify-center flex-shrink-0 relative">
-                {studentUser.photo ? (
-                  <img
-                    src={studentUser.photo}
-                    alt={studentUser.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="font-extrabold text-xl text-slate-700">
-                    {studentUser.name ? studentUser.name.charAt(0).toUpperCase() : 'S'}
-                  </span>
-                )}
+              <div
+                onClick={() => setActiveTab('Profile')}
+                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl overflow-hidden bg-slate-100 border-2 border-slate-200 shadow-sm flex items-center justify-center flex-shrink-0 relative group cursor-pointer"
+                title="Click to view & customize student profile"
+              >
+                <img
+                  src={getStudentAvatar(studentUser.photo, studentUser.name, studentUser.email, studentUser.id)}
+                  alt={studentUser.name}
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <svg className="w-4 h-4 text-white drop-shadow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                </div>
               </div>
               <div className="overflow-hidden min-w-0">
-                <h2 className="text-lg sm:text-xl font-extrabold text-[#131313] truncate tracking-tight">
+                <h2
+                  onClick={() => setActiveTab('Profile')}
+                  className="text-lg sm:text-xl font-extrabold text-[#131313] truncate tracking-tight cursor-pointer hover:text-[#EE2C3C] transition-colors"
+                  title="Click to view/edit profile"
+                >
                   {studentUser.name}
                 </h2>
                 <span className="text-xs sm:text-sm font-mono font-bold text-slate-500 block truncate mt-0.5">
@@ -2463,21 +2567,29 @@ export default function StudentPortalPage() {
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-100">
                     <div className="flex items-start sm:items-center space-x-5">
                       {/* Student Photo / Avatar */}
-                      <div className="relative flex-shrink-0">
-                        {studentUser.photo ? (
-                          <img
-                            src={studentUser.photo}
-                            alt={studentUser.name}
-                            className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 border-slate-200 shadow-sm"
-                          />
-                        ) : (
-                          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-[#131313] text-white font-bold flex items-center justify-center text-3xl border-2 border-slate-200 shadow-sm">
-                            {studentUser.name.charAt(0).toUpperCase()}
-                          </div>
-                        )}
-                        <span className="absolute -bottom-2 -right-2 px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-[#131313] text-white shadow-2xs">
-                          ID
-                        </span>
+                      <div className="relative flex-shrink-0 group">
+                        <img
+                          src={getStudentAvatar(studentUser.photo, studentUser.name, studentUser.email, studentUser.id)}
+                          alt={studentUser.name}
+                          className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 border-slate-200 shadow-sm"
+                        />
+                        <label
+                          htmlFor="student-profile-photo-upload"
+                          className="absolute -bottom-2 -right-2 p-1.5 rounded-full bg-[#131313] hover:bg-[#EE2C3C] text-white shadow-md cursor-pointer transition-all active:scale-95 flex items-center justify-center"
+                          title="Change Profile Photo"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                        </label>
+                        <input
+                          id="student-profile-photo-upload"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleDirectPhotoUpload}
+                        />
                       </div>
 
                       <div>
@@ -2619,20 +2731,58 @@ export default function StudentPortalPage() {
                           />
                         </div>
 
-                        <div>
-                          <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
-                            Profile Photo URL
+                        <div className="sm:col-span-2 space-y-3 pt-2 border-t border-slate-100">
+                          <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">
+                            Student Profile Picture
                           </label>
-                          <input
-                            type="url"
-                            value={editPhoto}
-                            onChange={(e) => setEditPhoto(e.target.value)}
-                            placeholder="https://example.com/photo.jpg"
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm text-[#131313] focus:border-[#EE2C3C] focus:outline-none shadow-2xs"
-                          />
-                          <span className="text-[11px] text-slate-500 mt-1 block">
-                            Paste any image URL or leave blank to display initials.
-                          </span>
+
+                          {/* Direct Upload & Avatar Presets */}
+                          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                            <label
+                              htmlFor="edit-student-file-upload"
+                              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold cursor-pointer transition-all active:scale-95 shadow-sm"
+                            >
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                              </svg>
+                              <span>Upload Photo from Device</span>
+                            </label>
+                            <input
+                              id="edit-student-file-upload"
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={handleDirectPhotoUpload}
+                            />
+
+                            <span className="text-xs text-slate-400 font-medium">or pick a default avatar:</span>
+
+                            <div className="flex items-center gap-2 flex-wrap">
+                              {DEFAULT_STUDENT_AVATARS.map((avatarUrl, idx) => (
+                                <button
+                                  key={idx}
+                                  type="button"
+                                  onClick={() => setEditPhoto(avatarUrl)}
+                                  className={`w-9 h-9 rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${
+                                    editPhoto === avatarUrl ? 'border-[#EE2C3C] ring-2 ring-red-400/30 scale-105' : 'border-slate-200 hover:border-slate-400'
+                                  }`}
+                                  title={`Avatar ${idx + 1}`}
+                                >
+                                  <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="pt-1">
+                            <input
+                              type="url"
+                              value={editPhoto}
+                              onChange={(e) => setEditPhoto(e.target.value)}
+                              placeholder="Or paste custom image URL: https://example.com/photo.jpg"
+                              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs sm:text-sm text-[#131313] focus:border-[#EE2C3C] focus:outline-none shadow-2xs"
+                            />
+                          </div>
                         </div>
                       </div>
 
@@ -4352,7 +4502,7 @@ export default function StudentPortalPage() {
           {/* TAB 7: REFER & EARN (Dynamic Admin Synced Referral & Course Offers) */}
           {activeTab === 'Refer & Earn' && (() => {
             const activeStudentOffers = studentOffers.filter(
-              (o) => (o.status === 'Active' || !o.status) && !o.hidden && o.status !== 'Hidden' && o.status !== 'Inactive'
+              (o) => (o.status === 'Active' || !o.status) && !o.hidden
             );
             const studentRefCode = studentUser.id ? `REF-${studentUser.id.replace(/[^A-Z0-9]/gi, '').toUpperCase()}` : 'RAMG8492';
             const referralProgram = activeStudentOffers.find((o) => o.type === 'referral');

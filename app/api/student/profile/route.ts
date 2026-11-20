@@ -13,9 +13,51 @@ let fallbackProfiles: Record<string, any> = {
     nativePlace: '',
     qualification: '',
     admissionDate: '11 Nov 2026',
-    photo: '',
+    photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
     stream: 'Civil CADD & Master BIM',
     assignedCourses: ['Civil CADD & Master BIM', 'Interior Architecture & 3D Visualization'],
+    courseFee: 0,
+    paidFee: 0,
+    balanceFee: 0,
+    labWorkstation: '',
+    leadInstructor: '',
+    campusLocation: 'R&D CADD Center, Metro Pillar 1042, Ameerpet, Hyderabad',
+    paymentReceipts: [],
+  },
+  'student2@gmail.com': {
+    studentId: 'STU-002',
+    name: 'Student 2',
+    email: 'student2@gmail.com',
+    password: '9908',
+    phone: '',
+    college: '',
+    nativePlace: '',
+    qualification: '',
+    admissionDate: '12 Nov 2026',
+    photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80',
+    stream: 'Mechanical CAD & SolidWorks Expert',
+    assignedCourses: ['Mechanical CAD & SolidWorks Expert', 'Ansys Simulation & FEA'],
+    courseFee: 0,
+    paidFee: 0,
+    balanceFee: 0,
+    labWorkstation: '',
+    leadInstructor: '',
+    campusLocation: 'R&D CADD Center, Metro Pillar 1042, Ameerpet, Hyderabad',
+    paymentReceipts: [],
+  },
+  'student3@gmail.com': {
+    studentId: 'STU-003',
+    name: 'Student 3',
+    email: 'student3@gmail.com',
+    password: '9908',
+    phone: '',
+    college: '',
+    nativePlace: '',
+    qualification: '',
+    admissionDate: '13 Nov 2026',
+    photo: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=80',
+    stream: 'Electrical CADD & Control Systems',
+    assignedCourses: ['Electrical CADD & Control Systems', 'AutoCAD Electrical & Panel Design'],
     courseFee: 0,
     paidFee: 0,
     balanceFee: 0,
@@ -30,6 +72,17 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const email = (searchParams.get('email') || 'student1@gmail.com').toLowerCase().trim();
+
+    const isStudent1 = email.includes('student1');
+    const isStudent2 = email.includes('student2');
+    const isStudent3 = email.includes('student3');
+    const defaultPhoto = isStudent1
+      ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80'
+      : isStudent2
+      ? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80'
+      : isStudent3
+      ? 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=80'
+      : 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80';
 
     const { db, isConnected } = await connectToDatabase();
     if (isConnected && db) {
@@ -50,7 +103,7 @@ export async function GET(request: NextRequest) {
           admissionDate: dbUser.admissionDate || (dbUser.createdAt
             ? new Date(dbUser.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
             : '11 Nov 2026'),
-          photo: dbUser.photo || '',
+          photo: dbUser.photo || dbUser.image || defaultPhoto,
           stream: dbUser.courseName || dbUser.stream || 'Civil CADD & Master BIM',
           assignedCourses: Array.isArray(dbUser.assignedCourses) && dbUser.assignedCourses.length > 0
             ? dbUser.assignedCourses
@@ -69,19 +122,18 @@ export async function GET(request: NextRequest) {
     }
 
     // Fallback profile without shared/leaked dummy data
-    const isStudent1 = email === 'student1@gmail.com';
     const profile = fallbackProfiles[email] || {
-      studentId: isStudent1 ? 'STU-001' : `STU-${Math.floor(100 + Math.random() * 900)}`,
-      name: isStudent1 ? 'Student 1' : email.split('@')[0],
+      studentId: isStudent1 ? 'STU-001' : isStudent2 ? 'STU-002' : isStudent3 ? 'STU-003' : `STU-${Math.floor(100 + Math.random() * 900)}`,
+      name: isStudent1 ? 'Student 1' : isStudent2 ? 'Student 2' : isStudent3 ? 'Student 3' : email.split('@')[0],
       email: email,
       phone: '',
       college: '',
       nativePlace: '',
       qualification: '',
       admissionDate: '11 Nov 2026',
-      photo: '',
-      stream: isStudent1 ? 'Civil CADD & Master BIM' : 'Engineering CAD',
-      assignedCourses: isStudent1 ? ['Civil CADD & Master BIM', 'Interior Architecture & 3D Visualization'] : [],
+      photo: defaultPhoto,
+      stream: isStudent1 ? 'Civil CADD & Master BIM' : isStudent2 ? 'Mechanical CAD & SolidWorks Expert' : isStudent3 ? 'Electrical CADD & Control Systems' : 'Engineering CAD',
+      assignedCourses: isStudent1 ? ['Civil CADD & Master BIM', 'Interior Architecture & 3D Visualization'] : isStudent2 ? ['Mechanical CAD & SolidWorks Expert', 'Ansys Simulation & FEA'] : isStudent3 ? ['Electrical CADD & Control Systems', 'AutoCAD Electrical & Panel Design'] : [],
       courseFee: 0,
       paidFee: 0,
       balanceFee: 0,
