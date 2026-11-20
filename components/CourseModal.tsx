@@ -646,15 +646,12 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
 
               {/* SECTION D: INTERACTIVE SYLLABUS & ROADMAP (ACCORDIONS) */}
               {!hiddenSections.includes("sec-6") && (
-              <section className="bg-white border border-slate-200/80 rounded-3xl p-7 sm:p-8 shadow-sm space-y-6">
+              <section className="bg-white border border-slate-200/80 rounded-2xl sm:rounded-3xl p-4 sm:p-7 lg:p-8 shadow-sm space-y-5 sm:space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                   <div className="flex items-center gap-3">
                     <span className="w-2.5 h-6 bg-[#EE2C3C] rounded-full inline-block"></span>
-                    <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-normal flex items-center gap-3">
+                    <h2 className="text-lg sm:text-2xl font-bold text-slate-900 tracking-normal">
                       Course Contents &amp; Units Breakdown
-                      <span className="text-xs font-bold text-[#EE2C3C] bg-red-50 border border-red-100 px-3 py-1 rounded-full">
-                        {modulesList.length} Units
-                      </span>
                     </h2>
                   </div>
                   

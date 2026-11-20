@@ -17,8 +17,8 @@ export const CourseCertificateShowcase: React.FC<CourseCertificateShowcaseProps>
   const mainTool = toolsList[0] || course.title;
 
   return (
-    <section className="bg-white border border-slate-200/80 rounded-3xl p-7 sm:p-8 lg:p-10 shadow-sm space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+    <section className="bg-white border border-slate-200/80 rounded-2xl sm:rounded-3xl p-4 sm:p-7 lg:p-10 shadow-sm space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-10 items-center">
         
         {/* LEFT COLUMN: Narrative matching exact CAD DESK layout in user Image 1 */}
         <div className="lg:col-span-5 space-y-4">
@@ -77,111 +77,111 @@ export const CourseCertificateShowcase: React.FC<CourseCertificateShowcaseProps>
               </div>
             </div>
           ) : (
-            <div className="relative bg-white rounded-2xl border-2 border-slate-200 shadow-xl overflow-hidden p-6 sm:p-8 select-none">
+            <div className="relative bg-white rounded-xl sm:rounded-2xl border-2 border-slate-200 shadow-xl overflow-hidden p-3.5 sm:p-6 lg:p-8 select-none max-w-full">
             
             {/* Background Security Border Elegant Double Guilloche Hairline (No Dashed Pattern) */}
-            <div className="absolute inset-2 border-2 border-[#15304C]/20 pointer-events-none rounded-xl"></div>
-            <div className="absolute inset-3.5 border border-[#F59E0B]/40 pointer-events-none rounded-lg"></div>
+            <div className="absolute inset-1.5 sm:inset-2 border border-[#15304C]/20 pointer-events-none rounded-lg sm:rounded-xl"></div>
+            <div className="absolute inset-2.5 sm:inset-3.5 border border-[#F59E0B]/30 pointer-events-none rounded-md sm:rounded-lg"></div>
 
             {/* Top-Left Navy & Gold Arc Decorative Elements */}
-            <div className="absolute -top-12 -left-12 w-32 h-32 rounded-full border-[10px] border-[#15304C]/10 pointer-events-none"></div>
-            <div className="absolute -bottom-10 -right-10 w-28 h-28 rounded-full border-[8px] border-[#F59E0B]/15 pointer-events-none"></div>
+            <div className="absolute -top-12 -left-12 w-24 h-24 sm:w-32 sm:h-32 rounded-full border-[6px] sm:border-[10px] border-[#15304C]/10 pointer-events-none"></div>
+            <div className="absolute -bottom-10 -right-10 w-20 h-20 sm:w-28 sm:h-28 rounded-full border-[6px] sm:border-[8px] border-[#F59E0B]/15 pointer-events-none"></div>
 
             {/* Certificate Header Bar */}
-            <div className="flex items-start justify-between relative z-10 border-b border-slate-200 pb-3">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2.5 sm:gap-4 relative z-10 border-b border-slate-200 pb-2.5 sm:pb-3">
               {/* Gold Medal Badge */}
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-amber-300 via-amber-500 to-amber-600 p-0.5 shadow-md flex items-center justify-center">
-                  <div className="w-full h-full rounded-full bg-[#15304C] border-2 border-amber-300 flex flex-col items-center justify-center text-center p-1">
-                    <span className="text-[7px] text-amber-300 font-extrabold uppercase tracking-widest leading-none">
+              <div className="flex items-center space-x-2.5 sm:space-x-3">
+                <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-amber-300 via-amber-500 to-amber-600 p-0.5 shadow-md flex items-center justify-center shrink-0">
+                  <div className="w-full h-full rounded-full bg-[#15304C] border border-amber-300 sm:border-2 flex flex-col items-center justify-center text-center p-0.5 sm:p-1">
+                    <span className="text-[6px] sm:text-[7px] text-amber-300 font-extrabold uppercase tracking-widest leading-none">
                       CERTIFIED
                     </span>
-                    <span className="text-[9px] text-white font-black leading-none my-0.5">
+                    <span className="text-[7.5px] sm:text-[9px] text-white font-black leading-none my-0.5">
                       COURSE
                     </span>
-                    <span className="text-[6px] text-amber-200 uppercase tracking-tighter leading-none">
+                    <span className="text-[5.5px] sm:text-[6px] text-amber-200 uppercase tracking-tighter leading-none">
                       PROGRAM
                     </span>
                   </div>
                 </div>
                 <div>
-                  <span className="text-[10px] font-mono font-bold text-slate-500 block">
+                  <span className="text-[9px] sm:text-[10px] font-mono font-bold text-slate-500 block truncate">
                     www.caddeskindia.com
                   </span>
-                  <span className="text-[9px] text-emerald-600 font-bold uppercase tracking-wider bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                  <span className="text-[8px] sm:text-[9px] text-emerald-600 font-bold uppercase tracking-wider bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 inline-block">
                     ISO 9001:2015 ACCREDITED
                   </span>
                 </div>
               </div>
 
               {/* Title */}
-              <div className="text-right">
-                <h3 className="text-xl sm:text-2xl font-serif font-black text-slate-900 tracking-wider uppercase leading-none">
+              <div className="text-left sm:text-right">
+                <h3 className="text-base sm:text-xl lg:text-2xl font-serif font-black text-slate-900 tracking-wide sm:tracking-wider uppercase leading-none break-words">
                   CERTIFICATE
                 </h3>
-                <span className="text-[10px] sm:text-xs font-serif italic text-slate-500 tracking-widest uppercase block mt-0.5">
+                <span className="text-[8.5px] sm:text-xs font-serif italic text-slate-500 tracking-widest uppercase block mt-0.5">
                   OF COMPLETION
                 </span>
               </div>
             </div>
 
             {/* Certificate Body */}
-            <div className="py-4 relative z-10 space-y-3">
-              <div className="flex items-baseline justify-between">
+            <div className="py-2.5 sm:py-4 relative z-10 space-y-2.5 sm:space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1.5 sm:gap-4">
                 <div>
-                  <span className="text-base sm:text-lg font-serif italic font-bold text-slate-800">
+                  <span className="text-sm sm:text-lg font-serif italic font-bold text-slate-800">
                     Congratulations !
                   </span>
-                  <p className="text-[9.5px] sm:text-[10px] text-slate-500 leading-tight max-w-[280px] sm:max-w-[340px] mt-0.5">
-                    The Course you have completed, was designed to meet your learning needs with professional instructors, relevant content, authorized courseware and ongoing evaluation by PTTS.
+                  <p className="text-[8.5px] sm:text-[10px] text-slate-500 leading-relaxed max-w-full sm:max-w-[340px] mt-0.5">
+                    The Course you have completed was designed to meet industrial standards with professional instructors, relevant content, authorized courseware and continuous evaluations.
                   </p>
                 </div>
-                <div className="text-right">
-                  <span className="text-sm sm:text-base font-serif italic font-bold text-slate-900 underline decoration-slate-400 underline-offset-4">
+                <div className="text-left sm:text-right mt-1 sm:mt-0">
+                  <span className="text-xs sm:text-base font-serif italic font-bold text-slate-900 underline decoration-slate-400 underline-offset-4 block truncate">
                     Rakesh Kumar Beniwal
                   </span>
-                  <span className="text-[9px] text-slate-400 block font-mono mt-0.5">
+                  <span className="text-[8px] sm:text-[9px] text-slate-400 block font-mono mt-0.5">
                     Candidate Name
                   </span>
                 </div>
               </div>
 
               {/* Certificate Metadata 2-Column Table */}
-              <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[10.5px] sm:text-xs pt-1 border-t border-slate-100">
-                <div className="space-y-1.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-x-4 sm:gap-y-2 text-[9.5px] sm:text-xs pt-1.5 border-t border-slate-100">
+                <div className="space-y-1 sm:space-y-1.5">
                   <div>
-                    <span className="text-slate-400 font-medium block text-[9.5px]">Father / Guardian Name:</span>
+                    <span className="text-slate-400 font-medium block text-[8.5px] sm:text-[9.5px]">Father / Guardian Name:</span>
                     <span className="font-bold text-slate-800">Ram Ji Lal Beniwal</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 font-medium block text-[9.5px]">Course Program Stream:</span>
+                    <span className="text-slate-400 font-medium block text-[8.5px] sm:text-[9.5px]">Course Program Stream:</span>
                     <span className="font-bold text-[#15304C]">{course.category || 'Civil / Mechanical Engineering'}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 font-medium block text-[9.5px]">Authorized Software Covered:</span>
+                    <span className="text-slate-400 font-medium block text-[8.5px] sm:text-[9.5px]">Authorized Software Covered:</span>
                     <span className="font-extrabold text-[#D20A0B] truncate block">{mainTool} &amp; CAD Standards</span>
                   </div>
                 </div>
 
-                <div className="space-y-1.5 text-right">
+                <div className="space-y-1 sm:space-y-1.5 text-left sm:text-right">
                   <div>
-                    <span className="text-slate-400 font-medium block text-[9.5px]">Certificate Reg. No:</span>
+                    <span className="text-slate-400 font-medium block text-[8.5px] sm:text-[9.5px]">Certificate Reg. No:</span>
                     <span className="font-mono font-bold text-slate-800">5001/00768</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 font-medium block text-[9.5px]">Course Lab Duration:</span>
+                    <span className="text-slate-400 font-medium block text-[8.5px] sm:text-[9.5px]">Course Lab Duration:</span>
                     <span className="font-bold text-slate-800">{course.duration || '8-10 Weeks (80 Hours)'}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 font-medium block text-[9.5px]">Performance Grade:</span>
+                    <span className="text-slate-400 font-medium block text-[8.5px] sm:text-[9.5px]">Performance Grade:</span>
                     <span className="font-bold text-emerald-600">Grade A+ (Distinction)</span>
                   </div>
                 </div>
               </div>
 
               {/* Training Center & Award Date */}
-              <div className="bg-slate-50 rounded-lg p-2.5 border border-slate-200 flex items-center justify-between text-[10px]">
-                <div>
+              <div className="bg-slate-50 rounded-lg p-2 sm:p-2.5 border border-slate-200 flex flex-col sm:flex-row gap-1 sm:items-center justify-between text-[9px] sm:text-[10px]">
+                <div className="truncate">
                   <span className="text-slate-500 font-medium">Authorized Training Center: </span>
                   <strong className="text-slate-900 font-bold">CAD DESK AMEERPET HYDERABAD</strong>
                 </div>
@@ -193,41 +193,41 @@ export const CourseCertificateShowcase: React.FC<CourseCertificateShowcaseProps>
             </div>
 
             {/* Bottom Row: Official Logos, Stamp, QR Code & Signature */}
-            <div className="flex items-end justify-between pt-2 border-t border-slate-200 relative z-10">
+            <div className="flex flex-wrap sm:flex-nowrap items-center sm:items-end justify-between gap-2.5 sm:gap-3 pt-2.5 border-t border-slate-200 relative z-10">
               {/* CAD DESK Official Logo & Tagline */}
               <div className="flex items-center space-x-2">
                 <img
                   src="/logo.png"
                   alt="CAD DESK"
-                  className="h-7 sm:h-8 w-auto object-contain"
+                  className="h-6 sm:h-8 w-auto object-contain"
                 />
-                <div className="border-l border-slate-300 pl-2 text-[8px] text-slate-500 leading-tight">
+                <div className="border-l border-slate-300 pl-1.5 sm:pl-2 text-[7.5px] sm:text-[8px] text-slate-500 leading-tight">
                   <span className="font-bold text-slate-700 block">CAD DESK INDIA</span>
                   <span>Registered Trademark</span>
                 </div>
               </div>
 
               {/* QR Code Validation */}
-              <div className="flex items-center space-x-2.5">
-                <div className="w-10 h-10 bg-slate-900 p-1 rounded border border-slate-700 flex items-center justify-center">
+              <div className="flex items-center space-x-2 sm:space-x-2.5 ml-auto sm:ml-0">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-slate-900 p-1 rounded border border-slate-700 flex items-center justify-center shrink-0">
                   <svg className="w-full h-full text-white" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M2 2h8v8H2V2zm2 2v4h4V4H4zm10-2h8v8h-8V2zm2 2v4h4V4h-4zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm14-2h4v2h-4v-2zm-4 0h2v4h-2v-4zm4 4h4v4h-4v-4zm-4 2h2v2h-2v-2zm-2-2h2v2h-2v-2zm0 4h2v2h-2v-2zm-4-4h2v2H8v-2zm2 2h2v2h-2v-2zm-2 2h2v2H8v-2z" />
                   </svg>
                 </div>
 
                 {/* ISO Seal */}
-                <div className="w-9 h-9 rounded-full border-2 border-amber-500 flex flex-col items-center justify-center text-[7px] font-black text-amber-700 leading-none">
+                <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full border-2 border-amber-500 flex flex-col items-center justify-center text-[6px] sm:text-[7px] font-black text-amber-700 leading-none shrink-0">
                   <span>ISO</span>
                   <span>9001</span>
                 </div>
 
                 {/* Managing Director Signature */}
-                <div className="text-center pl-2">
-                  <span className="font-serif italic font-extrabold text-sm text-slate-800 tracking-tight block">
+                <div className="text-center pl-1 sm:pl-2 shrink-0">
+                  <span className="font-serif italic font-extrabold text-xs sm:text-sm text-slate-800 tracking-tight block">
                     M.S. Beniwal
                   </span>
-                  <div className="w-20 h-px bg-slate-400 mx-auto my-0.5"></div>
-                  <span className="text-[7.5px] uppercase font-bold text-slate-500 tracking-wider block">
+                  <div className="w-16 sm:w-20 h-px bg-slate-400 mx-auto my-0.5"></div>
+                  <span className="text-[6.5px] sm:text-[7.5px] uppercase font-bold text-slate-500 tracking-wider block">
                     MANAGING DIRECTOR
                   </span>
                 </div>
@@ -236,7 +236,7 @@ export const CourseCertificateShowcase: React.FC<CourseCertificateShowcaseProps>
 
             {/* Prominent Diagonal "SAMPLE" Watermark matching exact Image 1 */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-20">
-              <span className="text-slate-400/25 font-black text-5xl sm:text-7xl lg:text-8xl tracking-[0.25em] -rotate-25 uppercase font-sans border-4 border-slate-400/20 px-6 py-2 rounded-2xl">
+              <span className="text-slate-400/20 font-black text-4xl sm:text-7xl lg:text-8xl tracking-[0.2em] sm:tracking-[0.25em] -rotate-25 uppercase font-sans border-2 sm:border-4 border-slate-400/15 px-4 sm:px-6 py-1 sm:py-2 rounded-xl sm:rounded-2xl">
                 SAMPLE
               </span>
             </div>
