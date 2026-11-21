@@ -22,7 +22,6 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
   onEnroll,
   content,
 }) => {
-  if (content?.hidden) return null;
   const [coursesList, setCoursesList] = useState<Course[]>(COURSES);
   const [searchQuery, setSearchQuery] = useState('');
   const [showAllCourses, setShowAllCourses] = useState(false);
@@ -222,6 +221,8 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
     { id: 'ppm', label: 'Project Management (PPM)' },
     { id: 'piping', label: 'Piping & Plant CAD' },
   ];
+
+  if (content?.hidden) return null;
 
   return (
     <section id="revealed-courses" className="py-14 sm:py-16 bg-[#F8FAFC] border-t border-b border-[#CBD5E1]">

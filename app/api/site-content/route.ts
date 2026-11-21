@@ -20,7 +20,14 @@ const readCachedContent = (): SiteContent => {
             ...DEFAULT_SITE_CONTENT.programs,
             ...parsed.programs,
             domains: Array.isArray(parsed.programs?.domains) && parsed.programs.domains.length > 0
-              ? parsed.programs.domains
+              ? parsed.programs.domains.map((dom: any, idx: number) => {
+                  const def = DEFAULT_SITE_CONTENT.programs.domains[idx] || DEFAULT_SITE_CONTENT.programs.domains.find((d: any) => d.id === dom.id);
+                  return {
+                    ...def,
+                    ...dom,
+                    bgImage: dom.bgImage || def?.bgImage || '',
+                  };
+                })
               : DEFAULT_SITE_CONTENT.programs.domains,
           },
           catalog: { ...DEFAULT_SITE_CONTENT.catalog, ...parsed.catalog },
@@ -65,7 +72,14 @@ export async function GET() {
             ...DEFAULT_SITE_CONTENT.programs,
             ...doc.content.programs,
             domains: Array.isArray(doc.content.programs?.domains) && doc.content.programs.domains.length > 0
-              ? doc.content.programs.domains
+              ? doc.content.programs.domains.map((dom: any, idx: number) => {
+                  const def = DEFAULT_SITE_CONTENT.programs.domains[idx] || DEFAULT_SITE_CONTENT.programs.domains.find((d: any) => d.id === dom.id);
+                  return {
+                    ...def,
+                    ...dom,
+                    bgImage: dom.bgImage || def?.bgImage || '',
+                  };
+                })
               : DEFAULT_SITE_CONTENT.programs.domains,
           },
           catalog: { ...DEFAULT_SITE_CONTENT.catalog, ...doc.content.catalog },

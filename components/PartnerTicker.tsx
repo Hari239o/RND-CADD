@@ -14,7 +14,6 @@ interface PartnerTickerProps {
 }
 
 export const PartnerTicker: React.FC<PartnerTickerProps> = ({ content }) => {
-  if (content?.hidden) return null;
   const [connectedCandidate, setConnectedCandidate] = useState<string | null>(null);
 
   // ROW 1: Colorful Real Company & Tech Giants (Scrolling Right-to-Left)
@@ -300,6 +299,8 @@ export const PartnerTicker: React.FC<PartnerTickerProps> = ({ content }) => {
       ),
     },
   ];
+
+  if (content?.hidden) return null;
 
   return (
     <div className="w-full bg-white border-b border-[#E2E8F0] overflow-hidden">

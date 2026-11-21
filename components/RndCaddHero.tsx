@@ -15,7 +15,6 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
   onExploreCatalog,
   content,
 }) => {
-  if (content?.hidden) return null;
   const shouldReduceMotion = useReducedMotion();
   const heroRef = useRef<HTMLDivElement>(null);
 
@@ -57,6 +56,8 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
       el.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
+  if (content?.hidden) return null;
 
   return (
     <section

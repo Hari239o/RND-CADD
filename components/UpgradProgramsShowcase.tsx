@@ -28,7 +28,6 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
   onOpenCourseModal,
   content,
 }) => {
-  if (content?.hidden) return null;
   const [selectedFolderId, setSelectedFolderId] = useState<string>('civil');
   const [activeCourseIndex, setActiveCourseIndex] = useState<number>(0);
   const [allCourses, setAllCourses] = useState<Course[]>(COURSES);
@@ -144,7 +143,7 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
     };
   }, []);
 
-  const folders: FolderDefinition[] = [
+  const DEFAULT_FOLDERS: FolderDefinition[] = [
     {
       id: 'civil',
       name: 'CIVIL CADD',
@@ -200,6 +199,23 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
       partnerMonogram: 'P6',
     },
   ];
+
+  const folders: FolderDefinition[] = DEFAULT_FOLDERS.map((def) => {
+    const matched = content?.domains?.find(
+      (d) =>
+        d.id.toLowerCase() === def.id.toLowerCase() ||
+        (def.id === 'electrical' && d.id.toLowerCase() === 'eee') ||
+        d.name.toLowerCase().includes(def.id.toLowerCase())
+    );
+    if (!matched) return def;
+    return {
+      ...def,
+      name: matched.name || def.name,
+      headline: matched.headline || def.headline,
+      image: matched.image || def.image,
+      bgImage: matched.bgImage || def.bgImage,
+    };
+  });
 
   // Helper to retrieve courses for a given folder id
   const getFolderCourses = (folderId: string): Course[] => {
@@ -332,6 +348,8 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
       if (el) el.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
+  if (content?.hidden) return null;
 
   return (
     <section id="upgrad-showcase" className="py-8 sm:py-10 bg-[#F8FAFC] border-t border-b border-[#E2E8F0]">

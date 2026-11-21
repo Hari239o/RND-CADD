@@ -17,7 +17,6 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
   onEnrollSuccess,
   content,
 }) => {
-  if (content?.hidden) return null;
   const [coursesList, setCoursesList] = useState<Course[]>(COURSES);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -159,6 +158,8 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
       }
     }
   };
+
+  if (content?.hidden) return null;
 
   return (
     <section id="enrollment" className="py-16 sm:py-20 bg-gradient-to-b from-[#F8FAFC] to-[#F1F5F9] border-t border-slate-200">

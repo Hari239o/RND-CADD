@@ -7579,7 +7579,7 @@ export default function AdminPortalPage() {
                 <div className="flex items-center gap-2">
                   {[
                     { id: 'hero', label: '1. Hero Section', isHidden: siteContent.hero.hidden },
-                    { id: 'programs', label: '2. Domain Programs', isHidden: siteContent.programs.hidden },
+                    { id: 'programs', label: '2. Explore Programs By Domain', isHidden: siteContent.programs.hidden },
                     { id: 'catalog', label: '3. Course Catalog', isHidden: siteContent.catalog.hidden },
                     { id: 'partners', label: '4. Hiring Partners', isHidden: siteContent.partners.hidden },
                     { id: 'enrollment', label: '5. Workstation Booking', isHidden: siteContent.enrollment.hidden },
@@ -7906,7 +7906,7 @@ export default function AdminPortalPage() {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-slate-200 gap-4">
                     <div>
                       <h3 className="text-xl font-black text-[#15304C]">
-                        Engineering Programs Showcase
+                        Explore Programs By Engineering Domain (Accordion Showcase)
                       </h3>
                     </div>
 
@@ -7999,7 +7999,7 @@ export default function AdminPortalPage() {
                   {/* Domain Cards & Media */}
                   <div className="space-y-4 pt-2">
                     <h4 className="text-sm font-black text-[#15304C] uppercase tracking-wider">
-                      Engineering Domain Cards &amp; Images
+                      Engineering Domain Cards & Images (Accordion Showcase Folders)
                     </h4>
                     
                     <div className="space-y-4">
