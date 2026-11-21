@@ -134,14 +134,14 @@ export const Header: React.FC<HeaderProps> = ({
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="bg-white/95 backdrop-blur-md rounded-full border border-slate-200/90 shadow-[0_12px_36px_-6px_rgba(15,23,42,0.1),0_2px_8px_rgba(15,23,42,0.04)] px-4 sm:px-6 lg:px-8 py-2.5 sm:py-2.5 flex items-center justify-between gap-3 sm:gap-4 xl:gap-8 transition-all min-h-[66px] sm:min-h-[68px] lg:min-h-[72px]"
+            className="bg-white/95 backdrop-blur-md rounded-full border border-slate-200/90 shadow-[0_12px_36px_-6px_rgba(15,23,42,0.1),0_2px_8px_rgba(15,23,42,0.04)] px-4 sm:px-6 lg:px-8 xl:px-10 py-2 sm:py-2.5 lg:py-2.5 xl:py-3 flex items-center justify-between gap-3 sm:gap-4 xl:gap-8 transition-all min-h-[68px] sm:min-h-[72px] md:min-h-[78px] lg:min-h-[86px] xl:min-h-[94px]"
           >
-            {/* Prominent Official RND CADD Logo - Increased Size on Mobile */}
-            <Link href="/" className="flex items-center shrink-0 group py-0.5" aria-label="RND CADD Home">
+            {/* Prominent Official RND CADD Logo & Company Identity - Enlarged for Premium Impact */}
+            <Link href="/" className="flex items-center shrink-0 group py-1" aria-label="RND CADD Home">
               <img
                 src="/logo.png"
-                alt="RND CADD"
-                className="h-10 sm:h-10 md:h-11 lg:h-12 w-auto object-contain transition-transform duration-200 group-hover:scale-102 drop-shadow-xs"
+                alt="RND CADD Training Institute"
+                className="h-12 sm:h-13 md:h-15 lg:h-18 xl:h-20 w-auto object-contain transition-transform duration-200 group-hover:scale-103 drop-shadow-xs"
               />
             </Link>
 
@@ -328,13 +328,13 @@ export const Header: React.FC<HeaderProps> = ({
               <div>
                 {/* Drawer Header */}
                 <div className="flex items-center justify-between pb-4 border-b border-slate-200">
-                  <div className="flex items-center gap-2.5">
-                    <img src="/logo.png" alt="RND CADD" className="h-10 w-auto object-contain" />
+                  <div className="flex items-center gap-3">
+                    <img src="/logo.png" alt="RND CADD" className="h-12 sm:h-14 w-auto object-contain" />
                     <div>
-                      <span className="text-xs font-black text-[#15304C] uppercase tracking-wide block">
+                      <span className="text-sm sm:text-base font-black text-[#15304C] uppercase tracking-wide block leading-tight">
                         RND CADD
                       </span>
-                      <span className="text-[10px] text-slate-500 font-medium block">
+                      <span className="text-xs sm:text-sm text-slate-500 font-semibold block leading-tight mt-0.5">
                         Training Institute
                       </span>
                     </div>
