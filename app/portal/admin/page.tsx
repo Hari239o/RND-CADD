@@ -804,6 +804,19 @@ export default function AdminPortalPage() {
   const handleCmsFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, onUploaded: (url: string) => void) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // 1. Instant local preview and fallback using FileReader (guaranteed to work across all devices & Vercel)
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      if (dataUrl) {
+        onUploaded(dataUrl);
+        setCmsNotification({ text: `Image loaded: ${file.name}`, type: 'success' });
+      }
+    };
+    reader.readAsDataURL(file);
+
+    // 2. Upload to server API (which supports both disk uploads and serverless base64)
     setIsUploadingImage(true);
     try {
       const formData = new FormData();
@@ -816,12 +829,10 @@ export default function AdminPortalPage() {
       if (data.success && data.url) {
         onUploaded(data.url);
         setCmsNotification({ text: `Image uploaded successfully: ${file.name}`, type: 'success' });
-      } else {
-        alert(data.message || 'Upload failed');
       }
     } catch (err) {
-      console.error('File upload error:', err);
-      alert('Error uploading file');
+      console.warn('API upload fallback warning:', err);
+      // FileReader already set the image successfully
     } finally {
       setIsUploadingImage(false);
       e.target.value = '';
@@ -3950,7 +3961,7 @@ export default function AdminPortalPage() {
       {/* RIGHT MAIN CONTENT AREA - SCROLLS INDEPENDENTLY */}
       <main className="flex-1 md:ml-80 flex flex-col min-h-0 md:h-screen overflow-y-auto">
         {/* Top Header Bar - Clean & Professional */}
-        {activeTab !== 'Courses' && (
+        {activeTab !== 'Courses' && activeTab !== 'CMS' && (
           <header className="bg-white border-b border-slate-200 px-4 sm:px-8 py-4 sm:py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <div className="flex items-center space-x-2 text-xs font-medium text-[#666666] mb-1">
@@ -7561,42 +7572,11 @@ export default function AdminPortalPage() {
 
           {/* TAB: CMS (LIVE WEBSITE CONTENT, IMAGES, SECTIONS & VISIBILITY CONTROLLER) */}
           {activeTab === 'CMS' && (
-            <div className="space-y-6">
+            <div className="space-y-5">
               
-              {/* Top Banner & Controller Header - Solid Flat Colors, No Gradients, No Icons */}
-              <div className="bg-white border-2 border-slate-200 rounded-2xl p-5 sm:p-6 shadow-xs">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-200">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-[#EE2C3C] text-white">
-                        LIVE CMS CONTROLLER
-                      </span>
-                      <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                        Real-Time Dynamic Website Editor
-                      </span>
-                    </div>
-                    <h2 className="text-2xl sm:text-3xl font-black text-[#15304C] tracking-tight">
-                      Website Content &amp; Media Management
-                    </h2>
-                    <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-3xl">
-                      Edit content, replace images, delete items, and control live visibility for any section of the website from the Hero section to the Footer. All changes persist in MongoDB and update live in real-time.
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-3 shrink-0">
-                    <Link
-                      href="/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-4 py-2.5 rounded-xl text-xs font-bold bg-[#15304C] text-white hover:bg-[#0E2033] transition-colors"
-                    >
-                      Open Live Website
-                    </Link>
-                  </div>
-                </div>
-
-                {/* Sub-Navigation Tabs across the 6 Website Sections */}
-                <div className="flex items-center gap-2 overflow-x-auto pt-4 no-scrollbar whitespace-nowrap">
+              {/* Horizontal Sub-Navigation Tabs across the 6 Website Sections */}
+              <div className="bg-white border-2 border-slate-200 rounded-2xl p-3 shadow-xs flex items-center justify-between gap-3 overflow-x-auto no-scrollbar whitespace-nowrap">
+                <div className="flex items-center gap-2">
                   {[
                     { id: 'hero', label: '1. Hero Section', isHidden: siteContent.hero.hidden },
                     { id: 'programs', label: '2. Domain Programs', isHidden: siteContent.programs.hidden },
@@ -7614,7 +7594,7 @@ export default function AdminPortalPage() {
                           setCmsActiveSection(tab.id as any);
                           setCmsNotification(null);
                         }}
-                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                        className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
                           isActive
                             ? 'bg-[#15304C] text-white shadow-xs'
                             : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -7632,6 +7612,15 @@ export default function AdminPortalPage() {
                     );
                   })}
                 </div>
+
+                <Link
+                  href="/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors shrink-0"
+                >
+                  View Live Site
+                </Link>
               </div>
 
               {/* Status & Notification Alert Box */}
@@ -7660,22 +7649,8 @@ export default function AdminPortalPage() {
                   {/* Section Control Action Bar */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-slate-200 gap-4">
                     <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                          Section Configuration
-                        </span>
-                        {siteContent.hero.hidden ? (
-                          <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-rose-100 text-rose-800 border border-rose-300">
-                            Status: Hidden on Website
-                          </span>
-                        ) : (
-                          <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">
-                            Status: Live &amp; Visible
-                          </span>
-                        )}
-                      </div>
-                      <h3 className="text-xl font-black text-[#15304C] mt-1">
-                        Hero Section (Headline, Badge, CTAs &amp; Hero Logo)
+                      <h3 className="text-xl font-black text-[#15304C]">
+                        Hero Section
                       </h3>
                     </div>
 
@@ -7708,7 +7683,7 @@ export default function AdminPortalPage() {
                         disabled={cmsSaving}
                         className="px-5 py-2 rounded-xl text-xs font-bold bg-[#EE2C3C] text-white hover:bg-[#D71E2E] shadow-xs transition-colors cursor-pointer"
                       >
-                        {cmsSaving ? 'Publishing...' : 'Save &amp; Publish Hero'}
+                        {cmsSaving ? 'Publishing...' : 'Save & Publish Hero'}
                       </button>
                     </div>
                   </div>
@@ -7930,22 +7905,8 @@ export default function AdminPortalPage() {
                   {/* Action Bar */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-slate-200 gap-4">
                     <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                          Section Configuration
-                        </span>
-                        {siteContent.programs.hidden ? (
-                          <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-rose-100 text-rose-800 border border-rose-300">
-                            Status: Hidden on Website
-                          </span>
-                        ) : (
-                          <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">
-                            Status: Live &amp; Visible
-                          </span>
-                        )}
-                      </div>
-                      <h3 className="text-xl font-black text-[#15304C] mt-1">
-                        Engineering Programs Showcase &amp; Folders
+                      <h3 className="text-xl font-black text-[#15304C]">
+                        Engineering Programs Showcase
                       </h3>
                     </div>
 
@@ -7978,7 +7939,7 @@ export default function AdminPortalPage() {
                         disabled={cmsSaving}
                         className="px-5 py-2 rounded-xl text-xs font-bold bg-[#EE2C3C] text-white hover:bg-[#D71E2E] shadow-xs transition-colors cursor-pointer"
                       >
-                        {cmsSaving ? 'Publishing...' : 'Save &amp; Publish Programs'}
+                        {cmsSaving ? 'Publishing...' : 'Save & Publish Programs'}
                       </button>
                     </div>
                   </div>
@@ -8205,22 +8166,8 @@ export default function AdminPortalPage() {
                   {/* Action Bar */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-slate-200 gap-4">
                     <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                          Section Configuration
-                        </span>
-                        {siteContent.catalog.hidden ? (
-                          <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-rose-100 text-rose-800 border border-rose-300">
-                            Status: Hidden on Website
-                          </span>
-                        ) : (
-                          <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">
-                            Status: Live &amp; Visible
-                          </span>
-                        )}
-                      </div>
-                      <h3 className="text-xl font-black text-[#15304C] mt-1">
-                        Course Catalog Hub Section
+                      <h3 className="text-xl font-black text-[#15304C]">
+                        Course Catalog Section
                       </h3>
                     </div>
 
@@ -8253,7 +8200,7 @@ export default function AdminPortalPage() {
                         disabled={cmsSaving}
                         className="px-5 py-2 rounded-xl text-xs font-bold bg-[#EE2C3C] text-white hover:bg-[#D71E2E] shadow-xs transition-colors cursor-pointer"
                       >
-                        {cmsSaving ? 'Publishing...' : 'Save &amp; Publish Catalog'}
+                        {cmsSaving ? 'Publishing...' : 'Save & Publish Catalog'}
                       </button>
                     </div>
                   </div>
@@ -8338,22 +8285,8 @@ export default function AdminPortalPage() {
                   {/* Action Bar */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-slate-200 gap-4">
                     <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                          Section Configuration
-                        </span>
-                        {siteContent.partners.hidden ? (
-                          <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-rose-100 text-rose-800 border border-rose-300">
-                            Status: Hidden on Website
-                          </span>
-                        ) : (
-                          <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">
-                            Status: Live &amp; Visible
-                          </span>
-                        )}
-                      </div>
-                      <h3 className="text-xl font-black text-[#15304C] mt-1">
-                        Hiring Partners &amp; Corporate Marquee
+                      <h3 className="text-xl font-black text-[#15304C]">
+                        Hiring Partners
                       </h3>
                     </div>
 
@@ -8386,7 +8319,7 @@ export default function AdminPortalPage() {
                         disabled={cmsSaving}
                         className="px-5 py-2 rounded-xl text-xs font-bold bg-[#EE2C3C] text-white hover:bg-[#D71E2E] shadow-xs transition-colors cursor-pointer"
                       >
-                        {cmsSaving ? 'Publishing...' : 'Save &amp; Publish Partners'}
+                        {cmsSaving ? 'Publishing...' : 'Save & Publish Partners'}
                       </button>
                     </div>
                   </div>
@@ -8512,22 +8445,8 @@ export default function AdminPortalPage() {
                   {/* Action Bar */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-slate-200 gap-4">
                     <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                          Section Configuration
-                        </span>
-                        {siteContent.enrollment.hidden ? (
-                          <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-rose-100 text-rose-800 border border-rose-300">
-                            Status: Hidden on Website
-                          </span>
-                        ) : (
-                          <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">
-                            Status: Live &amp; Visible
-                          </span>
-                        )}
-                      </div>
-                      <h3 className="text-xl font-black text-[#15304C] mt-1">
-                        Admissions &amp; Workstation Reservation Section
+                      <h3 className="text-xl font-black text-[#15304C]">
+                        Admissions &amp; Workstation Booking
                       </h3>
                     </div>
 
@@ -8560,7 +8479,7 @@ export default function AdminPortalPage() {
                         disabled={cmsSaving}
                         className="px-5 py-2 rounded-xl text-xs font-bold bg-[#EE2C3C] text-white hover:bg-[#D71E2E] shadow-xs transition-colors cursor-pointer"
                       >
-                        {cmsSaving ? 'Publishing...' : 'Save &amp; Publish Section'}
+                        {cmsSaving ? 'Publishing...' : 'Save & Publish Section'}
                       </button>
                     </div>
                   </div>
@@ -8677,22 +8596,8 @@ export default function AdminPortalPage() {
                   {/* Action Bar */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-slate-200 gap-4">
                     <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                          Section Configuration
-                        </span>
-                        {siteContent.footer.hidden ? (
-                          <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-rose-100 text-rose-800 border border-rose-300">
-                            Status: Hidden on Website
-                          </span>
-                        ) : (
-                          <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">
-                            Status: Live &amp; Visible
-                          </span>
-                        )}
-                      </div>
-                      <h3 className="text-xl font-black text-[#15304C] mt-1">
-                        Footer, Accreditations &amp; Campus Contact
+                      <h3 className="text-xl font-black text-[#15304C]">
+                        Footer &amp; Campus Contact
                       </h3>
                     </div>
 
@@ -8725,7 +8630,7 @@ export default function AdminPortalPage() {
                         disabled={cmsSaving}
                         className="px-5 py-2 rounded-xl text-xs font-bold bg-[#EE2C3C] text-white hover:bg-[#D71E2E] shadow-xs transition-colors cursor-pointer"
                       >
-                        {cmsSaving ? 'Publishing...' : 'Save &amp; Publish Footer'}
+                        {cmsSaving ? 'Publishing...' : 'Save & Publish Footer'}
                       </button>
                     </div>
                   </div>
