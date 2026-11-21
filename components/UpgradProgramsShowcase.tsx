@@ -3,11 +3,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { Course } from '@/lib/courses-data';
 import { COURSES } from '@/lib/courses-data';
+import type { ProgramsSectionContent } from '@/lib/site-content';
 
 interface UpgradProgramsShowcaseProps {
   activeStream: string;
   onSelectStream: (stream: string) => void;
   onOpenCourseModal?: (course: Course) => void;
+  content?: ProgramsSectionContent;
 }
 
 interface FolderDefinition {
@@ -24,7 +26,9 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
   activeStream,
   onSelectStream,
   onOpenCourseModal,
+  content,
 }) => {
+  if (content?.hidden) return null;
   const [selectedFolderId, setSelectedFolderId] = useState<string>('civil');
   const [activeCourseIndex, setActiveCourseIndex] = useState<number>(0);
   const [allCourses, setAllCourses] = useState<Course[]>(COURSES);
@@ -337,11 +341,16 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
         {/* Section Header */}
         <div className="mb-4 sm:mb-5 pb-3 border-b border-slate-200">
           <span className="text-[11px] font-bold text-[#EE2C3C] tracking-wider uppercase">
-            Global Certified Programs
+            {content?.badge || 'Global Certified Programs'}
           </span>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight mt-0.5">
-            Explore Programs By Engineering Domain
+            {content?.heading || 'Explore Programs By Engineering Domain'}
           </h2>
+          {content?.subheading && (
+            <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1">
+              {content.subheading}
+            </p>
+          )}
         </div>
 
         {/* MOBILE & TABLET SWIPEABLE DOMAIN SELECTOR (< lg) */}

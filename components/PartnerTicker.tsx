@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import type { PartnersSectionContent } from '@/lib/site-content';
 
 interface PartnerLogo {
   name: string;
@@ -8,7 +9,12 @@ interface PartnerLogo {
   renderLogo: () => React.ReactNode;
 }
 
-export const PartnerTicker: React.FC = () => {
+interface PartnerTickerProps {
+  content?: PartnersSectionContent;
+}
+
+export const PartnerTicker: React.FC<PartnerTickerProps> = ({ content }) => {
+  if (content?.hidden) return null;
   const [connectedCandidate, setConnectedCandidate] = useState<string | null>(null);
 
   // ROW 1: Colorful Real Company & Tech Giants (Scrolling Right-to-Left)
@@ -305,11 +311,16 @@ export const PartnerTicker: React.FC = () => {
         <div className="cad-container">
           <div className="text-center mb-8">
             <span className="text-xs font-bold text-[#D20A0B] tracking-wider uppercase bg-red-50 px-3 py-1 rounded-full border border-red-100">
-              GLOBAL CORPORATE RECRUITMENT NETWORK
+              {content?.badge || 'GLOBAL CORPORATE RECRUITMENT NETWORK'}
             </span>
             <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-2">
-              Great Universities, Top Global Firms
+              {content?.heading || 'Great Universities, Top Global Firms'}
             </h3>
+            {content?.subheading && (
+              <p className="text-xs sm:text-sm text-slate-500 mt-2 max-w-xl mx-auto">
+                {content.subheading}
+              </p>
+            )}
           </div>
         </div>
 

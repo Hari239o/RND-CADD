@@ -2,16 +2,20 @@
 
 import React, { useRef } from 'react';
 import { motion, useMotionValue, useSpring, useTransform, useReducedMotion } from 'framer-motion';
+import type { HeroSectionContent } from '@/lib/site-content';
 
 interface RndCaddHeroProps {
   onSelectStream: (stream: any) => void;
   onExploreCatalog: () => void;
+  content?: HeroSectionContent;
 }
 
 export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
   onSelectStream,
   onExploreCatalog,
+  content,
 }) => {
+  if (content?.hidden) return null;
   const shouldReduceMotion = useReducedMotion();
   const heroRef = useRef<HTMLDivElement>(null);
 
@@ -88,7 +92,7 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
               <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#D20A0B] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
               </svg>
-              <span className="truncate">Industry 4.0 CAD &amp; BIM Academy</span>
+              <span className="truncate">{content?.badge || 'Industry 4.0 CAD & BIM Academy'}</span>
             </motion.div>
 
             {/* Headline with Decreased, Balanced Font Size */}
@@ -98,8 +102,8 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
               transition={{ duration: 0.4, delay: 0.05, ease: 'easeOut' }}
               className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#15304C] tracking-tight leading-[1.14]"
             >
-              Master Industrial CAD. <br />
-              <span className="text-[#D20A0B]">Build Your Future.</span>
+              {content?.title || 'Master Industrial CAD.'} <br />
+              <span className="text-[#D20A0B]">{content?.highlight || 'Build Your Future.'}</span>
             </motion.h1>
 
             {/* Action CTAs - Responsive Side-by-Side on Mobile */}
@@ -111,20 +115,34 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
             >
               <button
                 type="button"
-                onClick={scrollToExperience}
+                onClick={() => {
+                  const link = content?.primaryCtaLink || '#revealed-courses';
+                  if (link.startsWith('#')) {
+                    const el = document.getElementById(link.slice(1));
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    else scrollToExperience();
+                  } else {
+                    window.location.href = link;
+                  }
+                }}
                 className="flex-1 sm:flex-initial px-4 sm:px-8 py-2.5 sm:py-3.5 bg-[#D20A0B] hover:bg-[#B50809] text-white text-xs sm:text-sm font-bold rounded-xl transition-all duration-150 shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 cursor-pointer text-center whitespace-nowrap"
               >
-                Explore Programs
+                {content?.primaryCtaText || 'Explore Programs'}
               </button>
               <button
                 type="button"
                 onClick={() => {
-                  const el = document.getElementById('enrollment');
-                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  const link = content?.secondaryCtaLink || '#enrollment';
+                  if (link.startsWith('#')) {
+                    const el = document.getElementById(link.slice(1));
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  } else {
+                    window.location.href = link;
+                  }
                 }}
                 className="flex-1 sm:flex-initial px-4 sm:px-8 py-2.5 sm:py-3.5 bg-white hover:bg-slate-50 border border-slate-300 hover:border-slate-400 text-[#15304C] text-xs sm:text-sm font-bold rounded-xl transition-all duration-150 shadow-2xs hover:shadow-xs cursor-pointer text-center whitespace-nowrap"
               >
-                Reserve Workstation
+                {content?.secondaryCtaText || 'Reserve Workstation'}
               </button>
             </motion.div>
           </div>
@@ -157,7 +175,7 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
               className="relative flex items-center justify-center will-change-transform cursor-pointer max-w-full"
             >
               <img
-                src="/logo_mark.png"
+                src={content?.heroImage || '/logo_mark.png'}
                 onError={(e: any) => {
                   e.currentTarget.src = '/logo.png';
                 }}

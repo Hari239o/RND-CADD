@@ -5,12 +5,14 @@ import { motion } from 'framer-motion';
 import type { Course } from '@/lib/courses-data';
 import { COURSES } from '@/lib/courses-data';
 import { CourseCard } from './CourseCard';
+import type { CatalogSectionContent } from '@/lib/site-content';
 
 interface DisciplineCourseHubProps {
   activeStream: string;
   onSelectStream: (stream: string) => void;
   onOpenCourseModal: (course: Course) => void;
   onEnroll?: (course: Course) => void;
+  content?: CatalogSectionContent;
 }
 
 export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
@@ -18,7 +20,9 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
   onSelectStream,
   onOpenCourseModal,
   onEnroll,
+  content,
 }) => {
+  if (content?.hidden) return null;
   const [coursesList, setCoursesList] = useState<Course[]>(COURSES);
   const [searchQuery, setSearchQuery] = useState('');
   const [showAllCourses, setShowAllCourses] = useState(false);
@@ -226,11 +230,16 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
         <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-8 pb-5 border-b border-[#CBD5E1] gap-6">
           <div>
             <div className="text-xs font-bold text-[#D20A0B] mb-2 tracking-wider uppercase">
-              INDUSTRY-CERTIFIED COURSE CATALOG
+              {content?.badge || 'INDUSTRY-CERTIFIED COURSE CATALOG'}
             </div>
             <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-[#15304C] uppercase">
               {getStreamTitle()}
             </h2>
+            {content?.subheading && (
+              <p className="text-xs text-slate-500 mt-1 max-w-xl">
+                {content.subheading}
+              </p>
+            )}
           </div>
 
           {/* Software Search Bar */}

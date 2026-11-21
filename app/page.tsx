@@ -12,6 +12,7 @@ import { CourseModal } from '@/components/CourseModal';
 import { EnquiryModal, FloatingEnquiryButton } from '@/components/EnquiryModal';
 import { ScrollToTopProgress } from '@/components/ScrollToTopProgress';
 import { Footer } from '@/components/Footer';
+import { DEFAULT_SITE_CONTENT, type SiteContent } from '@/lib/site-content';
 
 export default function HomePage() {
   const [activeStream, setActiveStream] = useState<string>('all');
@@ -21,6 +22,57 @@ export default function HomePage() {
   const [studentStream, setStudentStream] = useState<string>('');
   const [isEnquiryModalOpen, setIsEnquiryModalOpen] = useState<boolean>(false);
   const [enquiryInitialCourse, setEnquiryInitialCourse] = useState<string>('');
+  const [siteContent, setSiteContent] = useState<SiteContent>(DEFAULT_SITE_CONTENT);
+
+  // Fetch live dynamic site content
+  useEffect(() => {
+    // 1. Instant cache from localStorage
+    try {
+      if (typeof window !== 'undefined') {
+        const cached = localStorage.getItem('rnd_cadd_site_content');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed && typeof parsed === 'object') {
+            setSiteContent((prev) => ({ ...prev, ...parsed }));
+          }
+        }
+      }
+    } catch {}
+
+    // 2. Fetch fresh from server API
+    const fetchContent = async () => {
+      try {
+        const res = await fetch('/api/site-content');
+        const data = await res.json();
+        if (data.success && data.content) {
+          setSiteContent(data.content);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('rnd_cadd_site_content', JSON.stringify(data.content));
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching site content:', err);
+      }
+    };
+
+    fetchContent();
+
+    const handleContentUpdate = (e: any) => {
+      if (e.detail?.content) {
+        setSiteContent(e.detail.content);
+      } else {
+        fetchContent();
+      }
+    };
+
+    window.addEventListener('rnd_cadd_site_content_updated', handleContentUpdate);
+    window.addEventListener('storage', handleContentUpdate);
+
+    return () => {
+      window.removeEventListener('rnd_cadd_site_content_updated', handleContentUpdate);
+      window.removeEventListener('storage', handleContentUpdate);
+    };
+  }, []);
 
   useEffect(() => {
     const handleGlobalOpenEnquiry = (e: any) => {
@@ -124,12 +176,14 @@ export default function HomePage() {
       <main>
         {/* Stage 1: Official Hero (Title Reveal & Welcome) */}
         <RndCaddHero
+          content={siteContent.hero}
           onSelectStream={(stream) => handleSelectStream(stream)}
           onExploreCatalog={() => handleSelectStream('all')}
         />
 
         {/* Stage 2: upGrad Programs Showcase (Exact Image 2: Vertical Folder Strips, Counter & Folder Courses) */}
         <UpgradProgramsShowcase
+          content={siteContent.programs}
           activeStream={activeStream}
           onSelectStream={(stream) => setActiveStream(stream)}
           onOpenCourseModal={(course) => setSelectedCourse(course)}
@@ -137,6 +191,7 @@ export default function HomePage() {
 
         {/* Stage 4: Revealed Course Catalog with Dedicated High-Res Course Imagery */}
         <DisciplineCourseHub
+          content={siteContent.catalog}
           activeStream={activeStream}
           onSelectStream={setActiveStream}
           onOpenCourseModal={(course) => setSelectedCourse(course)}
@@ -144,10 +199,11 @@ export default function HomePage() {
         />
 
         {/* Top Hiring EPC Partners Infinite Marquee */}
-        <PartnerTicker />
+        <PartnerTicker content={siteContent.partners} />
 
         {/* Stage 6: Admissions & Workstation Reservation (Students Enroll in Course) */}
         <EnrollmentSection
+          content={siteContent.enrollment}
           preselectedCourse={enrollCourseTitle}
           onEnrollSuccess={handleEnrollSuccess}
         />
@@ -180,6 +236,7 @@ export default function HomePage() {
 
       {/* Footer */}
       <Footer
+        content={siteContent.footer}
         onSelectStream={handleSelectStream}
         onOpenEnrollModal={() => setIsEnquiryModalOpen(true)}
       />

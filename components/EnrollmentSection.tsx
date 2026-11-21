@@ -4,16 +4,20 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { COURSES } from '@/lib/courses-data';
 import type { Course } from '@/lib/courses-data';
+import type { EnrollmentSectionContent } from '@/lib/site-content';
 
 interface EnrollmentSectionProps {
   preselectedCourse?: string;
   onEnrollSuccess?: (courseTitle: string) => void;
+  content?: EnrollmentSectionContent;
 }
 
 export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
   preselectedCourse,
   onEnrollSuccess,
+  content,
 }) => {
+  if (content?.hidden) return null;
   const [coursesList, setCoursesList] = useState<Course[]>(COURSES);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -164,11 +168,16 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
         <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-red-50 text-[#EE2C3C] border border-red-200 mb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-[#EE2C3C] animate-pulse" />
-            Admissions Open • Batch 2026
+            {content?.badge || 'Admissions Open • Batch 2026'}
           </span>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Reserve Your CAD Workstation Seat
+            {content?.heading || 'Reserve Your CAD Workstation Seat'}
           </h2>
+          {content?.subheading && (
+            <p className="text-xs sm:text-sm text-slate-600 mt-2">
+              {content.subheading}
+            </p>
+          )}
         </div>
 
         {/* 2-Column Responsive Card Grid */}

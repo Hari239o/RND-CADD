@@ -5,6 +5,17 @@ import Link from 'next/link';
 import type { JobPost, JobApplicant } from '@/lib/jobs-data';
 import { INITIAL_JOBS } from '@/lib/jobs-data';
 import { COURSES } from '@/lib/courses-data';
+import {
+  DEFAULT_SITE_CONTENT,
+  type SiteContent,
+  type HeroSectionContent,
+  type ProgramsSectionContent,
+  type CatalogSectionContent,
+  type PartnersSectionContent,
+  type EnrollmentSectionContent,
+  type FooterSectionContent,
+  type ProgramDomainItem,
+} from '@/lib/site-content';
 
 interface StudentRecord {
   id: string;
@@ -651,6 +662,171 @@ export default function AdminPortalPage() {
   // Navigation State - Tab 01 "Student", Tab 02 "Courses" directly below
   const [activeTab, setActiveTab] = useState<string>('Student');
   const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false);
+
+  // Website CMS Live Editor State
+  const [siteContent, setSiteContent] = useState<SiteContent>(DEFAULT_SITE_CONTENT);
+  const [cmsActiveSection, setCmsActiveSection] = useState<'hero' | 'programs' | 'catalog' | 'partners' | 'enrollment' | 'footer'>('hero');
+  const [cmsSaving, setCmsSaving] = useState<boolean>(false);
+  const [cmsNotification, setCmsNotification] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState<boolean>(false);
+  const [newPartnerName, setNewPartnerName] = useState<string>('');
+  const [newAccreditationName, setNewAccreditationName] = useState<string>('');
+
+  // Load live site content
+  const loadSiteContent = async () => {
+    try {
+      if (typeof window !== 'undefined') {
+        const cached = localStorage.getItem('rnd_cadd_site_content');
+        if (cached) {
+          try {
+            const parsed = JSON.parse(cached);
+            if (parsed && typeof parsed === 'object') {
+              setSiteContent((prev) => ({ ...prev, ...parsed }));
+            }
+          } catch {}
+        }
+      }
+      const res = await fetch('/api/site-content');
+      const data = await res.json();
+      if (data.success && data.content) {
+        setSiteContent(data.content);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('rnd_cadd_site_content', JSON.stringify(data.content));
+        }
+      }
+    } catch (e) {
+      console.error('Failed to load site content:', e);
+    }
+  };
+
+  useEffect(() => {
+    loadSiteContent();
+  }, []);
+
+  const handleSaveCmsSection = async (sectionKey: 'hero' | 'programs' | 'catalog' | 'partners' | 'enrollment' | 'footer') => {
+    setCmsSaving(true);
+    setCmsNotification(null);
+    try {
+      const sectionData = siteContent[sectionKey];
+      const res = await fetch('/api/site-content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'update_section',
+          section: sectionKey,
+          data: sectionData,
+        }),
+      });
+      const result = await res.json();
+      if (result.success && result.content) {
+        setSiteContent(result.content);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('rnd_cadd_site_content', JSON.stringify(result.content));
+          window.dispatchEvent(new CustomEvent('rnd_cadd_site_content_updated', { detail: { content: result.content } }));
+        }
+        setCmsNotification({ text: `Section "${sectionKey.toUpperCase()}" published to live website successfully.`, type: 'success' });
+      } else {
+        setCmsNotification({ text: result.message || 'Failed to update section', type: 'error' });
+      }
+    } catch (err: any) {
+      setCmsNotification({ text: err.message || 'Error saving changes', type: 'error' });
+    } finally {
+      setCmsSaving(false);
+    }
+  };
+
+  const handleToggleSectionVisibility = async (sectionKey: 'hero' | 'programs' | 'catalog' | 'partners' | 'enrollment' | 'footer') => {
+    setCmsSaving(true);
+    setCmsNotification(null);
+    try {
+      const currentHidden = !!siteContent[sectionKey]?.hidden;
+      const res = await fetch('/api/site-content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'toggle_visibility',
+          section: sectionKey,
+          hidden: !currentHidden,
+        }),
+      });
+      const result = await res.json();
+      if (result.success && result.content) {
+        setSiteContent(result.content);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('rnd_cadd_site_content', JSON.stringify(result.content));
+          window.dispatchEvent(new CustomEvent('rnd_cadd_site_content_updated', { detail: { content: result.content } }));
+        }
+        const stateWord = !currentHidden ? 'HIDDEN' : 'VISIBLE';
+        setCmsNotification({ text: `Section "${sectionKey.toUpperCase()}" is now ${stateWord} on the live website.`, type: 'success' });
+      } else {
+        setCmsNotification({ text: result.message || 'Failed to toggle visibility', type: 'error' });
+      }
+    } catch (err: any) {
+      setCmsNotification({ text: err.message || 'Error toggling visibility', type: 'error' });
+    } finally {
+      setCmsSaving(false);
+    }
+  };
+
+  const handleResetCmsSection = async (sectionKey: 'hero' | 'programs' | 'catalog' | 'partners' | 'enrollment' | 'footer') => {
+    if (!confirm(`Are you sure you want to reset "${sectionKey.toUpperCase()}" back to default content? All custom edits will be reverted.`)) {
+      return;
+    }
+    setCmsSaving(true);
+    setCmsNotification(null);
+    try {
+      const res = await fetch('/api/site-content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'reset_section',
+          section: sectionKey,
+        }),
+      });
+      const result = await res.json();
+      if (result.success && result.content) {
+        setSiteContent(result.content);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('rnd_cadd_site_content', JSON.stringify(result.content));
+          window.dispatchEvent(new CustomEvent('rnd_cadd_site_content_updated', { detail: { content: result.content } }));
+        }
+        setCmsNotification({ text: `Section "${sectionKey.toUpperCase()}" reset to defaults successfully.`, type: 'success' });
+      } else {
+        setCmsNotification({ text: result.message || 'Failed to reset section', type: 'error' });
+      }
+    } catch (err: any) {
+      setCmsNotification({ text: err.message || 'Error resetting section', type: 'error' });
+    } finally {
+      setCmsSaving(false);
+    }
+  };
+
+  const handleCmsFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, onUploaded: (url: string) => void) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.success && data.url) {
+        onUploaded(data.url);
+        setCmsNotification({ text: `Image uploaded successfully: ${file.name}`, type: 'success' });
+      } else {
+        alert(data.message || 'Upload failed');
+      }
+    } catch (err) {
+      console.error('File upload error:', err);
+      alert('Error uploading file');
+    } finally {
+      setIsUploadingImage(false);
+      e.target.value = '';
+    }
+  };
 
   const [adminUser, setAdminUser] = useState({
     name: 'Hari Kishore Reddy',
@@ -3430,6 +3606,15 @@ export default function AdminPortalPage() {
         </svg>
       ),
     },
+    {
+      id: 'CMS',
+      label: 'Website CMS',
+      icon: (
+        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-.778.099-1.533.284-2.253" />
+        </svg>
+      ),
+    },
   ];
 
   // Filter students dynamically
@@ -3738,6 +3923,13 @@ export default function AdminPortalPage() {
                       {adminReviews.length}
                     </span>
                   )}
+                  {item.id === 'CMS' && (
+                    <span className={`text-[10px] font-mono px-2 py-0.5 rounded-md font-black tracking-wider uppercase ${
+                      isActive ? 'bg-[#FFFFFF]/20 text-[#FFFFFF]' : 'bg-[#EE2C3C] text-white'
+                    }`}>
+                      LIVE
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -3767,7 +3959,7 @@ export default function AdminPortalPage() {
                 <span className="text-[#131313] font-semibold">{activeTab}</span>
               </div>
               <h1 className="text-xl sm:text-2xl font-bold text-[#131313] tracking-tight">
-                {activeTab} Management
+                {activeTab === 'CMS' ? 'Website CMS & Live Editor' : `${activeTab} Management`}
               </h1>
             </div>
 
@@ -7347,23 +7539,1421 @@ export default function AdminPortalPage() {
                                     Edit
                                   </button>
 
-                                  <button
-                                    type="button"
-                                    onClick={() => handleDeleteLiveSession(session.id)}
-                                    className="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-rose-500 hover:bg-rose-50 transition-all cursor-pointer"
-                                  >
-                                    Delete
-                                  </button>
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        });
-                      })()}
-                    </tbody>
-                  </table>
+                                   <button
+                                     type="button"
+                                     onClick={() => handleDeleteLiveSession(session.id)}
+                                     className="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-rose-500 hover:bg-rose-50 transition-all cursor-pointer"
+                                   >
+                                     Delete
+                                   </button>
+                                 </div>
+                               </td>
+                             </tr>
+                           );
+                         });
+                       })()}
+                     </tbody>
+                   </table>
+                 </div>
+               </div>
+             </div>
+           )}
+
+          {/* TAB: CMS (LIVE WEBSITE CONTENT, IMAGES, SECTIONS & VISIBILITY CONTROLLER) */}
+          {activeTab === 'CMS' && (
+            <div className="space-y-6">
+              
+              {/* Top Banner & Controller Header - Solid Flat Colors, No Gradients, No Icons */}
+              <div className="bg-white border-2 border-slate-200 rounded-2xl p-5 sm:p-6 shadow-xs">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-200">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-[#EE2C3C] text-white">
+                        LIVE CMS CONTROLLER
+                      </span>
+                      <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                        Real-Time Dynamic Website Editor
+                      </span>
+                    </div>
+                    <h2 className="text-2xl sm:text-3xl font-black text-[#15304C] tracking-tight">
+                      Website Content &amp; Media Management
+                    </h2>
+                    <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-3xl">
+                      Edit content, replace images, delete items, and control live visibility for any section of the website from the Hero section to the Footer. All changes persist in MongoDB and update live in real-time.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-3 shrink-0">
+                    <Link
+                      href="/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2.5 rounded-xl text-xs font-bold bg-[#15304C] text-white hover:bg-[#0E2033] transition-colors"
+                    >
+                      Open Live Website
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Sub-Navigation Tabs across the 6 Website Sections */}
+                <div className="flex items-center gap-2 overflow-x-auto pt-4 no-scrollbar whitespace-nowrap">
+                  {[
+                    { id: 'hero', label: '1. Hero Section', isHidden: siteContent.hero.hidden },
+                    { id: 'programs', label: '2. Domain Programs', isHidden: siteContent.programs.hidden },
+                    { id: 'catalog', label: '3. Course Catalog', isHidden: siteContent.catalog.hidden },
+                    { id: 'partners', label: '4. Hiring Partners', isHidden: siteContent.partners.hidden },
+                    { id: 'enrollment', label: '5. Workstation Booking', isHidden: siteContent.enrollment.hidden },
+                    { id: 'footer', label: '6. Footer & Contact', isHidden: siteContent.footer.hidden },
+                  ].map((tab) => {
+                    const isActive = cmsActiveSection === tab.id;
+                    return (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => {
+                          setCmsActiveSection(tab.id as any);
+                          setCmsNotification(null);
+                        }}
+                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                          isActive
+                            ? 'bg-[#15304C] text-white shadow-xs'
+                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                        }`}
+                      >
+                        <span>{tab.label}</span>
+                        {tab.isHidden && (
+                          <span className={`px-1.5 py-0.2 rounded text-[9px] font-black uppercase ${
+                            isActive ? 'bg-[#EE2C3C] text-white' : 'bg-rose-100 text-rose-700'
+                          }`}>
+                            HIDDEN
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
+
+              {/* Status & Notification Alert Box */}
+              {cmsNotification && (
+                <div
+                  className={`p-4 rounded-xl text-xs sm:text-sm font-bold border-2 flex items-center justify-between ${
+                    cmsNotification.type === 'success'
+                      ? 'bg-emerald-50 border-emerald-300 text-emerald-900'
+                      : 'bg-rose-50 border-rose-300 text-rose-900'
+                  }`}
+                >
+                  <span>{cmsNotification.text}</span>
+                  <button
+                    type="button"
+                    onClick={() => setCmsNotification(null)}
+                    className="text-xs font-bold uppercase underline cursor-pointer ml-4"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              )}
+
+              {/* SECTION 1: HERO SECTION */}
+              {cmsActiveSection === 'hero' && (
+                <div className="bg-white border-2 border-slate-200 rounded-2xl p-5 sm:p-7 space-y-6">
+                  {/* Section Control Action Bar */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-slate-200 gap-4">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                          Section Configuration
+                        </span>
+                        {siteContent.hero.hidden ? (
+                          <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-rose-100 text-rose-800 border border-rose-300">
+                            Status: Hidden on Website
+                          </span>
+                        ) : (
+                          <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">
+                            Status: Live &amp; Visible
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="text-xl font-black text-[#15304C] mt-1">
+                        Hero Section (Headline, Badge, CTAs &amp; Hero Logo)
+                      </h3>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleSectionVisibility('hero')}
+                        disabled={cmsSaving}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
+                          siteContent.hero.hidden
+                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                            : 'bg-slate-800 hover:bg-slate-900 text-white'
+                        }`}
+                      >
+                        {siteContent.hero.hidden ? 'Show on Website' : 'Hide from Website'}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleResetCmsSection('hero')}
+                        disabled={cmsSaving}
+                        className="px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-rose-600 border border-rose-300 hover:bg-rose-50 transition-colors cursor-pointer"
+                      >
+                        Reset to Default
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleSaveCmsSection('hero')}
+                        disabled={cmsSaving}
+                        className="px-5 py-2 rounded-xl text-xs font-bold bg-[#EE2C3C] text-white hover:bg-[#D71E2E] shadow-xs transition-colors cursor-pointer"
+                      >
+                        {cmsSaving ? 'Publishing...' : 'Save &amp; Publish Hero'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Form Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                          Top Badge Pill
+                        </label>
+                        <input
+                          type="text"
+                          value={siteContent.hero.badge}
+                          onChange={(e) =>
+                            setSiteContent({
+                              ...siteContent,
+                              hero: { ...siteContent.hero, badge: e.target.value },
+                            })
+                          }
+                          className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-semibold focus:border-[#15304C] focus:outline-none"
+                          placeholder="Industry 4.0 CAD & BIM Academy"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                          Main Headline (First Part)
+                        </label>
+                        <input
+                          type="text"
+                          value={siteContent.hero.title}
+                          onChange={(e) =>
+                            setSiteContent({
+                              ...siteContent,
+                              hero: { ...siteContent.hero, title: e.target.value },
+                            })
+                          }
+                          className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-semibold focus:border-[#15304C] focus:outline-none"
+                          placeholder="Master Industrial CAD."
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                          Headline Highlight (Red Colored Part)
+                        </label>
+                        <input
+                          type="text"
+                          value={siteContent.hero.highlight}
+                          onChange={(e) =>
+                            setSiteContent({
+                              ...siteContent,
+                              hero: { ...siteContent.hero, highlight: e.target.value },
+                            })
+                          }
+                          className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 text-xs text-[#EE2C3C] font-bold focus:border-[#15304C] focus:outline-none"
+                          placeholder="Build Your Future."
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                          Hero Paragraph Description
+                        </label>
+                        <textarea
+                          rows={3}
+                          value={siteContent.hero.description}
+                          onChange={(e) =>
+                            setSiteContent({
+                              ...siteContent,
+                              hero: { ...siteContent.hero, description: e.target.value },
+                            })
+                          }
+                          className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-medium focus:border-[#15304C] focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      {/* Hero Image Management */}
+                      <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-4 space-y-3">
+                        <label className="block text-xs font-bold text-[#15304C] uppercase tracking-wider">
+                          Hero Section Image / Logo Mark
+                        </label>
+                        
+                        <div className="flex items-center gap-4">
+                          <div className="w-24 h-24 rounded-xl border-2 border-slate-300 bg-white p-2 flex items-center justify-center shrink-0">
+                            {siteContent.hero.heroImage ? (
+                              <img
+                                src={siteContent.hero.heroImage}
+                                alt="Hero"
+                                className="w-full h-full object-contain"
+                              />
+                            ) : (
+                              <span className="text-[10px] text-slate-400 font-bold">No Image</span>
+                            )}
+                          </div>
+
+                          <div className="flex-1 space-y-2">
+                            <div>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                id="hero-img-upload"
+                                className="hidden"
+                                onChange={(e) =>
+                                  handleCmsFileUpload(e, (url) => {
+                                    setSiteContent({
+                                      ...siteContent,
+                                      hero: { ...siteContent.hero, heroImage: url },
+                                    });
+                                  })
+                                }
+                              />
+                              <label
+                                htmlFor="hero-img-upload"
+                                className="inline-block px-3.5 py-1.5 rounded-lg text-xs font-bold bg-[#15304C] text-white hover:bg-[#0E2033] cursor-pointer"
+                              >
+                                {isUploadingImage ? 'Uploading...' : 'Upload Image File'}
+                              </label>
+                            </div>
+
+                            <input
+                              type="text"
+                              value={siteContent.hero.heroImage}
+                              onChange={(e) =>
+                                setSiteContent({
+                                  ...siteContent,
+                                  hero: { ...siteContent.hero, heroImage: e.target.value },
+                                })
+                              }
+                              className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs text-slate-800 font-mono"
+                              placeholder="/logo_mark.png or https://..."
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Primary CTA */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                            Primary Button Text
+                          </label>
+                          <input
+                            type="text"
+                            value={siteContent.hero.primaryCtaText}
+                            onChange={(e) =>
+                              setSiteContent({
+                                ...siteContent,
+                                hero: { ...siteContent.hero, primaryCtaText: e.target.value },
+                              })
+                            }
+                            className="w-full px-3 py-2 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-semibold"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                            Primary Button Link
+                          </label>
+                          <input
+                            type="text"
+                            value={siteContent.hero.primaryCtaLink}
+                            onChange={(e) =>
+                              setSiteContent({
+                                ...siteContent,
+                                hero: { ...siteContent.hero, primaryCtaLink: e.target.value },
+                              })
+                            }
+                            className="w-full px-3 py-2 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-semibold"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Secondary CTA */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                            Secondary Button Text
+                          </label>
+                          <input
+                            type="text"
+                            value={siteContent.hero.secondaryCtaText}
+                            onChange={(e) =>
+                              setSiteContent({
+                                ...siteContent,
+                                hero: { ...siteContent.hero, secondaryCtaText: e.target.value },
+                              })
+                            }
+                            className="w-full px-3 py-2 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-semibold"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                            Secondary Button Link
+                          </label>
+                          <input
+                            type="text"
+                            value={siteContent.hero.secondaryCtaLink}
+                            onChange={(e) =>
+                              setSiteContent({
+                                ...siteContent,
+                                hero: { ...siteContent.hero, secondaryCtaLink: e.target.value },
+                              })
+                            }
+                            className="w-full px-3 py-2 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-semibold"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* SECTION 2: PROGRAMS SHOWCASE */}
+              {cmsActiveSection === 'programs' && (
+                <div className="bg-white border-2 border-slate-200 rounded-2xl p-5 sm:p-7 space-y-6">
+                  {/* Action Bar */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-slate-200 gap-4">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                          Section Configuration
+                        </span>
+                        {siteContent.programs.hidden ? (
+                          <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-rose-100 text-rose-800 border border-rose-300">
+                            Status: Hidden on Website
+                          </span>
+                        ) : (
+                          <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">
+                            Status: Live &amp; Visible
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="text-xl font-black text-[#15304C] mt-1">
+                        Engineering Programs Showcase &amp; Folders
+                      </h3>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleSectionVisibility('programs')}
+                        disabled={cmsSaving}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
+                          siteContent.programs.hidden
+                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                            : 'bg-slate-800 hover:bg-slate-900 text-white'
+                        }`}
+                      >
+                        {siteContent.programs.hidden ? 'Show on Website' : 'Hide from Website'}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleResetCmsSection('programs')}
+                        disabled={cmsSaving}
+                        className="px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-rose-600 border border-rose-300 hover:bg-rose-50 transition-colors cursor-pointer"
+                      >
+                        Reset to Default
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleSaveCmsSection('programs')}
+                        disabled={cmsSaving}
+                        className="px-5 py-2 rounded-xl text-xs font-bold bg-[#EE2C3C] text-white hover:bg-[#D71E2E] shadow-xs transition-colors cursor-pointer"
+                      >
+                        {cmsSaving ? 'Publishing...' : 'Save &amp; Publish Programs'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Section Headings */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Section Badge Text
+                      </label>
+                      <input
+                        type="text"
+                        value={siteContent.programs.badge}
+                        onChange={(e) =>
+                          setSiteContent({
+                            ...siteContent,
+                            programs: { ...siteContent.programs, badge: e.target.value },
+                          })
+                        }
+                        className="w-full px-3.5 py-2 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-semibold"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Section Main Heading
+                      </label>
+                      <input
+                        type="text"
+                        value={siteContent.programs.heading}
+                        onChange={(e) =>
+                          setSiteContent({
+                            ...siteContent,
+                            programs: { ...siteContent.programs, heading: e.target.value },
+                          })
+                        }
+                        className="w-full px-3.5 py-2 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-semibold"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Section Subheading
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={siteContent.programs.subheading}
+                        onChange={(e) =>
+                          setSiteContent({
+                            ...siteContent,
+                            programs: { ...siteContent.programs, subheading: e.target.value },
+                          })
+                        }
+                        className="w-full px-3.5 py-2 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-medium"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Domain Cards & Media */}
+                  <div className="space-y-4 pt-2">
+                    <h4 className="text-sm font-black text-[#15304C] uppercase tracking-wider">
+                      Engineering Domain Cards &amp; Images
+                    </h4>
+                    
+                    <div className="space-y-4">
+                      {siteContent.programs.domains.map((dom, index) => (
+                        <div key={dom.id || index} className="p-4 rounded-xl border-2 border-slate-200 bg-slate-50 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-black text-[#15304C] uppercase tracking-wider">
+                              Domain {index + 1}: {dom.name} ({dom.id})
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">
+                                Domain Name
+                              </label>
+                              <input
+                                type="text"
+                                value={dom.name}
+                                onChange={(e) => {
+                                  const updated = [...siteContent.programs.domains];
+                                  updated[index].name = e.target.value;
+                                  setSiteContent({
+                                    ...siteContent,
+                                    programs: { ...siteContent.programs, domains: updated },
+                                  });
+                                }}
+                                className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white text-slate-900 font-bold"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">
+                                Domain Subtitle / Headline
+                              </label>
+                              <input
+                                type="text"
+                                value={dom.headline}
+                                onChange={(e) => {
+                                  const updated = [...siteContent.programs.domains];
+                                  updated[index].headline = e.target.value;
+                                  setSiteContent({
+                                    ...siteContent,
+                                    programs: { ...siteContent.programs, domains: updated },
+                                  });
+                                }}
+                                className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white text-slate-900 font-semibold"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Domain Foreground Image */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-slate-200">
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                                Card Foreground Image
+                              </label>
+                              <div className="flex items-center gap-3">
+                                <img
+                                  src={dom.image}
+                                  alt={dom.name}
+                                  className="w-16 h-12 rounded object-cover border border-slate-300 shrink-0"
+                                />
+                                <div className="flex-1 space-y-1">
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    id={`dom-img-${index}`}
+                                    className="hidden"
+                                    onChange={(e) =>
+                                      handleCmsFileUpload(e, (url) => {
+                                        const updated = [...siteContent.programs.domains];
+                                        updated[index].image = url;
+                                        setSiteContent({
+                                          ...siteContent,
+                                          programs: { ...siteContent.programs, domains: updated },
+                                        });
+                                      })
+                                    }
+                                  />
+                                  <label
+                                    htmlFor={`dom-img-${index}`}
+                                    className="inline-block px-2.5 py-1 rounded text-[11px] font-bold bg-[#15304C] text-white cursor-pointer"
+                                  >
+                                    Upload Image
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={dom.image}
+                                    onChange={(e) => {
+                                      const updated = [...siteContent.programs.domains];
+                                      updated[index].image = e.target.value;
+                                      setSiteContent({
+                                        ...siteContent,
+                                        programs: { ...siteContent.programs, domains: updated },
+                                      });
+                                    }}
+                                    className="w-full px-2 py-1 rounded border border-slate-300 text-[11px] font-mono bg-white"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                                Background Hero Image
+                              </label>
+                              <div className="flex items-center gap-3">
+                                <img
+                                  src={dom.bgImage}
+                                  alt={dom.name}
+                                  className="w-16 h-12 rounded object-cover border border-slate-300 shrink-0"
+                                />
+                                <div className="flex-1 space-y-1">
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    id={`dom-bg-${index}`}
+                                    className="hidden"
+                                    onChange={(e) =>
+                                      handleCmsFileUpload(e, (url) => {
+                                        const updated = [...siteContent.programs.domains];
+                                        updated[index].bgImage = url;
+                                        setSiteContent({
+                                          ...siteContent,
+                                          programs: { ...siteContent.programs, domains: updated },
+                                        });
+                                      })
+                                    }
+                                  />
+                                  <label
+                                    htmlFor={`dom-bg-${index}`}
+                                    className="inline-block px-2.5 py-1 rounded text-[11px] font-bold bg-[#15304C] text-white cursor-pointer"
+                                  >
+                                    Upload Background
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={dom.bgImage}
+                                    onChange={(e) => {
+                                      const updated = [...siteContent.programs.domains];
+                                      updated[index].bgImage = e.target.value;
+                                      setSiteContent({
+                                        ...siteContent,
+                                        programs: { ...siteContent.programs, domains: updated },
+                                      });
+                                    }}
+                                    className="w-full px-2 py-1 rounded border border-slate-300 text-[11px] font-mono bg-white"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* SECTION 3: COURSE CATALOG */}
+              {cmsActiveSection === 'catalog' && (
+                <div className="bg-white border-2 border-slate-200 rounded-2xl p-5 sm:p-7 space-y-6">
+                  {/* Action Bar */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-slate-200 gap-4">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                          Section Configuration
+                        </span>
+                        {siteContent.catalog.hidden ? (
+                          <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-rose-100 text-rose-800 border border-rose-300">
+                            Status: Hidden on Website
+                          </span>
+                        ) : (
+                          <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">
+                            Status: Live &amp; Visible
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="text-xl font-black text-[#15304C] mt-1">
+                        Course Catalog Hub Section
+                      </h3>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleSectionVisibility('catalog')}
+                        disabled={cmsSaving}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
+                          siteContent.catalog.hidden
+                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                            : 'bg-slate-800 hover:bg-slate-900 text-white'
+                        }`}
+                      >
+                        {siteContent.catalog.hidden ? 'Show on Website' : 'Hide from Website'}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleResetCmsSection('catalog')}
+                        disabled={cmsSaving}
+                        className="px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-rose-600 border border-rose-300 hover:bg-rose-50 transition-colors cursor-pointer"
+                      >
+                        Reset to Default
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleSaveCmsSection('catalog')}
+                        disabled={cmsSaving}
+                        className="px-5 py-2 rounded-xl text-xs font-bold bg-[#EE2C3C] text-white hover:bg-[#D71E2E] shadow-xs transition-colors cursor-pointer"
+                      >
+                        {cmsSaving ? 'Publishing...' : 'Save &amp; Publish Catalog'}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Catalog Section Badge
+                      </label>
+                      <input
+                        type="text"
+                        value={siteContent.catalog.badge}
+                        onChange={(e) =>
+                          setSiteContent({
+                            ...siteContent,
+                            catalog: { ...siteContent.catalog, badge: e.target.value },
+                          })
+                        }
+                        className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-semibold"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Catalog Section Heading
+                      </label>
+                      <input
+                        type="text"
+                        value={siteContent.catalog.heading}
+                        onChange={(e) =>
+                          setSiteContent({
+                            ...siteContent,
+                            catalog: { ...siteContent.catalog, heading: e.target.value },
+                          })
+                        }
+                        className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-semibold"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Catalog Section Subheading
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={siteContent.catalog.subheading}
+                        onChange={(e) =>
+                          setSiteContent({
+                            ...siteContent,
+                            catalog: { ...siteContent.catalog, subheading: e.target.value },
+                          })
+                        }
+                        className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-medium"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Quick Shortcut to Courses Management */}
+                  <div className="p-4 rounded-xl bg-slate-100 border border-slate-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <span className="text-xs font-bold text-[#15304C] uppercase tracking-wider block">
+                        Manage Individual Courses &amp; Modules
+                      </span>
+                      <p className="text-xs text-slate-600 mt-0.5">
+                        Course cards, syllabi, software lists, and pricing can be managed in the &quot;Courses&quot; tab of the Admin Console.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('Courses')}
+                      className="px-4 py-2 rounded-xl text-xs font-bold bg-[#15304C] text-white hover:bg-[#0E2033] shrink-0 cursor-pointer"
+                    >
+                      Open Courses Tab
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* SECTION 4: HIRING PARTNERS */}
+              {cmsActiveSection === 'partners' && (
+                <div className="bg-white border-2 border-slate-200 rounded-2xl p-5 sm:p-7 space-y-6">
+                  {/* Action Bar */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-slate-200 gap-4">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                          Section Configuration
+                        </span>
+                        {siteContent.partners.hidden ? (
+                          <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-rose-100 text-rose-800 border border-rose-300">
+                            Status: Hidden on Website
+                          </span>
+                        ) : (
+                          <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">
+                            Status: Live &amp; Visible
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="text-xl font-black text-[#15304C] mt-1">
+                        Hiring Partners &amp; Corporate Marquee
+                      </h3>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleSectionVisibility('partners')}
+                        disabled={cmsSaving}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
+                          siteContent.partners.hidden
+                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                            : 'bg-slate-800 hover:bg-slate-900 text-white'
+                        }`}
+                      >
+                        {siteContent.partners.hidden ? 'Show on Website' : 'Hide from Website'}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleResetCmsSection('partners')}
+                        disabled={cmsSaving}
+                        className="px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-rose-600 border border-rose-300 hover:bg-rose-50 transition-colors cursor-pointer"
+                      >
+                        Reset to Default
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleSaveCmsSection('partners')}
+                        disabled={cmsSaving}
+                        className="px-5 py-2 rounded-xl text-xs font-bold bg-[#EE2C3C] text-white hover:bg-[#D71E2E] shadow-xs transition-colors cursor-pointer"
+                      >
+                        {cmsSaving ? 'Publishing...' : 'Save &amp; Publish Partners'}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Partners Section Badge
+                      </label>
+                      <input
+                        type="text"
+                        value={siteContent.partners.badge}
+                        onChange={(e) =>
+                          setSiteContent({
+                            ...siteContent,
+                            partners: { ...siteContent.partners, badge: e.target.value },
+                          })
+                        }
+                        className="w-full px-3.5 py-2 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-semibold"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Section Main Heading
+                      </label>
+                      <input
+                        type="text"
+                        value={siteContent.partners.heading}
+                        onChange={(e) =>
+                          setSiteContent({
+                            ...siteContent,
+                            partners: { ...siteContent.partners, heading: e.target.value },
+                          })
+                        }
+                        className="w-full px-3.5 py-2 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-semibold"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Section Subheading
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={siteContent.partners.subheading}
+                        onChange={(e) =>
+                          setSiteContent({
+                            ...siteContent,
+                            partners: { ...siteContent.partners, subheading: e.target.value },
+                          })
+                        }
+                        className="w-full px-3.5 py-2 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-medium"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Add and Manage Partners List */}
+                  <div className="space-y-3 pt-2">
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                      Partner Company Names ({siteContent.partners.partners.length} Total)
+                    </label>
+
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={newPartnerName}
+                        onChange={(e) => setNewPartnerName(e.target.value)}
+                        placeholder="Enter company name (e.g. Larsen & Toubro, Tata Projects)..."
+                        className="flex-1 px-3.5 py-2 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-semibold"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (newPartnerName.trim()) {
+                            setSiteContent({
+                              ...siteContent,
+                              partners: {
+                                ...siteContent.partners,
+                                partners: [...siteContent.partners.partners, newPartnerName.trim()],
+                              },
+                            });
+                            setNewPartnerName('');
+                          }
+                        }}
+                        className="px-4 py-2 rounded-xl text-xs font-bold bg-[#15304C] text-white hover:bg-[#0E2033] cursor-pointer"
+                      >
+                        Add Partner
+                      </button>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 pt-2">
+                      {siteContent.partners.partners.map((partner, pIdx) => (
+                        <div
+                          key={pIdx}
+                          className="px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-300 text-xs font-bold text-slate-800 flex items-center gap-2"
+                        >
+                          <span>{partner}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updated = siteContent.partners.partners.filter((_, i) => i !== pIdx);
+                              setSiteContent({
+                                ...siteContent,
+                                partners: { ...siteContent.partners, partners: updated },
+                              });
+                            }}
+                            className="text-rose-600 hover:text-rose-800 text-xs font-black cursor-pointer"
+                            title="Delete Partner"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* SECTION 5: ADMISSIONS & WORKSTATION RESERVATION */}
+              {cmsActiveSection === 'enrollment' && (
+                <div className="bg-white border-2 border-slate-200 rounded-2xl p-5 sm:p-7 space-y-6">
+                  {/* Action Bar */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-slate-200 gap-4">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                          Section Configuration
+                        </span>
+                        {siteContent.enrollment.hidden ? (
+                          <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-rose-100 text-rose-800 border border-rose-300">
+                            Status: Hidden on Website
+                          </span>
+                        ) : (
+                          <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">
+                            Status: Live &amp; Visible
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="text-xl font-black text-[#15304C] mt-1">
+                        Admissions &amp; Workstation Reservation Section
+                      </h3>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleSectionVisibility('enrollment')}
+                        disabled={cmsSaving}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
+                          siteContent.enrollment.hidden
+                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                            : 'bg-slate-800 hover:bg-slate-900 text-white'
+                        }`}
+                      >
+                        {siteContent.enrollment.hidden ? 'Show on Website' : 'Hide from Website'}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleResetCmsSection('enrollment')}
+                        disabled={cmsSaving}
+                        className="px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-rose-600 border border-rose-300 hover:bg-rose-50 transition-colors cursor-pointer"
+                      >
+                        Reset to Default
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleSaveCmsSection('enrollment')}
+                        disabled={cmsSaving}
+                        className="px-5 py-2 rounded-xl text-xs font-bold bg-[#EE2C3C] text-white hover:bg-[#D71E2E] shadow-xs transition-colors cursor-pointer"
+                      >
+                        {cmsSaving ? 'Publishing...' : 'Save &amp; Publish Section'}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Section Badge Text
+                      </label>
+                      <input
+                        type="text"
+                        value={siteContent.enrollment.badge}
+                        onChange={(e) =>
+                          setSiteContent({
+                            ...siteContent,
+                            enrollment: { ...siteContent.enrollment, badge: e.target.value },
+                          })
+                        }
+                        className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-semibold"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Section Heading
+                      </label>
+                      <input
+                        type="text"
+                        value={siteContent.enrollment.heading}
+                        onChange={(e) =>
+                          setSiteContent({
+                            ...siteContent,
+                            enrollment: { ...siteContent.enrollment, heading: e.target.value },
+                          })
+                        }
+                        className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-semibold"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Section Subheading
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={siteContent.enrollment.subheading}
+                        onChange={(e) =>
+                          setSiteContent({
+                            ...siteContent,
+                            enrollment: { ...siteContent.enrollment, subheading: e.target.value },
+                          })
+                        }
+                        className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-medium"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Admissions Helpline Phone
+                      </label>
+                      <input
+                        type="text"
+                        value={siteContent.enrollment.helplinePhone}
+                        onChange={(e) =>
+                          setSiteContent({
+                            ...siteContent,
+                            enrollment: { ...siteContent.enrollment, helplinePhone: e.target.value },
+                          })
+                        }
+                        className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-semibold"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Lab Working Hours
+                      </label>
+                      <input
+                        type="text"
+                        value={siteContent.enrollment.labHours}
+                        onChange={(e) =>
+                          setSiteContent({
+                            ...siteContent,
+                            enrollment: { ...siteContent.enrollment, labHours: e.target.value },
+                          })
+                        }
+                        className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-semibold"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Guarantee Badge / Fee Status
+                      </label>
+                      <input
+                        type="text"
+                        value={siteContent.enrollment.guaranteeBadge}
+                        onChange={(e) =>
+                          setSiteContent({
+                            ...siteContent,
+                            enrollment: { ...siteContent.enrollment, guaranteeBadge: e.target.value },
+                          })
+                        }
+                        className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-semibold"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* SECTION 6: FOOTER & ACCREDITATIONS */}
+              {cmsActiveSection === 'footer' && (
+                <div className="bg-white border-2 border-slate-200 rounded-2xl p-5 sm:p-7 space-y-6">
+                  {/* Action Bar */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-slate-200 gap-4">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                          Section Configuration
+                        </span>
+                        {siteContent.footer.hidden ? (
+                          <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-rose-100 text-rose-800 border border-rose-300">
+                            Status: Hidden on Website
+                          </span>
+                        ) : (
+                          <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">
+                            Status: Live &amp; Visible
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="text-xl font-black text-[#15304C] mt-1">
+                        Footer, Accreditations &amp; Campus Contact
+                      </h3>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleSectionVisibility('footer')}
+                        disabled={cmsSaving}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
+                          siteContent.footer.hidden
+                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                            : 'bg-slate-800 hover:bg-slate-900 text-white'
+                        }`}
+                      >
+                        {siteContent.footer.hidden ? 'Show on Website' : 'Hide from Website'}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleResetCmsSection('footer')}
+                        disabled={cmsSaving}
+                        className="px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-rose-600 border border-rose-300 hover:bg-rose-50 transition-colors cursor-pointer"
+                      >
+                        Reset to Default
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleSaveCmsSection('footer')}
+                        disabled={cmsSaving}
+                        className="px-5 py-2 rounded-xl text-xs font-bold bg-[#EE2C3C] text-white hover:bg-[#D71E2E] shadow-xs transition-colors cursor-pointer"
+                      >
+                        {cmsSaving ? 'Publishing...' : 'Save &amp; Publish Footer'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Pre-Footer Action Banner */}
+                  <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-4 space-y-4">
+                    <span className="text-xs font-black text-[#15304C] uppercase tracking-wider block">
+                      Pre-Footer Action Banner
+                    </span>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">
+                          Banner Badge
+                        </label>
+                        <input
+                          type="text"
+                          value={siteContent.footer.bannerBadge}
+                          onChange={(e) =>
+                            setSiteContent({
+                              ...siteContent,
+                              footer: { ...siteContent.footer, bannerBadge: e.target.value },
+                            })
+                          }
+                          className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white text-slate-900 font-semibold"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">
+                          Banner Heading
+                        </label>
+                        <input
+                          type="text"
+                          value={siteContent.footer.bannerHeading}
+                          onChange={(e) =>
+                            setSiteContent({
+                              ...siteContent,
+                              footer: { ...siteContent.footer, bannerHeading: e.target.value },
+                            })
+                          }
+                          className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white text-slate-900 font-semibold"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">
+                          Button Text
+                        </label>
+                        <input
+                          type="text"
+                          value={siteContent.footer.bannerButtonText}
+                          onChange={(e) =>
+                            setSiteContent({
+                              ...siteContent,
+                              footer: { ...siteContent.footer, bannerButtonText: e.target.value },
+                            })
+                          }
+                          className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white text-slate-900 font-semibold"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Contact & Brand Information */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="md:col-span-2">
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        About Institute Description
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={siteContent.footer.aboutText}
+                        onChange={(e) =>
+                          setSiteContent({
+                            ...siteContent,
+                            footer: { ...siteContent.footer, aboutText: e.target.value },
+                          })
+                        }
+                        className="w-full px-3.5 py-2 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-medium"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Campus Physical Address
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={siteContent.footer.address}
+                        onChange={(e) =>
+                          setSiteContent({
+                            ...siteContent,
+                            footer: { ...siteContent.footer, address: e.target.value },
+                          })
+                        }
+                        className="w-full px-3.5 py-2 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-medium"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Contact Phone
+                      </label>
+                      <input
+                        type="text"
+                        value={siteContent.footer.phone}
+                        onChange={(e) =>
+                          setSiteContent({
+                            ...siteContent,
+                            footer: { ...siteContent.footer, phone: e.target.value },
+                          })
+                        }
+                        className="w-full px-3.5 py-2 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-semibold"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Contact Email
+                      </label>
+                      <input
+                        type="email"
+                        value={siteContent.footer.email}
+                        onChange={(e) =>
+                          setSiteContent({
+                            ...siteContent,
+                            footer: { ...siteContent.footer, email: e.target.value },
+                          })
+                        }
+                        className="w-full px-3.5 py-2 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-semibold"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        WhatsApp Number
+                      </label>
+                      <input
+                        type="text"
+                        value={siteContent.footer.whatsapp}
+                        onChange={(e) =>
+                          setSiteContent({
+                            ...siteContent,
+                            footer: { ...siteContent.footer, whatsapp: e.target.value },
+                          })
+                        }
+                        className="w-full px-3.5 py-2 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-semibold"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Copyright Notice
+                      </label>
+                      <input
+                        type="text"
+                        value={siteContent.footer.copyright}
+                        onChange={(e) =>
+                          setSiteContent({
+                            ...siteContent,
+                            footer: { ...siteContent.footer, copyright: e.target.value },
+                          })
+                        }
+                        className="w-full px-3.5 py-2 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-semibold"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Accreditations List */}
+                  <div className="space-y-3 pt-2">
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                      Accreditation &amp; Partner Software Badges
+                    </label>
+
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={newAccreditationName}
+                        onChange={(e) => setNewAccreditationName(e.target.value)}
+                        placeholder="Enter badge title (e.g. Autodesk, Dassault, Siemens)..."
+                        className="flex-1 px-3.5 py-2 rounded-xl border-2 border-slate-200 text-xs text-slate-900 font-semibold"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (newAccreditationName.trim()) {
+                            setSiteContent({
+                              ...siteContent,
+                              footer: {
+                                ...siteContent.footer,
+                                accreditations: [...siteContent.footer.accreditations, newAccreditationName.trim()],
+                              },
+                            });
+                            setNewAccreditationName('');
+                          }
+                        }}
+                        className="px-4 py-2 rounded-xl text-xs font-bold bg-[#15304C] text-white hover:bg-[#0E2033] cursor-pointer"
+                      >
+                        Add Badge
+                      </button>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 pt-2">
+                      {siteContent.footer.accreditations.map((acc, aIdx) => (
+                        <div
+                          key={aIdx}
+                          className="px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-300 text-xs font-bold text-slate-800 flex items-center gap-2"
+                        >
+                          <span>{acc}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updated = siteContent.footer.accreditations.filter((_, i) => i !== aIdx);
+                              setSiteContent({
+                                ...siteContent,
+                                footer: { ...siteContent.footer, accreditations: updated },
+                              });
+                            }}
+                            className="text-rose-600 hover:text-rose-800 text-xs font-black cursor-pointer"
+                            title="Delete Badge"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
             </div>
           )}
 
