@@ -21,9 +21,17 @@ export default function SignUpPage() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [existingAccountWarning, setExistingAccountWarning] = useState<{
+    email: string;
+    message: string;
+    redirectUrl: string;
+  } | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
+    if (name === 'email' && existingAccountWarning) {
+      setExistingAccountWarning(null);
+    }
     if (type === 'checkbox') {
       const checked = (e.target as HTMLInputElement).checked;
       setFormData((prev) => ({ ...prev, [name]: checked }));
@@ -36,6 +44,7 @@ export default function SignUpPage() {
     e.preventDefault();
     setErrorMessage('');
     setSuccessMessage('');
+    setExistingAccountWarning(null);
 
     if (!formData.fullName.trim()) {
       setErrorMessage('Please enter your full name.');
@@ -76,6 +85,16 @@ export default function SignUpPage() {
 
       const data = await res.json();
 
+      if (res.status === 409 || data.alreadyExists) {
+        setExistingAccountWarning({
+          email: formData.email.trim(),
+          message: data.message || 'An account with this email address already exists. Please log in instead.',
+          redirectUrl: data.redirectUrl || `/signin?email=${encodeURIComponent(formData.email.trim())}`,
+        });
+        setLoading(false);
+        return;
+      }
+
       if (data.success) {
         setSuccessMessage('Account created successfully! Loading your portal...');
         if (typeof window !== 'undefined') {
@@ -89,27 +108,13 @@ export default function SignUpPage() {
           router.push(targetUrl);
         }, 800);
       } else {
-        setErrorMessage(data.message || 'Registration failed. Please try again.');
+        setErrorMessage(data.message || 'Registration failed. Please check your details and try again.');
         setLoading(false);
       }
     } catch (err: any) {
-      console.warn('Signup fallback:', err);
-      setSuccessMessage('Account registered! Redirecting to student portal...');
-      if (typeof window !== 'undefined') {
-        const u = {
-          name: formData.fullName,
-          email: formData.email,
-          role: 'student',
-          stream: formData.stream,
-        };
-        sessionStorage.setItem('rnd_cadd_user', JSON.stringify(u));
-        sessionStorage.setItem('rnd_cadd_role', 'student');
-        localStorage.setItem('rnd_cadd_user', JSON.stringify(u));
-        localStorage.setItem('rnd_cadd_role', 'student');
-      }
-      setTimeout(() => {
-        router.push(`/portal/student?email=${encodeURIComponent(formData.email)}`);
-      }, 700);
+      console.error('Signup error:', err);
+      setErrorMessage('Unable to connect to the database. Please check your network connection and try again.');
+      setLoading(false);
     }
   };
 
@@ -163,6 +168,42 @@ export default function SignUpPage() {
                 Create Account
               </h1>
             </div>
+
+            {/* Account Already Exists Banner */}
+            {existingAccountWarning && (
+              <div className="mb-5 p-4 bg-[#FEF2F2] border-2 border-[#EF4444] rounded-2xl shadow-sm animate-fade-in">
+                <div className="flex items-start space-x-3">
+                  <div className="p-2 bg-[#FEE2E2] rounded-xl text-[#DC2626] flex-shrink-0 mt-0.5">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-bold text-[#991B1B]">
+                      Account Already Exists!
+                    </h3>
+                    <p className="text-xs text-[#7F1D1D] mt-1 leading-relaxed">
+                      {existingAccountWarning.message}
+                    </p>
+                    <div className="mt-3.5 flex flex-wrap items-center gap-2">
+                      <Link
+                        href={existingAccountWarning.redirectUrl}
+                        className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-bold text-[#FFFFFF] bg-[#EE2C3C] hover:bg-[#DC2626] transition-all shadow-sm active:scale-95"
+                      >
+                        <span>Log In to Your Account</span>
+                        <span>&rarr;</span>
+                      </Link>
+                      <Link
+                        href={`/forgot-password?email=${encodeURIComponent(existingAccountWarning.email)}`}
+                        className="inline-flex items-center px-3 py-2 rounded-xl text-xs font-semibold text-[#475569] hover:text-[#0F172A] border border-[#CBD5E1] bg-[#FFFFFF] hover:bg-[#F8FAFC] transition-all"
+                      >
+                        Forgot Password?
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Error & Success Messages */}
             {errorMessage && (
@@ -224,9 +265,18 @@ export default function SignUpPage() {
                     onChange={handleChange}
                     placeholder="name@example.com"
                     required
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#CBD5E1] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 focus:outline-none text-sm text-[#0F172A] placeholder-[#94A3B8] transition-all bg-[#FFFFFF]"
+                    className={`w-full pl-10 pr-4 py-2.5 rounded-xl border ${
+                      existingAccountWarning
+                        ? 'border-[#EF4444] ring-2 ring-[#EF4444]/20'
+                        : 'border-[#CBD5E1] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15'
+                    } focus:outline-none text-sm text-[#0F172A] placeholder-[#94A3B8] transition-all bg-[#FFFFFF]`}
                   />
                 </div>
+                {existingAccountWarning && (
+                  <p className="text-[11px] font-semibold text-[#DC2626] mt-1.5 flex items-center space-x-1">
+                    <span>* This email is already registered in our system.</span>
+                  </p>
+                )}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

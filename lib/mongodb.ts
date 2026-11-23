@@ -1,5 +1,16 @@
 import { MongoClient, Db } from 'mongodb';
 
+// Configure reliable DNS servers for SRV record resolution across various network environments
+try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const dns = require('dns');
+  if (typeof dns?.setServers === 'function') {
+    dns.setServers(['8.8.8.8', '1.1.1.1']);
+  }
+} catch {
+  // Ignore in environments where node:dns is unavailable
+}
+
 export function normalizeMongoUri(rawUri: string): string {
   if (!rawUri || !rawUri.includes('://')) return rawUri;
 

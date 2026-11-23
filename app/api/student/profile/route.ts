@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 
+export const dynamic = 'force-dynamic';
+
 // In-memory fallback cache to persist student profile edits across requests in development/fallback mode
 let fallbackProfiles: Record<string, any> = {
   'student1@gmail.com': {

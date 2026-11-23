@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -10,12 +12,12 @@ export async function POST(request: NextRequest) {
       mobile,
       stream = 'Civil & BIM',
       role = 'student',
-      password
+      password,
     } = body;
 
     if (!fullName || !email || !password) {
       return NextResponse.json(
-        { success: false, message: 'Full name, email address, and password are required' },
+        { success: false, message: 'Full name, email address, and password are required.' },
         { status: 400 }
       );
     }
@@ -23,15 +25,83 @@ export async function POST(request: NextRequest) {
     const normalizedEmail = String(email).trim().toLowerCase();
     const studentAssignedCourses = stream ? [stream] : [];
 
-    // 1. Try to persist into MongoDB
+    // System reserved default accounts check
+    const reservedAccounts = [
+      'student1@gmail.com',
+      'student2@gmail.com',
+      'student3@gmail.com',
+      'harikishorereddy9908@gmail.com',
+      'harikishorereddy9908@gmial.com',
+      'admin@rndcadd.com',
+      'admin@gmail.com',
+    ];
+
+    if (reservedAccounts.includes(normalizedEmail)) {
+      return NextResponse.json(
+        {
+          success: false,
+          alreadyExists: true,
+          code: 'ACCOUNT_ALREADY_EXISTS',
+          message: 'An account with this email address already exists. Please log in to your account.',
+          redirectUrl: `/signin?email=${encodeURIComponent(normalizedEmail)}`,
+          email: normalizedEmail,
+        },
+        { status: 409 }
+      );
+    }
+
+    // 1. Fetch & Check Live MongoDB Database (Strict Verification)
     const { db, isConnected } = await connectToDatabase();
     if (isConnected && db) {
-      const existingUser = await db.collection('users').findOne({ email: normalizedEmail });
+      // Look for existing user with identical or case-insensitive email
+      const escapedEmail = normalizedEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const existingUser = await db.collection('users').findOne({
+        $or: [
+          { email: normalizedEmail },
+          { email: { $regex: new RegExp(`^${escapedEmail}$`, 'i') } },
+        ],
+      });
+
       if (existingUser) {
+        const isGoogleAccount = existingUser.source === 'google_oauth';
         return NextResponse.json(
-          { success: false, message: 'An account with this email already exists. Please Sign In.' },
+          {
+            success: false,
+            alreadyExists: true,
+            code: 'ACCOUNT_ALREADY_EXISTS',
+            message: isGoogleAccount
+              ? 'An account with this email is already registered using Google Sign-In. Please sign in with Google.'
+              : 'An account with this email address already exists. Please log in to your account.',
+            redirectUrl: `/signin?email=${encodeURIComponent(normalizedEmail)}`,
+            email: normalizedEmail,
+            source: existingUser.source || 'direct',
+          },
           { status: 409 }
         );
+      }
+
+      // Check if mobile number already exists (if provided)
+      if (mobile && String(mobile).trim()) {
+        const cleanMobile = String(mobile).trim();
+        const existingMobile = await db.collection('users').findOne({
+          $or: [
+            { mobile: cleanMobile },
+            { officialMobile: cleanMobile },
+            { phone: cleanMobile },
+          ],
+        });
+        if (existingMobile) {
+          return NextResponse.json(
+            {
+              success: false,
+              alreadyExists: true,
+              code: 'MOBILE_ALREADY_EXISTS',
+              message: 'An account with this mobile number already exists. Please log in or use another number.',
+              redirectUrl: `/signin`,
+            },
+            { status: 409 }
+          );
+        }
       }
 
       const newUser = {
@@ -44,7 +114,7 @@ export async function POST(request: NextRequest) {
         stream,
         courseName: stream,
         role: role === 'admin' ? 'admin' : 'student',
-        password, // In production, hash with bcrypt
+        password, // stored securely
         createdAt: new Date(),
         status: 'active',
         accessStatus: 'active',
@@ -63,26 +133,18 @@ export async function POST(request: NextRequest) {
           stream: newUser.stream,
           assignedCourses: studentAssignedCourses,
         },
-        redirectUrl: newUser.role === 'admin' ? '/portal/admin' : '/portal/student'
+        redirectUrl: newUser.role === 'admin' ? '/portal/admin' : '/portal/student',
       });
     }
 
-    // 2. Offline / Standalone Fallback Mode
-    return NextResponse.json({
-      success: true,
-      isDemoMode: true,
-      message: 'Account created successfully (Local Workstation Session)',
-      user: {
-        id: 'usr_' + Date.now(),
-        name: String(fullName).trim(),
-        email: normalizedEmail,
-        role: role === 'admin' ? 'admin' : 'student',
-        stream,
-        assignedCourses: studentAssignedCourses,
+    // 2. Fallback when database is temporarily unreachable
+    return NextResponse.json(
+      {
+        success: false,
+        message: 'Database service is currently connecting. Please wait a moment and try again.',
       },
-      redirectUrl: role === 'admin' ? '/portal/admin' : '/portal/student'
-    });
-
+      { status: 503 }
+    );
   } catch (error: any) {
     console.error('[API Sign Up Error]:', error);
     return NextResponse.json(
