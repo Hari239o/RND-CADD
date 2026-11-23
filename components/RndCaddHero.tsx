@@ -78,8 +78,8 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
       {/* Seamless Vertical Gradient Overlay to blend top and bottom with page background */}
       <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,1)_0%,transparent_30%,transparent_70%,rgba(255,255,255,1)_100%)] pointer-events-none z-0" />
 
-      {/* Full-Screen Edge-to-Edge Container: Optimized Mobile Breathing Room */}
-      <div className="relative z-10 w-full px-4 sm:px-8 md:px-12 lg:px-20 xl:px-28 2xl:px-36 pt-20 xs:pt-24 sm:pt-36 lg:pt-44 xl:pt-48 pb-5 sm:pb-20 lg:pb-28">
+      {/* Full-Screen Edge-to-Edge Container: Generous Top Clearance Below Floating Navbar */}
+      <div className="relative z-10 w-full px-4 sm:px-8 md:px-12 lg:px-20 xl:px-28 2xl:px-36 pt-32 xs:pt-36 sm:pt-40 lg:pt-44 xl:pt-48 pb-6 sm:pb-20 lg:pb-28">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-8 lg:gap-14 xl:gap-20 items-center w-full">
           {/* Main Column: Centered on Mobile, Natural Left on Desktop */}
           <div className="lg:col-span-7 flex flex-col justify-center items-center lg:items-start text-center lg:text-left">
@@ -88,7 +88,7 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
               initial={{ opacity: 0, y: shouldReduceMotion ? 0 : -8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, ease: 'easeOut' }}
-              className="inline-flex items-center gap-1.5 sm:gap-2 self-center lg:self-start border border-blue-200/90 bg-blue-50/70 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-[13px] font-medium text-[#15304C] shadow-2xs mb-2.5 sm:mb-6"
+              className="inline-flex items-center gap-1.5 sm:gap-2 self-center lg:self-start border border-blue-200/90 bg-blue-50/70 px-3.5 sm:px-4 py-1.5 sm:py-1.5 rounded-full text-[11px] sm:text-[13px] font-medium text-[#15304C] shadow-2xs mb-3.5 sm:mb-6"
             >
               <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#D20A0B] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
@@ -101,55 +101,18 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
               initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.05, ease: 'easeOut' }}
-              className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#15304C] tracking-tight leading-[1.14] text-center lg:text-left"
+              className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#15304C] tracking-tight leading-[1.2] text-center lg:text-left mb-4 sm:mb-6"
             >
               {content?.title || 'Master Industrial CAD.'} <br />
               <span className="text-[#D20A0B]">{content?.highlight || 'Build Your Future.'}</span>
             </motion.h1>
-
-            {/* Mobile Visual Pattern: Interactive 3D Animated Logo sits between Headline & Action CTAs on Mobile */}
-            <div
-              className="flex lg:hidden items-center justify-center relative my-3 sm:my-5 py-1 select-none z-10 w-full"
-              style={{ perspective: 1200 }}
-            >
-              <motion.div
-                style={{
-                  x: translateX,
-                  y: translateY,
-                  rotateX: rotateX,
-                  rotateY: rotateY,
-                  transformStyle: 'preserve-3d',
-                }}
-                animate={{
-                  scale: shouldReduceMotion ? 1 : [1, 1.025, 1],
-                }}
-                transition={{
-                  scale: {
-                    duration: 4,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                  },
-                }}
-                className="relative flex items-center justify-center will-change-transform cursor-pointer"
-              >
-                <img
-                  src={content?.heroImage || '/logo_mark.png'}
-                  onError={(e: any) => {
-                    e.currentTarget.src = '/logo.png';
-                  }}
-                  alt="RND CADD Logo"
-                  className="w-28 xs:w-36 sm:w-48 h-auto object-contain transition-transform duration-200 hover:scale-105 drop-shadow-md"
-                  draggable={false}
-                />
-              </motion.div>
-            </div>
 
             {/* Action CTAs - Responsive Balanced Buttons on Mobile & Desktop */}
             <motion.div
               initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
-              className="mt-2 sm:mt-8 flex flex-row items-center justify-center lg:justify-start gap-2.5 sm:gap-4 w-full max-w-sm sm:max-w-none mx-auto lg:mx-0"
+              className="flex flex-row items-center justify-center lg:justify-start gap-2.5 sm:gap-4 w-full max-w-sm sm:max-w-none mx-auto lg:mx-0 mb-4 sm:mb-0"
             >
               <button
                 type="button"
@@ -183,6 +146,43 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
                 {content?.secondaryCtaText || 'Reserve Workstation'}
               </button>
             </motion.div>
+
+            {/* Mobile Visual Pattern: Interactive 3D Animated Logo centered below Action CTAs */}
+            <div
+              className="flex lg:hidden items-center justify-center relative mt-3 mb-1 py-1 select-none z-10 w-full"
+              style={{ perspective: 1200 }}
+            >
+              <motion.div
+                style={{
+                  x: translateX,
+                  y: translateY,
+                  rotateX: rotateX,
+                  rotateY: rotateY,
+                  transformStyle: 'preserve-3d',
+                }}
+                animate={{
+                  scale: shouldReduceMotion ? 1 : [1, 1.025, 1],
+                }}
+                transition={{
+                  scale: {
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                  },
+                }}
+                className="relative flex items-center justify-center will-change-transform cursor-pointer"
+              >
+                <img
+                  src={content?.heroImage || '/logo_mark.png'}
+                  onError={(e: any) => {
+                    e.currentTarget.src = '/logo.png';
+                  }}
+                  alt="RND CADD Logo"
+                  className="w-32 xs:w-40 sm:w-48 h-auto object-contain transition-transform duration-200 hover:scale-105 drop-shadow-md"
+                  draggable={false}
+                />
+              </motion.div>
+            </div>
           </div>
 
           {/* Desktop Right Column: Sleek Proportional Animated Logo (Hidden on Mobile, Visible on Desktop lg:) */}
