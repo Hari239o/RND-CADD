@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
+import { connectToDatabase } from '@/lib/mongodb';
 import {
   isCloudflareConfigured,
   uploadCourseAssetToCloudflare,
@@ -22,8 +23,9 @@ export async function POST(request: Request) {
     const buffer = Buffer.from(bytes);
     const mimeType = file.type || 'image/png';
     const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const base64Data = buffer.toString('base64');
 
-    // 1. PRIMARY: Try Cloudflare (R2 or Images API) if configured
+    // 1. PRIMARY (When configured): Cloudflare R2 / Images
     if (isCloudflareConfigured()) {
       try {
         const cloudflareResult = await uploadCourseAssetToCloudflare(
@@ -44,17 +46,44 @@ export async function POST(request: Request) {
           });
         }
       } catch (cfErr) {
-        console.warn('[Upload API] Cloudflare upload attempt encountered an issue, falling back:', cfErr);
+        console.warn('[Upload API] Cloudflare upload error, falling back to MongoDB:', cfErr);
       }
     }
 
-    // 2. FALLBACK: Generate Base64 Data URL for serverless resilience
-    const base64Data = buffer.toString('base64');
+    // 2. MONGODB DIRECT MEDIA STORAGE: Stores directly in MongoDB cluster
+    try {
+      const { db, isConnected } = await connectToDatabase();
+      if (isConnected && db) {
+        const mediaDoc = {
+          filename: safeName,
+          contentType: mimeType,
+          data: base64Data,
+          size: file.size,
+          folder,
+          createdAt: new Date(),
+        };
+
+        const result = await db.collection('media').insertOne(mediaDoc);
+        const fileUrl = `/api/media/${result.insertedId}`;
+
+        return NextResponse.json({
+          success: true,
+          url: fileUrl,
+          provider: 'mongodb',
+          id: result.insertedId.toString(),
+          name: file.name,
+          size: file.size,
+        });
+      }
+    } catch (dbErr) {
+      console.warn('[Upload API] MongoDB media storage error, using serverless fallback:', dbErr);
+    }
+
+    // 3. FALLBACK: Data URL / Local disk
     const dataUrl = `data:${mimeType};base64,${base64Data}`;
     let fileUrl = dataUrl;
     let provider = 'base64';
 
-    // 3. Optional local disk save if filesystem is writable
     try {
       const uploadDir = path.join(process.cwd(), 'public', 'uploads');
       await fs.mkdir(uploadDir, { recursive: true });
@@ -64,7 +93,6 @@ export async function POST(request: Request) {
       fileUrl = `/uploads/${filename}`;
       provider = 'local-disk';
     } catch {
-      // In serverless / read-only environments, keep fileUrl as dataUrl
       fileUrl = dataUrl;
       provider = 'base64';
     }
