@@ -225,11 +225,11 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
   if (content?.hidden) return null;
 
   return (
-    <section id="revealed-courses" className="py-14 sm:py-16 bg-[#F8FAFC] border-t border-b border-[#CBD5E1]">
+    <section id="revealed-courses" className="py-6 sm:py-16 bg-[#F8FAFC] border-t border-b border-[#CBD5E1]">
       <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1560px] mx-auto">
-        {/* Section Header with Dynamic Domain Title */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-8 pb-5 border-b border-[#CBD5E1] gap-6">
-          <div>
+        {/* Section Header with Dynamic Domain Title (Desktop Only - Hidden on Mobile as circled) */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-4 sm:mb-8 pb-3 sm:pb-5 border-b border-[#CBD5E1] gap-3 sm:gap-6">
+          <div className="hidden md:block">
             <div className="text-xs font-bold text-[#D20A0B] mb-2 tracking-wider uppercase">
               {content?.badge || 'INDUSTRY-CERTIFIED COURSE CATALOG'}
             </div>
