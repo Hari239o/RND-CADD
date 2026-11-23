@@ -352,12 +352,12 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
   if (content?.hidden) return null;
 
   return (
-    <section id="upgrad-showcase" className="py-8 sm:py-10 bg-[#F8FAFC] border-t border-b border-[#E2E8F0]">
+    <section id="upgrad-showcase" className="py-4 sm:py-10 bg-[#F8FAFC] border-t border-b border-[#E2E8F0]">
       {/* Container with compact balanced width */}
       <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1560px] mx-auto">
         
-        {/* Section Header */}
-        <div className="mb-4 sm:mb-5 pb-3 border-b border-slate-200">
+        {/* Section Header (Desktop Only - Hidden on Mobile as per request) */}
+        <div className="hidden md:block mb-4 sm:mb-5 pb-3 border-b border-slate-200">
           <span className="text-[11px] font-bold text-[#EE2C3C] tracking-wider uppercase">
             {content?.badge || 'Global Certified Programs'}
           </span>
@@ -481,8 +481,8 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
                 {/* Natural sunlight atmospheric overlay */}
                 <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/25 to-black/30 pointer-events-none" />
 
-                {/* Top Row: Stream Badge & Headline */}
-                <div className="relative z-10 flex items-center justify-between flex-wrap gap-2">
+                {/* Top Row: Stream Badge & Headline (Desktop Only - Hidden on Mobile as circled) */}
+                <div className="relative z-10 hidden md:flex items-center justify-between flex-wrap gap-2">
                   <span className="inline-flex items-center gap-2 bg-white/95 backdrop-blur-md text-slate-900 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs font-bold shadow-md">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#EE2C3C] animate-pulse"></span>
                     <span>{folder.name} DISCIPLINE • {countInFolder} TOTAL COURSES</span>
@@ -493,7 +493,7 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
                 </div>
 
                 {/* Bottom Content Area: Counter & Arrows on Left, Courses for THIS folder on Right */}
-                <div className="relative z-10 flex flex-col md:flex-row items-start md:items-end justify-between gap-4 sm:gap-5 pt-3 sm:pt-4 w-full min-w-0">
+                <div className="relative z-10 flex flex-col md:flex-row items-start md:items-end justify-between gap-4 sm:gap-5 pt-1 sm:pt-4 w-full min-w-0">
                   
                   {/* Left: Counter 01/08 and Working Navigation Arrows */}
                   <div className="text-white mb-1 select-none flex md:flex-col items-center md:items-start justify-between md:justify-start w-full md:w-auto flex-shrink-0">
@@ -504,13 +504,13 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
                           /{countInFolder < 10 ? `0${countInFolder}` : countInFolder}
                         </span>
                       </div>
-                      <p className="text-[10px] sm:text-[11px] font-bold text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] mt-1">
+                      <p className="hidden md:block text-[10px] sm:text-[11px] font-bold text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] mt-1">
                         Total {countInFolder} courses in this folder
                       </p>
                     </div>
 
-                    {/* Navigation Circular Arrows with Reliable Click State */}
-                    <div className="flex items-center gap-2 md:mt-3">
+                    {/* Navigation Circular Arrows (Desktop Only - Hidden on Mobile as circled) */}
+                    <div className="hidden md:flex items-center gap-2 md:mt-3">
                       <button
                         type="button"
                         onClick={handlePrev}
