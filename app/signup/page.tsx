@@ -115,22 +115,8 @@ export default function SignUpPage() {
 
   const handleGoogleSignUp = () => {
     setLoading(true);
-    setSuccessMessage('Connecting to Google Workspace...');
-    setTimeout(() => {
-      if (typeof window !== 'undefined') {
-        const u = {
-          name: 'Google CAD Trainee',
-          email: 'google.trainee@rndcadd.com',
-          role: 'student',
-          stream: 'Civil & BIM',
-        };
-        sessionStorage.setItem('rnd_cadd_user', JSON.stringify(u));
-        sessionStorage.setItem('rnd_cadd_role', 'student');
-        localStorage.setItem('rnd_cadd_user', JSON.stringify(u));
-        localStorage.setItem('rnd_cadd_role', 'student');
-      }
-      router.push('/portal/student?email=google.trainee%40rndcadd.com');
-    }, 700);
+    setSuccessMessage('Connecting to Google...');
+    window.location.href = '/api/auth/google';
   };
 
   return (

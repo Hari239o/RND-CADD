@@ -154,18 +154,7 @@ export default function SignInPage() {
 
   const handleGoogleSignIn = () => {
     setLoading(true);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(
-        'rnd_cadd_user',
-        JSON.stringify({
-          name: 'Google CAD Member',
-          email: 'member@gmail.com',
-          role: 'student',
-        })
-      );
-      localStorage.setItem('rnd_cadd_role', 'student');
-      window.location.href = '/portal/student';
-    }
+    window.location.href = '/api/auth/google';
   };
 
   return (
