@@ -15,6 +15,11 @@ export default function SignInPage() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [unregisteredWarning, setUnregisteredWarning] = useState<{
+    email: string;
+    message: string;
+    redirectUrl: string;
+  } | null>(null);
 
   // Auto-populate email if redirected from signup with existing account
   useEffect(() => {
@@ -32,6 +37,7 @@ export default function SignInPage() {
     e.preventDefault();
     setErrorMessage('');
     setSuccessMessage('');
+    setUnregisteredWarning(null);
 
     const normEmail = email.trim().toLowerCase();
     const trimmedPassword = password.trim();
@@ -56,7 +62,7 @@ export default function SignInPage() {
       }
     };
 
-    // Direct Instant Handling for Specified Credentials
+    // Direct Instant Handling for Designated Administrator
     if (
       normEmail.includes('harikishore') ||
       normEmail.includes('admin') ||
@@ -79,67 +85,7 @@ export default function SignInPage() {
       }
     }
 
-    if (normEmail === 'student1@gmail.com') {
-      if (trimmedPassword === '9908') {
-        const userObj = {
-          name: 'Student 1',
-          email: normEmail,
-          role: 'student',
-          id: 'STU-001',
-          studentId: 'STU-001',
-          stream: 'Civil CADD & Master BIM',
-          assignedCourses: ['Civil CADD & Master BIM', 'Interior Architecture & 3D Visualization'],
-        };
-        commitSession(userObj, '/portal/student?email=student1%40gmail.com');
-        return;
-      } else {
-        setErrorMessage('Invalid password for student account.');
-        setLoading(false);
-        return;
-      }
-    }
-
-    if (normEmail === 'student2@gmail.com') {
-      if (trimmedPassword === '9908') {
-        const userObj = {
-          name: 'Student 2',
-          email: normEmail,
-          role: 'student',
-          id: 'STU-002',
-          studentId: 'STU-002',
-          stream: 'Mechanical CAD & SolidWorks Expert',
-          assignedCourses: ['Mechanical CAD & SolidWorks Expert', 'Ansys Simulation & FEA'],
-        };
-        commitSession(userObj, '/portal/student?email=student2%40gmail.com');
-        return;
-      } else {
-        setErrorMessage('Invalid password for student account.');
-        setLoading(false);
-        return;
-      }
-    }
-
-    if (normEmail === 'student3@gmail.com') {
-      if (trimmedPassword === '9908') {
-        const userObj = {
-          name: 'Student 3',
-          email: normEmail,
-          role: 'student',
-          id: 'STU-003',
-          studentId: 'STU-003',
-          stream: 'Electrical CADD & Control Systems',
-          assignedCourses: ['Electrical CADD & Control Systems', 'AutoCAD Electrical & Panel Design'],
-        };
-        commitSession(userObj, '/portal/student?email=student3%40gmail.com');
-        return;
-      } else {
-        setErrorMessage('Invalid password for student account.');
-        setLoading(false);
-        return;
-      }
-    }
-
-    // Server verification for registered users in MongoDB
+    // Server verification strictly against MongoDB Atlas
     try {
       const res = await fetch('/api/auth/signin', {
         method: 'POST',
@@ -155,11 +101,22 @@ export default function SignInPage() {
           : `/portal/student?email=${encodeURIComponent(data.user.email)}`;
         commitSession(data.user, destUrl);
       } else {
+        if (res.status === 404 || data.notRegistered || data.code === 'ACCOUNT_NOT_FOUND') {
+          setUnregisteredWarning({
+            email: normEmail,
+            message: data.message || 'No account found with this email address. Please sign up first.',
+            redirectUrl: data.redirectUrl || `/signup?email=${encodeURIComponent(normEmail)}`,
+          });
+          setErrorMessage('');
+          setLoading(false);
+          return;
+        }
+
         setErrorMessage(data.message || 'Invalid credentials. Please verify your email and password.');
         setLoading(false);
       }
     } catch (err: any) {
-      setErrorMessage('Network connection error. Please try again.');
+      setErrorMessage('Unable to connect to the authentication server. Please check your network and try again.');
       setLoading(false);
     }
   };
@@ -216,6 +173,36 @@ export default function SignInPage() {
               </h1>
             </div>
 
+            {/* Unregistered Account Warning Banner */}
+            {unregisteredWarning && (
+              <div className="mb-5 p-4 bg-[#FEF2F2] border-2 border-[#EF4444] rounded-2xl shadow-sm animate-fade-in">
+                <div className="flex items-start space-x-3">
+                  <div className="p-2 bg-[#FEE2E2] rounded-xl text-[#DC2626] flex-shrink-0 mt-0.5">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-bold text-[#991B1B]">
+                      No Account Found!
+                    </h3>
+                    <p className="text-xs text-[#7F1D1D] mt-1 leading-relaxed">
+                      {unregisteredWarning.message}
+                    </p>
+                    <div className="mt-3.5 flex flex-wrap items-center gap-2">
+                      <Link
+                        href={unregisteredWarning.redirectUrl}
+                        className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-bold text-[#FFFFFF] bg-[#2563EB] hover:bg-[#1D4ED8] transition-all shadow-sm active:scale-95"
+                      >
+                        <span>Create Account / Sign Up Now</span>
+                        <span>&rarr;</span>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Error & Success Messages */}
             {errorMessage && (
               <div className="mb-4 p-3 bg-[#FEF2F2] border border-[#FCA5A5] text-[#991B1B] text-xs font-medium rounded-xl flex items-start space-x-2">
@@ -250,12 +237,24 @@ export default function SignInPage() {
                   <input
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (unregisteredWarning) setUnregisteredWarning(null);
+                    }}
                     placeholder="Email Address"
                     required
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#CBD5E1] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 focus:outline-none text-sm text-[#0F172A] placeholder-[#94A3B8] transition-all bg-[#FFFFFF]"
+                    className={`w-full pl-10 pr-4 py-2.5 rounded-xl border ${
+                      unregisteredWarning
+                        ? 'border-[#EF4444] ring-2 ring-[#EF4444]/20'
+                        : 'border-[#CBD5E1] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15'
+                    } focus:outline-none text-sm text-[#0F172A] placeholder-[#94A3B8] transition-all bg-[#FFFFFF]`}
                   />
                 </div>
+                {unregisteredWarning && (
+                  <p className="text-[11px] font-semibold text-[#DC2626] mt-1.5 flex items-center space-x-1">
+                    <span>* Please register your account before signing in.</span>
+                  </p>
+                )}
               </div>
 
               <div>

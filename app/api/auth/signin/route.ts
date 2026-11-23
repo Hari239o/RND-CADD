@@ -18,8 +18,7 @@ export async function POST(request: NextRequest) {
     const normalizedEmail = String(email).trim().toLowerCase();
     const trimmedPassword = String(password).trim();
 
-    // 1. Direct Verification for User's Designated Admin
-    // Admin: harikishorereddy9908@gmial.com (or @gmail.com) / admin@rndcadd.com / admin@gmail.com / 9908
+    // 1. Direct Verification for Designated Administrator
     if (
       normalizedEmail === 'harikishorereddy9908@gmial.com' ||
       normalizedEmail === 'harikishorereddy9908@gmail.com' ||
@@ -35,9 +34,9 @@ export async function POST(request: NextRequest) {
             name: 'Hari Kishore Reddy',
             email: normalizedEmail,
             role: 'admin',
-            stream: 'Executive CADD Administration'
+            stream: 'Executive CADD Administration',
           },
-          redirectUrl: '/portal/admin'
+          redirectUrl: '/portal/admin',
         });
       } else {
         return NextResponse.json(
@@ -47,137 +46,93 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 2. Direct Verification for Student Accounts (student1, student2, student3 / 9908)
-    if (normalizedEmail === 'student1@gmail.com') {
-      if (trimmedPassword === '9908') {
-        return NextResponse.json({
-          success: true,
-          message: 'Signed in as Student 1',
-          user: {
-            id: 'stu_001',
-            studentId: 'STU-001',
-            name: 'Student 1',
-            email: normalizedEmail,
-            role: 'student',
-            mobile: '',
-            officialMobile: '',
-            stream: 'Civil CADD & Master BIM',
-            assignedCourses: ['Civil CADD & Master BIM', 'Interior Architecture & 3D Visualization']
-          },
-          redirectUrl: '/portal/student?email=student1%40gmail.com'
-        });
-      } else {
-        return NextResponse.json(
-          { success: false, message: 'Invalid password for student account.' },
-          { status: 401 }
-        );
-      }
-    }
-
-    if (normalizedEmail === 'student2@gmail.com') {
-      if (trimmedPassword === '9908') {
-        return NextResponse.json({
-          success: true,
-          message: 'Signed in as Student 2',
-          user: {
-            id: 'stu_002',
-            studentId: 'STU-002',
-            name: 'Student 2',
-            email: normalizedEmail,
-            role: 'student',
-            mobile: '',
-            officialMobile: '',
-            stream: 'Mechanical CAD & SolidWorks Expert',
-            assignedCourses: ['Mechanical CAD & SolidWorks Expert', 'Ansys Simulation & FEA']
-          },
-          redirectUrl: '/portal/student?email=student2%40gmail.com'
-        });
-      } else {
-        return NextResponse.json(
-          { success: false, message: 'Invalid password for student account.' },
-          { status: 401 }
-        );
-      }
-    }
-
-    if (normalizedEmail === 'student3@gmail.com') {
-      if (trimmedPassword === '9908') {
-        return NextResponse.json({
-          success: true,
-          message: 'Signed in as Student 3',
-          user: {
-            id: 'stu_003',
-            studentId: 'STU-003',
-            name: 'Student 3',
-            email: normalizedEmail,
-            role: 'student',
-            mobile: '',
-            officialMobile: '',
-            stream: 'Electrical CADD & Control Systems',
-            assignedCourses: ['Electrical CADD & Control Systems', 'AutoCAD Electrical & Panel Design']
-          },
-          redirectUrl: '/portal/student?email=student3%40gmail.com'
-        });
-      } else {
-        return NextResponse.json(
-          { success: false, message: 'Invalid password for student account.' },
-          { status: 401 }
-        );
-      }
-    }
-
-    // 3. Check Live MongoDB Database (for all registered users)
+    // 2. Strict Verification against Live MongoDB Database
     const { db, isConnected } = await connectToDatabase();
-    if (isConnected && db) {
-      const user = await db.collection('users').findOne({ email: normalizedEmail });
-      if (user) {
-        if (user.password === trimmedPassword) {
-          const userRole = user.role === 'admin' ? 'admin' : 'student';
-          const userCourses = Array.isArray(user.assignedCourses) && user.assignedCourses.length > 0
-            ? user.assignedCourses
-            : (user.courseName ? [user.courseName] : (user.stream ? [user.stream] : []));
 
-          return NextResponse.json({
-            success: true,
-            message: 'Signed in successfully',
-            user: {
-              id: user._id.toString(),
-              studentId: user.studentId || `STU-${user._id.toString().slice(-4).toUpperCase()}`,
-              name: user.name || user.fullName || normalizedEmail.split('@')[0],
-              email: user.email,
-              role: userRole,
-              mobile: user.officialMobile || user.mobile || user.phone || '',
-              officialMobile: user.officialMobile || user.mobile || user.phone || '',
-              stream: user.stream || user.courseName || (userCourses[0] || 'Civil & BIM'),
-              assignedCourses: userCourses,
-            },
-            redirectUrl: userRole === 'admin' ? '/portal/admin' : '/portal/student'
-          });
-        } else {
-          return NextResponse.json(
-            { success: false, message: 'Invalid password. Please check and try again.' },
-            { status: 401 }
-          );
-        }
-      }
+    if (!isConnected || !db) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Database service is currently connecting. Please try again in a moment.',
+        },
+        { status: 503 }
+      );
     }
 
-    // 4. Standalone Fallback for dynamically registered users
-    return NextResponse.json({
-      success: true,
-      isDemoMode: true,
-      message: 'Signed in (Standalone Mode)',
-      user: {
-        id: 'usr_' + Date.now(),
-        name: normalizedEmail.split('@')[0],
-        email: normalizedEmail,
-        role: 'student',
-        stream: 'Civil & BIM',
-        assignedCourses: [],
-      },
-      redirectUrl: '/portal/student'
+    // Search for user in MongoDB (case-insensitive)
+    const escapedEmail = normalizedEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const user = await db.collection('users').findOne({
+      $or: [
+        { email: normalizedEmail },
+        { email: { $regex: new RegExp(`^${escapedEmail}$`, 'i') } },
+      ],
     });
 
+    // IF USER DOES NOT EXIST IN DATABASE -> BLOCK ACCESS & PROMPT SIGNUP
+    if (!user) {
+      return NextResponse.json(
+        {
+          success: false,
+          notRegistered: true,
+          code: 'ACCOUNT_NOT_FOUND',
+          message: 'No account found with this email address. Please sign up first to access the student portal.',
+          redirectUrl: `/signup?email=${encodeURIComponent(normalizedEmail)}`,
+        },
+        { status: 404 }
+      );
+    }
+
+    // If account was created via Google OAuth and has no local password
+    if (user.source === 'google_oauth' && !user.password) {
+      return NextResponse.json(
+        {
+          success: false,
+          code: 'GOOGLE_AUTH_REQUIRED',
+          message: 'This account was created using Google Sign-In. Please click "Continue with Google" to log in.',
+        },
+        { status: 400 }
+      );
+    }
+
+    // Verify Password
+    if (user.password !== trimmedPassword) {
+      return NextResponse.json(
+        {
+          success: false,
+          code: 'INVALID_PASSWORD',
+          message: 'Incorrect password. Please verify your password or use "Forgot Password" to reset it.',
+        },
+        { status: 401 }
+      );
+    }
+
+    // Password matches -> Grant Authenticated Session
+    const userRole = user.role === 'admin' ? 'admin' : 'student';
+    const userCourses =
+      Array.isArray(user.assignedCourses) && user.assignedCourses.length > 0
+        ? user.assignedCourses
+        : user.courseName
+        ? [user.courseName]
+        : user.stream
+        ? [user.stream]
+        : [];
+
+    return NextResponse.json({
+      success: true,
+      message: 'Signed in successfully',
+      user: {
+        id: user._id.toString(),
+        studentId: user.studentId || `STU-${user._id.toString().slice(-4).toUpperCase()}`,
+        name: user.name || user.fullName || normalizedEmail.split('@')[0],
+        email: user.email,
+        role: userRole,
+        mobile: user.officialMobile || user.mobile || user.phone || '',
+        officialMobile: user.officialMobile || user.mobile || user.phone || '',
+        stream: user.stream || user.courseName || (userCourses[0] || 'Civil & BIM'),
+        assignedCourses: userCourses,
+      },
+      redirectUrl: userRole === 'admin' ? '/portal/admin' : '/portal/student',
+    });
   } catch (error: any) {
     console.error('[API Sign In Error]:', error);
     return NextResponse.json(
