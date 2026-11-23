@@ -816,11 +816,12 @@ export default function AdminPortalPage() {
     };
     reader.readAsDataURL(file);
 
-    // 2. Upload to server API (which supports both disk uploads and serverless base64)
+    // 2. Upload to server API (which supports Cloudflare R2/Images, disk uploads and serverless base64)
     setIsUploadingImage(true);
     try {
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('folder', 'cms');
       const res = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
@@ -3067,11 +3068,13 @@ export default function AdminPortalPage() {
     try {
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('folder', 'courses');
       const res = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
       });
       const data = await res.json();
+      const cfBadge = data.provider?.startsWith('cloudflare') ? ' [Cloudflare Cloud]' : '';
       if (data.success && data.url) {
         if (target === 'courseImage') {
           if (editingCourse) {
@@ -3079,7 +3082,7 @@ export default function AdminPortalPage() {
           } else {
             setNewCourse((prev) => ({ ...prev, image: data.url }));
           }
-          showToast('Course banner image uploaded successfully.');
+          showToast(`Course banner image uploaded successfully.${cfBadge}`);
         } else if (target === 'labImage') {
           if (editingCourse) {
             setEditingCourse({ ...editingCourse, labImage: data.url });
