@@ -323,18 +323,18 @@ export const Header: React.FC<HeaderProps> = ({
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-              className="absolute top-0 right-0 bottom-0 w-full max-w-[340px] sm:max-w-sm bg-white shadow-2xl flex flex-col justify-between overflow-y-auto safe-pt safe-pb p-5 sm:p-6"
+              className="absolute top-0 right-0 bottom-0 w-full max-w-[360px] sm:max-w-sm bg-white shadow-2xl flex flex-col justify-between overflow-y-auto pt-9 xs:pt-11 sm:pt-12 px-5 sm:px-6 pb-6 rounded-l-3xl border-l border-slate-200/80"
             >
               <div>
-                {/* Drawer Header */}
-                <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+                {/* Drawer Header with Generous Top Clearance */}
+                <div className="flex items-center justify-between pb-3.5 border-b border-slate-200/90">
                   <div className="flex items-center gap-3">
-                    <img src="/logo.png" alt="RND CADD" className="h-12 sm:h-14 w-auto object-contain" />
+                    <img src="/logo.png" alt="RND CADD" className="h-10 sm:h-12 w-auto object-contain" />
                     <div>
-                      <span className="text-sm sm:text-base font-black text-[#15304C] uppercase tracking-wide block leading-tight">
+                      <span className="text-sm font-black text-[#15304C] uppercase tracking-wide block leading-tight">
                         RND CADD
                       </span>
-                      <span className="text-xs sm:text-sm text-slate-500 font-semibold block leading-tight mt-0.5">
+                      <span className="text-[11px] sm:text-xs text-slate-500 font-semibold block leading-tight mt-0.5">
                         Training Institute
                       </span>
                     </div>
@@ -342,24 +342,24 @@ export const Header: React.FC<HeaderProps> = ({
                   <button
                     type="button"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-colors cursor-pointer active:scale-95"
+                    className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-all cursor-pointer active:scale-90"
                     aria-label="Close Menu"
                   >
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
                 </div>
 
                 {/* User Status / Portal Card in Drawer */}
-                <div className="my-4 p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                <div className="my-3.5 p-3 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-2xs">
                   {currentUser ? (
                     <div className="flex items-center justify-between">
                       <div className="min-w-0 pr-2">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                           Signed in as
                         </span>
-                        <p className="text-xs font-extrabold text-slate-900 truncate">
+                        <p className="text-xs font-black text-slate-900 truncate">
                           {currentUser.name || currentUser.email}
                         </p>
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-[#EE2C3C] uppercase inline-block mt-0.5">
@@ -379,14 +379,14 @@ export const Header: React.FC<HeaderProps> = ({
                       <Link
                         href="/signin"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex-1 py-2.5 text-center rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-2xs transition-colors"
+                        className="flex-1 py-2.5 text-center rounded-xl bg-white border border-slate-300 text-xs font-bold text-[#15304C] hover:bg-slate-50 shadow-2xs transition-all active:scale-95"
                       >
                         Sign In
                       </Link>
                       <Link
                         href="/signup"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex-1 py-2.5 text-center rounded-xl bg-[#EE2C3C] hover:bg-[#D20A0B] text-white text-xs font-bold shadow-xs transition-colors"
+                        className="flex-1 py-2.5 text-center rounded-xl bg-[#EE2C3C] hover:bg-[#D20A0B] text-white text-xs font-bold shadow-sm shadow-red-500/20 transition-all active:scale-95"
                       >
                         Sign Up
                       </Link>
@@ -395,20 +395,21 @@ export const Header: React.FC<HeaderProps> = ({
                 </div>
 
                 {/* Primary Quick Links */}
-                <div className="space-y-1 mb-5">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block px-2 mb-1">
+                <div className="space-y-1.5 mb-4">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block px-1 mb-1">
                     Quick Navigation
                   </span>
+                  
                   <Link
                     href="/jobs"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between px-3.5 py-3 rounded-xl hover:bg-slate-100 text-xs font-bold text-slate-900 transition-colors"
+                    className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-slate-50/80 hover:bg-slate-100/90 border border-slate-200/70 text-xs font-bold text-slate-900 transition-colors"
                   >
-                    <span className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-[#EE2C3C]"></span>
+                    <span className="flex items-center gap-2.5">
+                      <span className="w-2 h-2 rounded-full bg-[#EE2C3C] animate-pulse"></span>
                       <span>Verified Jobs &amp; Placement Portal</span>
                     </span>
-                    <span className="text-[10px] bg-red-50 text-[#EE2C3C] border border-red-200 px-2 py-0.5 rounded-full font-bold">
+                    <span className="text-[9px] bg-red-100 text-[#EE2C3C] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">
                       LIVE
                     </span>
                   </Link>
@@ -416,36 +417,39 @@ export const Header: React.FC<HeaderProps> = ({
                   <button
                     type="button"
                     onClick={handleEnrollClick}
-                    className="w-full flex items-center justify-between px-3.5 py-3 rounded-xl hover:bg-slate-100 text-xs font-bold text-slate-900 transition-colors text-left"
+                    className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-slate-50/80 hover:bg-slate-100/90 border border-slate-200/70 text-xs font-bold text-slate-900 transition-colors text-left"
                   >
-                    <span className="flex items-center gap-2">
+                    <span className="flex items-center gap-2.5">
                       <span className="w-2 h-2 rounded-full bg-blue-500"></span>
                       <span>Reserve Workstation / Demo</span>
                     </span>
-                    <span className="text-slate-400">&rarr;</span>
+                    <span className="text-slate-400 font-bold">&rarr;</span>
                   </button>
                 </div>
 
-                {/* Engineering Disciplines Switcher */}
+                {/* Engineering Disciplines Grid Pattern (Clean 2-Column Responsive Chips) */}
                 <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block px-2 mb-2">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block px-1 mb-2">
                     Browse Engineering Domains
                   </span>
-                  <div className="space-y-1">
+                  <div className="grid grid-cols-2 gap-2">
                     {NAV_ITEMS.map((item) => {
                       const isSelected = activeStream === item.id;
+                      const isAll = item.id === 'all';
                       return (
                         <button
                           key={item.id}
                           onClick={() => handleStreamClick(item.id)}
-                          className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left cursor-pointer ${
+                          className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all text-left cursor-pointer active:scale-95 ${
+                            isAll ? 'col-span-2' : ''
+                          } ${
                             isSelected
-                              ? 'bg-[#EE2C3C] text-white shadow-sm'
-                              : 'text-slate-700 hover:bg-slate-100'
+                              ? 'bg-[#EE2C3C] text-white shadow-md shadow-red-500/20'
+                              : 'bg-slate-50/90 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
                           }`}
                         >
-                          <span>{item.label}</span>
-                          {isSelected && <span>✓</span>}
+                          <span className="truncate">{item.label}</span>
+                          {isSelected && <span className="text-white text-xs ml-1 shrink-0">✓</span>}
                         </button>
                       );
                     })}
@@ -454,7 +458,7 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
 
               {/* Drawer Footer */}
-              <div className="pt-4 border-t border-slate-200 mt-6">
+              <div className="pt-3.5 border-t border-slate-200/80 mt-4">
                 {currentUser && (
                   <button
                     type="button"
@@ -467,7 +471,7 @@ export const Header: React.FC<HeaderProps> = ({
                     Sign Out
                   </button>
                 )}
-                <p className="text-[10px] text-slate-400 text-center">
+                <p className="text-[10px] text-slate-400 text-center font-medium">
                   RND CADD Training Institute &bull; Ameerpet, Hyderabad
                 </p>
               </div>
