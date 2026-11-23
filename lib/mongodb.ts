@@ -1,7 +1,36 @@
 import { MongoClient, Db } from 'mongodb';
 
+export function normalizeMongoUri(rawUri: string): string {
+  if (!rawUri || !rawUri.includes('://')) return rawUri;
+
+  try {
+    const [scheme, rest] = rawUri.split('://');
+    if (!rest || !rest.includes('@')) return rawUri;
+
+    // Find the last '@' which separates credentials from the cluster host
+    const lastAtIndex = rest.lastIndexOf('@');
+    const creds = rest.substring(0, lastAtIndex);
+    const hostAndQuery = rest.substring(lastAtIndex + 1);
+
+    const firstColon = creds.indexOf(':');
+    if (firstColon === -1) return rawUri;
+
+    const rawUser = creds.substring(0, firstColon);
+    const rawPass = creds.substring(firstColon + 1);
+
+    // Decode first in case user already encoded some characters, then encode cleanly
+    const safeUser = encodeURIComponent(decodeURIComponent(rawUser));
+    const safePass = encodeURIComponent(decodeURIComponent(rawPass));
+
+    return `${scheme}://${safeUser}:${safePass}@${hostAndQuery}`;
+  } catch {
+    return rawUri;
+  }
+}
+
 export function getMongoUri(): string {
-  return process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/rnd_cadd';
+  const raw = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/rnd_cadd';
+  return normalizeMongoUri(raw.trim());
 }
 
 export function getMongoDbName(): string {
@@ -28,12 +57,19 @@ declare global {
 export async function getMongoClient(): Promise<MongoClient> {
   const uri = getMongoUri();
 
+  const isSrv = uri.startsWith('mongodb+srv://');
+  const mongoOptions: any = {
+    serverSelectionTimeoutMS: 10000,
+    connectTimeoutMS: 15000,
+  };
+  if (isSrv) {
+    mongoOptions.tls = true;
+    mongoOptions.tlsAllowInvalidCertificates = true;
+  }
+
   if (process.env.NODE_ENV === 'development') {
     if (!global._mongoClientPromise) {
-      client = new MongoClient(uri, {
-        serverSelectionTimeoutMS: 8000,
-        connectTimeoutMS: 10000,
-      });
+      client = new MongoClient(uri, mongoOptions);
       global._mongoClientPromise = client.connect().catch((err) => {
         global._mongoClientPromise = undefined;
         throw err;
@@ -42,10 +78,7 @@ export async function getMongoClient(): Promise<MongoClient> {
     return global._mongoClientPromise;
   } else {
     if (!clientPromise) {
-      client = new MongoClient(uri, {
-        serverSelectionTimeoutMS: 8000,
-        connectTimeoutMS: 10000,
-      });
+      client = new MongoClient(uri, mongoOptions);
       clientPromise = client.connect().catch((err) => {
         clientPromise = null;
         throw err;
