@@ -66,29 +66,29 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
       onMouseLeave={handleMouseLeave}
       className="relative w-full min-h-0 lg:min-h-[90vh] bg-white overflow-hidden border-b border-slate-100 flex items-center"
     >
-      {/* Background Circles - EXACT Unlox Architecture matching Image 2 */}
-      <div className="absolute w-[90vw] h-[90vw] sm:w-[85vw] sm:h-[85vw] max-w-[1100px] max-h-[1100px] -top-[50%] sm:-top-[60%] lg:-top-[68%] left-[20%] sm:left-[32%] lg:left-[40%] flex items-center justify-center pointer-events-none select-none z-0">
+      {/* Background Circles - Centered on Mobile, Offset on Desktop */}
+      <div className="absolute w-[90vw] h-[90vw] sm:w-[85vw] sm:h-[85vw] max-w-[1100px] max-h-[1100px] -top-[40%] sm:-top-[60%] lg:-top-[68%] left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[40%] flex items-center justify-center pointer-events-none select-none z-0">
         <div className="w-full h-full rounded-full bg-[radial-gradient(circle,_rgba(255,255,255,0)_35%,_rgba(145,194,255,0.38)_100%)]" />
       </div>
 
-      <div className="absolute w-[90vw] h-[90vw] sm:w-[85vw] sm:h-[85vw] max-w-[1100px] max-h-[1100px] top-[40%] sm:top-[42%] lg:top-[38%] left-[20%] sm:left-[32%] lg:left-[40%] flex items-center justify-center pointer-events-none select-none z-0">
+      <div className="absolute w-[90vw] h-[90vw] sm:w-[85vw] sm:h-[85vw] max-w-[1100px] max-h-[1100px] top-[40%] sm:top-[42%] lg:top-[38%] left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[40%] flex items-center justify-center pointer-events-none select-none z-0">
         <div className="w-full h-full rounded-full bg-[radial-gradient(circle,_rgba(255,255,255,0)_35%,_rgba(145,194,255,0.38)_100%)]" />
       </div>
 
       {/* Seamless Vertical Gradient Overlay to blend top and bottom with page background */}
       <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,1)_0%,transparent_30%,transparent_70%,rgba(255,255,255,1)_100%)] pointer-events-none z-0" />
 
-      {/* Full-Screen Edge-to-Edge Container: Comfortably utilizes the left side space */}
-      <div className="relative z-10 w-full px-4 sm:px-8 md:px-12 lg:px-20 xl:px-28 2xl:px-36 pt-32 sm:pt-36 lg:pt-44 xl:pt-48 pb-6 sm:pb-20 lg:pb-28">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-14 xl:gap-20 items-center w-full">
-          {/* Left Column: Occupies Left Side Naturally (UNLOX Full Screen Style) */}
-          <div className="lg:col-span-7 flex flex-col justify-center text-left">
+      {/* Full-Screen Edge-to-Edge Container: Optimized Mobile Breathing Room */}
+      <div className="relative z-10 w-full px-4 sm:px-8 md:px-12 lg:px-20 xl:px-28 2xl:px-36 pt-20 xs:pt-24 sm:pt-36 lg:pt-44 xl:pt-48 pb-5 sm:pb-20 lg:pb-28">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-8 lg:gap-14 xl:gap-20 items-center w-full">
+          {/* Main Column: Centered on Mobile, Natural Left on Desktop */}
+          <div className="lg:col-span-7 flex flex-col justify-center items-center lg:items-start text-center lg:text-left">
             {/* Top Pill Badge */}
             <motion.div
               initial={{ opacity: 0, y: shouldReduceMotion ? 0 : -8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, ease: 'easeOut' }}
-              className="inline-flex items-center gap-1.5 sm:gap-2 self-start border border-blue-200/90 bg-blue-50/70 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-[13px] font-medium text-[#15304C] shadow-2xs mb-3 sm:mb-6"
+              className="inline-flex items-center gap-1.5 sm:gap-2 self-center lg:self-start border border-blue-200/90 bg-blue-50/70 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-[13px] font-medium text-[#15304C] shadow-2xs mb-2.5 sm:mb-6"
             >
               <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#D20A0B] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
@@ -96,23 +96,60 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
               <span className="truncate">{content?.badge || 'Industry 4.0 CAD & BIM Academy'}</span>
             </motion.div>
 
-            {/* Headline with Decreased, Balanced Font Size */}
+            {/* Headline with Balanced Responsive Typography */}
             <motion.h1
               initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.05, ease: 'easeOut' }}
-              className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#15304C] tracking-tight leading-[1.14]"
+              className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#15304C] tracking-tight leading-[1.14] text-center lg:text-left"
             >
               {content?.title || 'Master Industrial CAD.'} <br />
               <span className="text-[#D20A0B]">{content?.highlight || 'Build Your Future.'}</span>
             </motion.h1>
 
-            {/* Action CTAs - Responsive Side-by-Side on Mobile */}
+            {/* Mobile Visual Pattern: Interactive 3D Animated Logo sits between Headline & Action CTAs on Mobile */}
+            <div
+              className="flex lg:hidden items-center justify-center relative my-3 sm:my-5 py-1 select-none z-10 w-full"
+              style={{ perspective: 1200 }}
+            >
+              <motion.div
+                style={{
+                  x: translateX,
+                  y: translateY,
+                  rotateX: rotateX,
+                  rotateY: rotateY,
+                  transformStyle: 'preserve-3d',
+                }}
+                animate={{
+                  scale: shouldReduceMotion ? 1 : [1, 1.025, 1],
+                }}
+                transition={{
+                  scale: {
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                  },
+                }}
+                className="relative flex items-center justify-center will-change-transform cursor-pointer"
+              >
+                <img
+                  src={content?.heroImage || '/logo_mark.png'}
+                  onError={(e: any) => {
+                    e.currentTarget.src = '/logo.png';
+                  }}
+                  alt="RND CADD Logo"
+                  className="w-28 xs:w-36 sm:w-48 h-auto object-contain transition-transform duration-200 hover:scale-105 drop-shadow-md"
+                  draggable={false}
+                />
+              </motion.div>
+            </div>
+
+            {/* Action CTAs - Responsive Balanced Buttons on Mobile & Desktop */}
             <motion.div
               initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
-              className="mt-4 sm:mt-8 flex flex-row items-center gap-2.5 sm:gap-4 w-full"
+              className="mt-2 sm:mt-8 flex flex-row items-center justify-center lg:justify-start gap-2.5 sm:gap-4 w-full max-w-sm sm:max-w-none mx-auto lg:mx-0"
             >
               <button
                 type="button"
@@ -148,9 +185,9 @@ export const RndCaddHero: React.FC<RndCaddHeroProps> = ({
             </motion.div>
           </div>
 
-          {/* Right Column: Sleek Proportional Animated Logo */}
+          {/* Desktop Right Column: Sleek Proportional Animated Logo (Hidden on Mobile, Visible on Desktop lg:) */}
           <div
-            className="lg:col-span-5 flex items-center justify-center relative mt-3 sm:mt-6 lg:mt-0 py-2 sm:py-8 select-none z-10"
+            className="hidden lg:flex lg:col-span-5 items-center justify-center relative mt-3 sm:mt-6 lg:mt-0 py-2 sm:py-8 select-none z-10"
             style={{ perspective: 1200 }}
           >
             {/* Interactive Mouse-Tracking Animated Logo */}
