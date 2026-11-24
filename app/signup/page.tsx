@@ -26,14 +26,25 @@ export default function SignUpPage() {
     message: string;
     redirectUrl: string;
   } | null>(null);
+  const [alreadyRegisteredModal, setAlreadyRegisteredModal] = useState<{
+    email: string;
+    message?: string;
+  } | null>(null);
 
-  // Auto-populate email if redirected from signin
+  // Auto-populate email if redirected from signin, or trigger modal if already registered
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const queryEmail = params.get('email');
+      const alreadyRegistered = params.get('already_registered');
       if (queryEmail) {
         setFormData((prev) => ({ ...prev, email: queryEmail }));
+      }
+      if (alreadyRegistered === 'true' && queryEmail) {
+        setAlreadyRegisteredModal({
+          email: queryEmail,
+          message: 'An account with this email address already exists. Please log in / sign in to access your student portal.',
+        });
       }
     }
   }, []);
@@ -102,6 +113,11 @@ export default function SignUpPage() {
           message: data.message || 'An account with this email address already exists. Please log in instead.',
           redirectUrl: data.redirectUrl || `/signin?email=${encodeURIComponent(formData.email.trim())}`,
         });
+        // Open Case 1 Pop-up Modal
+        setAlreadyRegisteredModal({
+          email: formData.email.trim(),
+          message: data.message || 'An account with this email address already exists in our system. Please log in / sign in to access your student portal.',
+        });
         setLoading(false);
         return;
       }
@@ -132,7 +148,7 @@ export default function SignUpPage() {
   const handleGoogleSignUp = () => {
     setLoading(true);
     setSuccessMessage('Connecting to Google...');
-    window.location.href = '/api/auth/google';
+    window.location.href = '/api/auth/google?mode=signup';
   };
 
   return (
@@ -438,6 +454,66 @@ export default function SignUpPage() {
           </div>
         </div>
       </footer>
+
+      {/* CASE 1 POP-UP MODAL: Account Already Registered */}
+      {alreadyRegisteredModal && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-[#0F172A]/75 backdrop-blur-sm animate-fade-in">
+          <div
+            className="bg-[#FFFFFF] rounded-2xl shadow-2xl max-w-md w-full border border-[#E2E8F0] overflow-hidden p-6 sm:p-7 text-center relative animate-scale-up"
+            role="dialog"
+            aria-modal="true"
+          >
+            {/* Top Close Button */}
+            <button
+              onClick={() => setAlreadyRegisteredModal(null)}
+              className="absolute top-4 right-4 text-[#94A3B8] hover:text-[#0F172A] p-1.5 rounded-lg hover:bg-[#F1F5F9] transition-all"
+              aria-label="Close"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Warning Alert Icon */}
+            <div className="mx-auto w-16 h-16 bg-[#FEE2E2] rounded-full flex items-center justify-center text-[#DC2626] mb-4 shadow-inner">
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+
+            {/* Modal Heading */}
+            <h3 className="text-xl font-bold text-[#15304C] mb-2 tracking-tight">
+              Email Already Registered!
+            </h3>
+
+            {/* Modal Body */}
+            <p className="text-sm text-[#475569] mb-6 leading-relaxed">
+              An account with <strong className="text-[#0F172A] font-semibold">{alreadyRegisteredModal.email}</strong> is already registered in our system. You do not need to sign up again.
+              <br />
+              Please sign in directly to access your student portal.
+            </p>
+
+            {/* Primary Action Button */}
+            <div className="space-y-2.5">
+              <Link
+                href={`/signin?email=${encodeURIComponent(alreadyRegisteredModal.email)}`}
+                className="w-full inline-flex items-center justify-center space-x-2 py-3 px-5 rounded-xl font-bold text-sm text-[#FFFFFF] bg-[#EE2C3C] hover:bg-[#DC2626] transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
+              >
+                <span>Go to Log In / Sign In</span>
+                <span>&rarr;</span>
+              </Link>
+
+              <button
+                type="button"
+                onClick={() => setAlreadyRegisteredModal(null)}
+                className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] transition-all border border-[#E2E8F0]"
+              >
+                Stay on Sign Up
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

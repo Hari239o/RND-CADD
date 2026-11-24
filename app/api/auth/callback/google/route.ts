@@ -7,6 +7,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
   const error = searchParams.get('error');
+  const mode = searchParams.get('state') || 'signin';
 
   const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || 'rnd-cadd.vercel.app';
   const proto = request.headers.get('x-forwarded-proto') || (host.includes('localhost') ? 'http' : 'https');
@@ -15,7 +16,8 @@ export async function GET(request: NextRequest) {
 
   if (error || !code) {
     console.warn('[Google OAuth] Authorization error or code missing:', error);
-    return NextResponse.redirect(`${baseUrl}/signin?error=${encodeURIComponent(error || 'cancelled')}`);
+    const fallbackRoute = mode === 'signup' ? '/signup' : '/signin';
+    return NextResponse.redirect(`${baseUrl}${fallbackRoute}?error=${encodeURIComponent(error || 'cancelled')}`);
   }
 
   const clientId = process.env.GOOGLE_CLIENT_ID || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
@@ -65,15 +67,42 @@ export async function GET(request: NextRequest) {
 
     const userRole = isAdmin ? 'admin' : 'student';
 
-    // 3. Sync or create user in MongoDB Atlas
+    // 3. Connect to MongoDB Atlas & Check Account Existence
     let dbUser: any = null;
+    let existing: any = null;
     try {
       const { db, isConnected } = await connectToDatabase();
       if (isConnected && db) {
         const usersCol = db.collection('users');
-        const existing = await usersCol.findOne({ email: normEmail });
+        const escapedEmail = normEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        existing = await usersCol.findOne({
+          $or: [
+            { email: normEmail },
+            { email: { $regex: new RegExp(`^${escapedEmail}$`, 'i') } },
+          ],
+        });
 
+        // CASE 1: Student is already registered, but tried to Sign Up via Google!
+        // Show pop-up stating the email is already registered and redirect to login.
+        if (mode === 'signup' && existing) {
+          console.log(`[Google OAuth Case-1] User ${normEmail} already registered. Redirecting to signup with already_registered modal.`);
+          return NextResponse.redirect(
+            `${baseUrl}/signup?already_registered=true&email=${encodeURIComponent(normEmail)}`
+          );
+        }
+
+        // CASE 2: Student has NOT registered yet, but tried to Sign In directly via Google!
+        // Show pop-up stating "Please Create an Account" and redirect to sign up.
+        if (mode === 'signin' && !existing && !isAdmin) {
+          console.log(`[Google OAuth Case-2] User ${normEmail} does not exist in DB. Redirecting to signin with not_registered modal.`);
+          return NextResponse.redirect(
+            `${baseUrl}/signin?not_registered=true&email=${encodeURIComponent(normEmail)}`
+          );
+        }
+
+        // Proceed with normal flow
         if (!existing) {
+          // New student registered via Google Sign-Up
           const newUser = {
             email: normEmail,
             name: googleUser.name || 'Google CAD Trainee',
@@ -87,7 +116,7 @@ export async function GET(request: NextRequest) {
           const insertRes = await usersCol.insertOne(newUser);
           dbUser = { ...newUser, id: insertRes.insertedId.toString() };
         } else {
-          // Update photo or last login if needed
+          // Existing student logging in via Google Sign-In
           await usersCol.updateOne(
             { _id: existing._id },
             {

@@ -20,14 +20,26 @@ export default function SignInPage() {
     message: string;
     redirectUrl: string;
   } | null>(null);
+  const [notRegisteredModal, setNotRegisteredModal] = useState<{
+    email: string;
+    message?: string;
+  } | null>(null);
 
-  // Auto-populate email if redirected from signup with existing account
+  // Auto-populate email if redirected from signup, or trigger modal if not registered
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const queryEmail = params.get('email');
+      const notRegistered = params.get('not_registered');
       if (queryEmail) {
         setEmail(queryEmail);
+      }
+      if (notRegistered === 'true' && queryEmail) {
+        setNotRegisteredModal({
+          email: queryEmail,
+          message: 'No account was found with this email address. Please create an account / sign up first.',
+        });
+      } else if (queryEmail) {
         setSuccessMessage('Account found! Please enter your password to sign in.');
       }
     }
@@ -107,6 +119,11 @@ export default function SignInPage() {
             message: data.message || 'No account found with this email address. Please sign up first.',
             redirectUrl: data.redirectUrl || `/signup?email=${encodeURIComponent(normEmail)}`,
           });
+          // Open Case 2 Pop-up Modal
+          setNotRegisteredModal({
+            email: normEmail,
+            message: data.message || 'No account found with this email address. Please create an account / sign up first.',
+          });
           setErrorMessage('');
           setLoading(false);
           return;
@@ -123,7 +140,7 @@ export default function SignInPage() {
 
   const handleGoogleSignIn = () => {
     setLoading(true);
-    window.location.href = '/api/auth/google';
+    window.location.href = '/api/auth/google?mode=signin';
   };
 
   return (
@@ -414,6 +431,66 @@ export default function SignInPage() {
           </div>
         </div>
       </footer>
+
+      {/* CASE 2 POP-UP MODAL: Please Create an Account */}
+      {notRegisteredModal && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-[#0F172A]/75 backdrop-blur-sm animate-fade-in">
+          <div
+            className="bg-[#FFFFFF] rounded-2xl shadow-2xl max-w-md w-full border border-[#E2E8F0] overflow-hidden p-6 sm:p-7 text-center relative animate-scale-up"
+            role="dialog"
+            aria-modal="true"
+          >
+            {/* Top Close Button */}
+            <button
+              onClick={() => setNotRegisteredModal(null)}
+              className="absolute top-4 right-4 text-[#94A3B8] hover:text-[#0F172A] p-1.5 rounded-lg hover:bg-[#F1F5F9] transition-all"
+              aria-label="Close"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* User Plus / Alert Icon */}
+            <div className="mx-auto w-16 h-16 bg-[#EFF6FF] rounded-full flex items-center justify-center text-[#2563EB] mb-4 shadow-inner">
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+              </svg>
+            </div>
+
+            {/* Modal Heading */}
+            <h3 className="text-xl font-bold text-[#15304C] mb-2 tracking-tight">
+              Please Create an Account
+            </h3>
+
+            {/* Modal Body */}
+            <p className="text-sm text-[#475569] mb-6 leading-relaxed">
+              We could not find an existing account registered with <strong className="text-[#0F172A] font-semibold">{notRegisteredModal.email}</strong>.
+              <br />
+              Please sign up first to create your student account.
+            </p>
+
+            {/* Primary Action Button */}
+            <div className="space-y-2.5">
+              <Link
+                href={`/signup?email=${encodeURIComponent(notRegisteredModal.email)}`}
+                className="w-full inline-flex items-center justify-center space-x-2 py-3 px-5 rounded-xl font-bold text-sm text-[#FFFFFF] bg-[#2563EB] hover:bg-[#1D4ED8] transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
+              >
+                <span>Please Create an Account</span>
+                <span>&rarr;</span>
+              </Link>
+
+              <button
+                type="button"
+                onClick={() => setNotRegisteredModal(null)}
+                className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] transition-all border border-[#E2E8F0]"
+              >
+                Stay on Log In
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
