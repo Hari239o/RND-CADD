@@ -5215,13 +5215,13 @@ export default function StudentPortalPage() {
             </div>
           ) : (
             <div className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-hidden">
-              {/* MAIN PLAYER COLUMN (Left / Center) - REDUCED COMFORTABLE CINEMA SCREEN SIZE */}
-              <div className="flex-1 flex flex-col min-h-0 overflow-y-auto bg-slate-100/60 p-3 sm:p-5 lg:p-6 space-y-4">
+              {/* MAIN PLAYER COLUMN (Left / Center) - FLUSH ON MOBILE TO REMOVE EMPTY VOID */}
+              <div className={`w-full ${studentViewerMode === 'notes' ? 'flex-1 min-h-0 overflow-y-auto' : 'flex-shrink-0'} lg:flex-1 lg:min-h-0 lg:overflow-y-auto bg-slate-100/80 p-2 sm:p-5 lg:p-6 space-y-2 sm:space-y-4`}>
                 {activePlayerClass ? (
-                  <div className="w-full max-w-6xl 2xl:max-w-7xl mx-auto space-y-4">
+                  <div className="w-full max-w-6xl 2xl:max-w-7xl mx-auto space-y-2 sm:space-y-4">
                     {/* MODE 1: PERMANENT CLASS VIDEO STREAM (Image 2 - Google Drive Recording Stream) */}
                     {studentViewerMode === 'video' && (
-                      <div className="w-full flex flex-col items-center space-y-4">
+                      <div className="w-full flex flex-col items-center space-y-2 sm:space-y-4">
                         {isYouTubeVideo ? (
                           /* YouTube Stream */
                           <div className="relative aspect-video w-full max-h-[78vh] bg-black rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center">
@@ -5359,17 +5359,35 @@ export default function StudentPortalPage() {
                 )}
               </div>
 
-              {/* PLAYLIST SIDEBAR (Clean LMS Layout) */}
-              <div className="w-full lg:w-96 xl:w-[400px] flex flex-col min-h-0 bg-white border-t lg:border-t-0 lg:border-l border-slate-200 shadow-xs flex-shrink-0">
-                {/* Clean Playlist Header */}
-                <div className="px-4 py-3 bg-white border-b border-slate-200 flex items-center justify-between flex-shrink-0">
-                  <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                    Course Playlist
-                  </span>
+              {/* PLAYLIST SIDEBAR (MNC Corporate LMS Layout - Seamless on Mobile) */}
+              <div className={`w-full lg:w-96 xl:w-[400px] ${studentViewerMode === 'notes' ? 'hidden lg:flex' : 'flex-1'} lg:flex-initial flex flex-col min-h-0 bg-white border-t lg:border-t-0 lg:border-l border-slate-200 shadow-xs`}>
+                {/* Clean MNC Playlist Header */}
+                <div className="px-4 py-3 bg-white border-b border-slate-100 flex items-center justify-between flex-shrink-0">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#EE2C3C]"></span>
+                    <span className="text-xs font-extrabold text-slate-900 uppercase tracking-wider">
+                      Course Curriculum
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">
+                      {playerCourse.classes?.length || 0} Lessons
+                    </span>
+                  </div>
+                  <div className="text-[11px] font-bold text-emerald-600 flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    <span>
+                      {
+                        playerCourse.classes?.filter((c) =>
+                          watchedClassIds.includes(c.id) ||
+                          watchedClassIds.includes(c.classNumber) ||
+                          watchedClassIds.includes(`${playerCourse.title}_${c.classNumber}`)
+                        ).length || 0
+                      }/{playerCourse.classes?.length || 0} Done
+                    </span>
+                  </div>
                 </div>
 
                 {/* Real-Time LMS Playlist Items */}
-                <div className="flex-1 overflow-y-auto divide-y divide-slate-100 p-2.5 space-y-1.5">
+                <div className="flex-1 overflow-y-auto divide-y divide-slate-100 p-0 sm:p-2.5 sm:space-y-1.5">
                   {(!playerCourse.classes || playerCourse.classes.length === 0) ? (
                     <div className="p-6 text-center text-xs text-slate-500 font-medium">
                       No lessons available in this course playlist.
@@ -5393,100 +5411,236 @@ export default function StudentPortalPage() {
                           : (cls.duration && cls.duration !== '45 mins' ? cls.duration : (videoDuration > 0 ? formatVideoTime(videoDuration) : ''));
 
                       return (
-                        <div
-                          key={cls.id || cIdx}
-                          onClick={() => {
-                            setActivePlayerClass(cls);
-                            setVideoCurrentTime(0);
-                            setVideoIsPlaying(false);
-                            setStudentViewerMode('video');
-                            markClassAsWatched(cls.id, playerCourse.title, cls.classNumber);
-                          }}
-                          className={`w-full rounded-xl transition-all p-3.5 flex items-start gap-3 cursor-pointer select-none border ${
-                            isCurrent
-                              ? 'bg-white border-slate-300 border-l-[5px] border-l-[#EE2C3C] shadow-sm'
-                              : 'bg-white hover:bg-slate-50/90 border-slate-200/90'
-                          }`}
-                        >
-                          {/* Round 1-Click Watched Toggle */}
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleToggleClassWatched(cls.id, playerCourse.title, cls.classNumber);
+                        <div key={cls.id || cIdx}>
+                          {/* MOBILE MNC-STYLE ROW (block lg:hidden) - High-Density Premium Curriculum Pattern */}
+                          <div
+                            onClick={() => {
+                              setActivePlayerClass(cls);
+                              setVideoCurrentTime(0);
+                              setVideoIsPlaying(false);
+                              setStudentViewerMode('video');
+                              markClassAsWatched(cls.id, playerCourse.title, cls.classNumber);
                             }}
-                            className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all cursor-pointer flex-shrink-0 mt-0.5 ${
-                              isWatched
-                                ? 'bg-emerald-600 text-white shadow-xs'
-                                : isCurrent
-                                ? 'bg-slate-900 text-white shadow-xs'
-                                : 'bg-slate-100 text-slate-600 border border-slate-200 hover:border-slate-300'
+                            className={`block lg:hidden w-full p-3.5 transition-all select-none border-b border-slate-100 cursor-pointer ${
+                              isCurrent
+                                ? 'bg-gradient-to-r from-rose-50/80 via-red-50/30 to-white border-l-4 border-l-[#EE2C3C]'
+                                : 'bg-white hover:bg-slate-50/90 active:bg-slate-100'
                             }`}
-                            title={isWatched ? 'Mark as Unwatched' : 'Mark as Completed'}
                           >
-                            {isWatched ? '✓' : cIdx + 1}
-                          </button>
-
-                          {/* Class Meta */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="text-sm font-bold text-slate-900 tracking-tight">
-                                {classLabel}
-                              </span>
-                              {displayDuration && (
-                                <span className="text-xs font-semibold text-slate-500 font-mono">
-                                  {displayDuration}
-                                </span>
+                            <div className="flex items-center gap-3">
+                              {/* Left: MNC Animated Soundwave / Checkmark / 2-Digit Number */}
+                              {isCurrent ? (
+                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#EE2C3C] to-[#C91827] text-white flex items-center justify-center shadow-xs flex-shrink-0">
+                                  <div className="flex items-end gap-[3px] h-3.5">
+                                    <span className="w-0.5 h-2 bg-white rounded-full animate-pulse" />
+                                    <span className="w-0.5 h-3.5 bg-white rounded-full animate-bounce" />
+                                    <span className="w-0.5 h-2.5 bg-white rounded-full animate-pulse" />
+                                  </div>
+                                </div>
+                              ) : isWatched ? (
+                                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200/90 flex items-center justify-center flex-shrink-0 shadow-2xs">
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                  </svg>
+                                </div>
+                              ) : (
+                                <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-600 border border-slate-200/80 flex items-center justify-center text-xs font-extrabold font-mono flex-shrink-0">
+                                  {String(cIdx + 1).padStart(2, '0')}
+                                </div>
                               )}
-                            </div>
 
-                            {/* Clean, Modern LMS Badges & Buttons */}
-                            <div className="flex items-center flex-wrap gap-2 mt-2.5">
-                              {isCurrent && (
-                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-red-50 text-[#EE2C3C] border border-red-200">
-                                  <span className="relative flex h-1.5 w-1.5">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#EE2C3C] opacity-75" />
-                                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#EE2C3C]" />
+                              {/* Middle: Title, Topic & Metadata */}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <span className={`text-sm font-bold tracking-tight truncate ${isCurrent ? 'text-[#EE2C3C]' : 'text-slate-900'}`}>
+                                    {classLabel}
                                   </span>
-                                  <span>Now Playing</span>
-                                </span>
-                              )}
+                                  {isCurrent && (
+                                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-wider bg-rose-100 text-[#EE2C3C]">
+                                      <span className="w-1 h-1 rounded-full bg-[#EE2C3C] animate-ping" />
+                                      Playing
+                                    </span>
+                                  )}
+                                </div>
 
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleToggleClassWatched(cls.id, playerCourse.title, cls.classNumber);
-                                }}
-                                className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold transition-all cursor-pointer border ${
-                                  isWatched
-                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
-                                    : 'bg-slate-50 hover:bg-slate-100 text-slate-600 border-slate-200 hover:border-emerald-400'
-                                }`}
-                                title={isWatched ? 'Completed (Click to unmark)' : 'Click to mark as watched'}
-                              >
-                                <span className={isWatched ? 'text-emerald-600 font-bold' : 'text-slate-400'}>
-                                  {isWatched ? '✓ Completed' : '○ Mark Done'}
-                                </span>
-                              </button>
+                                {/* Subtitle / Topic if distinct */}
+                                {cls.title && cls.title.toLowerCase() !== classLabel.toLowerCase() && (
+                                  <p className="text-xs text-slate-600 truncate mt-0.5 font-medium">
+                                    {cls.title}
+                                  </p>
+                                )}
 
-                              {cls.pdfUrl && (
+                                {/* Meta Badges */}
+                                <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-500 font-medium">
+                                  {displayDuration && (
+                                    <span className="flex items-center gap-1 font-mono text-slate-600">
+                                      <svg className="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <circle cx="12" cy="12" r="10" strokeWidth="2" />
+                                        <polyline points="12 6 12 12 16 14" strokeWidth="2" />
+                                      </svg>
+                                      {displayDuration}
+                                    </span>
+                                  )}
+                                  <span>•</span>
+                                  <span className={isWatched ? 'text-emerald-600 font-semibold' : (isCurrent ? 'text-[#EE2C3C] font-semibold' : 'text-slate-400')}>
+                                    {isWatched ? 'Completed' : (isCurrent ? 'In Progress' : 'Up Next')}
+                                  </span>
+                                  {cls.pdfUrl && (
+                                    <>
+                                      <span>•</span>
+                                      <span className="text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded text-[10px] font-semibold">
+                                        PDF Notes
+                                      </span>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Right: Actions */}
+                              <div className="flex items-center gap-1.5 flex-shrink-0">
+                                {cls.pdfUrl && (
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setActivePlayerClass(cls);
+                                      setStudentViewerMode('notes');
+                                    }}
+                                    className="w-8 h-8 rounded-lg bg-slate-50 hover:bg-rose-50 text-slate-600 hover:text-[#EE2C3C] border border-slate-200 hover:border-rose-200 flex items-center justify-center transition-all cursor-pointer"
+                                    title="Open Class Notes & PDF"
+                                  >
+                                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
+                                    </svg>
+                                  </button>
+                                )}
+
                                 <button
                                   type="button"
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    setActivePlayerClass(cls);
-                                    setStudentViewerMode('notes');
+                                    handleToggleClassWatched(cls.id, playerCourse.title, cls.classNumber);
                                   }}
-                                  className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-white hover:bg-slate-50 text-slate-700 hover:text-[#EE2C3C] border border-slate-200 hover:border-[#EE2C3C]/40 transition-all cursor-pointer shadow-2xs group/pdf"
-                                  title="Open Class Notes & PDF"
+                                  className={`h-8 px-2.5 rounded-lg text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer border ${
+                                    isWatched
+                                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                                      : 'bg-white hover:bg-slate-100 text-slate-600 border-slate-200 hover:border-slate-300'
+                                  }`}
+                                  title={isWatched ? 'Completed (Click to unmark)' : 'Click to mark as watched'}
                                 >
-                                  <svg className="w-3.5 h-3.5 text-[#EE2C3C] group-hover/pdf:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
-                                  </svg>
-                                  <span>PDF Notes</span>
+                                  {isWatched ? (
+                                    <>
+                                      <svg className="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                      </svg>
+                                      <span>Done</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <span className="w-3 h-3 rounded-full border-2 border-slate-300 inline-block" />
+                                      <span>Mark</span>
+                                    </>
+                                  )}
                                 </button>
-                              )}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* DESKTOP LMS CARD ITEM (hidden lg:flex) */}
+                          <div
+                            onClick={() => {
+                              setActivePlayerClass(cls);
+                              setVideoCurrentTime(0);
+                              setVideoIsPlaying(false);
+                              setStudentViewerMode('video');
+                              markClassAsWatched(cls.id, playerCourse.title, cls.classNumber);
+                            }}
+                            className={`hidden lg:flex w-full rounded-xl transition-all p-3.5 items-start gap-3 cursor-pointer select-none border ${
+                              isCurrent
+                                ? 'bg-white border-slate-300 border-l-[5px] border-l-[#EE2C3C] shadow-sm'
+                                : 'bg-white hover:bg-slate-50/90 border-slate-200/90'
+                            }`}
+                          >
+                            {/* Round 1-Click Watched Toggle */}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleToggleClassWatched(cls.id, playerCourse.title, cls.classNumber);
+                              }}
+                              className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all cursor-pointer flex-shrink-0 mt-0.5 ${
+                                isWatched
+                                  ? 'bg-emerald-600 text-white shadow-xs'
+                                  : isCurrent
+                                  ? 'bg-slate-900 text-white shadow-xs'
+                                  : 'bg-slate-100 text-slate-600 border border-slate-200 hover:border-slate-300'
+                              }`}
+                              title={isWatched ? 'Mark as Unwatched' : 'Mark as Completed'}
+                            >
+                              {isWatched ? '✓' : cIdx + 1}
+                            </button>
+
+                            {/* Class Meta */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-sm font-bold text-slate-900 tracking-tight">
+                                  {classLabel}
+                                </span>
+                                {displayDuration && (
+                                  <span className="text-xs font-semibold text-slate-500 font-mono">
+                                    {displayDuration}
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Clean, Modern LMS Badges & Buttons */}
+                              <div className="flex items-center flex-wrap gap-2 mt-2.5">
+                                {isCurrent && (
+                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-red-50 text-[#EE2C3C] border border-red-200">
+                                    <span className="relative flex h-1.5 w-1.5">
+                                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#EE2C3C] opacity-75" />
+                                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#EE2C3C]" />
+                                    </span>
+                                    <span>Now Playing</span>
+                                  </span>
+                                )}
+
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleToggleClassWatched(cls.id, playerCourse.title, cls.classNumber);
+                                  }}
+                                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold transition-all cursor-pointer border ${
+                                    isWatched
+                                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                                      : 'bg-slate-50 hover:bg-slate-100 text-slate-600 border-slate-200 hover:border-emerald-400'
+                                  }`}
+                                  title={isWatched ? 'Completed (Click to unmark)' : 'Click to mark as watched'}
+                                >
+                                  <span className={isWatched ? 'text-emerald-600 font-bold' : 'text-slate-400'}>
+                                    {isWatched ? '✓ Completed' : '○ Mark Done'}
+                                  </span>
+                                </button>
+
+                                {cls.pdfUrl && (
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setActivePlayerClass(cls);
+                                      setStudentViewerMode('notes');
+                                    }}
+                                    className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-white hover:bg-slate-50 text-slate-700 hover:text-[#EE2C3C] border border-slate-200 hover:border-[#EE2C3C]/40 transition-all cursor-pointer shadow-2xs group/pdf"
+                                    title="Open Class Notes & PDF"
+                                  >
+                                    <svg className="w-3.5 h-3.5 text-[#EE2C3C] group-hover/pdf:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
+                                    </svg>
+                                    <span>PDF Notes</span>
+                                  </button>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>
