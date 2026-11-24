@@ -19,82 +19,6 @@ export async function GET() {
         }
       });
 
-      // 2. Ensure student1@gmail.com, student2@gmail.com, and student3@gmail.com exist cleanly for test signin
-      const defaultStudents = [
-        {
-          name: 'Student 1',
-          studentId: 'STU-001',
-          email: 'student1@gmail.com',
-          password: '9908',
-          role: 'student',
-          photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
-          courseName: 'Civil CADD & Master BIM',
-          stream: 'Civil CADD & Master BIM',
-          software: 'AutoCAD, Revit Architecture',
-          assignedCourses: ['Civil CADD & Master BIM', 'Interior Architecture & 3D Visualization'],
-        },
-        {
-          name: 'Student 2',
-          studentId: 'STU-002',
-          email: 'student2@gmail.com',
-          password: '9908',
-          role: 'student',
-          photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80',
-          courseName: 'Mechanical CAD & SolidWorks Expert',
-          stream: 'Mechanical CAD & SolidWorks Expert',
-          software: 'SolidWorks, Ansys, AutoCAD Mechanical',
-          assignedCourses: ['Mechanical CAD & SolidWorks Expert', 'Ansys Simulation & FEA'],
-        },
-        {
-          name: 'Student 3',
-          studentId: 'STU-003',
-          email: 'student3@gmail.com',
-          password: '9908',
-          role: 'student',
-          photo: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=80',
-          courseName: 'Electrical CADD & Control Systems',
-          stream: 'Electrical CADD & Control Systems',
-          software: 'AutoCAD Electrical, EPLAN',
-          assignedCourses: ['Electrical CADD & Control Systems', 'AutoCAD Electrical & Panel Design'],
-        },
-      ];
-
-      for (const defStu of defaultStudents) {
-        const existing = await db.collection('users').findOne({ email: defStu.email });
-        if (!existing) {
-          await db.collection('users').insertOne({
-            name: defStu.name,
-            studentId: defStu.studentId,
-            email: defStu.email,
-            password: defStu.password,
-            role: 'student',
-            admissionDate: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-            courseName: defStu.courseName,
-            stream: defStu.stream,
-            software: defStu.software,
-            qualification: '',
-            college: '',
-            residence: '',
-            officialMobile: '',
-            mobile: '',
-            courseFee: 0,
-            paidFee: 0,
-            balanceFee: 0,
-            accessStatus: 'active',
-            assignedCourses: defStu.assignedCourses,
-            designs: [],
-            createdAt: new Date()
-          });
-        } else {
-          if (!Array.isArray(existing.assignedCourses) || existing.assignedCourses.length === 0) {
-            await db.collection('users').updateOne(
-              { email: defStu.email },
-              { $set: { assignedCourses: defStu.assignedCourses } }
-            );
-          }
-        }
-      }
-
       // Fetch all real student accounts (excluding admin)
       const users = await db
         .collection('users')
@@ -419,19 +343,33 @@ export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
+    const email = searchParams.get('email');
 
-    if (!id) {
-      return NextResponse.json({ success: false, message: 'Student ID required' }, { status: 400 });
+    if (!id && !email) {
+      return NextResponse.json({ success: false, message: 'Student ID or email required' }, { status: 400 });
     }
 
     const { db, isConnected } = await connectToDatabase();
     if (isConnected && db) {
-      try {
-        const { ObjectId } = await import('mongodb');
-        await db.collection('users').deleteOne({ _id: new ObjectId(id) });
-      } catch {
-        await db.collection('users').deleteOne({ id });
+      const { ObjectId } = await import('mongodb');
+      const deleteConditions: any[] = [];
+      if (id) {
+        deleteConditions.push({ id });
+        deleteConditions.push({ studentId: id });
+        if (ObjectId.isValid(id)) {
+          deleteConditions.push({ _id: new ObjectId(id) });
+        }
       }
+      if (email) {
+        deleteConditions.push({ email: email.toLowerCase().trim() });
+      }
+
+      const result = await db.collection('users').deleteOne({ $or: deleteConditions });
+      return NextResponse.json({
+        success: true,
+        deletedCount: result.deletedCount,
+        message: 'Student record deleted successfully from database',
+      });
     }
 
     return NextResponse.json({

@@ -1213,37 +1213,6 @@ export async function GET(request: Request) {
 
       if (count === 0) {
         await collection.insertMany(inMemoryCourses);
-      } else {
-        // Ensure all default courses exist in DB and are hydrated with rich curriculum
-        for (const defaultCourse of inMemoryCourses) {
-          const exists = await collection.findOne({
-            $or: [{ id: defaultCourse.id }, { title: defaultCourse.title }]
-          });
-          if (!exists) {
-            await collection.insertOne(defaultCourse);
-          } else if (
-            !exists.modules ||
-            exists.modules.length === 0 ||
-            !exists.capstoneProject ||
-            (exists.image && (exists.image.includes('1541888946425') || exists.image.includes('1581092335397') || exists.image.includes('1504917599217')))
-          ) {
-            // Self-heal and sync rich curriculum & valid high-res imagery
-            await collection.updateOne(
-              { _id: exists._id },
-              {
-                $set: {
-                  modules: defaultCourse.modules,
-                  syllabus: defaultCourse.syllabus,
-                  capstoneProject: defaultCourse.capstoneProject,
-                  careerRoles: defaultCourse.careerRoles,
-                  certification: defaultCourse.certification,
-                  prerequisites: defaultCourse.prerequisites,
-                  image: defaultCourse.image,
-                }
-              }
-            );
-          }
-        }
       }
 
       let query: any = {};
@@ -1387,20 +1356,48 @@ export async function PUT(request: Request) {
 export async function DELETE(request: Request) {
   const { searchParams } = new URL(request.url);
   const courseId = searchParams.get('id');
+  const courseTitle = searchParams.get('title');
+  const courseCode = searchParams.get('code');
 
-  if (!courseId) {
-    return NextResponse.json({ success: false, message: 'Course ID is required' }, { status: 400 });
+  if (!courseId && !courseTitle && !courseCode) {
+    return NextResponse.json({ success: false, message: 'Course ID, title, or code is required' }, { status: 400 });
   }
 
   // Update in-memory store immediately
-  inMemoryCourses = inMemoryCourses.filter(c => c.id !== courseId);
+  inMemoryCourses = inMemoryCourses.filter((c) =>
+    (!courseId || (c.id !== courseId && c.id.toLowerCase() !== courseId.toLowerCase())) &&
+    (!courseTitle || c.title.toLowerCase().trim() !== courseTitle.toLowerCase().trim()) &&
+    (!courseCode || c.code?.toLowerCase().trim() !== courseCode.toLowerCase().trim())
+  );
 
   try {
     const { db, isConnected } = await connectToDatabase();
     if (isConnected && db) {
+      const { ObjectId } = await import('mongodb');
       const collection = db.collection('courses');
-      const result = await collection.deleteOne({ id: courseId });
-      return NextResponse.json({ success: true, deletedCount: result.deletedCount });
+      const deleteConditions: any[] = [];
+      if (courseId) {
+        deleteConditions.push({ id: courseId });
+        deleteConditions.push({ id: courseId.toLowerCase() });
+        if (ObjectId.isValid(courseId)) {
+          deleteConditions.push({ _id: new ObjectId(courseId) });
+        }
+      }
+      if (courseTitle) {
+        deleteConditions.push({ title: courseTitle });
+        deleteConditions.push({ title: new RegExp(`^${courseTitle.trim()}$`, 'i') });
+      }
+      if (courseCode) {
+        deleteConditions.push({ code: courseCode });
+        deleteConditions.push({ code: new RegExp(`^${courseCode.trim()}$`, 'i') });
+      }
+
+      const result = await collection.deleteOne({ $or: deleteConditions });
+      return NextResponse.json({
+        success: true,
+        deletedCount: result.deletedCount,
+        message: 'Course deleted permanently from database',
+      });
     }
   } catch (dbErr) {
     console.warn('[Courses API] Failed to delete in MongoDB:', dbErr);

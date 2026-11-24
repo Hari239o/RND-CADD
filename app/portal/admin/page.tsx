@@ -2075,12 +2075,12 @@ export default function AdminPortalPage() {
     }
 
     try {
-      const res = await fetch(`/api/admin/students?id=${student.id}`, {
+      const res = await fetch(`/api/admin/students?id=${encodeURIComponent(student.id)}&email=${encodeURIComponent(student.email)}`, {
         method: 'DELETE',
       });
       const data = await res.json();
       if (data.success) {
-        setStudents((prev) => prev.filter((s) => s.id !== student.id));
+        setStudents((prev) => prev.filter((s) => s.id !== student.id && s.email !== student.email));
         showToast(`Deleted student ${student.name} successfully.`);
       } else {
         alert(data.message || 'Failed to delete student.');
@@ -2839,12 +2839,12 @@ export default function AdminPortalPage() {
     }
 
     try {
-      const res = await fetch(`/api/courses?id=${course.id}`, {
+      const res = await fetch(`/api/courses?id=${encodeURIComponent(course.id)}&title=${encodeURIComponent(course.title)}&code=${encodeURIComponent(course.code || '')}`, {
         method: 'DELETE',
       });
       const data = await res.json();
       if (data.success) {
-        const nextList = courses.filter((c) => c.id !== course.id);
+        const nextList = courses.filter((c) => c.id !== course.id && c.title !== course.title);
         setCourses(nextList);
         persistLiveCourses(nextList);
         showToast(`Course "${course.title}" deleted.`);
