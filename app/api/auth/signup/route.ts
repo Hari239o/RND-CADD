@@ -120,6 +120,8 @@ export async function POST(request: NextRequest) {
         status: 'active',
         accessStatus: 'pending_enrollment',
         assignedCourses: [], // Strictly empty upon registration
+        attendance: 0, // Starts fresh with zero attendance recorded
+        designs: [], // Starts fresh with zero CAD designs submitted
         courseFee: 0,
         paidFee: 0,
         balanceFee: 0,

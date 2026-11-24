@@ -113,6 +113,8 @@ export async function GET(request: NextRequest) {
             stream: '',
             courseName: '',
             assignedCourses: [],
+            attendance: 0,
+            designs: [],
             courseFee: 0,
             paidFee: 0,
             balanceFee: 0,

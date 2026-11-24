@@ -708,6 +708,8 @@ export default function StudentPortalPage() {
     campusLocation: 'R&D CADD Center, Metro Pillar 1042, Ameerpet, Hyderabad',
     assignedCourses: [] as string[],
     paymentReceipts: [] as PaymentReceipt[],
+    attendance: 0,
+    designs: [] as any[],
   });
 
   // Profile Edit & Security States
@@ -1046,6 +1048,8 @@ export default function StudentPortalPage() {
             balanceFee: matching.balanceFee !== undefined ? Number(matching.balanceFee) : prev.balanceFee,
             accessStatus: matching.accessStatus || 'active',
             assignedCourses: resolvedCourses,
+            attendance: typeof matching.attendance === 'number' ? matching.attendance : (matching.attendance ? Number(matching.attendance) : 0),
+            designs: Array.isArray(matching.designs) ? matching.designs : [],
           }));
           // Fetch certificates with verified student ID
           fetchStudentCertificates(matching.email || userEmail, matching.studentId || matching.id);
@@ -1113,6 +1117,8 @@ export default function StudentPortalPage() {
           campusLocation: p.campusLocation || prev.campusLocation,
           assignedCourses: Array.isArray(p.assignedCourses) && p.assignedCourses.length > 0 ? p.assignedCourses : prev.assignedCourses,
           paymentReceipts: Array.isArray(p.paymentReceipts) ? p.paymentReceipts : prev.paymentReceipts,
+          attendance: typeof p.attendance === 'number' ? p.attendance : prev.attendance,
+          designs: Array.isArray(p.designs) ? p.designs : prev.designs,
         }));
         if (!isEditingProfile) {
           setEditName(p.name || 'Student');
@@ -2610,10 +2616,12 @@ export default function StudentPortalPage() {
                   <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
                     Lab Attendance
                   </span>
-                  <span className="text-3xl font-extrabold text-[#131313]">94.2%</span>
-                  <span className="text-xs text-emerald-600 font-medium block mt-1.5 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                    Ameerpet Campus &bull; Regular
+                  <span suppressHydrationWarning className="text-3xl font-extrabold text-[#131313]">
+                    {studentUser.attendance && Number(studentUser.attendance) > 0 ? `${studentUser.attendance}%` : '0%'}
+                  </span>
+                  <span suppressHydrationWarning className="text-xs text-slate-500 font-medium block mt-1.5 flex items-center gap-1">
+                    <span className={`w-1.5 h-1.5 rounded-full ${studentUser.attendance && Number(studentUser.attendance) > 0 ? 'bg-emerald-500' : 'bg-slate-300'}`}></span>
+                    {studentUser.attendance && Number(studentUser.attendance) > 0 ? 'Ameerpet Campus • Regular' : 'No attendance recorded yet'}
                   </span>
                 </div>
 
@@ -2621,9 +2629,15 @@ export default function StudentPortalPage() {
                   <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
                     CAD Designs Submitted
                   </span>
-                  <span className="text-3xl font-extrabold text-[#131313]">3 Models</span>
-                  <span className="text-xs text-slate-500 font-medium block mt-1.5">
-                    BIM, 3D Piping &amp; Floor Plans
+                  <span suppressHydrationWarning className="text-3xl font-extrabold text-[#131313]">
+                    {Array.isArray(studentUser.designs) && studentUser.designs.length > 0
+                      ? `${studentUser.designs.length} Model${studentUser.designs.length > 1 ? 's' : ''}`
+                      : '0 Models'}
+                  </span>
+                  <span suppressHydrationWarning className="text-xs text-slate-500 font-medium block mt-1.5 truncate">
+                    {Array.isArray(studentUser.designs) && studentUser.designs.length > 0
+                      ? studentUser.designs.map((d: any) => d.title || d.name || 'Model').slice(0, 3).join(', ')
+                      : 'No designs submitted yet'}
                   </span>
                 </div>
 
@@ -2636,10 +2650,10 @@ export default function StudentPortalPage() {
                     Verified Credentials
                   </span>
                   <span suppressHydrationWarning className="text-2xl font-extrabold text-emerald-600">
-                    {studentCertificates.length > 0 ? `Issued (${studentCertificates.length})` : 'Eligible'}
+                    {studentCertificates.length > 0 ? `Issued (${studentCertificates.length})` : (overallSyllabusProgress === 100 ? 'Eligible' : '0 Issued')}
                   </span>
                   <span className="text-xs text-slate-600 font-medium block mt-1.5 flex items-center gap-1">
-                    View Certificate &rarr;
+                    {studentCertificates.length > 0 ? 'View Certificate →' : (overallSyllabusProgress === 100 ? 'Claim Certificate →' : 'Complete course to earn')}
                   </span>
                 </div>
               </div>

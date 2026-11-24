@@ -115,6 +115,8 @@ export async function GET(request: NextRequest) {
           leadInstructor: dbUser.leadInstructor || '',
           campusLocation: 'R&D CADD Center, Metro Pillar 1042, Ameerpet, Hyderabad',
           paymentReceipts: Array.isArray(dbUser.paymentReceipts) ? dbUser.paymentReceipts : [],
+          attendance: typeof dbUser.attendance === 'number' ? dbUser.attendance : 0,
+          designs: Array.isArray(dbUser.designs) ? dbUser.designs : [],
         };
 
         return NextResponse.json({ success: true, profile: profileData });
@@ -141,6 +143,8 @@ export async function GET(request: NextRequest) {
       leadInstructor: '',
       campusLocation: 'R&D CADD Center, Metro Pillar 1042, Ameerpet, Hyderabad',
       paymentReceipts: [],
+      attendance: 0,
+      designs: [],
     };
     return NextResponse.json({ success: true, profile });
   } catch (error: any) {
