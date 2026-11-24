@@ -492,7 +492,7 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
                 <div className="relative z-10 hidden md:flex items-center justify-between flex-wrap gap-2">
                   <span className="inline-flex items-center gap-2 bg-white text-slate-900 border border-slate-200 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs font-bold shadow-2xs">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#EE2C3C] animate-pulse"></span>
-                    <span>{folder.name} DISCIPLINE • {countInFolder} TOTAL COURSES</span>
+                    <span>{folder.name.toUpperCase()} • {countInFolder} TOTAL COURSES</span>
                   </span>
                   <span className="hidden md:inline-flex text-xs font-bold text-slate-700 bg-white border border-slate-200 px-3.5 py-1.5 rounded-full shadow-2xs">
                     {folder.headline}

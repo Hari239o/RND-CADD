@@ -145,7 +145,8 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
   const certificationText = course.certification || 'Autodesk & Dassault Systèmes Certificate';
   const prerequisitesText = course.prerequisites || 'Diploma / B.Tech / Working Professional / Mechanical / Civil / Electrical Graduate';
   const totalHours = course.totalHours || (modulesList.reduce((acc: number, m: any) => acc + (m.hours || 0), 0) || 80);
-  const streamText = (course.folder || course.stream || 'engineering').toUpperCase();
+  const rawStream = (course.folder || course.stream || 'civil').toLowerCase();
+  const streamText = (rawStream === 'eee' ? 'electrical' : rawStream).toUpperCase();
   const categoryText = course.category || `${streamText} CERTIFIED PROGRAM`;
   const feeAmount = Number(course.fee) || 32000;
   const trainingMode = course.mode || 'Classroom & Dedicated CAD Workstation Lab';
@@ -364,7 +365,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                 {/* Badges */}
                 <div className="flex flex-wrap items-center gap-2 pt-1">
                   <span className="px-3 py-1 rounded-md bg-[#EE2C3C] text-white font-bold uppercase text-[11px] tracking-wider">
-                    {streamText} DISCIPLINE
+                    {streamText}
                   </span>
                   <span className="px-3 py-1 rounded-md bg-white/15 text-white font-bold uppercase text-[11px] border border-white/20">
                     {categoryText}
@@ -388,19 +389,11 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
 
                 {/* Key Facts Row */}
                 <div className="flex flex-wrap items-center gap-6 pt-4 text-xs sm:text-sm text-slate-200 border-t border-white/15">
-                  <div className="flex items-center gap-1.5 font-bold text-amber-400">
-                    <span className="text-base">★</span>
-                    <span className="text-white font-black text-base">4.9</span>
-                    <span className="text-slate-300 font-normal">(1,840+ Ratings)</span>
-                  </div>
                   <div>
                     Duration: <span className="text-white font-bold">{course.duration || '8-10 Weeks'}</span> ({totalHours} Lab Hours)
                   </div>
                   <div>
                     Mode: <span className="text-white font-bold">{trainingMode}</span>
-                  </div>
-                  <div className="text-emerald-300 font-bold flex items-center gap-1">
-                    <span className="text-base">✓</span> 100% Placement Assistance
                   </div>
                 </div>
               </div>
