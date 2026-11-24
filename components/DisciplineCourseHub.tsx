@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import type { Course } from '@/lib/courses-data';
 import { COURSES } from '@/lib/courses-data';
@@ -25,6 +25,38 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
   const [coursesList, setCoursesList] = useState<Course[]>(COURSES);
   const [searchQuery, setSearchQuery] = useState('');
   const [showAllCourses, setShowAllCourses] = useState(false);
+  const mobileTabsRef = useRef<HTMLDivElement>(null);
+
+  // Smooth auto-scroll for category tabs on mobile
+  const scrollToStreamTab = (tabId: string) => {
+    if (typeof window === 'undefined') return;
+    const container = mobileTabsRef.current;
+    if (!container) return;
+
+    const button = container.querySelector(`[data-tab-id="${tabId}"]`) as HTMLElement;
+    if (!button) return;
+
+    const tabIndex = folderTabs.findIndex((t) => t.id === tabId);
+    if (tabIndex === 0) {
+      container.scrollTo({ left: 0, behavior: 'smooth' });
+      return;
+    }
+
+    const buttonLeft = button.offsetLeft;
+    const targetScroll = Math.max(0, buttonLeft - 20);
+    container.scrollTo({
+      left: targetScroll,
+      behavior: 'smooth',
+    });
+  };
+
+  // Sync scroll position when activeStream changes
+  useEffect(() => {
+    const t = setTimeout(() => {
+      scrollToStreamTab(activeStream);
+    }, 50);
+    return () => clearTimeout(t);
+  }, [activeStream]);
 
   // Reset showAllCourses whenever active stream or search query changes
   useEffect(() => {
@@ -262,7 +294,15 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
         </div>
 
         {/* Filter Switcher Tabs across all 6 main folders - Smooth Swipeable Bar on Mobile, Clean Wrap on Desktop */}
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-3 mb-6 sm:mb-10 w-full -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap sm:gap-2.5 sm:overflow-visible">
+        <div
+          ref={mobileTabsRef}
+          className="flex relative items-center gap-2 overflow-x-auto no-scrollbar pb-3 mb-6 sm:mb-10 w-full -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap sm:gap-2.5 sm:overflow-visible scroll-smooth select-none"
+          style={{
+            WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+          }}
+        >
           {folderTabs.map((tab) => {
             const count =
               tab.id === 'all'
@@ -279,16 +319,20 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
             return (
               <button
                 key={tab.id}
-                onClick={() => onSelectStream(tab.id)}
-                className={`shrink-0 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-[13px] font-semibold tracking-tight transition-all duration-200 flex items-center gap-2 sm:gap-2.5 cursor-pointer select-none whitespace-nowrap ${
+                data-tab-id={tab.id}
+                onClick={() => {
+                  onSelectStream(tab.id);
+                  scrollToStreamTab(tab.id);
+                }}
+                className={`shrink-0 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-[13px] font-semibold tracking-tight transition-all duration-300 ease-out flex items-center gap-2 sm:gap-2.5 cursor-pointer select-none whitespace-nowrap transform active:scale-95 ${
                   isSelected
-                    ? 'bg-[#D20A0B] text-white border border-[#D20A0B] shadow-md font-bold'
+                    ? 'bg-[#D20A0B] text-white border border-[#D20A0B] shadow-md font-bold scale-[1.02]'
                     : 'bg-white text-[#15304C] border border-[#CBD5E1] hover:border-[#D20A0B] hover:text-[#D20A0B] hover:bg-[#FFF5F5] shadow-sm'
                 }`}
               >
                 <span>{tab.label}</span>
                 <span
-                  className={`text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-full transition-colors ${
+                  className={`text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-full transition-colors duration-300 ${
                     isSelected ? 'bg-white text-[#D20A0B]' : 'bg-[#F1F5F9] text-[#64748B]'
                   }`}
                 >

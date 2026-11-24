@@ -32,6 +32,7 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
   const [activeCourseIndex, setActiveCourseIndex] = useState<number>(0);
   const [allCourses, setAllCourses] = useState<Course[]>(COURSES);
   const cardsScrollRef = useRef<HTMLDivElement>(null);
+  const mobileNavContainerRef = useRef<HTMLDivElement>(null);
   const isProgrammaticScrollRef = useRef<boolean>(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -287,13 +288,60 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
     }
   };
 
-  // When folder changes, reset scroll to start immediately
+  // Smooth auto-scroll for mobile category navbar tabs
+  const scrollToFolderTab = (folderId: string) => {
+    if (typeof window === 'undefined') return;
+    const container = mobileNavContainerRef.current;
+    if (!container) return;
+
+    const button = container.querySelector(`[data-folder-id="${folderId}"]`) as HTMLElement;
+    if (!button) return;
+
+    const folderIndex = folders.findIndex((f) => f.id === folderId);
+    if (folderIndex === 0) {
+      container.scrollTo({ left: 0, behavior: 'smooth' });
+      return;
+    }
+
+    // Move the clicked tab towards the left side (with ~20px padding from container's left)
+    // so that the right-side tabs that were offscreen come smoothly sliding into view!
+    const buttonLeft = button.offsetLeft;
+    const targetScroll = Math.max(0, buttonLeft - 20);
+
+    container.scrollTo({
+      left: targetScroll,
+      behavior: 'smooth',
+    });
+  };
+
+  // When folder changes, reset scroll to start immediately and slide mobile navbar tab into view
   useEffect(() => {
     setActiveCourseIndex(0);
     if (cardsScrollRef.current) {
       cardsScrollRef.current.scrollTo({ left: 0, behavior: 'instant' });
     }
+    // Small timeout ensures DOM layout is updated before scrolling
+    const t = setTimeout(() => {
+      scrollToFolderTab(selectedFolderId);
+    }, 50);
+    return () => clearTimeout(t);
   }, [selectedFolderId]);
+
+  // Sync with activeStream prop from parent
+  useEffect(() => {
+    if (activeStream) {
+      const s = activeStream.toLowerCase();
+      const match = folders.find(
+        (f) =>
+          f.stream.toLowerCase() === s ||
+          f.id.toLowerCase() === s ||
+          (s === 'eee' && f.id === 'elec')
+      );
+      if (match && match.id !== selectedFolderId) {
+        setSelectedFolderId(match.id);
+      }
+    }
+  }, [activeStream]);
 
   const handlePrev = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -350,6 +398,8 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
       setActiveCourseIndex(0);
       onSelectStream(stream);
     }
+    // Instantly initiate smooth slide of the mobile navbar
+    scrollToFolderTab(folderId);
   };
 
   const handleViewCourse = (course: Course) => {
@@ -384,28 +434,43 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
         </div>
 
         {/* MOBILE & TABLET SWIPEABLE DOMAIN SELECTOR (< lg) */}
-        <div className="flex lg:hidden items-center gap-2 overflow-x-auto no-scrollbar pb-3 mb-3 w-full -mx-4 px-4 sm:mx-0 sm:px-0">
-          {folders.map((folder) => {
-            const isSelected = folder.id === selectedFolderId;
-            const count = getFolderCourses(folder.id).length;
-            return (
-              <button
-                key={folder.id}
-                type="button"
-                onClick={() => handleFolderActivate(folder.id, folder.stream)}
-                className={`shrink-0 px-3.5 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
-                  isSelected
-                    ? 'bg-[#EE2C3C] text-white shadow-md shadow-red-500/20'
-                    : 'bg-white text-slate-700 border border-slate-200 hover:border-slate-300'
-                }`}
-              >
-                <span>{folder.name}</span>
-                <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-black ${isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'}`}>
-                  {count}
-                </span>
-              </button>
-            );
-          })}
+        <div className="relative w-full lg:hidden mb-3">
+          <div
+            ref={mobileNavContainerRef}
+            className="flex relative items-center gap-2 overflow-x-auto no-scrollbar pb-3 pt-1 w-full -mx-4 px-4 sm:mx-0 sm:px-0 scroll-smooth select-none"
+            style={{
+              WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+            }}
+          >
+            {folders.map((folder) => {
+              const isSelected = folder.id === selectedFolderId;
+              const count = getFolderCourses(folder.id).length;
+              return (
+                <button
+                  key={folder.id}
+                  data-folder-id={folder.id}
+                  type="button"
+                  onClick={() => handleFolderActivate(folder.id, folder.stream)}
+                  className={`shrink-0 px-4 py-2.5 rounded-full text-xs font-black transition-all duration-300 ease-out flex items-center gap-2 cursor-pointer whitespace-nowrap transform active:scale-95 ${
+                    isSelected
+                      ? 'bg-[#EE2C3C] text-white shadow-lg shadow-red-500/25 scale-[1.03] ring-2 ring-red-400/40 z-10'
+                      : 'bg-white text-slate-700 border border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                  }`}
+                >
+                  <span>{folder.name}</span>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.5 rounded-full font-black transition-colors duration-300 ${
+                      isSelected ? 'bg-white/25 text-white' : 'bg-slate-100 text-slate-600'
+                    }`}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* ========================================================================= */}
@@ -568,7 +633,7 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
                     >
                       {coursesInFolder.map((course, idx) => (
                         <div
-                          key={`${course.id}-${idx}`}
+                          key={`${selectedFolderId}-${course.id}-${idx}`}
                           className={`${
                             coursesInFolder.length === 1
                               ? 'w-full max-w-[340px] sm:max-w-[380px]'
