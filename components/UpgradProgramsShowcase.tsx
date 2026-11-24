@@ -469,25 +469,20 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
 
             // =====================================================================
             // EXPANDED ACTIVE DISCIPLINE SHOWCASE (Opens right here in its position!)
+            // Clean Light Background both on Mobile & Laptop/Desktop as requested
             // =====================================================================
             return (
               <div
                 key={folder.id}
-                className="flex-1 rounded-2xl overflow-hidden relative shadow-2xl min-h-0 sm:min-h-[500px] flex flex-col justify-between p-3.5 sm:p-6 lg:p-7 bg-cover bg-center transition-all duration-700 ease-in-out min-w-0 lg:min-w-[550px] xl:min-w-[650px] 2xl:min-w-[760px] ring-2 ring-[#EE2C3C] border border-slate-100 animate-fadeIn"
-                style={{
-                  backgroundImage: `url('${folder.bgImage}')`,
-                }}
+                className="flex-1 rounded-2xl overflow-hidden relative shadow-lg min-h-0 sm:min-h-[500px] flex flex-col justify-between p-3.5 sm:p-6 lg:p-7 bg-gradient-to-br from-[#F8FAFC] via-[#F1F5F9] to-[#E2E8F0]/60 border border-slate-200/90 ring-2 ring-[#EE2C3C]/80 transition-all duration-500 ease-in-out min-w-0 lg:min-w-[550px] xl:min-w-[650px] 2xl:min-w-[760px] animate-fadeIn"
               >
-                {/* Natural sunlight atmospheric overlay */}
-                <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/25 to-black/30 pointer-events-none" />
-
                 {/* Top Row: Stream Badge & Headline (Desktop Only - Hidden on Mobile as circled) */}
                 <div className="relative z-10 hidden md:flex items-center justify-between flex-wrap gap-2">
-                  <span className="inline-flex items-center gap-2 bg-white/95 backdrop-blur-md text-slate-900 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs font-bold shadow-md">
+                  <span className="inline-flex items-center gap-2 bg-white text-slate-900 border border-slate-200 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs font-bold shadow-2xs">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#EE2C3C] animate-pulse"></span>
                     <span>{folder.name} DISCIPLINE • {countInFolder} TOTAL COURSES</span>
                   </span>
-                  <span className="hidden md:inline-flex text-xs font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] bg-black/35 backdrop-blur-sm px-3.5 py-1.5 rounded-full border border-white/20">
+                  <span className="hidden md:inline-flex text-xs font-bold text-slate-700 bg-white border border-slate-200 px-3.5 py-1.5 rounded-full shadow-2xs">
                     {folder.headline}
                   </span>
                 </div>
@@ -496,15 +491,15 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
                 <div className="relative z-10 flex flex-col md:flex-row items-start md:items-end justify-between gap-4 sm:gap-5 pt-1 sm:pt-4 w-full min-w-0">
                   
                   {/* Left: Counter 01/08 and Working Navigation Arrows */}
-                  <div className="text-white mb-1 select-none flex md:flex-col items-center md:items-start justify-between md:justify-start w-full md:w-auto flex-shrink-0">
+                  <div className="text-slate-900 mb-1 select-none flex md:flex-col items-center md:items-start justify-between md:justify-start w-full md:w-auto flex-shrink-0">
                     <div>
-                      <div className="text-3xl sm:text-5xl font-black tracking-tight drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] leading-none">
+                      <div className="text-3xl sm:text-5xl font-black tracking-tight text-[#15304C] leading-none">
                         0{countInFolder > 0 ? activeCourseIndex + 1 : 0}
-                        <span className="text-lg sm:text-2xl font-light opacity-90 ml-1">
+                        <span className="text-lg sm:text-2xl font-light text-slate-400 ml-1">
                           /{countInFolder < 10 ? `0${countInFolder}` : countInFolder}
                         </span>
                       </div>
-                      <p className="hidden md:block text-[10px] sm:text-[11px] font-bold text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] mt-1">
+                      <p className="hidden md:block text-[10px] sm:text-[11px] font-bold text-slate-500 mt-1">
                         Total {countInFolder} courses in this folder
                       </p>
                     </div>
@@ -515,11 +510,11 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
                         type="button"
                         onClick={handlePrev}
                         aria-label="Previous course"
-                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white hover:bg-slate-50 text-slate-800 shadow-xl flex items-center justify-center transition-all active:scale-90 hover:scale-105 cursor-pointer select-none group border border-slate-100"
+                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white hover:bg-[#EE2C3C] text-slate-700 hover:text-white shadow-md flex items-center justify-center transition-all active:scale-90 hover:scale-105 cursor-pointer select-none group border border-slate-200"
                         title="Previous course"
                       >
                         <svg
-                          className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-800 transition-transform group-hover:-translate-x-0.5"
+                          className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform group-hover:-translate-x-0.5"
                           fill="none"
                           stroke="currentColor"
                           strokeWidth="2.2"
@@ -532,11 +527,11 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
                         type="button"
                         onClick={handleNext}
                         aria-label="Next course"
-                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white hover:bg-slate-50 text-slate-800 shadow-xl flex items-center justify-center transition-all active:scale-90 hover:scale-105 cursor-pointer select-none group border border-slate-100"
+                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white hover:bg-[#EE2C3C] text-slate-700 hover:text-white shadow-md flex items-center justify-center transition-all active:scale-90 hover:scale-105 cursor-pointer select-none group border border-slate-200"
                         title="Next course"
                       >
                         <svg
-                          className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-800 transition-transform group-hover:translate-x-0.5"
+                          className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform group-hover:translate-x-0.5"
                           fill="none"
                           stroke="currentColor"
                           strokeWidth="2.2"
@@ -566,7 +561,7 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
                             coursesInFolder.length === 1
                               ? 'w-full max-w-[340px] sm:max-w-[380px]'
                               : 'w-[230px] sm:w-[245px] xl:w-[255px]'
-                          } flex-shrink-0 bg-white rounded-2xl border border-white/90 shadow-xl flex flex-col justify-between overflow-hidden group hover:-translate-y-1 transition-all duration-300 animate-fadeIn`}
+                          } flex-shrink-0 bg-white rounded-2xl border border-slate-200/90 shadow-md flex flex-col justify-between overflow-hidden group hover:-translate-y-1 transition-all duration-300 animate-fadeIn`}
                         >
                           {/* Top Image + Circular Partner Monogram Badge */}
                           <div className="relative w-full h-28 sm:h-32 overflow-hidden bg-slate-100 flex-shrink-0">
@@ -642,9 +637,9 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
 
                     {/* Progress Bar Track */}
                     {countInFolder > 0 && (
-                      <div className="w-full bg-white/20 h-1.5 rounded-full overflow-hidden mt-1 backdrop-blur-sm shadow-inner">
+                      <div className="w-full bg-slate-200/90 h-1.5 rounded-full overflow-hidden mt-1 shadow-inner">
                         <div
-                          className="bg-white h-full rounded-full transition-all duration-300 ease-out shadow-sm"
+                          className="bg-[#EE2C3C] h-full rounded-full transition-all duration-300 ease-out shadow-xs"
                           style={{
                             width: `${Math.max(15, ((activeCourseIndex + 1) / countInFolder) * 100)}%`,
                           }}
