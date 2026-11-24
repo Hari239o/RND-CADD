@@ -696,15 +696,20 @@ export default function JobsPortalPage() {
   };
 
   const handleInitiateApply = (job: JobPost) => {
-    setSelectedJobForApply(job);
-    if (currentUser) {
-      setApplicantName(currentUser.name || 'Student');
-      setApplicantEmail(currentUser.email || 'student1@gmail.com');
-      setApplicantStudentId(currentUser.studentId || currentUser.id || 'STU-001');
-      setApplicantStream(currentUser.stream || job.discipline);
-      setApplicantPhone(currentUser.phone || currentUser.mobile || '+91 99080 12345');
-      setApplicantQualification(currentUser.qualification || 'B.Tech / Diploma in Engineering');
+    if (!currentUser) {
+      showToast('🔒 Please Sign Up or Sign In to apply for jobs.');
+      if (typeof window !== 'undefined') {
+        window.location.href = '/signup?redirect=/jobs';
+      }
+      return;
     }
+    setSelectedJobForApply(job);
+    setApplicantName(currentUser.name || 'Student');
+    setApplicantEmail(currentUser.email || '');
+    setApplicantStudentId(currentUser.studentId || currentUser.id || 'STU-001');
+    setApplicantStream(currentUser.stream || job.discipline);
+    setApplicantPhone(currentUser.phone || currentUser.mobile || '');
+    setApplicantQualification(currentUser.qualification || 'B.Tech / Diploma in Engineering');
   };
 
   const handleSubmitApplication = async (e: React.FormEvent) => {
@@ -1051,6 +1056,39 @@ export default function JobsPortalPage() {
 
       {/* JOBS SECTION (Pleasant modern #E7F0FF cards, #0066ff buttons) */}
       <section id="openings" className="w-full h-auto px-3.5 sm:px-8 lg:px-16 overflow-hidden py-10 sm:py-14 max-w-[1400px] mx-auto">
+        {/* Student Auth Notice: Job application features are unlocked once signed up */}
+        {!currentUser && (
+          <div className="mb-8 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50 via-slate-50 to-red-50 border border-blue-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-[#EE2C3C] text-white flex items-center justify-center font-bold text-base shrink-0 shadow-md shadow-red-500/20">
+                🎓
+              </div>
+              <div>
+                <h3 className="text-sm sm:text-base font-bold text-[#15304C]">
+                  Student Placement &amp; Job Applications
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
+                  Direct job applications and recruiter drives are exclusive to registered students. Please Sign Up or Sign In to unlock the application feature.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2.5 shrink-0 w-full sm:w-auto">
+              <Link
+                href="/signup?redirect=/jobs"
+                className="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-[#EE2C3C] hover:bg-[#D20A0B] text-white text-xs font-bold shadow-sm shadow-red-500/20 transition-all text-center whitespace-nowrap active:scale-95"
+              >
+                Sign Up to Apply
+              </Link>
+              <Link
+                href="/signin?redirect=/jobs"
+                className="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-[#15304C] text-xs font-bold shadow-2xs transition-all text-center whitespace-nowrap active:scale-95"
+              >
+                Sign In
+              </Link>
+            </div>
+          </div>
+        )}
+
         {/* Section Top Header with Prev/Next Navigation Controls */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>

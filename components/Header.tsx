@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -28,6 +28,10 @@ export const Header: React.FC<HeaderProps> = ({
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [hoveredTab, setHoveredTab] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [authDropdownOpen, setAuthDropdownOpen] = useState(false);
+  const [desktopAuthDropdownOpen, setDesktopAuthDropdownOpen] = useState(false);
+  const authDropdownRef = useRef<HTMLDivElement>(null);
+  const desktopAuthDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const syncUser = () => {
@@ -59,6 +63,24 @@ export const Header: React.FC<HeaderProps> = ({
     };
   }, []);
 
+  // Close dropdowns on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (authDropdownRef.current && !authDropdownRef.current.contains(e.target as Node)) {
+        setAuthDropdownOpen(false);
+      }
+      if (desktopAuthDropdownRef.current && !desktopAuthDropdownRef.current.contains(e.target as Node)) {
+        setDesktopAuthDropdownOpen(false);
+      }
+    };
+    if (authDropdownOpen || desktopAuthDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [authDropdownOpen, desktopAuthDropdownOpen]);
+
   // Lock body scroll when mobile menu is open
   useEffect(() => {
     if (mobileMenuOpen) {
@@ -71,11 +93,13 @@ export const Header: React.FC<HeaderProps> = ({
     };
   }, [mobileMenuOpen]);
 
-  // Close mobile drawer on Escape key
+  // Close mobile drawer and dropdowns on Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setMobileMenuOpen(false);
+        setAuthDropdownOpen(false);
+        setDesktopAuthDropdownOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -246,40 +270,153 @@ export const Header: React.FC<HeaderProps> = ({
                   </button>
                 </>
               ) : (
-                <>
-                  <Link
-                    href="/signin"
-                    className="px-4 py-2 rounded-full text-xs xl:text-[13px] font-semibold text-slate-700 hover:text-slate-950 bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-slate-300 transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer"
+                <div className="relative" ref={desktopAuthDropdownRef}>
+                  <button
+                    type="button"
+                    onClick={() => setDesktopAuthDropdownOpen(!desktopAuthDropdownOpen)}
+                    className="px-4 py-2 rounded-full text-xs xl:text-[13px] font-bold bg-[#15304C] hover:bg-[#0F2038] text-white transition-all shadow-xs flex items-center gap-2 cursor-pointer active:scale-95"
+                    aria-expanded={desktopAuthDropdownOpen}
                   >
-                    <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg className="w-3.5 h-3.5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                     </svg>
-                    <span>Sign In</span>
-                  </Link>
-                  <Link
-                    href="/signup"
-                    className="px-5 py-2 rounded-full text-xs xl:text-[13px] font-bold bg-[#EE2C3C] hover:bg-[#D20A0B] text-white transition-all shadow-xs hover:shadow-md hover:shadow-red-500/20 active:scale-95 cursor-pointer flex items-center gap-1.5"
-                  >
-                    <span>Sign Up</span>
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    <span>Sign In / Sign Up</span>
+                    <svg className={`w-3 h-3 text-slate-300 transition-transform duration-200 ${desktopAuthDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                     </svg>
-                  </Link>
-                </>
+                  </button>
+
+                  <AnimatePresence>
+                    {desktopAuthDropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                        transition={{ duration: 0.15, ease: 'easeOut' }}
+                        className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-slate-200/90 p-2 z-50 overflow-hidden"
+                      >
+                        <div className="px-3 py-1.5 border-b border-slate-100 mb-1">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Student Portal Access</p>
+                        </div>
+                        <Link
+                          href="/signin"
+                          onClick={() => setDesktopAuthDropdownOpen(false)}
+                          className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-slate-800 transition-colors group cursor-pointer"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-slate-100 group-hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-colors">
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="text-xs font-bold text-slate-900 group-hover:text-[#EE2C3C] transition-colors">Sign In</p>
+                            <p className="text-[10px] text-slate-500 font-medium">Log into existing student account</p>
+                          </div>
+                        </Link>
+
+                        <Link
+                          href="/signup"
+                          onClick={() => setDesktopAuthDropdownOpen(false)}
+                          className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-red-50/50 hover:bg-red-50 text-[#EE2C3C] transition-colors group cursor-pointer mt-1 border border-red-100/60"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-[#EE2C3C] text-white flex items-center justify-center shadow-xs">
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.375 12.375 0 014 19.235z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="text-xs font-bold text-[#EE2C3C]">Sign Up</p>
+                            <p className="text-[10px] text-slate-600 font-medium">New student registration</p>
+                          </div>
+                        </Link>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               )}
             </div>
 
-            {/* Mobile / Tablet Controls (< lg) - Increased Size on Mobile */}
-            <div className="flex lg:hidden items-center gap-2.5 shrink-0">
-              {/* Quick Jobs Badge Link on Mobile */}
-              <Link
-                href="/jobs"
-                className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full bg-slate-900 text-white text-xs font-black tracking-wide uppercase shadow-sm active:scale-95"
-                title="Jobs Portal"
-              >
-                <span className="w-2 h-2 rounded-full bg-[#EE2C3C] animate-pulse"></span>
-                <span>Jobs</span>
-              </Link>
+            {/* Mobile / Tablet Controls (< lg) - Jobs shown ONLY when signed up, otherwise Sign In / Sign Up dropdown */}
+            <div className="flex lg:hidden items-center gap-2 sm:gap-2.5 shrink-0">
+              {currentUser ? (
+                /* Show Jobs button ONLY once student is signed up/signed in */
+                <Link
+                  href="/jobs"
+                  className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full bg-slate-900 hover:bg-[#EE2C3C] text-white text-xs font-black tracking-wide uppercase shadow-sm active:scale-95 transition-all"
+                  title="Verified Jobs Portal"
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span>Jobs</span>
+                </Link>
+              ) : (
+                /* In place of Jobs: Sign In / Sign Up Dropdown */
+                <div className="relative" ref={authDropdownRef}>
+                  <button
+                    type="button"
+                    onClick={() => setAuthDropdownOpen(!authDropdownOpen)}
+                    className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full bg-[#15304C] hover:bg-[#0F2038] text-white text-xs font-bold tracking-wide transition-all shadow-sm active:scale-95 cursor-pointer"
+                    aria-expanded={authDropdownOpen}
+                    aria-haspopup="true"
+                    aria-label="Sign In or Sign Up"
+                  >
+                    <svg className="w-3.5 h-3.5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                    </svg>
+                    <span>Sign In / Up</span>
+                    <svg className={`w-3 h-3 text-slate-300 transition-transform duration-200 ${authDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                    </svg>
+                  </button>
+
+                  {/* Mobile Dropdown Menu */}
+                  <AnimatePresence>
+                    {authDropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                        transition={{ duration: 0.15, ease: 'easeOut' }}
+                        className="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-2xl border border-slate-200/90 p-2 z-50 overflow-hidden"
+                      >
+                        <div className="px-2.5 py-1.5 border-b border-slate-100 mb-1">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Student Account</p>
+                        </div>
+                        <Link
+                          href="/signin"
+                          onClick={() => setAuthDropdownOpen(false)}
+                          className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-slate-800 transition-colors group cursor-pointer"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-slate-100 group-hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-colors">
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+                            </svg>
+                          </div>
+                          <div className="text-left">
+                            <p className="text-xs font-bold text-slate-900 group-hover:text-[#EE2C3C] transition-colors">Sign In</p>
+                            <p className="text-[10px] text-slate-500 font-medium">Existing student login</p>
+                          </div>
+                        </Link>
+
+                        <Link
+                          href="/signup"
+                          onClick={() => setAuthDropdownOpen(false)}
+                          className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-red-50/50 hover:bg-red-50 text-[#EE2C3C] transition-colors group cursor-pointer mt-1 border border-red-100/60"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-[#EE2C3C] text-white flex items-center justify-center shadow-xs">
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.375 12.375 0 014 19.235z" />
+                            </svg>
+                          </div>
+                          <div className="text-left">
+                            <p className="text-xs font-bold text-[#EE2C3C]">Sign Up</p>
+                            <p className="text-[10px] text-slate-600 font-medium">Create new account</p>
+                          </div>
+                        </Link>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )}
 
               {/* Hamburger Button - Prominent & Comfortable Touch Target */}
               <button
@@ -400,19 +537,22 @@ export const Header: React.FC<HeaderProps> = ({
                     Quick Navigation
                   </span>
                   
-                  <Link
-                    href="/jobs"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-slate-50/80 hover:bg-slate-100/90 border border-slate-200/70 text-xs font-bold text-slate-900 transition-colors"
-                  >
-                    <span className="flex items-center gap-2.5">
-                      <span className="w-2 h-2 rounded-full bg-[#EE2C3C] animate-pulse"></span>
-                      <span>Verified Jobs &amp; Placement Portal</span>
-                    </span>
-                    <span className="text-[9px] bg-red-100 text-[#EE2C3C] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                      LIVE
-                    </span>
-                  </Link>
+                  {/* Verified Jobs Portal: ONLY shown once student is signed up/signed in */}
+                  {currentUser && (
+                    <Link
+                      href="/jobs"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-slate-50/80 hover:bg-slate-100/90 border border-slate-200/70 text-xs font-bold text-slate-900 transition-colors"
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <span className="w-2 h-2 rounded-full bg-[#EE2C3C] animate-pulse"></span>
+                        <span>Verified Jobs &amp; Placement Portal</span>
+                      </span>
+                      <span className="text-[9px] bg-red-100 text-[#EE2C3C] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                        LIVE
+                      </span>
+                    </Link>
+                  )}
 
                   <button
                     type="button"
