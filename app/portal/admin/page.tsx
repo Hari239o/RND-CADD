@@ -3655,6 +3655,88 @@ export default function AdminPortalPage() {
     },
   ];
 
+  // MNC Dashboard Menu Helpers (Badge Counts & Icon Theming)
+  const getAdminNavBadge = (id: string, isActive: boolean) => {
+    const badgeClass = (colorClass: string) =>
+      `text-[11px] font-mono font-black px-2 py-0.5 rounded-full shadow-2xs ${
+        isActive ? 'bg-white/20 text-white' : colorClass
+      }`;
+
+    switch (id) {
+      case 'Student':
+        return <span className={badgeClass('bg-[#DCFCE7] text-[#166534]')}>{students.length}</span>;
+      case 'Courses':
+        return <span className={badgeClass('bg-[#E0E7FF] text-[#1E1B4B]')}>{courses.length}</span>;
+      case 'Certificate':
+        return <span className={badgeClass('bg-[#FEF3C7] text-[#92400E]')}>{certificates.length}</span>;
+      case 'Ebook':
+        return <span className={badgeClass('bg-[#FEE2E2] text-[#991B1B]')}>{ebooks.length}</span>;
+      case 'Jobs':
+        return <span className={badgeClass('bg-[#E0E7FF] text-[#3730A3]')}>{adminJobs.filter((j) => j.status === 'Active').length}</span>;
+      case 'Offers':
+        return <span className={badgeClass('bg-[#FEF3C7] text-[#92400E]')}>{adminOffers.filter((o) => o.status === 'Active').length}</span>;
+      case 'Live':
+        return (
+          <span className={`text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 ${
+            liveSession?.status === 'Live Now'
+              ? 'bg-emerald-500 text-white animate-pulse'
+              : isActive
+              ? 'bg-white/20 text-white'
+              : 'bg-slate-100 text-slate-700'
+          }`}>
+            {liveSession?.status === 'Live Now' && <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />}
+            {liveSession?.status === 'Live Now' ? 'LIVE' : (liveSession?.status === 'Scheduled' ? 'SOON' : '0')}
+          </span>
+        );
+      case 'Support': {
+        const pending = adminTickets.filter((t) => t.status !== 'Resolved').length;
+        return <span className={badgeClass('bg-[#FEF3C7] text-[#B45309]')}>{pending}</span>;
+      }
+      case 'Assignments':
+        return <span className={badgeClass('bg-[#DCFCE7] text-[#166534]')}>{adminAssignments.length}</span>;
+      case 'Reviews':
+        return <span className={badgeClass('bg-[#FEF3C7] text-[#92400E]')}>{adminReviews.length}</span>;
+      case 'CMS':
+        return <span className={badgeClass('bg-slate-100 text-slate-700 font-bold')}>Live</span>;
+      default:
+        return null;
+    }
+  };
+
+  const getAdminIconBg = (id: string, isActive: boolean) => {
+    if (isActive) return 'bg-[#EE2C3C] text-white shadow-xs';
+    switch (id) {
+      case 'Student': return 'bg-emerald-50 text-emerald-600 border border-emerald-200/60';
+      case 'Courses': return 'bg-indigo-50 text-indigo-600 border border-indigo-200/60';
+      case 'Certificate': return 'bg-amber-50 text-amber-600 border border-amber-200/60';
+      case 'Assignments': return 'bg-teal-50 text-teal-600 border border-teal-200/60';
+      case 'Ebook': return 'bg-purple-50 text-purple-600 border border-purple-200/60';
+      case 'Jobs': return 'bg-sky-50 text-sky-600 border border-sky-200/60';
+      case 'Offers': return 'bg-rose-50 text-rose-600 border border-rose-200/60';
+      case 'Live': return 'bg-red-50 text-red-600 border border-red-200/60';
+      case 'Support': return 'bg-orange-50 text-orange-600 border border-orange-200/60';
+      case 'Reviews': return 'bg-yellow-50 text-yellow-600 border border-yellow-200/60';
+      case 'CMS': return 'bg-slate-100 text-slate-700 border border-slate-200/60';
+      default: return 'bg-slate-100 text-slate-700 border border-slate-200/60';
+    }
+  };
+
+  // Grouped Navigation for MNC Corporate Structure
+  const adminNavSections = [
+    {
+      category: 'CORE ACADEMIC MODULES',
+      items: adminNavItems.filter((item) => ['Student', 'Courses', 'Certificate', 'Assignments'].includes(item.id)),
+    },
+    {
+      category: 'STUDENT CAREERS & SESSIONS',
+      items: adminNavItems.filter((item) => ['Jobs', 'Ebook', 'Live', 'Offers'].includes(item.id)),
+    },
+    {
+      category: 'OPERATIONS & WEBSITE CMS',
+      items: adminNavItems.filter((item) => ['Support', 'Reviews', 'CMS'].includes(item.id)),
+    },
+  ];
+
   // Filter students dynamically
   const filteredStudents = students.filter((s) => {
     const matchesSearch =
@@ -3735,21 +3817,25 @@ export default function AdminPortalPage() {
         </div>
       </div>
 
-      {/* MOBILE HORIZONTAL SWIPEABLE TAB PILLS (< md) */}
-      <div className="md:hidden flex items-center gap-1.5 overflow-x-auto py-2 px-3 bg-white border-b border-slate-200 no-scrollbar whitespace-nowrap scrollbar-none z-30">
+      {/* MOBILE HORIZONTAL SWIPEABLE TAB PILLS (< md) - MNC Modern Pills with Badges */}
+      <div className="md:hidden flex items-center gap-2 overflow-x-auto py-2.5 px-3 bg-white border-b border-slate-200 no-scrollbar whitespace-nowrap scrollbar-none z-30 shadow-2xs">
         {adminNavItems.map((item) => {
           const isActive = activeTab === item.id;
           return (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 flex-shrink-0 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2 flex-shrink-0 cursor-pointer border ${
                 isActive
-                  ? 'bg-[#131313] text-white shadow-xs'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  ? 'bg-[#131313] text-white border-slate-900 shadow-xs'
+                  : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
               }`}
             >
+              <span className={`w-4 h-4 rounded flex items-center justify-center ${isActive ? 'text-white' : 'text-slate-600'}`}>
+                {item.icon}
+              </span>
               <span>{item.label}</span>
+              {getAdminNavBadge(item.id, isActive)}
             </button>
           );
         })}
@@ -3780,42 +3866,66 @@ export default function AdminPortalPage() {
                 </button>
               </div>
 
-              {/* Admin Info */}
-              <div className="p-3 my-4 rounded-xl bg-slate-50 border border-slate-200">
-                <h4 className="text-xs font-extrabold text-slate-900">{adminUser.name}</h4>
-                <p className="text-[11px] text-slate-500 truncate mt-0.5">{adminUser.email}</p>
-                <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider block mt-1">
-                  Executive Admin
-                </span>
+              {/* Admin Info - MNC Executive Profile Card */}
+              <div className="p-3.5 my-3.5 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 text-white shadow-md border border-slate-700 flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#EE2C3C] to-[#C91827] text-white flex items-center justify-center font-extrabold text-sm shadow-xs flex-shrink-0">
+                  {adminUser.name ? adminUser.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'AD'}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-1">
+                    <h4 className="text-xs font-extrabold text-white truncate tracking-tight">{adminUser.name}</h4>
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" title="Active Admin Console" />
+                  </div>
+                  <p className="text-[11px] text-slate-300 truncate mt-0.5 font-mono">{adminUser.email}</p>
+                  <div className="flex items-center gap-1.5 mt-1">
+                    <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-white/15 text-white">
+                      Executive Admin
+                    </span>
+                    <span className="text-[9px] font-semibold text-slate-400 truncate">
+                      • Ameerpet Campus
+                    </span>
+                  </div>
+                </div>
               </div>
 
-              {/* Nav links */}
-              <div className="space-y-1">
-                {adminNavItems.map((item) => {
-                  const isActive = activeTab === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => {
-                        setActiveTab(item.id);
-                        setIsMobileNavOpen(false);
-                      }}
-                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left ${
-                        isActive
-                          ? 'bg-[#131313] text-white shadow-xs'
-                          : 'text-slate-700 hover:bg-slate-100'
-                      }`}
-                    >
-                      <span className="flex items-center gap-2.5">
-                        <span className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-700'}`}>
-                          {item.icon}
-                        </span>
-                        <span>{item.label}</span>
-                      </span>
-                      {isActive && <span>✓</span>}
-                    </button>
-                  );
-                })}
+              {/* Categorized MNC Navigation Items */}
+              <div className="space-y-4">
+                {adminNavSections.map((sec, sIdx) => (
+                  <div key={sIdx} className="space-y-1">
+                    <div className="px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center justify-between">
+                      <span>{sec.category}</span>
+                      <span className="w-8 h-px bg-slate-200" />
+                    </div>
+                    {sec.items.map((item) => {
+                      const isActive = activeTab === item.id;
+                      return (
+                        <button
+                          key={item.id}
+                          onClick={() => {
+                            setActiveTab(item.id);
+                            setIsMobileNavOpen(false);
+                          }}
+                          className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left ${
+                            isActive
+                              ? 'bg-[#131313] text-white shadow-sm border-l-4 border-l-[#EE2C3C]'
+                              : 'text-slate-800 hover:bg-slate-100/80 active:bg-slate-200/70'
+                          }`}
+                        >
+                          <span className="flex items-center gap-3 min-w-0">
+                            <span className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors ${getAdminIconBg(item.id, isActive)}`}>
+                              {item.icon}
+                            </span>
+                            <span className="truncate">{item.label}</span>
+                          </span>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            {getAdminNavBadge(item.id, isActive)}
+                            {isActive && <span className="text-[#EE2C3C] text-xs font-black">●</span>}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -3861,116 +3971,42 @@ export default function AdminPortalPage() {
             </div>
           </div>
 
-          {/* Sidebar Navigation Items - Perfectly proportioned, clean layout */}
-          <nav className="flex-1 px-3 py-3 space-y-1.5 overflow-y-auto">
-            {adminNavItems.map((item) => {
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-base font-bold transition-all text-left cursor-pointer ${
-                    isActive
-                      ? 'bg-[#131313] text-[#FFFFFF] shadow-sm'
-                      : 'text-[#334155] hover:bg-[#F1F5F9] hover:text-[#0F172A]'
-                  }`}
-                >
-                  <span className="flex items-center space-x-3">
-                    <span
-                      className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+          {/* Sidebar Navigation Items - MNC Corporate Grouped Design */}
+          <nav className="flex-1 px-3 py-3 space-y-4 overflow-y-auto">
+            {adminNavSections.map((sec, sIdx) => (
+              <div key={sIdx} className="space-y-1">
+                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center justify-between">
+                  <span>{sec.category}</span>
+                  <span className="w-10 h-px bg-slate-200" />
+                </div>
+                {sec.items.map((item) => {
+                  const isActive = activeTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setActiveTab(item.id)}
+                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold transition-all text-left cursor-pointer ${
                         isActive
-                          ? 'bg-[#FFFFFF]/20 text-[#FFFFFF]'
-                          : 'bg-[#F1F5F9] text-[#334155]'
+                          ? 'bg-[#131313] text-white shadow-sm border-l-4 border-l-[#EE2C3C]'
+                          : 'text-[#334155] hover:bg-slate-100 hover:text-slate-900'
                       }`}
                     >
-                      {item.icon}
-                    </span>
-                    <span className="truncate">{item.label}</span>
-                  </span>
-                  {item.id === 'Student' && (
-                    <span className={`text-xs font-mono px-2 py-0.5 rounded-md font-black ${
-                      isActive ? 'bg-[#FFFFFF]/20 text-[#FFFFFF]' : 'bg-[#DCFCE7] text-[#166534]'
-                    }`}>
-                      {students.length}
-                    </span>
-                  )}
-                  {item.id === 'Courses' && (
-                    <span className={`text-xs font-mono px-2 py-0.5 rounded-md font-black ${
-                      isActive ? 'bg-[#FFFFFF]/20 text-[#FFFFFF]' : 'bg-[#E0E7FF] text-[#1E1B4B]'
-                    }`}>
-                      {courses.length}
-                    </span>
-                  )}
-                  {item.id === 'Certificate' && (
-                    <span className={`text-xs font-mono px-2 py-0.5 rounded-md font-black ${
-                      isActive ? 'bg-[#FFFFFF]/20 text-[#FFFFFF]' : 'bg-[#FEF3C7] text-[#92400E]'
-                    }`}>
-                      {certificates.length}
-                    </span>
-                  )}
-                  {item.id === 'Ebook' && (
-                    <span className={`text-xs font-mono px-2 py-0.5 rounded-md font-black ${
-                      isActive ? 'bg-[#FFFFFF]/20 text-[#FFFFFF]' : 'bg-[#FEE2E2] text-[#991B1B]'
-                    }`}>
-                      {ebooks.length}
-                    </span>
-                  )}
-                  {item.id === 'Jobs' && (
-                    <span className={`text-xs font-mono px-2 py-0.5 rounded-md font-black ${
-                      isActive ? 'bg-[#FFFFFF]/20 text-[#FFFFFF]' : 'bg-[#E0E7FF] text-[#3730A3]'
-                    }`}>
-                      {adminJobs.filter((j) => j.status === 'Active').length}
-                    </span>
-                  )}
-                  {item.id === 'Support' && adminTickets.filter((t) => t.status !== 'Resolved').length > 0 && (
-                    <span className={`text-xs font-mono px-2 py-0.5 rounded-md font-black ${
-                      isActive ? 'bg-[#FFFFFF]/20 text-[#FFFFFF]' : 'bg-[#FEF3C7] text-[#B45309]'
-                    }`}>
-                      {adminTickets.filter((t) => t.status !== 'Resolved').length}
-                    </span>
-                  )}
-                  {item.id === 'Assignments' && (
-                    <span className={`text-xs font-mono px-2 py-0.5 rounded-md font-black ${
-                      isActive ? 'bg-[#FFFFFF]/20 text-[#FFFFFF]' : 'bg-[#DCFCE7] text-[#166534]'
-                    }`}>
-                      {adminAssignments.length}
-                    </span>
-                  )}
-                                    {item.id === 'Offers' && (
-                    <span className={`text-xs font-mono px-2 py-0.5 rounded-md font-black ${
-                      isActive ? 'bg-[#FFFFFF]/20 text-[#FFFFFF]' : 'bg-[#FEF3C7] text-[#92400E]'
-                    }`}>
-                      {adminOffers.filter((o) => o.status === 'Active').length}
-                    </span>
-                  )}
-                  {item.id === 'Live' && (
-                    <span className={`text-xs font-mono px-2 py-0.5 rounded-md font-bold ${
-                      liveSession?.status === 'Live Now'
-                        ? 'bg-emerald-500 text-white animate-pulse'
-                        : isActive
-                          ? 'bg-white/20 text-white'
-                          : 'bg-slate-100 text-slate-700'
-                    }`}>
-                      {liveSession?.status === 'Live Now' ? 'LIVE' : (liveSession?.status === 'Scheduled' ? 'SOON' : '0')}
-                    </span>
-                  )}
-                  {item.id === 'Reviews' && (
-                    <span className={`text-xs font-mono px-2 py-0.5 rounded-md font-black ${
-                      isActive ? 'bg-[#FFFFFF]/20 text-[#FFFFFF]' : 'bg-[#FEF3C7] text-[#92400E]'
-                    }`}>
-                      {adminReviews.length}
-                    </span>
-                  )}
-                  {item.id === 'CMS' && (
-                    <span className={`text-[10px] font-mono px-2 py-0.5 rounded-md font-black tracking-wider uppercase ${
-                      isActive ? 'bg-[#FFFFFF]/20 text-[#FFFFFF]' : 'bg-[#EE2C3C] text-white'
-                    }`}>
-                      LIVE
-                    </span>
-                  )}
-                </button>
-              );
-            })}
+                      <span className="flex items-center space-x-3 min-w-0">
+                        <span
+                          className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors ${getAdminIconBg(item.id, isActive)}`}
+                        >
+                          {item.icon}
+                        </span>
+                        <span className="truncate">{item.label}</span>
+                      </span>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {getAdminNavBadge(item.id, isActive)}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
           </nav>
         </div>
 

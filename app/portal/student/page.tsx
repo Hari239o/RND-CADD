@@ -2208,7 +2208,86 @@ export default function StudentPortalPage() {
     },
   ];
 
-  const isAccessRevoked = studentUser.accessStatus === 'revoked';
+  // MNC Dashboard Menu Helpers for Student Portal
+  const getStudentNavBadge = (id: string, isActive: boolean) => {
+    const badgeClass = (colorClass: string) =>
+      `text-[11px] font-mono font-bold px-2 py-0.5 rounded-full shadow-2xs ${
+        isActive ? 'bg-white/20 text-white' : colorClass
+      }`;
+
+    switch (id) {
+      case 'Home':
+        return <span className={badgeClass('bg-indigo-100 text-indigo-800')}>{studentUser.assignedCourses?.length || 0}</span>;
+      case 'Profile':
+        return <span className={badgeClass('bg-emerald-100 text-emerald-800')}>Active</span>;
+      case 'Jobs':
+        return <span className={badgeClass('bg-sky-100 text-sky-800')}>{studentJobs.filter((j) => j.status === 'Active').length}</span>;
+      case 'Certificates':
+        return <span className={badgeClass('bg-amber-100 text-amber-800')}>{studentCertificates.length}</span>;
+      case 'Assignments':
+        return <span className={badgeClass('bg-emerald-100 text-emerald-800')}>{studentAssignments.length}</span>;
+      case 'E-Books':
+        return <span className={badgeClass('bg-rose-100 text-rose-800')}>{studentEbooks.length}</span>;
+      case 'Live':
+        return (
+          <span className={`text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 ${
+            liveClass?.status === 'Live Now' && liveClass?.isLive
+              ? 'bg-emerald-500 text-white animate-pulse'
+              : isActive
+              ? 'bg-white/20 text-white'
+              : 'bg-slate-100 text-slate-600'
+          }`}>
+            {liveClass?.status === 'Live Now' && liveClass?.isLive && <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />}
+            {liveClass?.status === 'Live Now' && liveClass?.isLive ? 'LIVE' : 'Online'}
+          </span>
+        );
+      case 'Chat': {
+        const openTickets = studentTickets.filter((t) => t.status !== 'Resolved').length;
+        return <span className={badgeClass('bg-orange-100 text-orange-800')}>{openTickets}</span>;
+      }
+      case 'Refer & Earn':
+        return <span className={badgeClass('bg-rose-100 text-rose-800')}>Offers</span>;
+      case 'Rate':
+        return <span className={badgeClass('bg-yellow-100 text-yellow-800')}>★</span>;
+      default:
+        return null;
+    }
+  };
+
+  const getStudentIconBg = (id: string, isActive: boolean) => {
+    if (isActive) return 'bg-[#EE2C3C] text-white shadow-xs';
+    switch (id) {
+      case 'Home': return 'bg-indigo-50 text-indigo-600 border border-indigo-200/60';
+      case 'Profile': return 'bg-emerald-50 text-emerald-600 border border-emerald-200/60';
+      case 'Certificates': return 'bg-amber-50 text-amber-600 border border-amber-200/60';
+      case 'Assignments': return 'bg-teal-50 text-teal-600 border border-teal-200/60';
+      case 'E-Books': return 'bg-purple-50 text-purple-600 border border-purple-200/60';
+      case 'Live': return 'bg-red-50 text-red-600 border border-red-200/60';
+      case 'Jobs': return 'bg-sky-50 text-sky-600 border border-sky-200/60';
+      case 'Chat': return 'bg-orange-50 text-orange-600 border border-orange-200/60';
+      case 'Refer & Earn': return 'bg-rose-50 text-rose-600 border border-rose-200/60';
+      case 'Rate': return 'bg-yellow-50 text-yellow-600 border border-yellow-200/60';
+      default: return 'bg-slate-100 text-slate-700 border border-slate-200/60';
+    }
+  };
+
+  // Grouped Navigation Sections for Student Portal
+  const studentNavSections = [
+    {
+      category: 'ACADEMIC CURRICULUM',
+      items: navItems.filter((item) => ['Home', 'Profile', 'Certificates', 'Assignments'].includes(item.id)),
+    },
+    {
+      category: 'RESOURCES & LAB SESSIONS',
+      items: navItems.filter((item) => ['E-Books', 'Live', 'Jobs'].includes(item.id)),
+    },
+    {
+      category: 'SERVICES & SUPPORT',
+      items: navItems.filter((item) => ['Chat', 'Refer & Earn', 'Rate'].includes(item.id)),
+    },
+  ];
+
+    const isAccessRevoked = studentUser.accessStatus === 'revoked';
 
   return (
     <div
@@ -2271,27 +2350,31 @@ export default function StudentPortalPage() {
         </div>
       </div>
 
-      {/* MOBILE HORIZONTAL SWIPEABLE TAB PILLS (< md) */}
-      <div className="md:hidden flex items-center gap-1.5 overflow-x-auto py-2 px-3 bg-white border-b border-slate-200 no-scrollbar whitespace-nowrap scrollbar-none z-30">
+      {/* MOBILE HORIZONTAL SWIPEABLE TAB PILLS (< md) - MNC Modern Layout */}
+      <div className="md:hidden flex items-center gap-2 overflow-x-auto py-2.5 px-3 bg-white border-b border-slate-200 no-scrollbar whitespace-nowrap scrollbar-none z-30 shadow-2xs">
         {navItems.map((item) => {
           const isActive = activeTab === item.id;
           return (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 flex-shrink-0 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2 flex-shrink-0 cursor-pointer border ${
                 isActive
-                  ? 'bg-[#131313] text-white shadow-xs'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  ? 'bg-[#131313] text-white border-slate-900 shadow-xs'
+                  : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
               }`}
             >
+              <span className={`w-4 h-4 rounded flex items-center justify-center ${isActive ? 'text-white' : 'text-slate-600'}`}>
+                {item.icon}
+              </span>
               <span>{item.label}</span>
+              {getStudentNavBadge(item.id, isActive)}
             </button>
           );
         })}
       </div>
 
-      {/* MOBILE DRAWER (< md) */}
+      {/* MOBILE DRAWER (< md) - MNC Executive Student Drawer */}
       {isMobileNavOpen && (
         <div className="fixed inset-0 z-50 md:hidden flex">
           <div
@@ -2301,7 +2384,7 @@ export default function StudentPortalPage() {
           <div className="relative w-full max-w-xs bg-white h-full z-10 flex flex-col justify-between p-5 overflow-y-auto safe-pb shadow-2xl">
             <div>
               <div className="flex items-center justify-between pb-4 border-b border-slate-200">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5">
                   <img src="/logo.png" alt="RND CADD" className="h-9 w-auto object-contain" />
                   <div>
                     <h3 className="text-xs font-black text-slate-900 leading-tight">STUDENT PORTAL</h3>
@@ -2316,55 +2399,72 @@ export default function StudentPortalPage() {
                 </button>
               </div>
 
-              {/* Student Info */}
+              {/* Student Info - MNC Executive Profile Card */}
               <div
                 onClick={() => {
                   setActiveTab('Profile');
                   setIsMobileNavOpen(false);
                 }}
-                className="p-3 my-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-3 cursor-pointer hover:bg-slate-100 transition-colors"
+                className="p-3.5 my-3.5 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 text-white shadow-md border border-slate-700 flex items-center gap-3 cursor-pointer hover:border-slate-600 transition-all"
               >
-                <div className="w-12 h-12 rounded-xl overflow-hidden border border-slate-200 shrink-0 shadow-2xs">
+                <div className="w-12 h-12 rounded-xl overflow-hidden border-2 border-white/20 shrink-0 shadow-xs relative">
                   <img
                     src={getStudentAvatar(studentUser.photo, studentUser.name, studentUser.email, studentUser.id)}
                     alt={studentUser.name}
                     className="w-full h-full object-cover"
                   />
+                  <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-slate-900" />
                 </div>
-                <div className="min-w-0">
-                  <h4 className="text-xs font-extrabold text-slate-900 truncate">{studentUser.name}</h4>
-                  <p className="text-[11px] text-slate-500 font-mono mt-0.5 truncate">ID: {studentUser.id}</p>
-                  <p className="text-[10px] text-slate-600 truncate mt-0.5">{studentUser.stream}</p>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-1">
+                    <h4 className="text-xs font-extrabold text-white truncate tracking-tight">{studentUser.name}</h4>
+                    <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                      Verified
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-300 font-mono mt-0.5 truncate">ID: {studentUser.id}</p>
+                  <p className="text-[10px] text-slate-400 truncate mt-0.5 font-medium">{studentUser.stream || 'Certified CAD Trainee'}</p>
                 </div>
               </div>
 
-              {/* Nav links */}
-              <div className="space-y-1">
-                {navItems.map((item) => {
-                  const isActive = activeTab === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => {
-                        setActiveTab(item.id);
-                        setIsMobileNavOpen(false);
-                      }}
-                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left ${
-                        isActive
-                          ? 'bg-[#131313] text-white shadow-xs'
-                          : 'text-slate-700 hover:bg-slate-100'
-                      }`}
-                    >
-                      <span className="flex items-center gap-2.5">
-                        <span className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-all ${isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-700'}`}>
-                          {item.icon}
-                        </span>
-                        <span>{item.label}</span>
-                      </span>
-                      {isActive && <span>✓</span>}
-                    </button>
-                  );
-                })}
+              {/* Categorized MNC Navigation Items */}
+              <div className="space-y-4">
+                {studentNavSections.map((sec, sIdx) => (
+                  <div key={sIdx} className="space-y-1">
+                    <div className="px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center justify-between">
+                      <span>{sec.category}</span>
+                      <span className="w-8 h-px bg-slate-200" />
+                    </div>
+                    {sec.items.map((item) => {
+                      const isActive = activeTab === item.id;
+                      return (
+                        <button
+                          key={item.id}
+                          onClick={() => {
+                            setActiveTab(item.id);
+                            setIsMobileNavOpen(false);
+                          }}
+                          className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left ${
+                            isActive
+                              ? 'bg-[#131313] text-white shadow-sm border-l-4 border-l-[#EE2C3C]'
+                              : 'text-slate-800 hover:bg-slate-100/80 active:bg-slate-200/70'
+                          }`}
+                        >
+                          <span className="flex items-center gap-3 min-w-0">
+                            <span className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors ${getStudentIconBg(item.id, isActive)}`}>
+                              {item.icon}
+                            </span>
+                            <span className="truncate">{item.label}</span>
+                          </span>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            {getStudentNavBadge(item.id, isActive)}
+                            {isActive && <span className="text-[#EE2C3C] text-xs font-black">●</span>}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -2386,7 +2486,7 @@ export default function StudentPortalPage() {
         </div>
       )}
 
-      {/* LEFT SIDEBAR - FIXED & IMMOBILE (Pointers locked to viewport, does not move when scrolling) */}
+      {/* LEFT SIDEBAR - FIXED & IMMOBILE (MNC Grouped Design) */}
       <aside className="hidden md:flex w-full md:w-80 md:fixed md:top-0 md:left-0 md:bottom-0 md:h-screen bg-[#FFFFFF] border-r border-slate-200 flex-col justify-between shadow-xs z-30 flex-shrink-0">
         <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
           {/* Student Profile Identity */}
@@ -2423,75 +2523,42 @@ export default function StudentPortalPage() {
             </div>
           </div>
 
-          {/* Sidebar Navigation Items - UpGrad Admin Portal Design */}
-          <nav className="flex-1 px-3 py-3 space-y-1.5 overflow-y-auto">
-            {navItems.map((item) => {
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-base font-bold transition-all text-left cursor-pointer ${
-                    isActive
-                      ? 'bg-[#131313] text-[#FFFFFF] shadow-sm font-extrabold'
-                      : 'text-[#334155] hover:bg-slate-100 hover:text-[#0F172A]'
-                  }`}
-                >
-                  <span className="flex items-center space-x-3.5">
-                    <span
-                      className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-all ${
+          {/* Sidebar Navigation Items - MNC Corporate Grouped Design */}
+          <nav className="flex-1 px-3 py-3 space-y-4 overflow-y-auto">
+            {studentNavSections.map((sec, sIdx) => (
+              <div key={sIdx} className="space-y-1">
+                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center justify-between">
+                  <span>{sec.category}</span>
+                  <span className="w-10 h-px bg-slate-200" />
+                </div>
+                {sec.items.map((item) => {
+                  const isActive = activeTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setActiveTab(item.id)}
+                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold transition-all text-left cursor-pointer ${
                         isActive
-                          ? 'bg-white/20 text-white'
-                          : 'bg-slate-100 text-slate-700'
+                          ? 'bg-[#131313] text-white shadow-sm border-l-4 border-l-[#EE2C3C]'
+                          : 'text-[#334155] hover:bg-slate-100 hover:text-slate-900'
                       }`}
                     >
-                      {item.icon}
-                    </span>
-                    <span className="text-base tracking-tight font-bold">{item.label}</span>
-                  </span>
-                  {item.id === 'Jobs' && (
-                    <span suppressHydrationWarning className={`text-xs sm:text-sm font-mono px-2.5 py-0.5 rounded-full font-bold ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-800'
-                    }`}>
-                      {studentJobs.filter((j) => j.status === 'Active').length}
-                    </span>
-                  )}
-                  {item.id === 'Certificates' && (
-                    <span suppressHydrationWarning className={`text-xs sm:text-sm font-mono px-2.5 py-0.5 rounded-full font-bold ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-900'
-                    }`}>
-                      {studentCertificates.length}
-                    </span>
-                  )}
-                  {item.id === 'Assignments' && (
-                    <span suppressHydrationWarning className={`text-xs sm:text-sm font-mono px-2.5 py-0.5 rounded-full font-bold ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-900'
-                    }`}>
-                      {studentAssignments.length}
-                    </span>
-                  )}
-                  {item.id === 'E-Books' && (
-                    <span suppressHydrationWarning className={`text-xs sm:text-sm font-mono px-2.5 py-0.5 rounded-full font-bold ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-rose-100 text-rose-900'
-                    }`}>
-                      {studentEbooks.length}
-                    </span>
-                  )}
-                  {item.id === 'Live' && (
-                    <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
-                      liveClass?.status === 'Live Now' && liveClass?.isLive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'
-                    }`} />
-                  )}
-                  {item.id === 'Chat' && studentTickets.filter((t) => t.status === 'Resolved').length > 0 && (
-                    <span className={`text-xs font-mono px-2 py-0.5 rounded-full font-bold ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-800'
-                    }`}>
-                      {studentTickets.filter((t) => t.status === 'Resolved').length} Solved
-                    </span>
-                  )}
-                </button>
-              );
-            })}
+                      <span className="flex items-center space-x-3 min-w-0">
+                        <span
+                          className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors ${getStudentIconBg(item.id, isActive)}`}
+                        >
+                          {item.icon}
+                        </span>
+                        <span className="truncate">{item.label}</span>
+                      </span>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {getStudentNavBadge(item.id, isActive)}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
           </nav>
         </div>
 
