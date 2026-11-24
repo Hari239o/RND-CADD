@@ -102,31 +102,33 @@ export async function GET() {
         .sort({ createdAt: -1 })
         .toArray();
 
-      const formatted = users.map((u, i) => ({
-        id: u._id.toString(),
-        studentId: u.studentId || `STU-${String(i + 1).padStart(3, '0')}`,
-        name: u.fullName || u.name || 'Enrolled Student',
-        email: u.email,
-        photo: u.photo || (u.email === 'student1@gmail.com' ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80' : u.email === 'student2@gmail.com' ? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80' : u.email === 'student3@gmail.com' ? 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=80' : 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80'),
-        mobile: u.officialMobile && u.officialMobile !== '-' ? u.officialMobile : (u.mobile && u.mobile !== '-' ? u.mobile : (u.phone && u.phone !== '-' ? u.phone : '')),
-        officialMobile: u.officialMobile && u.officialMobile !== '-' ? u.officialMobile : (u.mobile && u.mobile !== '-' ? u.mobile : (u.phone && u.phone !== '-' ? u.phone : '')),
-        admissionDate: u.admissionDate || (u.createdAt
-          ? new Date(u.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
-          : new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })),
-        courseName: u.courseName || u.stream || 'Civil CADD & Master BIM',
-        software: u.software || 'AutoCAD, Revit',
-        qualification: u.qualification || '-',
-        college: u.college || '-',
-        residence: u.residence || 'Hyderabad',
-        courseFee: u.courseFee || 0,
-        paidFee: u.paidFee !== undefined ? u.paidFee : 0,
-        balanceFee: u.balanceFee !== undefined ? u.balanceFee : 0,
-        accessStatus: u.accessStatus || 'active',
-        assignedCourses: Array.isArray(u.assignedCourses) && u.assignedCourses.length > 0
-          ? u.assignedCourses
-          : [u.courseName || u.stream || 'Civil CADD & Master BIM'],
-        designs: Array.isArray(u.designs) ? u.designs : [],
-      }));
+      const formatted = users.map((u, i) => {
+        const studentCourses = Array.isArray(u.assignedCourses) ? u.assignedCourses : [];
+        const isEnrolled = studentCourses.length > 0;
+        return {
+          id: u._id.toString(),
+          studentId: u.studentId || `STU-${String(i + 1).padStart(3, '0')}`,
+          name: u.fullName || u.name || 'Enrolled Student',
+          email: u.email,
+          photo: u.photo || (u.email === 'student1@gmail.com' ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80' : u.email === 'student2@gmail.com' ? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80' : u.email === 'student3@gmail.com' ? 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=80' : 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80'),
+          mobile: u.officialMobile && u.officialMobile !== '-' ? u.officialMobile : (u.mobile && u.mobile !== '-' ? u.mobile : (u.phone && u.phone !== '-' ? u.phone : '')),
+          officialMobile: u.officialMobile && u.officialMobile !== '-' ? u.officialMobile : (u.mobile && u.mobile !== '-' ? u.mobile : (u.phone && u.phone !== '-' ? u.phone : '')),
+          admissionDate: u.admissionDate || (u.createdAt
+            ? new Date(u.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+            : new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })),
+          courseName: isEnrolled ? (u.courseName || studentCourses[0]) : '',
+          software: isEnrolled ? (u.software || 'AutoCAD, Revit') : '-',
+          qualification: u.qualification || '-',
+          college: u.college || '-',
+          residence: u.residence || 'Hyderabad',
+          courseFee: u.courseFee || 0,
+          paidFee: u.paidFee !== undefined ? u.paidFee : 0,
+          balanceFee: u.balanceFee !== undefined ? u.balanceFee : 0,
+          accessStatus: isEnrolled ? (u.accessStatus || 'active') : 'pending_enrollment',
+          assignedCourses: studentCourses,
+          designs: Array.isArray(u.designs) ? u.designs : [],
+        };
+      });
 
       return NextResponse.json({ success: true, students: formatted });
     }

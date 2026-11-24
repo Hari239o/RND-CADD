@@ -4242,17 +4242,20 @@ export default function AdminPortalPage() {
                               {/* Assigned Courses */}
                               <td className="py-4 px-5 max-w-xs">
                                 <div className="flex flex-wrap gap-1.5">
-                                  {(stu.assignedCourses && stu.assignedCourses.length > 0
-                                    ? stu.assignedCourses
-                                    : [stu.courseName]
-                                  ).map((course, idx) => (
-                                    <span
-                                      key={idx}
-                                      className="inline-block px-3 py-1 rounded-md text-xs sm:text-sm font-semibold bg-slate-100 text-[#131313] border border-slate-200"
-                                    >
-                                      {course}
+                                  {stu.assignedCourses && stu.assignedCourses.length > 0 ? (
+                                    stu.assignedCourses.map((course, idx) => (
+                                      <span
+                                        key={idx}
+                                        className="inline-block px-3 py-1 rounded-md text-xs sm:text-sm font-semibold bg-slate-100 text-[#131313] border border-slate-200"
+                                      >
+                                        {course}
+                                      </span>
+                                    ))
+                                  ) : (
+                                    <span className="inline-block px-2.5 py-1 rounded-md text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+                                      Not Enrolled
                                     </span>
-                                  ))}
+                                  )}
                                 </div>
                               </td>
 
@@ -4268,17 +4271,27 @@ export default function AdminPortalPage() {
 
                               {/* Fees */}
                               <td className="py-4 px-5">
-                                <div className="font-bold text-[#131313] text-sm sm:text-base">
-                                  Paid: Rs {stu.paidFee.toLocaleString()}
-                                </div>
-                                {stu.balanceFee > 0 ? (
-                                  <div className="text-xs sm:text-sm text-amber-600 font-semibold mt-0.5">
-                                    Due: Rs {stu.balanceFee.toLocaleString()}
-                                  </div>
+                                {stu.assignedCourses && stu.assignedCourses.length > 0 ? (
+                                  <>
+                                    <div className="font-bold text-[#131313] text-sm sm:text-base">
+                                      Paid: Rs {stu.paidFee.toLocaleString()}
+                                    </div>
+                                    {stu.balanceFee > 0 ? (
+                                      <div className="text-xs sm:text-sm text-amber-600 font-semibold mt-0.5">
+                                        Due: Rs {stu.balanceFee.toLocaleString()}
+                                      </div>
+                                    ) : (
+                                      <span className="inline-block px-2.5 py-0.5 rounded-full text-xs sm:text-sm font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 mt-0.5">
+                                        Paid in Full
+                                      </span>
+                                    )}
+                                  </>
                                 ) : (
-                                  <span className="inline-block px-2.5 py-0.5 rounded-full text-xs sm:text-sm font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 mt-0.5">
-                                    Paid in Full
-                                  </span>
+                                  <div>
+                                    <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
+                                      No Active Enrollment
+                                    </span>
+                                  </div>
                                 )}
                               </td>
 

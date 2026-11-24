@@ -102,16 +102,21 @@ export async function GET(request: NextRequest) {
 
         // Proceed with normal flow
         if (!existing) {
-          // New student registered via Google Sign-Up
+          // New student registered via Google Sign-Up: Strictly no default assigned courses until formally enrolled
           const newUser = {
             email: normEmail,
-            name: googleUser.name || 'Google CAD Trainee',
+            name: googleUser.name || 'CAD Student',
             photo: googleUser.picture || '',
             role: userRole,
             source: 'google_oauth',
             createdAt: new Date().toISOString(),
-            stream: 'Civil CADD & Master BIM',
-            assignedCourses: ['Civil CADD & Master BIM'],
+            stream: '',
+            courseName: '',
+            assignedCourses: [],
+            courseFee: 0,
+            paidFee: 0,
+            balanceFee: 0,
+            accessStatus: 'pending_enrollment',
           };
           const insertRes = await usersCol.insertOne(newUser);
           dbUser = { ...newUser, id: insertRes.insertedId.toString() };
@@ -140,11 +145,11 @@ export async function GET(request: NextRequest) {
     // 4. Build session object
     const sessionUser = {
       id: dbUser?.id || dbUser?.studentId || 'GOOGLE_USER',
-      name: googleUser.name || 'Google CAD Trainee',
+      name: googleUser.name || 'CAD Student',
       email: normEmail,
       photo: googleUser.picture || '',
       role: userRole,
-      assignedCourses: dbUser?.assignedCourses || ['Civil CADD & Master BIM'],
+      assignedCourses: Array.isArray(dbUser?.assignedCourses) ? dbUser.assignedCourses : [],
     };
 
     const targetUrl = isAdmin

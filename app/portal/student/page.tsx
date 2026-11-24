@@ -763,7 +763,7 @@ export default function StudentPortalPage() {
 
           const resolvedCourses = Array.isArray(matching.assignedCourses) && matching.assignedCourses.length > 0
             ? Array.from(new Set([...matching.assignedCourses, ...perStudentCourses]))
-            : (perStudentCourses.length > 0 ? perStudentCourses : (matching.courseName ? [matching.courseName] : []));
+            : (perStudentCourses.length > 0 ? perStudentCourses : []);
 
           setStudentUser((prev) => ({
             ...prev,
@@ -2422,8 +2422,32 @@ export default function StudentPortalPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {enrolledCoursesData.map((courseData, idx) => {
+                {enrolledCoursesData.length === 0 ? (
+                  <div className="bg-white rounded-2xl border border-dashed border-slate-300 p-8 sm:p-12 text-center shadow-xs">
+                    <div className="w-14 h-14 mx-auto rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 mb-3.5">
+                      <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                      </svg>
+                    </div>
+                    <h3 className="text-base sm:text-lg font-bold text-slate-900">
+                      No Enrolled Programs Yet
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-600 mt-1.5 max-w-md mx-auto leading-relaxed">
+                      You have signed up successfully, but have not enrolled in any professional CAD programs yet. Browse our certified industry tracks to get enrolled.
+                    </p>
+                    <div className="mt-5 flex justify-center gap-3">
+                      <Link
+                        href="/#programs"
+                        className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-[#EE2C3C] hover:bg-[#DC2626] transition-all shadow-sm"
+                      >
+                        <span>Explore Certified Programs</span>
+                        <span>&rarr;</span>
+                      </Link>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {enrolledCoursesData.map((courseData, idx) => {
                     const matched = courseData.matched;
                     const cName = courseData.name;
                     const classCount = courseData.totalCount;
@@ -2552,9 +2576,10 @@ export default function StudentPortalPage() {
                     );
                   })}
                 </div>
-              </div>
+              )}
             </div>
-          )}
+          </div>
+        )}
 
           {/* TAB 2: PROFILE - EXECUTIVE STUDENT DOSSIER & FINANCIAL LEDGER */}
           {activeTab === 'Profile' && (

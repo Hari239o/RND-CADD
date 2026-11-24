@@ -106,10 +106,8 @@ export async function GET(request: NextRequest) {
             ? new Date(dbUser.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
             : '11 Nov 2026'),
           photo: dbUser.photo || dbUser.image || defaultPhoto,
-          stream: dbUser.courseName || dbUser.stream || 'Civil CADD & Master BIM',
-          assignedCourses: Array.isArray(dbUser.assignedCourses) && dbUser.assignedCourses.length > 0
-            ? dbUser.assignedCourses
-            : [dbUser.courseName || dbUser.stream || 'Civil CADD & Master BIM'],
+          stream: dbUser.stream || '',
+          assignedCourses: Array.isArray(dbUser.assignedCourses) ? dbUser.assignedCourses : [],
           courseFee,
           paidFee,
           balanceFee,

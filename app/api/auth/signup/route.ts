@@ -23,7 +23,8 @@ export async function POST(request: NextRequest) {
     }
 
     const normalizedEmail = String(email).trim().toLowerCase();
-    const studentAssignedCourses = stream ? [stream] : [];
+    // Strictly no default course access for new account registration until student formally enrolls
+    const studentAssignedCourses: string[] = [];
 
     // System reserved default accounts check
     const reservedAccounts = [
@@ -111,14 +112,17 @@ export async function POST(request: NextRequest) {
         mobile: mobile ? String(mobile).trim() : '',
         officialMobile: mobile ? String(mobile).trim() : '',
         phone: mobile ? String(mobile).trim() : '',
-        stream,
-        courseName: stream,
+        stream: stream ? String(stream).trim() : '',
+        courseName: '', // Empty until officially enrolled in a course
         role: role === 'admin' ? 'admin' : 'student',
         password, // stored securely
         createdAt: new Date(),
         status: 'active',
-        accessStatus: 'active',
-        assignedCourses: studentAssignedCourses,
+        accessStatus: 'pending_enrollment',
+        assignedCourses: [], // Strictly empty upon registration
+        courseFee: 0,
+        paidFee: 0,
+        balanceFee: 0,
       };
 
       const result = await db.collection('users').insertOne(newUser);
@@ -131,7 +135,7 @@ export async function POST(request: NextRequest) {
           email: newUser.email,
           role: newUser.role,
           stream: newUser.stream,
-          assignedCourses: studentAssignedCourses,
+          assignedCourses: [],
         },
         redirectUrl: newUser.role === 'admin' ? '/portal/admin' : '/portal/student',
       });
