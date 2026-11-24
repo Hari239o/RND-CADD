@@ -418,7 +418,7 @@ export const Header: React.FC<HeaderProps> = ({
                 </div>
               )}
 
-              {/* Hamburger Button - Prominent & Comfortable Touch Target */}
+              {/* Mobile Drawer Toggle Button - Panel Sidebar Icon */}
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -430,7 +430,10 @@ export const Header: React.FC<HeaderProps> = ({
                   {mobileMenuOpen ? (
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                   ) : (
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    <>
+                      <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" strokeWidth={2.2} />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 3v18" stroke="currentColor" strokeWidth={2.2} />
+                    </>
                   )}
                 </svg>
               </button>
