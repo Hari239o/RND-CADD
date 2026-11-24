@@ -1239,9 +1239,13 @@ export async function GET(request: Request) {
           image: c.image && !c.image.includes('1541888946425') && !c.image.includes('1581092335397') && !c.image.includes('1504917599217')
             ? c.image
             : fallback?.image || c.image,
+          classes: Array.isArray(c.classes) && c.classes.length > 0 ? c.classes : (fallback?.classes || []),
         });
       });
-      return NextResponse.json({ success: true, source: 'mongodb', courses: normalized, folders: MAIN_FOLDERS });
+      return NextResponse.json(
+        { success: true, source: 'mongodb', courses: normalized, folders: MAIN_FOLDERS },
+        { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' } }
+      );
     }
   } catch (err) {
     console.warn('[Courses API] MongoDB query notice, serving local courses dataset:', err);
@@ -1255,7 +1259,10 @@ export async function GET(request: Request) {
     filtered = filtered.filter(c => c.stream === stream);
   }
 
-  return NextResponse.json({ success: true, source: 'fallback', courses: filtered, folders: MAIN_FOLDERS });
+  return NextResponse.json(
+    { success: true, source: 'fallback', courses: filtered, folders: MAIN_FOLDERS },
+    { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' } }
+  );
 }
 
 // POST create a new course
@@ -1329,17 +1336,37 @@ export async function PUT(request: Request) {
     try {
       const { db, isConnected } = await connectToDatabase();
       if (isConnected && db) {
+        const { ObjectId } = await import('mongodb');
         const collection = db.collection('courses');
-        const matchFilter: any = courseId && courseTitle
-          ? { $or: [{ id: courseId }, { title: courseTitle }] }
-          : (courseId ? { id: courseId } : { title: courseTitle });
+        
+        // Remove _id from $set payload to prevent MongoServerError modifying immutable _id
+        const { _id, ...fieldsToUpdate } = updatedCourse as any;
 
-        await collection.findOneAndUpdate(
-          matchFilter,
-          { $set: updatedCourse },
+        const matchFilter: any = {};
+        const orConditions: any[] = [];
+        if (body._id && ObjectId.isValid(body._id)) {
+          orConditions.push({ _id: new ObjectId(body._id) });
+        }
+        if (courseId) {
+          orConditions.push({ id: courseId });
+          orConditions.push({ id: courseId.toLowerCase() });
+          if (ObjectId.isValid(courseId)) {
+            orConditions.push({ _id: new ObjectId(courseId) });
+          }
+        }
+        if (courseTitle) {
+          orConditions.push({ title: courseTitle });
+          orConditions.push({ title: new RegExp(`^${courseTitle.trim()}$`, 'i') });
+        }
+
+        const filter = orConditions.length > 0 ? { $or: orConditions } : { id: courseId };
+
+        const updateResult = await collection.findOneAndUpdate(
+          filter,
+          { $set: fieldsToUpdate },
           { returnDocument: 'after', upsert: true }
         );
-        return NextResponse.json({ success: true, course: updatedCourse });
+        return NextResponse.json({ success: true, course: { ...updatedCourse, _id: updateResult?._id?.toString() } });
       }
     } catch (dbErr) {
       console.warn('[Courses API] Failed to update in MongoDB, fallback mode:', dbErr);
@@ -1392,16 +1419,22 @@ export async function DELETE(request: Request) {
         deleteConditions.push({ code: new RegExp(`^${courseCode.trim()}$`, 'i') });
       }
 
-      const result = await collection.deleteOne({ $or: deleteConditions });
-      return NextResponse.json({
-        success: true,
-        deletedCount: result.deletedCount,
-        message: 'Course deleted permanently from database',
-      });
+      const result = await collection.deleteMany({ $or: deleteConditions });
+      return NextResponse.json(
+        {
+          success: true,
+          deletedCount: result.deletedCount,
+          message: 'Course deleted permanently from database',
+        },
+        { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' } }
+      );
     }
   } catch (dbErr) {
     console.warn('[Courses API] Failed to delete in MongoDB:', dbErr);
   }
 
-  return NextResponse.json({ success: true, message: 'Deleted course' });
+  return NextResponse.json(
+    { success: true, message: 'Deleted course' },
+    { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' } }
+  );
 }

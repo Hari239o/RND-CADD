@@ -59,61 +59,73 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
 
     const fetchCourses = async () => {
       try {
-        const res = await fetch('/api/courses');
+        const res = await fetch('/api/courses?t=' + Date.now(), { cache: 'no-store' });
         const data = await res.json();
         if (data.success && Array.isArray(data.courses) && data.courses.length > 0) {
-          // Merge API courses with default COURSES so no domain is ever depleted
-          const merged: Course[] = [...COURSES];
-          data.courses.forEach((sc: any) => {
-            const index = merged.findIndex(
+          const mappedCourses: Course[] = data.courses.map((sc: any) => {
+            const auth = COURSES.find(
               (c) =>
                 c.id.toLowerCase() === sc.id?.toLowerCase() ||
                 c.title.toLowerCase().trim() === sc.title?.toLowerCase().trim()
             );
             const streamVal = sc.folder === 'electrical' ? 'eee' : (sc.stream || sc.folder);
 
+            const toolsList = Array.isArray(sc.tools) && sc.tools.length > 0
+              ? sc.tools
+              : typeof sc.software === 'string' && sc.software.trim()
+              ? sc.software.split(',').map((s: string) => s.trim()).filter(Boolean)
+              : auth?.tools || ['CAD Tools'];
+
+            const modulesList = Array.isArray(sc.modules) && sc.modules.length > 0
+              ? sc.modules
+              : Array.isArray(sc.syllabus) && sc.syllabus.length > 0
+              ? sc.syllabus.map((s: string, i: number) => ({
+                  number: String(i + 1).padStart(2, '0'),
+                  title: s,
+                  hours: 20,
+                  topics: [s, 'Practical lab drafting & validation'],
+                }))
+              : auth?.modules || [];
+
             const courseObj: any = {
-              id: sc.id || `course-${sc.code || Math.random().toString(36).substring(7)}`,
-              code: sc.code,
-              folder: sc.folder,
-              fee: Number(sc.fee || sc.price) || 35000,
+              id: sc.id || auth?.id || `course-${sc.code || Math.random().toString(36).substring(7)}`,
+              code: sc.code || auth?.code || 'CAD-PRO',
+              folder: sc.folder || auth?.folder,
+              fee: Number(sc.fee || sc.price) || auth?.fee || 35000,
               stream: streamVal,
               title: sc.title,
-              category: sc.category || sc.domain || 'Engineering CAD',
-              tagline: sc.tagline || sc.overview || 'Industrial certified CAD/BIM course',
-              duration: sc.duration || '90 Days (180 Hours)',
-              totalHours: Number(sc.totalHours) || 120,
-              level: sc.level || 'Professional Diploma',
-              rating: sc.rating || '4.9/5',
-              enrolledStudents: sc.enrolledStudents || '450+ Trainees',
-              tools: sc.tools || ['CAD Tools'],
+              category: sc.category || auth?.category || sc.domain || 'Engineering CAD',
+              tagline: sc.tagline || auth?.tagline || sc.overview || 'Industrial certified CAD/BIM course',
+              duration: sc.duration || auth?.duration || '90 Days (180 Hours)',
+              totalHours: Number(sc.totalHours) || auth?.totalHours || 120,
+              level: sc.level || auth?.level || 'Professional Diploma',
+              rating: sc.rating || auth?.rating || '4.9/5',
+              enrolledStudents: sc.enrolledStudents || auth?.enrolledStudents || '450+ Trainees',
+              tools: toolsList,
               image:
-                sc.image ||
-                'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80',
-              overview: sc.overview || '',
-              certification: sc.certification || 'Autodesk & Dassault Certificate',
-              careerRoles: sc.careerRoles || ['CAD Design Engineer'],
-              prerequisites: sc.prerequisites || 'Diploma / B.Tech',
-              capstoneProject: sc.capstoneProject || {
+                (sc.image && !sc.image.includes('1541888946425') && !sc.image.includes('1581092335397') && !sc.image.includes('1504917599217'))
+                  ? sc.image
+                  : auth?.image || 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80',
+              overview: sc.overview || auth?.overview || '',
+              certification: sc.certification || auth?.certification || 'Autodesk & Dassault Certificate',
+              careerRoles: sc.careerRoles || auth?.careerRoles || ['CAD Design Engineer'],
+              prerequisites: sc.prerequisites || auth?.prerequisites || 'Diploma / B.Tech',
+              capstoneProject: sc.capstoneProject || auth?.capstoneProject || {
                 title: `${sc.title} Live Industry Project`,
                 description: 'Real-world industrial drafting, modeling, and validation project.',
                 deliverables: ['Design Drawings', '3D CAD Model', 'Project Dossier'],
               },
-              modules: sc.modules || [],
-              classes: sc.classes || [],
+              modules: modulesList,
+              classes: sc.classes || auth?.classes || [],
               status: sc.status || 'Active',
             };
 
-            if (index >= 0) {
-              merged[index] = { ...merged[index], ...courseObj };
-            } else {
-              merged.push(courseObj);
-            }
+            return courseObj;
           });
-          setAllCourses(merged);
+          setAllCourses(mappedCourses);
           try {
             if (typeof window !== 'undefined') {
-              localStorage.setItem('rnd_cadd_live_courses', JSON.stringify(merged));
+              localStorage.setItem('rnd_cadd_live_courses', JSON.stringify(mappedCourses));
             }
           } catch {}
         }

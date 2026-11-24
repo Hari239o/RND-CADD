@@ -25,23 +25,23 @@ export const CourseCatalog: React.FC<CourseCatalogProps> = ({
   useEffect(() => {
     const fetchLiveCourses = async () => {
       try {
-        const res = await fetch('/api/courses');
+        const res = await fetch('/api/courses?t=' + Date.now(), { cache: 'no-store' });
         const data = await res.json();
         if (data.success && Array.isArray(data.courses) && data.courses.length > 0) {
-          const merged: Course[] = [...COURSES];
-          data.courses.forEach((sc: any) => {
-            const index = merged.findIndex(
+          const mapped: Course[] = data.courses.map((sc: any) => {
+            const auth = COURSES.find(
               (c) =>
                 c.id.toLowerCase() === sc.id?.toLowerCase() ||
                 c.title.toLowerCase().trim() === sc.title?.toLowerCase().trim()
             );
-            if (index >= 0) {
-              merged[index] = { ...merged[index], ...sc };
-            } else {
-              merged.push(sc);
-            }
+            return {
+              ...(auth || {}),
+              ...sc,
+              tools: Array.isArray(sc.tools) && sc.tools.length > 0 ? sc.tools : (auth?.tools || ['CAD Tools']),
+              classes: sc.classes || auth?.classes || [],
+            };
           });
-          setCoursesList(merged);
+          setCoursesList(mapped);
         }
       } catch (err) {
         console.error('Failed to load live courses in CourseCatalog:', err);

@@ -241,16 +241,13 @@ function formatVideoTime(seconds: number): string {
 const DEFAULT_COURSE_CLASSES: Record<string, CourseClass[]> = {
   'civil cadd & master bim': [
     {
-      id: 'cls-auto-1',
+      id: 'cls-civ-1',
       classNumber: 'Class 01',
-      title: 'Civil CADD & Master BIM - Fundamentals & CAD Standards',
+      title: 'AutoCAD 2D Drafting Standards & Project Setup',
       duration: '45 mins',
       videoType: 'drive',
       videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
-      description: 'Introduction to standard user interface, navigation shortcuts, template configurations, and BIS/ISO standards.',
-      pdfUrl: undefined,
-      pdfName: undefined,
-      pdfSize: undefined,
+      description: 'Industry-standard DWG setup, BIS title block standards, layer architecture, and precision snap tools.',
     },
     {
       id: 'cls-civ-2',
@@ -260,9 +257,6 @@ const DEFAULT_COURSE_CLASSES: Record<string, CourseClass[]> = {
       videoType: 'drive',
       videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
       description: 'Modeling structural compound walls, core layers, elevation datum levels, and structural grid alignments.',
-      pdfUrl: undefined,
-      pdfName: undefined,
-      pdfSize: undefined,
     },
     {
       id: 'cls-civ-3',
@@ -272,9 +266,6 @@ const DEFAULT_COURSE_CLASSES: Record<string, CourseClass[]> = {
       videoType: 'drive',
       videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
       description: 'Creating parametric window/door families, curtain wall mullion layout, and reference planes.',
-      pdfUrl: undefined,
-      pdfName: undefined,
-      pdfSize: undefined,
     },
     {
       id: 'cls-civ-4',
@@ -284,9 +275,122 @@ const DEFAULT_COURSE_CLASSES: Record<string, CourseClass[]> = {
       videoType: 'drive',
       videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
       description: 'Multi-trade hard clash detection, 4D construction schedule simulation, and GPU real-time daylight rendering.',
-      pdfUrl: undefined,
-      pdfName: undefined,
-      pdfSize: undefined,
+    },
+  ],
+  'mechanical cad/cam/cae diploma': [
+    {
+      id: 'cls-mec-1',
+      classNumber: 'Class 01',
+      title: 'SolidWorks 3D Parametric Sketching & Constraints',
+      duration: '50 mins',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
+      description: 'Fully constrained 2D sketches, geometric relations, boss-extrude, cut-extrude, and thin features.',
+    },
+    {
+      id: 'cls-mec-2',
+      classNumber: 'Class 02',
+      title: 'Sheet Metal Unfolding, K-Factor & Welded Structures',
+      duration: '60 mins',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
+      description: 'Edge flanges, miter flanges, sheet metal gauge tables, flat pattern development, and structural weldments.',
+    },
+    {
+      id: 'cls-mec-3',
+      classNumber: 'Class 03',
+      title: 'CATIA V5 Generative Shape Design & Wireframe Tools',
+      duration: '65 mins',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
+      description: 'Splines, boundary curves, sweep surfaces, blend surfaces, multi-section surfaces, and curvature continuity.',
+    },
+    {
+      id: 'cls-mec-4',
+      classNumber: 'Class 04',
+      title: 'ANSYS Static Structural Stress & Deflection Simulation',
+      duration: '55 mins',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
+      description: 'Material library assignment, adaptive tetrahedral meshing, boundary conditions, and Von-Mises stress analysis.',
+    },
+  ],
+  'solidworks master professional': [
+    {
+      id: 'cls-sw-1',
+      classNumber: 'Class 01',
+      title: 'SolidWorks 3D Parametric Part & Assembly Engineering',
+      duration: '55 mins',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
+      description: 'Precision sketches, top-down and bottom-up assemblies, mate references, and interference checks.',
+    },
+    {
+      id: 'cls-sw-2',
+      classNumber: 'Class 02',
+      title: 'Sheet Metal Design, Forming Tools & Weldments',
+      duration: '60 mins',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
+      description: 'Base flanges, gauge tables, flat patterns, cut lists, weld beads, and structural steel frames.',
+    },
+    {
+      id: 'cls-sw-3',
+      classNumber: 'Class 03',
+      title: 'Industrial Surfacing, Mold Design & Tooling Splits',
+      duration: '65 mins',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
+      description: 'Draft analysis, parting lines, shut-off surfaces, core and cavity block extraction for injection molding.',
+    },
+  ],
+  'ansys fea & cfd multiphysics simulation': [
+    {
+      id: 'cls-ans-1',
+      classNumber: 'Class 01',
+      title: 'ANSYS Static Structural Stress & Deflection Analysis',
+      duration: '55 mins',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
+      description: 'Material assignments, boundary supports, structural loads, adaptive tetrahedral meshing, and Von-Mises results.',
+    },
+    {
+      id: 'cls-ans-2',
+      classNumber: 'Class 02',
+      title: 'Steady-State Thermal & Modal Vibration Simulation',
+      duration: '60 mins',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
+      description: 'Heat flux, thermal conductivity, natural frequency extraction, mode shapes, and resonance prevention.',
+    },
+  ],
+  'electrical cadd & switchgear design': [
+    {
+      id: 'cls-ele-1',
+      classNumber: 'Class 01',
+      title: 'Single Line Diagram (SLD) Drafting & IEC Standards',
+      duration: '45 mins',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
+      description: 'IEC 60617 graphical symbols, feeder sizing, busbar arrangements, and incoming HT/LT panel architecture.',
+    },
+    {
+      id: 'cls-ele-2',
+      classNumber: 'Class 02',
+      title: 'Motor Control Center (MCC) & Control Logic Schematics',
+      duration: '55 mins',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
+      description: 'DOL, Star-Delta power & control wiring, interlocking circuits, terminal blocks, and cable routing.',
+    },
+    {
+      id: 'cls-ele-3',
+      classNumber: 'Class 03',
+      title: 'ETAP Balanced Load Flow & Short Circuit Calculations',
+      duration: '60 mins',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
+      description: 'Bus voltage profiles, branch loading, symmetrical short circuit currents, and breaker breaking capacity.',
     },
   ],
   'interior architecture & 3d visualization': [
@@ -298,9 +402,6 @@ const DEFAULT_COURSE_CLASSES: Record<string, CourseClass[]> = {
       videoType: 'drive',
       videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
       description: 'Anthropometric dimensions, circulation corridors, furniture clearance standards, and false ceiling grids.',
-      pdfUrl: undefined,
-      pdfName: undefined,
-      pdfSize: undefined,
     },
     {
       id: 'cls-int-2',
@@ -310,9 +411,6 @@ const DEFAULT_COURSE_CLASSES: Record<string, CourseClass[]> = {
       videoType: 'drive',
       videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
       description: 'Tandem drawer mechanisms, carcass panels, shutter finishes, edge-banding, and hardware specifications.',
-      pdfUrl: undefined,
-      pdfName: undefined,
-      pdfSize: undefined,
     },
     {
       id: 'cls-int-3',
@@ -322,25 +420,192 @@ const DEFAULT_COURSE_CLASSES: Record<string, CourseClass[]> = {
       videoType: 'drive',
       videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
       description: 'IES photometric spotlights, dome HDRI environment lighting, PBR reflection glossiness, and normal bump maps.',
-      pdfUrl: undefined,
-      pdfName: undefined,
-      pdfSize: undefined,
+    },
+  ],
+  'piping & plant engineering cadd': [
+    {
+      id: 'cls-pip-1',
+      classNumber: 'Class 01',
+      title: 'P&ID Process Drafting & Instrumentation Standards',
+      duration: '45 mins',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
+      description: 'Piping & Instrumentation Diagrams, ISA 5.1 symbology, line designation tables, and valve schedules.',
+    },
+    {
+      id: 'cls-pip-2',
+      classNumber: 'Class 02',
+      title: '3D Equipment Modeling & Pipe Rack Routing',
+      duration: '55 mins',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
+      description: 'Nozzle orientations, pipe specifications, insulation thickness, pipe rack tier spacing, and valve access.',
+    },
+    {
+      id: 'cls-pip-3',
+      classNumber: 'Class 03',
+      title: 'Automated Isometrics, BOM & Caesar II Flexibility',
+      duration: '60 mins',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
+      description: 'Isometric drawing extraction, cut-length bill of materials, thermal expansion stress loops, and spring hanger loads.',
+    },
+  ],
+  'project planning & management (ppm)': [
+    {
+      id: 'cls-ppm-1',
+      classNumber: 'Class 01',
+      title: 'Enterprise Project Structure (EPS) & WBS Hierarchy',
+      duration: '45 mins',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
+      description: 'Creating multi-tier EPS nodes, organizational breakdown structures (OBS), and 100% rule WBS decomposition.',
+    },
+    {
+      id: 'cls-ppm-2',
+      classNumber: 'Class 02',
+      title: 'Activity Logic Ties, Critical Path (CPM) & Float Tracking',
+      duration: '55 mins',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
+      description: 'FS, SS, FF, SF relationships, lead/lag times, total float, free float, and early/late date scheduling.',
+    },
+    {
+      id: 'cls-ppm-3',
+      classNumber: 'Class 03',
+      title: 'Resource Allocation, Leveling & Earned Value (EVA)',
+      duration: '60 mins',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
+      description: 'Labor/non-labor resource rate curves, peak leveling, Planned Value (PV), Earned Value (EV), and SPI/CPI tracking.',
     },
   ],
 };
+
+function findCourseInCatalog(nameOrId: string, catalog: StoredCourse[]): StoredCourse | undefined {
+  if (!nameOrId || !catalog || catalog.length === 0) return undefined;
+  const target = nameOrId.toLowerCase().trim();
+
+  // 1. Exact ID or Title or Code match
+  const exact = catalog.find(
+    (c) =>
+      c.id.toLowerCase() === target ||
+      c.title.toLowerCase().trim() === target ||
+      c.code?.toLowerCase().trim() === target
+  );
+  if (exact) return exact;
+
+  // 2. Substring / contains match
+  const containsMatch = catalog.find((c) => {
+    const cTitle = c.title.toLowerCase().trim();
+    return cTitle.includes(target) || target.includes(cTitle);
+  });
+  if (containsMatch) return containsMatch;
+
+  // 3. Keyword / software match
+  const keywords = target.split(/[\s&,/+-]+/).filter((w) => w.length > 3);
+  for (const kw of keywords) {
+    const kwMatch = catalog.find(
+      (c) =>
+        c.title.toLowerCase().includes(kw) ||
+        c.software?.toLowerCase().includes(kw) ||
+        (Array.isArray(c.tools) && c.tools.some((t: string) => t.toLowerCase().includes(kw)))
+    );
+    if (kwMatch) return kwMatch;
+  }
+
+  // 4. Domain match
+  if (target.includes('mech') || target.includes('solidworks') || target.includes('ansys') || target.includes('catia') || target.includes('creo')) {
+    const mech = catalog.find((c) => c.folder === 'mechanical' || c.stream === 'mechanical');
+    if (mech) return mech;
+  }
+  if (target.includes('elec') || target.includes('eplan') || target.includes('etap') || target.includes('altium')) {
+    const elec = catalog.find((c) => c.folder === 'electrical' || c.stream === 'eee');
+    if (elec) return elec;
+  }
+  if (target.includes('pip') || target.includes('plant') || target.includes('sp3d')) {
+    const pip = catalog.find((c) => c.folder === 'piping');
+    if (pip) return pip;
+  }
+  if (target.includes('ppm') || target.includes('primavera') || target.includes('project')) {
+    const ppm = catalog.find((c) => c.folder === 'ppm');
+    if (ppm) return ppm;
+  }
+  if (target.includes('interior') || target.includes('sketchup')) {
+    const intc = catalog.find((c) => c.folder === 'interior');
+    if (intc) return intc;
+  }
+
+  return undefined;
+}
 
 function getClassesForCourse(courseTitle: string, matchedClasses?: CourseClass[]): CourseClass[] {
   if (matchedClasses && matchedClasses.length > 0) {
     return matchedClasses;
   }
   const cleanTitle = (courseTitle || '').toLowerCase().trim();
+
+  // Check exact dictionary match
   if (DEFAULT_COURSE_CLASSES[cleanTitle]) {
     return DEFAULT_COURSE_CLASSES[cleanTitle];
   }
-  if (cleanTitle.includes('interior') || cleanTitle.includes('3d') || cleanTitle.includes('arch')) {
+
+  // Match by domain/discipline - STRICT ISOLATION so Civil never leaks into Mechanical
+  if (cleanTitle.includes('mech') || cleanTitle.includes('solidworks') || cleanTitle.includes('ansys') || cleanTitle.includes('catia') || cleanTitle.includes('creo') || cleanTitle.includes('cam') || cleanTitle.includes('cae') || cleanTitle.includes('nx') || cleanTitle.includes('cnc')) {
+    return DEFAULT_COURSE_CLASSES['mechanical cad/cam/cae diploma'];
+  }
+
+  if (cleanTitle.includes('elec') || cleanTitle.includes('eplan') || cleanTitle.includes('etap') || cleanTitle.includes('altium') || cleanTitle.includes('matlab') || cleanTitle.includes('circuit') || cleanTitle.includes('switchgear') || cleanTitle.includes('panel')) {
+    return DEFAULT_COURSE_CLASSES['electrical cadd & switchgear design'];
+  }
+
+  if (cleanTitle.includes('pip') || cleanTitle.includes('plant') || cleanTitle.includes('sp3d') || cleanTitle.includes('caesar') || cleanTitle.includes('p&id')) {
+    return DEFAULT_COURSE_CLASSES['piping & plant engineering cadd'];
+  }
+
+  if (cleanTitle.includes('ppm') || cleanTitle.includes('primavera') || cleanTitle.includes('project') || cleanTitle.includes('msp') || cleanTitle.includes('estimation') || cleanTitle.includes('surveying')) {
+    return DEFAULT_COURSE_CLASSES['project planning & management (ppm)'];
+  }
+
+  if (cleanTitle.includes('interior') || cleanTitle.includes('sketchup') || cleanTitle.includes('space') || cleanTitle.includes('furniture')) {
     return DEFAULT_COURSE_CLASSES['interior architecture & 3d visualization'];
   }
-  return DEFAULT_COURSE_CLASSES['civil cadd & master bim'];
+
+  if (cleanTitle.includes('civil') || cleanTitle.includes('bim') || cleanTitle.includes('revit') || cleanTitle.includes('etabs') || cleanTitle.includes('staad') || cleanTitle.includes('arch') || cleanTitle.includes('drafting')) {
+    return DEFAULT_COURSE_CLASSES['civil cadd & master bim'];
+  }
+
+  // Dynamic isolated classes tailored specifically for this course title
+  const safeSlug = (cleanTitle || 'cad-course').replace(/[^a-z0-9]+/g, '-');
+  return [
+    {
+      id: `cls-${safeSlug}-1`,
+      classNumber: 'Class 01',
+      title: `${courseTitle} - Industry CAD Standards & Interface`,
+      duration: '45 mins',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
+      description: `Introduction to ${courseTitle} core interface, shortcuts, and industrial drafting standards.`,
+    },
+    {
+      id: `cls-${safeSlug}-2`,
+      classNumber: 'Class 02',
+      title: `${courseTitle} - Advanced Modeling & Lab Drafting`,
+      duration: '55 mins',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
+      description: `Hands-on practical workflows and modeling techniques for ${courseTitle}.`,
+    },
+    {
+      id: `cls-${safeSlug}-3`,
+      classNumber: 'Class 03',
+      title: `${courseTitle} - Capstone Project Dossier & Final Portfolio`,
+      duration: '60 mins',
+      videoType: 'drive',
+      videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
+      description: `Industrial capstone project validation and drawing sheet generation for ${courseTitle}.`,
+    },
+  ];
 }
 
 const BookCoverGraphic = ({ book, onClick }: { book: EbookItem; onClick?: () => void }) => {
@@ -1032,7 +1297,7 @@ export default function StudentPortalPage() {
   // Fetch courses catalog to link classwise videos
   const fetchCourses = async () => {
     try {
-      const res = await fetch('/api/courses');
+      const res = await fetch('/api/courses?t=' + Date.now(), { cache: 'no-store' });
       const data = await res.json();
       if (data.success && Array.isArray(data.courses)) {
         setAllCourses(data.courses);
@@ -1401,12 +1666,8 @@ export default function StudentPortalPage() {
   // Compute Enrolled Courses with Classes & Live Progress
   const enrolledCoursesData = useMemo(() => {
     return studentUser.assignedCourses.map((cName) => {
-      const matched = allCourses.find(
-        (c) =>
-          c.title.toLowerCase().trim() === cName.toLowerCase().trim() ||
-          c.code.toLowerCase().trim() === cName.toLowerCase().trim()
-      );
-      const classes: CourseClass[] = getClassesForCourse(cName, matched?.classes);
+      const matched = findCourseInCatalog(cName, allCourses);
+      const classes: CourseClass[] = getClassesForCourse(matched?.title || cName, matched?.classes);
       const watchedCount = classes.filter((cls, cIdx) => {
         const numMatch = (cls.classNumber || '').match(/\d+/);
         const num = numMatch ? parseInt(numMatch[0], 10) : cIdx + 1;
@@ -1577,18 +1838,13 @@ export default function StudentPortalPage() {
 
   const handleOpenStudio = (course: StoredCourse, targetClass?: CourseClass | null) => {
     // 1. Immediately match existing course data from allCourses or fallback
-    const catalogMatch = allCourses.find(
-      (c) =>
-        c.id === course.id ||
-        c.title.toLowerCase().trim() === course.title.toLowerCase().trim() ||
-        c.code.toLowerCase().trim() === course.code.toLowerCase().trim()
-    );
+    const catalogMatch = findCourseInCatalog(course.title, allCourses) || findCourseInCatalog(course.id, allCourses);
     const candidateClasses =
       (catalogMatch?.classes && catalogMatch.classes.length > 0)
         ? catalogMatch.classes
         : (course.classes && course.classes.length > 0 ? course.classes : undefined);
 
-    const courseClasses = getClassesForCourse(course.title, candidateClasses);
+    const courseClasses = getClassesForCourse(catalogMatch?.title || course.title, candidateClasses);
     const resolvedCourse: StoredCourse = {
       ...(catalogMatch || course),
       classes: courseClasses,
@@ -1616,17 +1872,12 @@ export default function StudentPortalPage() {
     }
 
     // 2. Fetch fresh courses in background so any class newly added by Admin appears immediately
-    fetch('/api/courses')
+    fetch('/api/courses?t=' + Date.now(), { cache: 'no-store' })
       .then((r) => r.json())
       .then((data) => {
         if (data.success && Array.isArray(data.courses)) {
           setAllCourses(data.courses);
-          const fresh = data.courses.find(
-            (c: StoredCourse) =>
-              c.id === course.id ||
-              c.title.toLowerCase().trim() === course.title.toLowerCase().trim() ||
-              c.code.toLowerCase().trim() === course.code.toLowerCase().trim()
-          );
+          const fresh = findCourseInCatalog(course.title, data.courses) || findCourseInCatalog(course.id, data.courses);
           if (fresh && Array.isArray(fresh.classes) && fresh.classes.length > 0) {
             setPlayerCourse(fresh);
             if (targetClass) {

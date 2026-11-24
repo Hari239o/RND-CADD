@@ -856,7 +856,18 @@ export default function AdminPortalPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'revoked'>('all');
 
   // Interactive Courses Catalog State (loaded dynamically from /api/courses)
-  const [courses, setCourses] = useState<CourseItem[]>(DEFAULT_COURSES);
+  const [courses, setCourses] = useState<CourseItem[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('rnd_cadd_live_courses');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch {}
+    }
+    return DEFAULT_COURSES;
+  });
   const [foldersList, setFoldersList] = useState<any[]>([...MAIN_FOLDERS]);
   const [showAddFolderModal, setShowAddFolderModal] = useState<boolean>(false);
   const [newFolderForm, setNewFolderForm] = useState({
@@ -1242,7 +1253,7 @@ export default function AdminPortalPage() {
   const fetchCourses = async (silent = false) => {
     if (!silent) setIsLoadingCourses(true);
     try {
-      const res = await fetch('/api/courses');
+      const res = await fetch('/api/courses?t=' + Date.now(), { cache: 'no-store' });
       const data = await res.json();
       if (data.success && Array.isArray(data.courses)) {
         const hydrated = data.courses.map((c: CourseItem) => {
@@ -1265,6 +1276,7 @@ export default function AdminPortalPage() {
             tagline: c.tagline || auth.tagline,
             totalHours: c.totalHours || auth.totalHours,
             duration: c.duration || auth.duration,
+            classes: Array.isArray(c.classes) ? c.classes : [],
           };
         });
         setCourses(hydrated);
@@ -2844,7 +2856,11 @@ export default function AdminPortalPage() {
       });
       const data = await res.json();
       if (data.success) {
-        const nextList = courses.filter((c) => c.id !== course.id && c.title !== course.title);
+        const nextList = courses.filter((c) =>
+          c.id !== course.id &&
+          c.id.toLowerCase() !== course.id.toLowerCase() &&
+          c.title.toLowerCase().trim() !== course.title.toLowerCase().trim()
+        );
         setCourses(nextList);
         persistLiveCourses(nextList);
         showToast(`Course "${course.title}" deleted.`);
@@ -3009,7 +3025,15 @@ export default function AdminPortalPage() {
       });
       const data = await res.json();
       if (data.success && data.course) {
-        setCourses((prev) => prev.map((c) => (c.id === updatedPayload.id ? data.course : c)));
+        const nextList = courses.map((c) =>
+          c.id === updatedPayload.id ||
+          c.id.toLowerCase() === updatedPayload.id.toLowerCase() ||
+          c.title.toLowerCase().trim() === updatedPayload.title.toLowerCase().trim()
+            ? { ...c, ...data.course, classes: currentClasses }
+            : c
+        );
+        setCourses(nextList);
+        persistLiveCourses(nextList);
         setManagingClassesCourse(data.course);
         showToast(`Successfully saved ${currentClasses.length} class(es) for "${managingClassesCourse.title}".`);
       } else {

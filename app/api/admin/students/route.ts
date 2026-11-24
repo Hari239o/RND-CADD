@@ -89,7 +89,7 @@ export async function GET() {
           mobile: '',
           officialMobile: '',
           admissionDate: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-          courseName: 'Mechanical CAD & SolidWorks Expert',
+          courseName: 'Mechanical CAD/CAM/CAE Diploma',
           software: 'SolidWorks, Ansys, AutoCAD Mechanical',
           qualification: '',
           college: '',
@@ -98,7 +98,7 @@ export async function GET() {
           paidFee: 0,
           balanceFee: 0,
           accessStatus: 'active',
-          assignedCourses: ['Mechanical CAD & SolidWorks Expert', 'Ansys Simulation & FEA'],
+          assignedCourses: ['Mechanical CAD/CAM/CAE Diploma', 'SOLIDWORKS Master Professional'],
           designs: [],
         },
         {
@@ -109,7 +109,7 @@ export async function GET() {
           mobile: '',
           officialMobile: '',
           admissionDate: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-          courseName: 'Electrical CADD & Control Systems',
+          courseName: 'Electrical CADD & Switchgear Design',
           software: 'AutoCAD Electrical, EPLAN',
           qualification: '',
           college: '',
@@ -118,7 +118,7 @@ export async function GET() {
           paidFee: 0,
           balanceFee: 0,
           accessStatus: 'active',
-          assignedCourses: ['Electrical CADD & Control Systems', 'AutoCAD Electrical & Panel Design'],
+          assignedCourses: ['Electrical CADD & Switchgear Design', 'AutoCAD Electrical Industrial Systems'],
           designs: [],
         }
       ]
