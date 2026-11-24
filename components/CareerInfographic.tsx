@@ -188,11 +188,10 @@ export const HIRING_CONGLOMERATES: HiringConglomerate[] = [
     id: 'tata-tech',
     name: 'Tata Technologies',
     renderLogo: () => (
-      <div className="flex items-center gap-1.5 flex-shrink-0">
-        <div className="w-5 h-5 rounded-full border-[1.5px] border-[#1E4B88] flex items-center justify-center bg-blue-50/60 shadow-xs">
-          <span className="text-[10px] font-black text-[#1E4B88]">T</span>
-        </div>
-        <span className="text-[11px] font-black text-[#1E4B88] tracking-wider">TATA</span>
+      <div className="w-6 h-6 rounded-md bg-[#004B87] flex items-center justify-center text-white shrink-0 shadow-2xs">
+        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
+          <path d="M4 6.5C8 5.5 16 5.5 20 6.5M7 8C10 7.2 14 7.2 17 8M10.5 8V18.5M13.5 8V18.5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"/>
+        </svg>
       </div>
     ),
   },
@@ -200,8 +199,8 @@ export const HIRING_CONGLOMERATES: HiringConglomerate[] = [
     id: 'lt',
     name: 'Larsen & Toubro (L&T)',
     renderLogo: () => (
-      <div className="flex items-center gap-1 bg-[#003B71] text-white px-2 py-0.5 rounded shadow-xs flex-shrink-0">
-        <span className="text-[11px] font-black tracking-wider">L&amp;T</span>
+      <div className="w-6 h-6 rounded-md bg-[#003B71] flex items-center justify-center text-white shrink-0 shadow-2xs">
+        <span className="font-serif font-black text-[10px] tracking-tight leading-none">L&amp;T</span>
       </div>
     ),
   },
@@ -209,9 +208,9 @@ export const HIRING_CONGLOMERATES: HiringConglomerate[] = [
     id: 'schneider',
     name: 'Schneider Electric',
     renderLogo: () => (
-      <div className="w-5 h-5 rounded bg-[#3DCD58] flex items-center justify-center text-white shadow-xs flex-shrink-0">
-        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round">
-          <path d="M8 5l8 7-8 7" />
+      <div className="w-6 h-6 rounded-md bg-[#009530] flex items-center justify-center text-white shrink-0 shadow-2xs">
+        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M8.5 4.5L15.5 12L8.5 19.5H12.5L19.5 12L12.5 4.5H8.5Z" />
         </svg>
       </div>
     ),
@@ -220,8 +219,11 @@ export const HIRING_CONGLOMERATES: HiringConglomerate[] = [
     id: 'cyient',
     name: 'Cyient Limited',
     renderLogo: () => (
-      <div className="w-5 h-5 rounded-full bg-[#00A3E0] flex items-center justify-center text-white flex-shrink-0 shadow-xs">
-        <div className="w-2 h-2 rounded-full bg-white"></div>
+      <div className="w-6 h-6 rounded-md bg-[#00A3E0] flex items-center justify-center text-white shrink-0 shadow-2xs">
+        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="7.5" stroke="white" strokeWidth="2.2" />
+          <circle cx="12" cy="12" r="3" fill="white" />
+        </svg>
       </div>
     ),
   },
@@ -229,24 +231,25 @@ export const HIRING_CONGLOMERATES: HiringConglomerate[] = [
     id: 'meil',
     name: 'MEIL Infrastructure',
     renderLogo: () => (
-      <div className="px-1.5 py-0.5 rounded bg-[#C4122F] text-white font-black text-[10px] tracking-tight flex-shrink-0 shadow-xs">
+      <div className="h-6 px-1.5 rounded-md bg-[#C4122F] flex items-center justify-center text-white font-black text-[10px] tracking-tight shrink-0 shadow-2xs">
         MEIL
       </div>
     ),
   },
   {
     id: 'boeing-airbus',
-    name: 'Boeing & Airbus Tier-1',
+    name: 'Boeing & Airbus',
     renderLogo: () => (
-      <div className="flex items-center -space-x-1 flex-shrink-0">
-        <div className="w-5 h-5 rounded bg-[#0033A0] flex items-center justify-center text-white shadow-xs" title="Boeing">
+      <div className="flex items-center -space-x-1 shrink-0">
+        <div className="w-5 h-5 rounded bg-[#0033A0] flex items-center justify-center text-white shadow-2xs" title="Boeing">
           <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16.93V15h-2v3.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 11v2h2v-2l5-5h2v2l-3.5 3.5H19c.62 0 1.2.09 1.76.24C20.08 15.22 16.95 18.44 13 18.93z" />
+            <circle cx="12" cy="12" r="9" stroke="white" strokeWidth="1.2" fill="none"/>
+            <path d="M6 12C9 8 15 8 18 12C15 16 9 16 6 12Z" fill="white"/>
           </svg>
         </div>
-        <div className="w-5 h-5 rounded bg-[#00205B] flex items-center justify-center text-white shadow-xs" title="Airbus">
+        <div className="w-5 h-5 rounded bg-[#00205B] flex items-center justify-center text-white shadow-2xs" title="Airbus">
           <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+            <path d="M12 3L14.5 10H22L16 14.5L18.5 21L12 17L5.5 21L8 14.5L2 10H9.5L12 3Z"/>
           </svg>
         </div>
       </div>
@@ -256,8 +259,10 @@ export const HIRING_CONGLOMERATES: HiringConglomerate[] = [
     id: 'atkins',
     name: 'AtkinsRéalis',
     renderLogo: () => (
-      <div className="w-5 h-5 rounded bg-[#E0004D] flex items-center justify-center text-white font-black text-[10px] flex-shrink-0 shadow-xs">
-        ▲
+      <div className="w-6 h-6 rounded-md bg-[#E0004D] flex items-center justify-center text-white shrink-0 shadow-2xs">
+        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 4L20 20H15.5L12 13L8.5 20H4L12 4Z" />
+        </svg>
       </div>
     ),
   },
@@ -265,8 +270,8 @@ export const HIRING_CONGLOMERATES: HiringConglomerate[] = [
     id: 'jacobs',
     name: 'Jacobs Engineering',
     renderLogo: () => (
-      <div className="flex items-center gap-1 bg-[#00529B] text-white px-1.5 py-0.5 rounded shadow-xs flex-shrink-0">
-        <span className="text-[10px] font-black tracking-wider">JACOBS</span>
+      <div className="h-6 px-1.5 rounded-md bg-[#00529B] flex items-center justify-center text-white shrink-0 shadow-2xs">
+        <span className="text-[9.5px] font-black tracking-wider text-white">JACOBS</span>
       </div>
     ),
   },
@@ -274,9 +279,9 @@ export const HIRING_CONGLOMERATES: HiringConglomerate[] = [
     id: 'alstom',
     name: 'Alstom Transport',
     renderLogo: () => (
-      <div className="flex items-center gap-0.5 bg-[#002B49] text-white px-1.5 py-0.5 rounded shadow-xs flex-shrink-0">
-        <span className="text-[10px] font-black text-[#FF003B]">/</span>
-        <span className="text-[9px] font-black tracking-tight">ALSTOM</span>
+      <div className="h-6 px-1.5 rounded-md bg-[#002B49] flex items-center gap-0.5 text-white shrink-0 shadow-2xs">
+        <span className="text-[11px] font-black text-[#FF003B] leading-none">/</span>
+        <span className="text-[9px] font-black tracking-tight leading-none">ALSTOM</span>
       </div>
     ),
   },
@@ -284,8 +289,9 @@ export const HIRING_CONGLOMERATES: HiringConglomerate[] = [
     id: 'siemens',
     name: 'Siemens Energy',
     renderLogo: () => (
-      <div className="flex items-baseline gap-1 bg-[#00646E] text-white px-1.5 py-0.5 rounded shadow-xs flex-shrink-0">
-        <span className="text-[9px] font-black tracking-wider uppercase">SIEMENS</span>
+      <div className="h-6 px-1.5 rounded-md bg-[#00646E] flex items-center gap-1 text-white shrink-0 shadow-2xs">
+        <span className="text-[9px] font-black tracking-wider uppercase leading-none">SIEMENS</span>
+        <span className="w-1.5 h-1.5 rounded-full bg-[#EB780A] shrink-0"></span>
       </div>
     ),
   },
@@ -372,18 +378,17 @@ export const CareerInfographic: React.FC<CareerInfographicProps> = ({ course }) 
         <span className="text-xs font-black text-slate-500 uppercase tracking-wider block mb-3.5">
           Our Alumni Are Hired At Top MNC Firms:
         </span>
-        <div className="flex flex-wrap gap-2.5 sm:gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-2.5">
           {HIRING_CONGLOMERATES.map((partner) => (
-            <motion.div
+            <div
               key={partner.id}
-              whileHover={{ y: -2, scale: 1.02, transition: { duration: 0.15 } }}
-              className="flex items-center gap-2.5 bg-slate-50/80 hover:bg-white px-3.5 py-2 rounded-xl border border-slate-200 hover:border-slate-300 hover:shadow-sm transition-all cursor-default select-none shadow-2xs group"
+              className="flex items-center gap-2 bg-slate-50/90 hover:bg-white p-2 sm:px-3 sm:py-2.5 rounded-xl border border-slate-200 hover:border-slate-300 hover:shadow-xs transition-all cursor-default select-none shadow-2xs group min-h-[44px]"
             >
-              {partner.renderLogo()}
-              <span className="text-xs font-bold text-slate-800 group-hover:text-slate-900 transition-colors">
+              <div className="shrink-0">{partner.renderLogo()}</div>
+              <span className="text-[11px] sm:text-xs font-bold text-slate-800 group-hover:text-slate-900 transition-colors truncate">
                 {partner.name}
               </span>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>
