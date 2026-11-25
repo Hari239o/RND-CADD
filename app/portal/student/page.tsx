@@ -249,7 +249,7 @@ function formatYouTubeEmbedUrl(url: string): string {
     if (parts) videoId = parts;
   }
   if (videoId) {
-    return `https://www.youtube.com/embed/${videoId}?enablejsapi=1&playsinline=1&controls=0&rel=0&modestbranding=1`;
+    return `https://www.youtube.com/embed/${videoId}?enablejsapi=1&playsinline=1&controls=1&rel=0&modestbranding=1`;
   }
   return trimmed;
 }
@@ -5472,12 +5472,10 @@ export default function StudentPortalPage() {
 
                       return (
                         <div className="w-full flex flex-col items-center">
-                          {/* YOUTUBE-STYLE FLOATING PLAYER CONTAINER (Matching User Screenshot e8d67f65.jpg) */}
+                          {/* CLEAN NATIVE PLAYER CONTAINER (Permanent Native YouTube & Drive Player Controls Only) */}
                           <div
                             ref={playerContainerRef}
-                            onMouseMove={handleUserActivity}
-                            onTouchStart={handleUserActivity}
-                            className="relative aspect-video w-full max-h-[78vh] bg-black rounded-xl sm:rounded-2xl overflow-hidden border border-slate-800 shadow-xl flex items-center justify-center select-none group"
+                            className="relative aspect-video w-full max-h-[78vh] bg-black rounded-xl sm:rounded-2xl overflow-hidden border border-slate-800 shadow-xl flex items-center justify-center"
                           >
                             {/* Video Stream: Clean YouTube or Google Drive embed */}
                             {isYouTubeVideo ? (
@@ -5487,11 +5485,6 @@ export default function StudentPortalPage() {
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                 allowFullScreen
                                 title={activePlayerClass.title}
-                                onLoad={(e) => {
-                                  try {
-                                    e.currentTarget.contentWindow?.postMessage(JSON.stringify({ event: 'listening' }), '*');
-                                  } catch {}
-                                }}
                               />
                             ) : (
                               <div className="relative w-full h-full overflow-hidden">
@@ -5513,201 +5506,6 @@ export default function StudentPortalPage() {
                                 />
                               </div>
                             )}
-
-                            {/* TOAST MESSAGE NOTIFICATION */}
-                            {videoToast && (
-                              <div className="absolute top-4 sm:top-6 left-1/2 -translate-x-1/2 bg-black/90 backdrop-blur-md text-white text-xs sm:text-sm font-semibold px-3 sm:px-4 py-1 sm:py-1.5 rounded-full border border-white/20 shadow-2xl pointer-events-none z-50 animate-in fade-in duration-200">
-                                {videoToast}
-                              </div>
-                            )}
-
-                            {/* SPEED SELECTION MENU */}
-                            {showSpeedMenu && (
-                              <div
-                                className="absolute bottom-16 sm:bottom-20 right-2 sm:right-6 w-48 sm:w-56 bg-[#1f1f1f]/95 backdrop-blur-md text-white rounded-2xl shadow-2xl border border-white/10 z-50 overflow-hidden py-1.5 animate-in fade-in zoom-in-95 duration-150"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <div className="px-3.5 py-2 flex items-center justify-between border-b border-white/10">
-                                  <span className="text-xs font-bold text-white/90">Playback Speed</span>
-                                  <button
-                                    type="button"
-                                    onClick={() => setShowSpeedMenu(false)}
-                                    className="w-5 h-5 rounded-full hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors cursor-pointer"
-                                  >
-                                    ✕
-                                  </button>
-                                </div>
-                                <div className="max-h-52 overflow-y-auto py-1">
-                                  {[0.5, 0.75, 1, 1.25, 1.5, 2].map((s) => {
-                                    const isSelected = videoPlaybackSpeed === s;
-                                    return (
-                                      <button
-                                        key={s}
-                                        type="button"
-                                        onClick={() => handleSpeedChange(s)}
-                                        className={`w-full px-3.5 py-1.5 text-left text-xs font-medium flex items-center justify-between transition-colors cursor-pointer ${
-                                          isSelected ? 'bg-white/15 text-white font-bold' : 'text-white/80 hover:bg-white/10 hover:text-white'
-                                        }`}
-                                      >
-                                        <span>{s === 1 ? 'Normal (1x)' : `${s}x`}</span>
-                                        {isSelected && <span>✓</span>}
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-                              </div>
-                            )}
-
-                            {/* ROUNDED FEATURES FLOATING CONTROLS (Permanently Visible on Mobile & Laptop - Matching User Screenshot e8d67f65.jpg) */}
-                            <div
-                              className={`absolute bottom-0 inset-x-0 z-40 bg-gradient-to-t from-black/95 via-black/50 to-transparent pt-6 sm:pt-8 pb-2 sm:pb-3 px-2 sm:px-4 transition-all duration-300 opacity-100 pointer-events-auto sm:${
-                                showControlsOverlay || !videoIsPlaying || showSpeedMenu
-                                  ? 'opacity-100 sm:pointer-events-auto'
-                                  : 'opacity-0 sm:pointer-events-none'
-                              }`}
-                            >
-                              {/* Scrubber Timeline Bar with vertical cursor indicator `- |` */}
-                              {(() => {
-                                const durationMatch = activePlayerClass?.duration?.match(/(\d+)/);
-                                const fallbackSecs = durationMatch ? parseInt(durationMatch[1], 10) * 60 : 3000;
-                                const totalDurationSecs = videoDuration > 0 ? videoDuration : fallbackSecs;
-                                const progressPct =
-                                  totalDurationSecs > 0
-                                    ? Math.min(100, Math.max(0, (videoCurrentTime / totalDurationSecs) * 100))
-                                    : 0;
-
-                                return (
-                                  <div
-                                    className="relative w-full h-3.5 sm:h-4.5 flex items-center cursor-pointer group/scrub select-none px-0.5"
-                                    onClick={handleScrubberClick}
-                                  >
-                                    {/* Background track */}
-                                    <div className="w-full h-[2.5px] sm:h-1 bg-white/25 rounded-full overflow-hidden transition-all group-hover/scrub:h-1.5">
-                                      {/* Played progress fill */}
-                                      <div
-                                        className="h-full bg-white transition-all"
-                                        style={{ width: `${progressPct}%` }}
-                                      />
-                                    </div>
-                                    {/* Vertical Bar Thumb Indicator matching screenshot */}
-                                    <div
-                                      className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-[3px] sm:w-[4px] h-3 sm:h-4 bg-white rounded-xs shadow-md pointer-events-none transition-transform"
-                                      style={{ left: `${progressPct}%` }}
-                                    />
-                                  </div>
-                                );
-                              })()}
-
-                              {/* CONTROLS ROW (Matching Screenshot Exactly: White Pill Play + Dark Capsules) */}
-                              <div className="w-full flex items-center justify-between gap-1 sm:gap-3 mt-1 sm:mt-2">
-                                {/* LEFT GROUP: White Pill Play/Pause Button + Dark Capsule with [ ⟲10 | ⟳10 | Time ] */}
-                                <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-                                  {/* Prominent White Pill Play/Pause Button */}
-                                  <button
-                                    type="button"
-                                    onClick={handlePlayPause}
-                                    className="h-7 sm:h-8.5 px-3.5 sm:px-5 rounded-full bg-white hover:bg-slate-100 text-black font-bold flex items-center justify-center shadow-lg transition-transform active:scale-95 cursor-pointer shrink-0"
-                                    title={videoIsPlaying ? 'Pause (k)' : 'Play (k)'}
-                                  >
-                                    {videoIsPlaying ? (
-                                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" viewBox="0 0 24 24">
-                                        <rect x="6" y="4" width="4" height="16" rx="1" />
-                                        <rect x="14" y="4" width="4" height="16" rx="1" />
-                                      </svg>
-                                    ) : (
-                                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current translate-x-0.5" viewBox="0 0 24 24">
-                                        <path d="M8 5v14l11-7z" />
-                                      </svg>
-                                    )}
-                                  </button>
-
-                                  {/* Dark Capsule: [ ⟲10 | ⟳10 | Time ] */}
-                                  <div className="bg-[#1c1c1e]/90 hover:bg-[#1c1c1e] backdrop-blur-md rounded-full border border-white/10 px-2.5 sm:px-3.5 py-1 sm:py-1.5 flex items-center gap-2 sm:gap-3 text-white shadow-xl shrink-0">
-                                    <button
-                                      type="button"
-                                      onClick={handleSkipBackward}
-                                      className="text-white hover:text-white/80 transition-transform active:scale-90 cursor-pointer flex items-center justify-center shrink-0 relative"
-                                      title="Rewind 10s"
-                                    >
-                                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12.5 4.5A8.5 8.5 0 1 0 21 13" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12.5 1.5v6l-4-3 4-3z" />
-                                      </svg>
-                                      <span className="absolute text-[6.5px] sm:text-[7.5px] font-black top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pt-0.5">10</span>
-                                    </button>
-
-                                    <button
-                                      type="button"
-                                      onClick={handleSkipForward}
-                                      className="text-white hover:text-white/80 transition-transform active:scale-90 cursor-pointer flex items-center justify-center shrink-0 relative"
-                                      title="Forward 10s"
-                                    >
-                                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M11.5 4.5A8.5 8.5 0 1 1 3 13" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M11.5 1.5v6l4-3-4-3z" />
-                                      </svg>
-                                      <span className="absolute text-[6.5px] sm:text-[7.5px] font-black top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pt-0.5">10</span>
-                                    </button>
-
-                                    {(() => {
-                                      const durationMatch = activePlayerClass?.duration?.match(/(\d+)/);
-                                      const fallbackSecs = durationMatch ? parseInt(durationMatch[1], 10) * 60 : 3000;
-                                      const totalDurationSecs = videoDuration > 0 ? videoDuration : fallbackSecs;
-                                      return (
-                                        <div className="text-[10px] sm:text-xs font-semibold text-white/95 select-none tracking-tight whitespace-nowrap pl-0.5">
-                                          <span>{formatVideoTime(videoCurrentTime)}</span>
-                                          <span className="text-white/50 mx-0.5">/</span>
-                                          <span className="text-white/70">{formatVideoTime(totalDurationSecs)}</span>
-                                        </div>
-                                      );
-                                    })()}
-                                  </div>
-                                </div>
-
-                                {/* RIGHT GROUP: Dark Capsule with [ 🔊 | 1x | ⛶ ] */}
-                                <div className="bg-[#1c1c1e]/90 hover:bg-[#1c1c1e] backdrop-blur-md rounded-full border border-white/10 px-2 sm:px-3 py-1 sm:py-1.5 flex items-center gap-1.5 sm:gap-2.5 text-white shadow-xl shrink-0">
-                                  <button
-                                    type="button"
-                                    onClick={handleToggleMute}
-                                    className="text-white hover:text-white/80 transition-transform active:scale-90 cursor-pointer flex items-center justify-center shrink-0"
-                                    title={videoIsMuted ? 'Unmute' : 'Mute'}
-                                  >
-                                    {videoIsMuted ? (
-                                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
-                                      </svg>
-                                    ) : (
-                                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                                      </svg>
-                                    )}
-                                  </button>
-
-                                  {/* Speed Pill */}
-                                  <button
-                                    type="button"
-                                    onClick={() => setShowSpeedMenu((prev) => !prev)}
-                                    className="text-[10px] sm:text-xs font-bold px-1.5 py-0.5 rounded-full hover:bg-white/15 text-white/90 hover:text-white transition-all cursor-pointer"
-                                    title="Playback speed"
-                                  >
-                                    {videoPlaybackSpeed === 1 ? '1x' : `${videoPlaybackSpeed}x`}
-                                  </button>
-
-                                  {/* Fullscreen Pill */}
-                                  <button
-                                    type="button"
-                                    onClick={handleToggleFullscreen}
-                                    className="text-white hover:text-white/80 transition-transform active:scale-90 cursor-pointer flex items-center justify-center shrink-0"
-                                    title="Full screen"
-                                  >
-                                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                                    </svg>
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
                           </div>
                         </div>
                       );
