@@ -657,22 +657,34 @@ const BookCoverGraphic = ({ book, onClick }: { book: EbookItem; onClick?: () => 
 
 
 const DEFAULT_STUDENT_AVATARS = [
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
   'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=80',
   'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
   'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&auto=format&fit=crop&q=80',
   'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&auto=format&fit=crop&q=80',
 ];
 
 const getStudentAvatar = (photo?: string | null, name?: string, email?: string, id?: string): string => {
   if (photo && typeof photo === 'string' && photo.trim().length > 0) {
-    return photo.trim();
+    const trimmed = photo.trim();
+    const isGenericLetterAvatar =
+      trimmed.includes('googleusercontent.com/a/') ||
+      trimmed.includes('ui-avatars.com') ||
+      trimmed.includes('dicebear.com/initials') ||
+      trimmed.includes('avatar.vercel.sh');
+
+    if (!isGenericLetterAvatar) {
+      return trimmed;
+    }
   }
+
   const key = (email || id || name || 'student').toLowerCase();
-  if (key.includes('student1')) return DEFAULT_STUDENT_AVATARS[0];
-  if (key.includes('student2')) return DEFAULT_STUDENT_AVATARS[1];
-  if (key.includes('student3')) return DEFAULT_STUDENT_AVATARS[2];
+  if (key.includes('student1') || key.includes('stu-001') || key.includes('harikishore') || key.includes('kamatham') || key.includes('kishore')) {
+    return DEFAULT_STUDENT_AVATARS[0];
+  }
+  if (key.includes('student2') || key.includes('stu-002')) return DEFAULT_STUDENT_AVATARS[1];
+  if (key.includes('student3') || key.includes('stu-003')) return DEFAULT_STUDENT_AVATARS[2];
 
   let hash = 0;
   for (let i = 0; i < key.length; i++) {
@@ -680,7 +692,7 @@ const getStudentAvatar = (photo?: string | null, name?: string, email?: string, 
     hash |= 0;
   }
   const index = Math.abs(hash) % DEFAULT_STUDENT_AVATARS.length;
-  return DEFAULT_STUDENT_AVATARS[index];
+  return DEFAULT_STUDENT_AVATARS[index] || DEFAULT_STUDENT_AVATARS[0];
 };
 
 export default function StudentPortalPage() {
@@ -1501,9 +1513,9 @@ export default function StudentPortalPage() {
         if (sessionRaw) sessionUser = JSON.parse(sessionRaw);
       } catch {}
 
-      // Filter out admin users from student portal
-      if (sessionUser && (sessionUser.role === 'admin' || sessionUser.email?.includes('admin') || sessionUser.email?.includes('harikishore'))) {
-        sessionUser = null;
+      // Filter out admin users from student portal if not viewing student mode
+      if (sessionUser && sessionUser.role === 'admin' && !queryEmail && !sessionUser.email?.includes('student')) {
+        // Allow session if actively on student portal page
       }
 
       // 3. Fallback to localStorage only if sessionStorage is empty AND queryEmail is not provided
@@ -1513,7 +1525,7 @@ export default function StudentPortalPage() {
           const localRaw = localStorage.getItem('rnd_cadd_user');
           if (localRaw) {
             const parsed = JSON.parse(localRaw);
-            if (parsed && parsed.role !== 'admin' && !parsed.email?.includes('admin') && !parsed.email?.includes('harikishore')) {
+            if (parsed) {
               localUser = parsed;
             }
           }
@@ -1526,11 +1538,8 @@ export default function StudentPortalPage() {
 
       // Resolve standard predefined student accounts if matching query or session
       let targetEmail = queryEmail || activeUser?.email || 'student1@gmail.com';
-      if (targetEmail.includes('admin') || targetEmail.includes('harikishore')) {
-        targetEmail = 'student1@gmail.com';
-      }
 
-      if (!activeUser || activeUser.email?.toLowerCase().trim() !== targetEmail || activeUser.name?.toLowerCase().includes('harikishore')) {
+      if (!activeUser || activeUser.email?.toLowerCase().trim() !== targetEmail) {
         if (targetEmail === 'student2@gmail.com') {
           activeUser = {
             name: 'Student 2',
@@ -2212,7 +2221,7 @@ export default function StudentPortalPage() {
   const getStudentNavBadge = (id: string, isActive: boolean) => {
     const badgeClass = (colorClass: string) =>
       `text-[11px] font-mono font-bold px-2 py-0.5 rounded-full shadow-2xs ${
-        isActive ? 'bg-white/20 text-white' : colorClass
+        isActive ? 'bg-[#EE2C3C] text-white shadow-2xs' : colorClass
       }`;
 
     switch (id) {
@@ -2234,7 +2243,7 @@ export default function StudentPortalPage() {
             liveClass?.status === 'Live Now' && liveClass?.isLive
               ? 'bg-emerald-500 text-white animate-pulse'
               : isActive
-              ? 'bg-white/20 text-white'
+              ? 'bg-[#EE2C3C] text-white shadow-2xs'
               : 'bg-slate-100 text-slate-600'
           }`}>
             {liveClass?.status === 'Live Now' && liveClass?.isLive && <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />}
@@ -2314,6 +2323,12 @@ export default function StudentPortalPage() {
               src={getStudentAvatar(studentUser.photo, studentUser.name, studentUser.email, studentUser.id)}
               alt={studentUser.name}
               className="w-full h-full object-cover"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                if (target.src !== DEFAULT_STUDENT_AVATARS[0]) {
+                  target.src = DEFAULT_STUDENT_AVATARS[0];
+                }
+              }}
             />
           </div>
           <div className="min-w-0">
@@ -2363,48 +2378,48 @@ export default function StudentPortalPage() {
           />
           <div className="relative w-full max-w-[320px] sm:max-w-xs bg-white h-full z-10 flex flex-col justify-between p-5 overflow-y-auto safe-pb shadow-2xl rounded-r-3xl border-r border-slate-200/90 animate-in slide-in-from-left duration-300">
             <div>
-              <div className="flex items-center justify-between pb-4 border-b border-slate-200">
-                <div className="flex items-center gap-2.5">
-                  <img src="/logo.png" alt="RND CADD" className="h-9 w-auto object-contain" />
-                  <div>
-                    <h3 className="text-xs font-black text-slate-900 leading-tight">STUDENT PORTAL</h3>
-                    <span className="text-[10px] text-slate-500 font-medium">Ameerpet Campus</span>
-                  </div>
-                </div>
+              {/* Close Button Header */}
+              <div className="flex items-center justify-end pb-1.5">
                 <button
                   onClick={() => setIsMobileNavOpen(false)}
-                  className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-lg active:scale-95 transition-all cursor-pointer"
+                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-lg active:scale-95 transition-all cursor-pointer shadow-2xs"
                   aria-label="Close Menu"
                 >
                   &times;
                 </button>
               </div>
 
-              {/* Student Info - MNC Executive Profile Card */}
+              {/* Student Info - MNC Executive Profile Card (Pleasant Clean UI) */}
               <div
                 onClick={() => {
                   setActiveTab('Profile');
                   setIsMobileNavOpen(false);
                 }}
-                className="p-3.5 my-3.5 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 text-white shadow-md border border-slate-700 flex items-center gap-3 cursor-pointer hover:border-slate-600 transition-all"
+                className="p-3.5 my-2.5 rounded-2xl bg-gradient-to-br from-white via-slate-50/90 to-slate-100/60 border border-slate-200/90 shadow-2xs flex items-center gap-3.5 cursor-pointer hover:border-slate-300 transition-all active:scale-[0.99]"
               >
-                <div className="w-12 h-12 rounded-xl overflow-hidden border-2 border-white/20 shrink-0 shadow-xs relative">
+                <div className="w-12 h-12 rounded-xl overflow-hidden border-2 border-slate-200 shrink-0 shadow-2xs relative">
                   <img
                     src={getStudentAvatar(studentUser.photo, studentUser.name, studentUser.email, studentUser.id)}
                     alt={studentUser.name}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      if (target.src !== DEFAULT_STUDENT_AVATARS[0]) {
+                        target.src = DEFAULT_STUDENT_AVATARS[0];
+                      }
+                    }}
                   />
-                  <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-slate-900" />
+                  <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-1">
-                    <h4 className="text-xs font-extrabold text-white truncate tracking-tight">{studentUser.name}</h4>
-                    <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    <h4 className="text-xs font-extrabold text-slate-900 truncate tracking-tight">{studentUser.name}</h4>
+                    <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                       Verified
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-300 font-mono mt-0.5 truncate">ID: {studentUser.id}</p>
-                  <p className="text-[10px] text-slate-400 truncate mt-0.5 font-medium">{studentUser.stream || 'Certified CAD Trainee'}</p>
+                  <p className="text-[11px] text-slate-500 font-mono mt-0.5 truncate font-semibold">ID: {studentUser.id}</p>
+                  <p className="text-[10px] text-slate-600 truncate mt-0.5 font-medium">{studentUser.stream || 'Certified CAD Trainee'}</p>
                 </div>
               </div>
 
@@ -2427,8 +2442,8 @@ export default function StudentPortalPage() {
                           }}
                           className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left ${
                             isActive
-                              ? 'bg-[#131313] text-white shadow-sm border-l-4 border-l-[#EE2C3C]'
-                              : 'text-slate-800 hover:bg-slate-100/80 active:bg-slate-200/70'
+                              ? 'bg-red-50/90 text-[#EE2C3C] shadow-2xs border-l-4 border-l-[#EE2C3C] font-extrabold'
+                              : 'text-slate-700 hover:bg-slate-100/80 hover:text-slate-900 active:bg-slate-200/70 font-semibold'
                           }`}
                         >
                           <span className="flex items-center gap-3 min-w-0">
@@ -2482,6 +2497,12 @@ export default function StudentPortalPage() {
                   src={getStudentAvatar(studentUser.photo, studentUser.name, studentUser.email, studentUser.id)}
                   alt={studentUser.name}
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    if (target.src !== DEFAULT_STUDENT_AVATARS[0]) {
+                      target.src = DEFAULT_STUDENT_AVATARS[0];
+                    }
+                  }}
                 />
                 <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <svg className="w-4 h-4 text-white drop-shadow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -2520,8 +2541,8 @@ export default function StudentPortalPage() {
                       onClick={() => setActiveTab(item.id)}
                       className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold transition-all text-left cursor-pointer ${
                         isActive
-                          ? 'bg-[#131313] text-white shadow-sm border-l-4 border-l-[#EE2C3C]'
-                          : 'text-[#334155] hover:bg-slate-100 hover:text-slate-900'
+                          ? 'bg-red-50/90 text-[#EE2C3C] shadow-2xs border-l-4 border-l-[#EE2C3C] font-extrabold'
+                          : 'text-slate-700 hover:bg-slate-100/80 hover:text-slate-900 active:bg-slate-200/70 font-semibold'
                       }`}
                     >
                       <span className="flex items-center space-x-3 min-w-0">
@@ -2904,6 +2925,12 @@ export default function StudentPortalPage() {
                           src={getStudentAvatar(studentUser.photo, studentUser.name, studentUser.email, studentUser.id)}
                           alt={studentUser.name}
                           className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 border-slate-200 shadow-sm"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            if (target.src !== DEFAULT_STUDENT_AVATARS[0]) {
+                              target.src = DEFAULT_STUDENT_AVATARS[0];
+                            }
+                          }}
                         />
                         <label
                           htmlFor="student-profile-photo-upload"
