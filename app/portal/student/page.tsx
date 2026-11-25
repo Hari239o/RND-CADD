@@ -5423,8 +5423,8 @@ export default function StudentPortalPage() {
             </div>
           ) : (
             <div className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-hidden">
-              {/* MAIN PLAYER COLUMN (Left / Center) - FLUSH ON MOBILE TO REMOVE EMPTY VOID */}
-              <div className={`w-full ${studentViewerMode === 'notes' ? 'flex-1 min-h-0 overflow-y-auto' : 'flex-shrink-0'} lg:flex-1 lg:min-h-0 lg:overflow-y-auto bg-slate-100/80 p-2 sm:p-5 lg:p-6 space-y-2 sm:space-y-4`}>
+              {/* MAIN PLAYER COLUMN (Left / Center) - EXPANDED ON MOBILE TO UTILIZE DOWN SPACE */}
+              <div className={`w-full ${studentViewerMode === 'notes' ? 'flex-1 min-h-0 overflow-y-auto' : 'flex-shrink-0'} lg:flex-1 lg:min-h-0 lg:overflow-y-auto bg-slate-100/80 p-1.5 sm:p-5 lg:p-6 space-y-2 sm:space-y-4`}>
                 {activePlayerClass ? (
                   <div className="w-full max-w-6xl 2xl:max-w-7xl mx-auto space-y-2 sm:space-y-4">
                     {/* MODE 1: PERMANENT CLASS VIDEO STREAM (Image 2 - Google Drive Recording Stream) */}
@@ -5439,16 +5439,16 @@ export default function StudentPortalPage() {
 
                       return (
                         <div className="w-full flex flex-col items-center">
-                          {/* CLEAN VIDEO PLAYER CONTAINER */}
+                          {/* EXPANDED VIDEO PLAYER CONTAINER (Taller on mobile to use down space) */}
                           <div
                             ref={playerContainerRef}
-                            className="relative aspect-video w-full max-h-[78vh] bg-black rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center select-none"
+                            className="relative w-full h-[45vh] min-h-[310px] max-h-[56vh] sm:h-auto sm:aspect-video sm:max-h-[78vh] bg-black rounded-xl sm:rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center select-none"
                           >
                             {/* Video Stream: Clean YouTube or Google Drive embed */}
                             {isYouTubeVideo ? (
                               <iframe
                                 src={formatYouTubeEmbedUrl(activePlayerClass.videoUrl)}
-                                className="w-full h-full border-0 rounded-2xl pointer-events-auto"
+                                className="w-full h-full border-0 pointer-events-auto"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                 allowFullScreen
                                 title={activePlayerClass.title}
@@ -5456,7 +5456,7 @@ export default function StudentPortalPage() {
                             ) : (
                               <iframe
                                 src={formatGoogleDriveUrl(activePlayerClass.videoUrl)}
-                                className="w-full h-full border-0 rounded-2xl pointer-events-auto"
+                                className="w-full h-full border-0 pointer-events-auto"
                                 allow="autoplay; encrypted-media; fullscreen"
                                 allowFullScreen
                                 title={activePlayerClass.title}
