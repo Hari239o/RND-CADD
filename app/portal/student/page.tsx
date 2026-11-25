@@ -238,10 +238,16 @@ function isPlaceholderOrBrokenDriveUrl(url?: string): boolean {
 function formatYouTubeEmbedUrl(url: string): string {
   if (!url) return '';
   const trimmed = url.trim();
-  if (trimmed.includes('youtube.com/embed/')) return trimmed;
-  const match = trimmed.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([\w-]{11})/);
+  let videoId = '';
+  const match = trimmed.match(/(?:youtu\.be\/|(?:www\.|m\.)?youtube(?:-nocookie)?\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([\w-]{11})/);
   if (match && match[1]) {
-    return `https://www.youtube-nocookie.com/embed/${match[1]}`;
+    videoId = match[1];
+  } else if (trimmed.includes('youtube.com/embed/')) {
+    const parts = trimmed.split('youtube.com/embed/')[1]?.split('?')[0]?.split('/')[0];
+    if (parts) videoId = parts;
+  }
+  if (videoId) {
+    return `https://www.youtube-nocookie.com/embed/${videoId}?enablejsapi=1&playsinline=1&controls=1&rel=0&modestbranding=1`;
   }
   return trimmed;
 }
@@ -5493,14 +5499,14 @@ export default function StudentPortalPage() {
                             )}
 
                             {/* TOAST MESSAGE NOTIFICATION */}
-                            {videoToast && (
+                            {!isYouTubeVideo && !useIframeFallback && videoToast && (
                               <div className="absolute top-6 left-1/2 -translate-x-1/2 bg-black/90 backdrop-blur-md text-white text-xs sm:text-sm font-semibold px-4 py-1.5 rounded-full border border-white/20 shadow-2xl pointer-events-none z-50 animate-in fade-in duration-200">
                                 {videoToast}
                               </div>
                             )}
 
-                            {/* SPEED SELECTION MENU (Matching Image 3) */}
-                            {showSpeedMenu && (
+                            {/* SPEED SELECTION MENU (For native HTML5 stream only) */}
+                            {!isYouTubeVideo && !useIframeFallback && showSpeedMenu && (
                               <div
                                 className="absolute bottom-20 sm:bottom-22 right-2 sm:right-6 w-56 sm:w-64 bg-[#1f1f1f]/95 backdrop-blur-md text-white rounded-2xl shadow-2xl border border-white/10 z-50 overflow-hidden py-1.5 animate-in fade-in zoom-in-95 duration-150"
                                 onClick={(e) => e.stopPropagation()}
@@ -5549,8 +5555,8 @@ export default function StudentPortalPage() {
                               </div>
                             )}
 
-                            {/* SETTINGS MENU (Matching Image 4) */}
-                            {showSettingsMenu && (
+                            {/* SETTINGS MENU (For native HTML5 stream only) */}
+                            {!isYouTubeVideo && !useIframeFallback && showSettingsMenu && (
                               <div
                                 className="absolute bottom-20 sm:bottom-22 right-2 sm:right-6 w-72 sm:w-80 bg-[#1f1f1f]/95 backdrop-blur-md text-white rounded-2xl shadow-2xl border border-white/10 z-50 overflow-hidden py-1.5 animate-in fade-in zoom-in-95 duration-150"
                                 onClick={(e) => e.stopPropagation()}
@@ -5761,14 +5767,15 @@ export default function StudentPortalPage() {
                               </div>
                             )}
 
-                            {/* FLOATING IN-VIDEO CONTROLS OVERLAY (Matching Image 2 Exactly) */}
-                            <div
-                              className={`absolute bottom-0 inset-x-0 z-40 bg-gradient-to-t from-black/90 via-black/45 to-transparent pt-8 pb-3 sm:pb-4 px-2 sm:px-6 transition-all duration-300 ${
-                                showControlsOverlay || !videoIsPlaying || showSpeedMenu || showSettingsMenu
-                                  ? 'opacity-100 pointer-events-auto'
-                                  : 'opacity-0 pointer-events-none'
-                              }`}
-                            >
+                            {/* FLOATING IN-VIDEO CONTROLS OVERLAY (For native HTML5 stream only) */}
+                            {!isYouTubeVideo && !useIframeFallback && (
+                              <div
+                                className={`absolute bottom-0 inset-x-0 z-40 bg-gradient-to-t from-black/90 via-black/45 to-transparent pt-8 pb-3 sm:pb-4 px-2 sm:px-6 transition-all duration-300 ${
+                                  showControlsOverlay || !videoIsPlaying || showSpeedMenu || showSettingsMenu
+                                    ? 'opacity-100 pointer-events-auto'
+                                    : 'opacity-0 pointer-events-none'
+                                }`}
+                              >
                               {/* Scrubber Timeline Bar with vertical cursor indicator `- |` matching Image 2 */}
                               {(() => {
                                 const progressPct =
@@ -5933,6 +5940,7 @@ export default function StudentPortalPage() {
                                 </div>
                               </div>
                             </div>
+                            )}
                           </div>
                         </div>
                       );
