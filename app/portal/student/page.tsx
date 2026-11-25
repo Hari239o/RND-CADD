@@ -202,6 +202,23 @@ function formatGoogleDriveUrl(url?: string): string {
   return trimmed;
 }
 
+function formatGoogleDriveDirectStreamUrl(url?: string): string {
+  if (!url) return '';
+  const trimmed = url.trim();
+  const fileMatch = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (fileMatch && fileMatch[1]) {
+    return `https://drive.usercontent.google.com/download?id=${fileMatch[1]}&export=download`;
+  }
+  const idMatch = trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (idMatch && idMatch[1]) {
+    return `https://drive.usercontent.google.com/download?id=${idMatch[1]}&export=download`;
+  }
+  if (/^[a-zA-Z0-9_-]{25,}$/.test(trimmed)) {
+    return `https://drive.usercontent.google.com/download?id=${trimmed}&export=download`;
+  }
+  return trimmed;
+}
+
 function isPlaceholderOrBrokenDriveUrl(url?: string): boolean {
   if (!url) return true;
   const trimmed = url.trim();
@@ -882,6 +899,7 @@ export default function StudentPortalPage() {
   const [playlistSearchQuery, setPlaylistSearchQuery] = useState<string>('');
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const playerContainerRef = useRef<HTMLDivElement | null>(null);
+  const [useIframeFallback, setUseIframeFallback] = useState<boolean>(false);
 
   // Real-time Student Certificates State (Dynamic DB Synced)
   const [studentCertificates, setStudentCertificates] = useState<StudentCertificate[]>([]);
@@ -2034,6 +2052,7 @@ export default function StudentPortalPage() {
       setShowControlsOverlay(true);
       setShowSpeedMenu(false);
       setShowSettingsMenu(false);
+      setUseIframeFallback(false);
     }
   }, [activePlayerClass]);
 
@@ -5412,27 +5431,37 @@ export default function StudentPortalPage() {
 
                       return (
                         <div className="w-full flex flex-col items-center">
-                          {/* YOUTUBE-STYLE FLOATING PLAYER CONTAINER (Images 2, 3, 4) */}
+                          {/* YOUTUBE / LOOM-STYLE FLOATING PLAYER CONTAINER (Matching Image 2) */}
                           <div
                             ref={playerContainerRef}
                             onMouseMove={handleUserActivity}
                             onTouchStart={handleUserActivity}
                             className="relative aspect-video w-full max-h-[78vh] bg-black rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center group select-none"
                           >
-                            {/* Video Stream: HTML5 direct video or iframe */}
-                            {activePlayerClass.videoType === 'direct' ? (
+                            {/* Video Stream: HTML5 Native WebM/MP4 stream, YouTube iframe, or fallback Drive iframe */}
+                            {!useIframeFallback && !isYouTubeVideo ? (
                               <video
                                 ref={videoRef}
-                                src={activePlayerClass.videoUrl}
-                                className="w-full h-full object-contain rounded-2xl"
+                                src={formatGoogleDriveDirectStreamUrl(activePlayerClass.videoUrl) || activePlayerClass.videoUrl}
+                                className="w-full h-full object-contain rounded-2xl cursor-pointer"
                                 playsInline
+                                preload="metadata"
+                                onClick={handlePlayPause}
                                 onTimeUpdate={() => {
                                   if (videoRef.current) setVideoCurrentTime(videoRef.current.currentTime);
                                 }}
                                 onLoadedMetadata={() => {
-                                  if (videoRef.current) setVideoDuration(videoRef.current.duration);
+                                  if (videoRef.current && videoRef.current.duration) {
+                                    setVideoDuration(videoRef.current.duration);
+                                  }
                                 }}
+                                onPlay={() => setVideoIsPlaying(true)}
+                                onPause={() => setVideoIsPlaying(false)}
                                 onEnded={handleVideoEnded}
+                                onError={() => {
+                                  console.warn('Direct stream error, falling back to iframe');
+                                  setUseIframeFallback(true);
+                                }}
                               />
                             ) : isYouTubeVideo ? (
                               <iframe
@@ -5443,92 +5472,29 @@ export default function StudentPortalPage() {
                                 title={activePlayerClass.title}
                               />
                             ) : (
-                              <iframe
-                                src={formatGoogleDriveUrl(activePlayerClass.videoUrl)}
-                                className="w-full h-full border-0 rounded-2xl pointer-events-auto"
-                                allow="autoplay; encrypted-media; fullscreen"
-                                allowFullScreen
-                                title={activePlayerClass.title}
-                              />
-                            )}
-
-                            {/* Top-Right Shield: Hides & blocks Google Drive pop-out & external window button while playing */}
-                            <div
-                              className="absolute top-0 right-0 w-28 h-16 bg-black z-30 pointer-events-auto select-none"
-                              aria-hidden="true"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                              }}
-                            />
-
-                            {/* TOP OVERLAY BAR: Class title & Mark Done pill */}
-                            <div
-                              className={`absolute top-0 inset-x-0 z-35 bg-gradient-to-b from-black/85 via-black/40 to-transparent p-3 sm:p-4 flex items-center justify-between gap-3 transition-opacity duration-300 ${
-                                showControlsOverlay || !videoIsPlaying || showSpeedMenu || showSettingsMenu
-                                  ? 'opacity-100 pointer-events-auto'
-                                  : 'opacity-0 pointer-events-none'
-                              }`}
-                            >
-                              <div className="flex items-center gap-2 min-w-0 pr-28">
-                                <span className="px-2 py-0.5 rounded bg-white/20 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider backdrop-blur-xs shrink-0">
-                                  {activePlayerClass.classNumber || 'Class'}
-                                </span>
-                                <h3 className="text-xs sm:text-sm md:text-base font-bold text-white truncate drop-shadow-sm">
-                                  {activePlayerClass.title}
-                                </h3>
+                              <div className="relative w-full h-full">
+                                <iframe
+                                  src={formatGoogleDriveUrl(activePlayerClass.videoUrl)}
+                                  className="w-full h-full border-0 rounded-2xl pointer-events-auto"
+                                  allow="autoplay; encrypted-media; fullscreen"
+                                  allowFullScreen
+                                  title={activePlayerClass.title}
+                                />
+                                {/* Top-Right Shield for iframe fallback */}
+                                <div
+                                  className="absolute top-0 right-0 w-28 h-16 bg-black z-30 pointer-events-auto select-none"
+                                  aria-hidden="true"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                  }}
+                                />
                               </div>
-
-                              {/* Quick Mark Done Button on Top Bar */}
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleToggleClassWatched(
-                                    activePlayerClass.id,
-                                    playerCourse?.title,
-                                    activePlayerClass.classNumber
-                                  )
-                                }
-                                className={`shrink-0 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-md active:scale-95 ${
-                                  isCurrentClassWatched
-                                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                                    : 'bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm border border-white/20'
-                                }`}
-                                title="Toggle Mark Done status"
-                              >
-                                {isCurrentClassWatched ? (
-                                  <>
-                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    <span>Done</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <span className="w-1.5 h-1.5 rounded-full bg-white/80" />
-                                    <span>Mark Done</span>
-                                  </>
-                                )}
-                              </button>
-                            </div>
-
-                            {/* CENTER PLAY BUTTON (When Paused) */}
-                            {!videoIsPlaying && (
-                              <button
-                                type="button"
-                                onClick={handlePlayPause}
-                                className="absolute inset-0 m-auto w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-black/70 hover:bg-[#EE2C3C] text-white flex items-center justify-center transition-all duration-300 shadow-2xl backdrop-blur-xs scale-100 hover:scale-110 active:scale-95 cursor-pointer z-35 border border-white/20"
-                                title="Play Video"
-                              >
-                                <svg className="w-8 h-8 sm:w-10 sm:h-10 fill-current translate-x-0.5" viewBox="0 0 24 24">
-                                  <path d="M8 5v14l11-7z" />
-                                </svg>
-                              </button>
                             )}
 
                             {/* TOAST MESSAGE NOTIFICATION */}
                             {videoToast && (
-                              <div className="absolute top-16 left-1/2 -translate-x-1/2 bg-black/90 backdrop-blur-md text-white text-xs sm:text-sm font-semibold px-4 py-1.5 rounded-full border border-white/20 shadow-2xl pointer-events-none z-50 animate-in fade-in duration-200">
+                              <div className="absolute top-6 left-1/2 -translate-x-1/2 bg-black/90 backdrop-blur-md text-white text-xs sm:text-sm font-semibold px-4 py-1.5 rounded-full border border-white/20 shadow-2xl pointer-events-none z-50 animate-in fade-in duration-200">
                                 {videoToast}
                               </div>
                             )}
@@ -5536,7 +5502,7 @@ export default function StudentPortalPage() {
                             {/* SPEED SELECTION MENU (Matching Image 3) */}
                             {showSpeedMenu && (
                               <div
-                                className="absolute bottom-16 sm:bottom-18 right-2 sm:right-6 w-56 sm:w-64 bg-[#1f1f1f]/95 backdrop-blur-md text-white rounded-2xl shadow-2xl border border-white/10 z-50 overflow-hidden py-1.5 animate-in fade-in zoom-in-95 duration-150"
+                                className="absolute bottom-20 sm:bottom-22 right-2 sm:right-6 w-56 sm:w-64 bg-[#1f1f1f]/95 backdrop-blur-md text-white rounded-2xl shadow-2xl border border-white/10 z-50 overflow-hidden py-1.5 animate-in fade-in zoom-in-95 duration-150"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 <div className="px-4 py-2.5 flex items-center justify-between border-b border-white/10">
@@ -5544,7 +5510,7 @@ export default function StudentPortalPage() {
                                   <button
                                     type="button"
                                     onClick={() => setShowSpeedMenu(false)}
-                                    className="w-6 h-6 rounded-full hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+                                    className="w-6 h-6 rounded-full hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors cursor-pointer"
                                   >
                                     ✕
                                   </button>
@@ -5586,7 +5552,7 @@ export default function StudentPortalPage() {
                             {/* SETTINGS MENU (Matching Image 4) */}
                             {showSettingsMenu && (
                               <div
-                                className="absolute bottom-16 sm:bottom-18 right-2 sm:right-6 w-72 sm:w-80 bg-[#1f1f1f]/95 backdrop-blur-md text-white rounded-2xl shadow-2xl border border-white/10 z-50 overflow-hidden py-1.5 animate-in fade-in zoom-in-95 duration-150"
+                                className="absolute bottom-20 sm:bottom-22 right-2 sm:right-6 w-72 sm:w-80 bg-[#1f1f1f]/95 backdrop-blur-md text-white rounded-2xl shadow-2xl border border-white/10 z-50 overflow-hidden py-1.5 animate-in fade-in zoom-in-95 duration-150"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 {settingsActiveSubmenu === 'main' && (
@@ -5596,7 +5562,7 @@ export default function StudentPortalPage() {
                                       <button
                                         type="button"
                                         onClick={() => setShowSettingsMenu(false)}
-                                        className="w-6 h-6 rounded-full hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+                                        className="w-6 h-6 rounded-full hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors cursor-pointer"
                                       >
                                         ✕
                                       </button>
@@ -5696,7 +5662,7 @@ export default function StudentPortalPage() {
                                       <button
                                         type="button"
                                         onClick={() => setSettingsActiveSubmenu('main')}
-                                        className="flex items-center gap-1.5 text-xs font-bold text-white/90 hover:text-white"
+                                        className="flex items-center gap-1.5 text-xs font-bold text-white/90 hover:text-white cursor-pointer"
                                       >
                                         <span>&lsaquo;</span>
                                         <span>Quality</span>
@@ -5704,7 +5670,7 @@ export default function StudentPortalPage() {
                                       <button
                                         type="button"
                                         onClick={() => setShowSettingsMenu(false)}
-                                        className="w-6 h-6 rounded-full hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+                                        className="w-6 h-6 rounded-full hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors cursor-pointer"
                                       >
                                         ✕
                                       </button>
@@ -5743,7 +5709,7 @@ export default function StudentPortalPage() {
                                       <button
                                         type="button"
                                         onClick={() => setSettingsActiveSubmenu('main')}
-                                        className="flex items-center gap-1.5 text-xs font-bold text-white/90 hover:text-white"
+                                        className="flex items-center gap-1.5 text-xs font-bold text-white/90 hover:text-white cursor-pointer"
                                       >
                                         <span>&lsaquo;</span>
                                         <span>Playback speed</span>
@@ -5751,7 +5717,7 @@ export default function StudentPortalPage() {
                                       <button
                                         type="button"
                                         onClick={() => setShowSettingsMenu(false)}
-                                        className="w-6 h-6 rounded-full hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+                                        className="w-6 h-6 rounded-full hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors cursor-pointer"
                                       >
                                         ✕
                                       </button>
@@ -5795,15 +5761,15 @@ export default function StudentPortalPage() {
                               </div>
                             )}
 
-                            {/* FLOATING IN-VIDEO CONTROLS OVERLAY (Matching Image 2 YouTube Player) */}
+                            {/* FLOATING IN-VIDEO CONTROLS OVERLAY (Matching Image 2 Exactly) */}
                             <div
-                              className={`absolute bottom-0 inset-x-0 z-40 bg-gradient-to-t from-black/95 via-black/80 to-transparent pt-8 pb-3 px-3 sm:px-4 transition-all duration-300 ${
+                              className={`absolute bottom-0 inset-x-0 z-40 bg-gradient-to-t from-black/90 via-black/45 to-transparent pt-8 pb-3 sm:pb-4 px-2 sm:px-6 transition-all duration-300 ${
                                 showControlsOverlay || !videoIsPlaying || showSpeedMenu || showSettingsMenu
                                   ? 'opacity-100 pointer-events-auto'
                                   : 'opacity-0 pointer-events-none'
                               }`}
                             >
-                              {/* Scrubber Timeline Bar */}
+                              {/* Scrubber Timeline Bar with vertical cursor indicator `- |` matching Image 2 */}
                               {(() => {
                                 const progressPct =
                                   videoDuration > 0
@@ -5812,118 +5778,103 @@ export default function StudentPortalPage() {
 
                                 return (
                                   <div
-                                    className="relative w-full h-4 sm:h-5 flex items-center cursor-pointer group/scrub select-none"
+                                    className="relative w-full h-4 sm:h-5 flex items-center cursor-pointer group/scrub select-none px-1"
                                     onClick={handleScrubberClick}
                                   >
                                     {/* Background track */}
-                                    <div className="w-full h-1 sm:h-1.5 bg-white/20 rounded-full overflow-hidden transition-all group-hover/scrub:h-2 sm:group-hover/scrub:h-2.5">
-                                      {/* Buffer bar */}
+                                    <div className="w-full h-0.5 sm:h-1 bg-white/25 rounded-full overflow-hidden transition-all group-hover/scrub:h-1.5">
+                                      {/* Played progress fill */}
                                       <div
-                                        className="h-full bg-white/30 transition-all"
-                                        style={{ width: `${Math.min(100, progressPct + 15)}%` }}
+                                        className="h-full bg-white transition-all"
+                                        style={{ width: `${progressPct}%` }}
                                       />
                                     </div>
-                                    {/* Played progress fill */}
+                                    {/* Vertical Bar Thumb Indicator matching Image 2 */}
                                     <div
-                                      className="absolute left-0 top-1/2 -translate-y-1/2 h-1 sm:h-1.5 bg-[#EE2C3C] rounded-full pointer-events-none transition-all group-hover/scrub:h-2 sm:group-hover/scrub:h-2.5"
-                                      style={{ width: `${progressPct}%` }}
-                                    />
-                                    {/* Scrubber thumb circle */}
-                                    <div
-                                      className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-[#EE2C3C] rounded-full shadow-md scale-0 group-hover/scrub:scale-100 transition-transform pointer-events-none border-2 border-white"
+                                      className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-[3px] sm:w-[4px] h-3.5 sm:h-4.5 bg-white rounded-xs shadow-md pointer-events-none transition-transform"
                                       style={{ left: `${progressPct}%` }}
                                     />
                                   </div>
                                 );
                               })()}
 
-                              {/* Buttons and Time Row */}
-                              <div className="w-full flex items-center justify-between gap-2 mt-1 sm:mt-1.5 text-white">
-                                {/* Left Controls: Play/Pause, -10s, +10s, Time, Chapters */}
-                                <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+                              {/* THREE FLOATING CONTROL PILLS (Matching Image 2 Exactly) */}
+                              <div className="w-full flex items-center justify-between gap-1.5 sm:gap-3 mt-2 sm:mt-2.5">
+                                {/* Pill 1: [ Play/Pause | ⟲10 | ⟳10 | 0:03 / 5:51 ] */}
+                                <div className="bg-[#1c1c1e]/90 hover:bg-[#1c1c1e] backdrop-blur-md rounded-2xl border border-white/10 px-3 sm:px-4 py-1.5 sm:py-2 flex items-center gap-2 sm:gap-3.5 text-white shadow-xl shrink-0">
                                   <button
                                     type="button"
                                     onClick={handlePlayPause}
-                                    className={`h-8 sm:h-9 px-2.5 sm:px-3 rounded-full text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-md active:scale-95 ${
-                                      videoIsPlaying
-                                        ? 'bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm'
-                                        : 'bg-[#EE2C3C] hover:bg-[#D71E2E] text-white'
-                                    }`}
+                                    className="text-white hover:text-white/80 transition-transform active:scale-90 cursor-pointer flex items-center justify-center shrink-0"
                                     title={videoIsPlaying ? 'Pause' : 'Play'}
                                   >
                                     {videoIsPlaying ? (
-                                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                                        <rect x="6" y="5" width="4" height="14" rx="1" />
-                                        <rect x="14" y="5" width="4" height="14" rx="1" />
+                                      <svg className="w-4 h-4 sm:w-5 sm:h-5 fill-current" viewBox="0 0 24 24">
+                                        <rect x="6" y="4" width="4" height="16" rx="1" />
+                                        <rect x="14" y="4" width="4" height="16" rx="1" />
                                       </svg>
                                     ) : (
-                                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                      <svg className="w-4 h-4 sm:w-5 sm:h-5 fill-current" viewBox="0 0 24 24">
                                         <path d="M8 5v14l11-7z" />
                                       </svg>
                                     )}
                                   </button>
 
-                                  {/* -10s Skip Button */}
                                   <button
                                     type="button"
                                     onClick={handleSkipBackward}
-                                    className="h-8 w-8 sm:h-9 sm:w-9 rounded-full hover:bg-white/15 text-white flex items-center justify-center transition-all cursor-pointer active:scale-90"
-                                    title="Back 10 seconds"
+                                    className="text-white hover:text-white/80 transition-transform active:scale-90 cursor-pointer flex items-center justify-center shrink-0 relative"
+                                    title="Rewind 10s"
                                   >
-                                    <div className="relative flex items-center justify-center">
-                                      <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12.5 4.5A8.5 8.5 0 1 0 21 13" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12.5 1.5v6l-4-3 4-3z" />
-                                      </svg>
-                                      <span className="absolute text-[8px] sm:text-[9px] font-black -bottom-0.5">10</span>
-                                    </div>
+                                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M12.5 4.5A8.5 8.5 0 1 0 21 13" />
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M12.5 1.5v6l-4-3 4-3z" />
+                                    </svg>
+                                    <span className="absolute text-[7px] sm:text-[8px] font-black top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pt-0.5">10</span>
                                   </button>
 
-                                  {/* +10s Skip Button */}
                                   <button
                                     type="button"
                                     onClick={handleSkipForward}
-                                    className="h-8 w-8 sm:h-9 sm:w-9 rounded-full hover:bg-white/15 text-white flex items-center justify-center transition-all cursor-pointer active:scale-90"
-                                    title="Forward 10 seconds"
+                                    className="text-white hover:text-white/80 transition-transform active:scale-90 cursor-pointer flex items-center justify-center shrink-0 relative"
+                                    title="Forward 10s"
                                   >
-                                    <div className="relative flex items-center justify-center">
-                                      <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M11.5 4.5A8.5 8.5 0 1 1 3 13" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M11.5 1.5v6l4-3-4-3z" />
-                                      </svg>
-                                      <span className="absolute text-[8px] sm:text-[9px] font-black -bottom-0.5">10</span>
-                                    </div>
+                                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M11.5 4.5A8.5 8.5 0 1 1 3 13" />
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M11.5 1.5v6l4-3-4-3z" />
+                                    </svg>
+                                    <span className="absolute text-[7px] sm:text-[8px] font-black top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pt-0.5">10</span>
                                   </button>
 
-                                  {/* Time Display */}
-                                  <div className="text-[11px] sm:text-xs font-semibold text-white/90 tracking-wide select-none ml-1">
+                                  <div className="text-[11px] sm:text-xs font-medium text-white/95 select-none tracking-tight whitespace-nowrap pl-0.5">
                                     <span>{formatVideoTime(videoCurrentTime)}</span>
                                     <span className="text-white/50 mx-1">/</span>
                                     <span className="text-white/70">{formatVideoTime(videoDuration || 351)}</span>
                                   </div>
-
-                                  {/* Chapters Pill (Desktop / Tablet) */}
-                                  <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/15 backdrop-blur-sm text-[11px] font-medium text-white/90 max-w-[200px] truncate select-none">
-                                    <span className="text-white/50">•</span>
-                                    <span className="truncate">{activePlayerClass.title}</span>
-                                  </div>
                                 </div>
 
-                                {/* Right Controls: Volume, CC, Speed pill, Settings Gear, Fullscreen */}
-                                <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+                                {/* Pill 2: [ Chapters ] */}
+                                <div className="hidden sm:flex bg-[#1c1c1e]/90 hover:bg-[#1c1c1e] backdrop-blur-md rounded-2xl border border-white/10 px-4 py-1.5 sm:py-2 items-center gap-1.5 text-white shadow-xl cursor-default select-none">
+                                  <span className="text-xs font-semibold text-white/90 truncate max-w-[140px] md:max-w-[200px]">
+                                    Chapters
+                                  </span>
+                                </div>
+
+                                {/* Pill 3: [ 🔊 | CC | 1x | ⚙ | ⛶ ] */}
+                                <div className="bg-[#1c1c1e]/90 hover:bg-[#1c1c1e] backdrop-blur-md rounded-2xl border border-white/10 px-3 sm:px-4 py-1.5 sm:py-2 flex items-center gap-2 sm:gap-3.5 text-white shadow-xl shrink-0">
                                   <button
                                     type="button"
                                     onClick={handleToggleMute}
-                                    className="h-8 w-8 sm:h-9 sm:w-9 rounded-full hover:bg-white/15 text-white flex items-center justify-center transition-all cursor-pointer active:scale-90"
+                                    className="text-white hover:text-white/80 transition-transform active:scale-90 cursor-pointer flex items-center justify-center shrink-0"
                                     title={videoIsMuted ? 'Unmute' : 'Mute'}
                                   >
                                     {videoIsMuted || videoVolume === 0 ? (
-                                      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
                                       </svg>
                                     ) : (
-                                      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                                       </svg>
                                     )}
@@ -5932,10 +5883,8 @@ export default function StudentPortalPage() {
                                   <button
                                     type="button"
                                     onClick={handleToggleCC}
-                                    className={`h-7 px-2 rounded sm:rounded-md text-[11px] sm:text-xs font-black transition-all cursor-pointer border ${
-                                      subtitlesEnabled
-                                        ? 'bg-white text-black border-white'
-                                        : 'bg-transparent text-white/80 border-white/30 hover:border-white/60 hover:text-white'
+                                    className={`h-5 sm:h-6 px-1.5 rounded text-[10px] sm:text-[11px] font-bold border transition-colors cursor-pointer flex items-center justify-center shrink-0 ${
+                                      subtitlesEnabled ? 'bg-white text-black border-white' : 'border-white/30 text-white/80 hover:text-white'
                                     }`}
                                     title="Subtitles/CC"
                                   >
@@ -5948,10 +5897,8 @@ export default function StudentPortalPage() {
                                       setShowSpeedMenu(!showSpeedMenu);
                                       setShowSettingsMenu(false);
                                     }}
-                                    className={`h-7 sm:h-8 px-2 sm:px-2.5 rounded-full text-xs font-bold transition-all cursor-pointer border ${
-                                      showSpeedMenu
-                                        ? 'bg-white text-black border-white'
-                                        : 'bg-white/10 hover:bg-white/20 text-white border-white/20'
+                                    className={`text-xs font-semibold px-1 py-0.5 rounded transition-colors cursor-pointer shrink-0 ${
+                                      showSpeedMenu ? 'bg-white text-black' : 'text-white hover:text-white/80'
                                     }`}
                                     title="Playback Speed"
                                   >
@@ -5965,14 +5912,12 @@ export default function StudentPortalPage() {
                                       setShowSpeedMenu(false);
                                       setSettingsActiveSubmenu('main');
                                     }}
-                                    className={`h-8 w-8 sm:h-9 sm:w-9 rounded-full flex items-center justify-center transition-all cursor-pointer active:scale-90 ${
-                                      showSettingsMenu
-                                        ? 'bg-white text-black rotate-45'
-                                        : 'hover:bg-white/15 text-white'
+                                    className={`text-white hover:text-white/80 transition-transform active:scale-90 cursor-pointer flex items-center justify-center shrink-0 ${
+                                      showSettingsMenu ? 'rotate-45' : ''
                                     }`}
                                     title="Settings"
                                   >
-                                    <svg className="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                    <svg className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-200" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                                       <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                     </svg>
@@ -5981,10 +5926,10 @@ export default function StudentPortalPage() {
                                   <button
                                     type="button"
                                     onClick={handleToggleFullscreen}
-                                    className="h-8 w-8 sm:h-9 sm:w-9 rounded-full hover:bg-white/15 text-white flex items-center justify-center transition-all cursor-pointer active:scale-90"
+                                    className="text-white hover:text-white/80 transition-transform active:scale-90 cursor-pointer flex items-center justify-center shrink-0"
                                     title="Fullscreen"
                                   >
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                                     </svg>
                                   </button>
