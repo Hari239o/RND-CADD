@@ -2715,26 +2715,29 @@ export default function StudentPortalPage() {
           {/* TAB 1: HOME */}
           {activeTab === 'Home' && (
             <div className="space-y-6">
-              {/* Quick Stat Metric Cards */}
-              <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md transition-all">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                      Syllabus Progress
-                    </span>
-                    <span suppressHydrationWarning className="text-[11px] font-bold text-slate-500">
-                      {watchedClassesCount}/{totalClassesCount} Classes
-                    </span>
+              {/* Quick Stat Metric Cards - MNC Compact 2x2 Responsive Grid */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+                {/* 1. Syllabus Progress */}
+                <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-1 gap-1">
+                      <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider truncate">
+                        Syllabus
+                      </span>
+                      <span suppressHydrationWarning className="text-[10px] sm:text-[11px] font-bold text-slate-500 shrink-0">
+                        {watchedClassesCount}/{totalClassesCount}
+                      </span>
+                    </div>
+                    <div className="flex items-baseline gap-1.5">
+                      <span suppressHydrationWarning className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#EE2C3C]">
+                        {overallSyllabusProgress}%
+                      </span>
+                      <span className="text-[10px] sm:text-xs text-emerald-600 font-semibold truncate">
+                        {overallSyllabusProgress === 100 ? 'Done' : 'Active'}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-baseline space-x-2">
-                    <span suppressHydrationWarning className="text-3xl font-extrabold text-[#EE2C3C]">
-                      {overallSyllabusProgress}%
-                    </span>
-                    <span className="text-xs text-emerald-600 font-semibold">
-                      {overallSyllabusProgress === 100 ? 'Completed' : 'In Progress'}
-                    </span>
-                  </div>
-                  <div className="w-full bg-slate-100 h-2 rounded-full mt-2.5 overflow-hidden">
+                  <div className="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden">
                     <div
                       className="bg-[#EE2C3C] h-full rounded-full transition-all duration-500"
                       style={{ width: `${overallSyllabusProgress}%` }}
@@ -2742,54 +2745,64 @@ export default function StudentPortalPage() {
                   </div>
                 </div>
 
-                <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md transition-all">
-                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
-                    Lab Attendance
-                  </span>
-                  <span suppressHydrationWarning className="text-3xl font-extrabold text-[#131313]">
-                    {studentUser.attendance && Number(studentUser.attendance) > 0 ? `${studentUser.attendance}%` : '0%'}
-                  </span>
-                  <span suppressHydrationWarning className="text-xs text-slate-500 font-medium block mt-1.5 flex items-center gap-1">
-                    <span className={`w-1.5 h-1.5 rounded-full ${studentUser.attendance && Number(studentUser.attendance) > 0 ? 'bg-emerald-500' : 'bg-slate-300'}`}></span>
-                    {studentUser.attendance && Number(studentUser.attendance) > 0 ? 'Ameerpet Campus • Regular' : 'No attendance recorded yet'}
-                  </span>
-                </div>
-
-                <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md transition-all">
-                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
-                    CAD Designs Submitted
-                  </span>
-                  <span suppressHydrationWarning className="text-3xl font-extrabold text-[#131313]">
-                    {Array.isArray(studentUser.designs) && studentUser.designs.length > 0
-                      ? `${studentUser.designs.length} Model${studentUser.designs.length > 1 ? 's' : ''}`
-                      : '0 Models'}
-                  </span>
-                  <span suppressHydrationWarning className="text-xs text-slate-500 font-medium block mt-1.5 truncate">
-                    {Array.isArray(studentUser.designs) && studentUser.designs.length > 0
-                      ? studentUser.designs.map((d: any) => d.title || d.name || 'Model').slice(0, 3).join(', ')
-                      : 'No designs submitted yet'}
+                {/* 2. Lab Attendance */}
+                <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between">
+                  <div>
+                    <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1 truncate">
+                      Attendance
+                    </span>
+                    <span suppressHydrationWarning className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#131313]">
+                      {studentUser.attendance && Number(studentUser.attendance) > 0 ? `${studentUser.attendance}%` : '0%'}
+                    </span>
+                  </div>
+                  <span suppressHydrationWarning className="text-[10px] sm:text-xs text-slate-500 font-medium block mt-1.5 truncate flex items-center gap-1">
+                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${studentUser.attendance && Number(studentUser.attendance) > 0 ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+                    <span className="truncate">{studentUser.attendance && Number(studentUser.attendance) > 0 ? 'Regular' : 'No records yet'}</span>
                   </span>
                 </div>
 
+                {/* 3. CAD Designs Submitted */}
+                <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between">
+                  <div>
+                    <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1 truncate">
+                      CAD Models
+                    </span>
+                    <span suppressHydrationWarning className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#131313]">
+                      {Array.isArray(studentUser.designs) && studentUser.designs.length > 0
+                        ? `${studentUser.designs.length}`
+                        : '0'}
+                      <span className="text-xs sm:text-sm font-semibold text-slate-500 ml-1">Models</span>
+                    </span>
+                  </div>
+                  <span suppressHydrationWarning className="text-[10px] sm:text-xs text-slate-500 font-medium block mt-1.5 truncate">
+                    {Array.isArray(studentUser.designs) && studentUser.designs.length > 0
+                      ? `${studentUser.designs.length} submitted`
+                      : 'None submitted'}
+                  </span>
+                </div>
+
+                {/* 4. Credentials */}
                 <div
                   onClick={() => setActiveTab('Certificates')}
-                  className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md hover:border-slate-400 transition-all cursor-pointer"
+                  className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-slate-400 transition-all cursor-pointer flex flex-col justify-between"
                   title="Click to view official verified certificates"
                 >
-                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
-                    Verified Credentials
-                  </span>
-                  <span suppressHydrationWarning className="text-2xl font-extrabold text-emerald-600">
-                    {studentCertificates.length > 0 ? `Issued (${studentCertificates.length})` : (overallSyllabusProgress === 100 ? 'Eligible' : '0 Issued')}
-                  </span>
-                  <span className="text-xs text-slate-600 font-medium block mt-1.5 flex items-center gap-1">
-                    {studentCertificates.length > 0 ? 'View Certificate →' : (overallSyllabusProgress === 100 ? 'Claim Certificate →' : 'Complete course to earn')}
+                  <div>
+                    <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1 truncate">
+                      Credentials
+                    </span>
+                    <span suppressHydrationWarning className="text-lg sm:text-2xl font-extrabold text-emerald-600 truncate block">
+                      {studentCertificates.length > 0 ? `Issued (${studentCertificates.length})` : (overallSyllabusProgress === 100 ? 'Eligible' : '0 Issued')}
+                    </span>
+                  </div>
+                  <span className="text-[10px] sm:text-xs text-slate-600 font-medium block mt-1.5 truncate flex items-center gap-1">
+                    <span className="truncate">{studentCertificates.length > 0 ? 'View Cert →' : (overallSyllabusProgress === 100 ? 'Claim Cert →' : 'Complete course')}</span>
                   </span>
                 </div>
               </div>
 
               {/* Dynamic Assigned Courses by Admin - Professional LMS Course Cards (Image-2 Fix) */}
-              <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 sm:p-7 space-y-6">
+              <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-4 sm:p-7 space-y-5 sm:space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
                   <div>
                     <h3 className="text-lg font-bold text-[#131313]">
