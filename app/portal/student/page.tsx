@@ -2479,12 +2479,7 @@ export default function StudentPortalPage() {
                   <div className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between gap-1">
-                    <h4 className="text-sm sm:text-base font-extrabold text-slate-900 truncate tracking-tight">{studentUser.name}</h4>
-                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">
-                      Verified
-                    </span>
-                  </div>
+                  <h4 className="text-sm sm:text-base font-extrabold text-slate-900 truncate tracking-tight">{studentUser.name}</h4>
                   <p className="text-xs text-slate-500 font-mono mt-0.5 truncate font-semibold">ID: {studentUser.id}</p>
                   <p className="text-xs text-slate-600 truncate mt-0.5 font-medium">{studentUser.stream || 'Certified CAD Trainee'}</p>
                 </div>
@@ -2530,13 +2525,7 @@ export default function StudentPortalPage() {
               </div>
             </div>
 
-            <div className="pt-4 border-t border-slate-200 mt-6 space-y-2">
-              <Link
-                href="/"
-                className="w-full py-2 px-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 block text-center hover:bg-slate-50"
-              >
-                Back to Main Website
-              </Link>
+            <div className="pt-4 border-t border-slate-200 mt-6">
               <button
                 onClick={handleLogout}
                 className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-[#EE2C3C] hover:bg-[#D71E2E] block text-center"

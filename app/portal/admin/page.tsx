@@ -3895,13 +3895,7 @@ export default function AdminPortalPage() {
               </div>
             </div>
 
-            <div className="pt-4 border-t border-slate-200 mt-6 space-y-2">
-              <Link
-                href="/"
-                className="w-full py-2 px-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 block text-center hover:bg-slate-50"
-              >
-                Back to Main Website
-              </Link>
+            <div className="pt-4 border-t border-slate-200 mt-6">
               <button
                 onClick={handleLogout}
                 className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-[#EE2C3C] hover:bg-[#D71E2E] block text-center"
