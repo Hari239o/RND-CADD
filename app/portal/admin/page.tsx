@@ -3796,59 +3796,39 @@ export default function AdminPortalPage() {
         <div className="flex items-center gap-2">
           <Link
             href="/"
-            className="px-2.5 py-1.5 text-[11px] font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+            className="px-3 py-1.5 text-[11px] font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors border border-slate-200/80 shadow-2xs"
           >
             Site
           </Link>
           <button
             type="button"
             onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
-            className="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center border border-slate-200 cursor-pointer"
-            aria-label="Toggle Admin Menu"
+            className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center border border-slate-200 cursor-pointer shadow-2xs active:scale-95 transition-all"
+            aria-label={isMobileNavOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
+            aria-expanded={isMobileNavOpen}
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
               {isMobileNavOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M6 18L18 6M6 6l12 12" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M4 6h16M4 12h16m-7 6h7" />
+                <>
+                  <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" strokeWidth={2.2} />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 3v18" stroke="currentColor" strokeWidth={2.2} />
+                </>
               )}
             </svg>
           </button>
         </div>
       </div>
 
-      {/* MOBILE HORIZONTAL SWIPEABLE TAB PILLS (< md) - MNC Modern Pills with Badges */}
-      <div className="md:hidden flex items-center gap-2 overflow-x-auto py-2.5 px-3 bg-white border-b border-slate-200 no-scrollbar whitespace-nowrap scrollbar-none z-30 shadow-2xs">
-        {adminNavItems.map((item) => {
-          const isActive = activeTab === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2 flex-shrink-0 cursor-pointer border ${
-                isActive
-                  ? 'bg-[#131313] text-white border-slate-900 shadow-xs'
-                  : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
-              }`}
-            >
-              <span className={`w-4 h-4 rounded flex items-center justify-center ${isActive ? 'text-white' : 'text-slate-600'}`}>
-                {item.icon}
-              </span>
-              <span>{item.label}</span>
-              {getAdminNavBadge(item.id, isActive)}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* MOBILE DRAWER (< md) */}
+      {/* MOBILE DRAWER (< md) - MNC Executive Admin Drawer with Border Radius */}
       {isMobileNavOpen && (
-        <div className="fixed inset-0 z-50 md:hidden flex">
+        <div className="fixed inset-0 z-50 md:hidden flex animate-fadeIn">
           <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-xs"
+            className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
             onClick={() => setIsMobileNavOpen(false)}
           />
-          <div className="relative w-full max-w-xs bg-white h-full z-10 flex flex-col justify-between p-5 overflow-y-auto safe-pb shadow-2xl">
+          <div className="relative w-full max-w-[320px] sm:max-w-xs bg-white h-full z-10 flex flex-col justify-between p-5 overflow-y-auto safe-pb shadow-2xl rounded-r-3xl border-r border-slate-200/90 animate-in slide-in-from-left duration-300">
             <div>
               <div className="flex items-center justify-between pb-4 border-b border-slate-200">
                 <div className="flex items-center gap-2.5">
@@ -3860,7 +3840,8 @@ export default function AdminPortalPage() {
                 </div>
                 <button
                   onClick={() => setIsMobileNavOpen(false)}
-                  className="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center"
+                  className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-lg active:scale-95 transition-all cursor-pointer"
+                  aria-label="Close Menu"
                 >
                   &times;
                 </button>
