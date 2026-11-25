@@ -2713,9 +2713,6 @@ export default function StudentPortalPage() {
                     <h3 className="text-lg font-bold text-[#131313]">
                       Assigned Engineering Programs
                     </h3>
-                    <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
-                      Accredited training programs and video lectures active on your student profile
-                    </p>
                   </div>
                   <div className="flex items-center gap-2 self-start sm:self-auto">
                     <button
@@ -2745,9 +2742,6 @@ export default function StudentPortalPage() {
                     <h3 className="text-base sm:text-lg font-bold text-slate-900">
                       No Enrolled Programs Yet
                     </h3>
-                    <p className="text-xs sm:text-sm text-slate-600 mt-1.5 max-w-md mx-auto leading-relaxed">
-                      You have signed up successfully, but have not enrolled in any professional CAD programs yet. Browse our certified industry tracks to get enrolled.
-                    </p>
                     <div className="mt-5 flex justify-center gap-3">
                       <Link
                         href="/#programs"
@@ -3586,9 +3580,6 @@ export default function StudentPortalPage() {
                     <h2 className="text-xl sm:text-2xl font-bold text-[#131313] tracking-tight">
                       Core Engineering Job Openings &amp; Verified Placement Drives
                     </h2>
-                    <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
-                      All vacancies are verified with corporate EPC partners. Apply with 1-click using your certified RND CADD student profile.
-                    </p>
                   </div>
 
                   <div className="flex items-center gap-2 flex-wrap">
@@ -3693,9 +3684,6 @@ export default function StudentPortalPage() {
                         </svg>
                       </div>
                       <h3 className="text-lg font-bold text-[#131313]">No Matching Job Vacancies</h3>
-                      <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                        There are currently no active vacancies matching your search or filters. Check back soon or reset filters.
-                      </p>
                       <button
                         onClick={() => {
                           setJobSearchQuery('');
@@ -4019,9 +4007,6 @@ export default function StudentPortalPage() {
                     <h3 className="text-xl sm:text-2xl font-bold text-[#131313] tracking-tight">
                       Official Student Certificates &amp; Credentials
                     </h3>
-                    <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
-                      Verified industrial CAD credentials issued student-wise by RND CADD Academy Ameerpet Campus.
-                    </p>
                   </div>
 
                   <div className="flex items-center space-x-3 flex-shrink-0">
@@ -4041,9 +4026,6 @@ export default function StudentPortalPage() {
                     <h4 className="text-lg font-bold text-[#131313]">
                       No Official Certificates Uploaded Yet
                     </h4>
-                    <p className="text-xs sm:text-sm text-slate-500 max-w-lg mx-auto leading-relaxed font-medium">
-                      Your official Autodesk &amp; Dassault Systemes certificates are uploaded here by Academic Director Er. Swamy Naidu upon course completion and capstone evaluation.
-                    </p>
                     <div className="pt-2">
                       <button
                         onClick={() => setActiveTab('Home')}
@@ -4170,9 +4152,6 @@ export default function StudentPortalPage() {
                     <h3 className="text-xl sm:text-2xl font-bold text-[#131313] tracking-tight">
                       Official CAD Reference Manuals &amp; E-Books
                     </h3>
-                    <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
-                      Official Autodesk, Dassault, and IS-Code technical manuals distributed to your student workstation.
-                    </p>
                   </div>
 
                   <div className="flex items-center space-x-2 flex-wrap gap-2">
@@ -4246,9 +4225,6 @@ export default function StudentPortalPage() {
                     <h4 className="text-lg font-bold text-[#131313]">
                       No CAD E-Books Available Yet
                     </h4>
-                    <p className="text-xs sm:text-sm text-slate-500 max-w-lg mx-auto leading-relaxed font-medium">
-                      Official CAD technical handbooks, command guides, and engineering workbooks will be uploaded here by academy instructors.
-                    </p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-2">
@@ -4546,9 +4522,6 @@ export default function StudentPortalPage() {
                     return (
                       <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-2">
                         <h4 className="text-base font-bold text-[#131313]">No assignments available</h4>
-                        <p className="text-xs text-slate-500 max-w-md mx-auto">
-                          There are currently no assignments assigned for your enrolled course.
-                        </p>
                       </div>
                     );
                   }
@@ -4860,9 +4833,6 @@ export default function StudentPortalPage() {
                         <h3 className="text-xl sm:text-2xl font-bold text-[#131313] tracking-tight">
                           {referralProgram.title || 'Refer Engineering Peers & Earn Benefits'}
                         </h3>
-                        <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
-                          {referralProgram.description || 'Share your unique student referral link with friends enrolling in Civil, Mechanical, or Electrical CADD. You both receive software voucher credits.'}
-                        </p>
                       </div>
 
                       {referralProgram.referrerReward && (
@@ -5003,9 +4973,6 @@ export default function StudentPortalPage() {
                 <h3 className="text-xl sm:text-2xl font-bold text-[#131313] tracking-tight">
                   Rate Your Training Experience
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
-                  Your feedback helps us continuously improve our lab workstations, curriculum, and placement assistance. All reviews are forwarded directly to R&amp;D CADD Administration.
-                </p>
               </div>
 
               {reviewSuccessMsg && (
