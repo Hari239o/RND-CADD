@@ -5798,15 +5798,16 @@ export default function StudentPortalPage() {
                                 );
                               })()}
 
-                              {/* THREE FLOATING CONTROL PILLS (Matching Image 2 Exactly) */}
-                              <div className="w-full flex items-center justify-between gap-1.5 sm:gap-3 mt-2 sm:mt-2.5">
-                                {/* Pill 1: [ Play/Pause | ⟲10 | ⟳10 | 0:03 / 5:51 ] */}
-                                <div className="bg-[#1c1c1e]/90 hover:bg-[#1c1c1e] backdrop-blur-md rounded-2xl border border-white/10 px-3 sm:px-4 py-1.5 sm:py-2 flex items-center gap-2 sm:gap-3.5 text-white shadow-xl shrink-0">
+                              {/* CONTROLS ROW (Matching Image 1 Exactly: White Pill Play + Dark Capsules) */}
+                              <div className="w-full flex items-center justify-between gap-2 sm:gap-4 mt-2 sm:mt-2.5">
+                                {/* LEFT GROUP: White Pill Play/Pause Button + Dark Capsule with [ ⟲10 | ⟳10 | Time ] */}
+                                <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                                  {/* Prominent White Pill Play/Pause Button (Matching Image 1) */}
                                   <button
                                     type="button"
                                     onClick={handlePlayPause}
-                                    className="text-white hover:text-white/80 transition-transform active:scale-90 cursor-pointer flex items-center justify-center shrink-0"
-                                    title={videoIsPlaying ? 'Pause' : 'Play'}
+                                    className="h-8 sm:h-9 px-4 sm:px-5 rounded-full bg-white hover:bg-slate-100 text-black font-bold flex items-center justify-center shadow-lg transition-transform active:scale-95 cursor-pointer shrink-0"
+                                    title={videoIsPlaying ? 'Pause (k)' : 'Play (k)'}
                                   >
                                     {videoIsPlaying ? (
                                       <svg className="w-4 h-4 sm:w-5 sm:h-5 fill-current" viewBox="0 0 24 24">
@@ -5814,59 +5815,55 @@ export default function StudentPortalPage() {
                                         <rect x="14" y="4" width="4" height="16" rx="1" />
                                       </svg>
                                     ) : (
-                                      <svg className="w-4 h-4 sm:w-5 sm:h-5 fill-current" viewBox="0 0 24 24">
+                                      <svg className="w-4 h-4 sm:w-5 sm:h-5 fill-current translate-x-0.5" viewBox="0 0 24 24">
                                         <path d="M8 5v14l11-7z" />
                                       </svg>
                                     )}
                                   </button>
 
-                                  <button
-                                    type="button"
-                                    onClick={handleSkipBackward}
-                                    className="text-white hover:text-white/80 transition-transform active:scale-90 cursor-pointer flex items-center justify-center shrink-0 relative"
-                                    title="Rewind 10s"
-                                  >
-                                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" d="M12.5 4.5A8.5 8.5 0 1 0 21 13" />
-                                      <path strokeLinecap="round" strokeLinejoin="round" d="M12.5 1.5v6l-4-3 4-3z" />
-                                    </svg>
-                                    <span className="absolute text-[7px] sm:text-[8px] font-black top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pt-0.5">10</span>
-                                  </button>
+                                  {/* Dark Capsule: [ ⟲10 | ⟳10 | Time ] */}
+                                  <div className="bg-[#1c1c1e]/90 hover:bg-[#1c1c1e] backdrop-blur-md rounded-full border border-white/10 px-3 sm:px-4 py-1.5 sm:py-2 flex items-center gap-2.5 sm:gap-3.5 text-white shadow-xl shrink-0">
+                                    <button
+                                      type="button"
+                                      onClick={handleSkipBackward}
+                                      className="text-white hover:text-white/80 transition-transform active:scale-90 cursor-pointer flex items-center justify-center shrink-0 relative"
+                                      title="Rewind 10s (j)"
+                                    >
+                                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12.5 4.5A8.5 8.5 0 1 0 21 13" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12.5 1.5v6l-4-3 4-3z" />
+                                      </svg>
+                                      <span className="absolute text-[7px] sm:text-[8px] font-black top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pt-0.5">10</span>
+                                    </button>
 
-                                  <button
-                                    type="button"
-                                    onClick={handleSkipForward}
-                                    className="text-white hover:text-white/80 transition-transform active:scale-90 cursor-pointer flex items-center justify-center shrink-0 relative"
-                                    title="Forward 10s"
-                                  >
-                                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" d="M11.5 4.5A8.5 8.5 0 1 1 3 13" />
-                                      <path strokeLinecap="round" strokeLinejoin="round" d="M11.5 1.5v6l4-3-4-3z" />
-                                    </svg>
-                                    <span className="absolute text-[7px] sm:text-[8px] font-black top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pt-0.5">10</span>
-                                  </button>
+                                    <button
+                                      type="button"
+                                      onClick={handleSkipForward}
+                                      className="text-white hover:text-white/80 transition-transform active:scale-90 cursor-pointer flex items-center justify-center shrink-0 relative"
+                                      title="Forward 10s (l)"
+                                    >
+                                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M11.5 4.5A8.5 8.5 0 1 1 3 13" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M11.5 1.5v6l4-3-4-3z" />
+                                      </svg>
+                                      <span className="absolute text-[7px] sm:text-[8px] font-black top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pt-0.5">10</span>
+                                    </button>
 
-                                  <div className="text-[11px] sm:text-xs font-medium text-white/95 select-none tracking-tight whitespace-nowrap pl-0.5">
-                                    <span>{formatVideoTime(videoCurrentTime)}</span>
-                                    <span className="text-white/50 mx-1">/</span>
-                                    <span className="text-white/70">{formatVideoTime(videoDuration || 351)}</span>
+                                    <div className="text-[11px] sm:text-xs font-semibold text-white/95 select-none tracking-tight whitespace-nowrap pl-0.5">
+                                      <span>{formatVideoTime(videoCurrentTime)}</span>
+                                      <span className="text-white/50 mx-1">/</span>
+                                      <span className="text-white/70">{formatVideoTime(videoDuration || 351)}</span>
+                                    </div>
                                   </div>
                                 </div>
 
-                                {/* Pill 2: [ Chapters ] */}
-                                <div className="hidden sm:flex bg-[#1c1c1e]/90 hover:bg-[#1c1c1e] backdrop-blur-md rounded-2xl border border-white/10 px-4 py-1.5 sm:py-2 items-center gap-1.5 text-white shadow-xl cursor-default select-none">
-                                  <span className="text-xs font-semibold text-white/90 truncate max-w-[140px] md:max-w-[200px]">
-                                    Chapters
-                                  </span>
-                                </div>
-
-                                {/* Pill 3: [ 🔊 | CC | 1x | ⚙ | ⛶ ] */}
-                                <div className="bg-[#1c1c1e]/90 hover:bg-[#1c1c1e] backdrop-blur-md rounded-2xl border border-white/10 px-3 sm:px-4 py-1.5 sm:py-2 flex items-center gap-2 sm:gap-3.5 text-white shadow-xl shrink-0">
+                                {/* RIGHT GROUP: Dark Capsule with [ 🔊 | CC | 1x | ⚙ | ⛶ ] */}
+                                <div className="bg-[#1c1c1e]/90 hover:bg-[#1c1c1e] backdrop-blur-md rounded-full border border-white/10 px-3 sm:px-4 py-1.5 sm:py-2 flex items-center gap-2 sm:gap-3.5 text-white shadow-xl shrink-0">
                                   <button
                                     type="button"
                                     onClick={handleToggleMute}
                                     className="text-white hover:text-white/80 transition-transform active:scale-90 cursor-pointer flex items-center justify-center shrink-0"
-                                    title={videoIsMuted ? 'Unmute' : 'Mute'}
+                                    title={videoIsMuted ? 'Unmute (m)' : 'Mute (m)'}
                                   >
                                     {videoIsMuted || videoVolume === 0 ? (
                                       <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -5874,7 +5871,7 @@ export default function StudentPortalPage() {
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
                                       </svg>
                                     ) : (
-                                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                      <svg className="w-4 h-4 sm:w-5 sm:h-5 fill-none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                                       </svg>
                                     )}
@@ -5886,7 +5883,7 @@ export default function StudentPortalPage() {
                                     className={`h-5 sm:h-6 px-1.5 rounded text-[10px] sm:text-[11px] font-bold border transition-colors cursor-pointer flex items-center justify-center shrink-0 ${
                                       subtitlesEnabled ? 'bg-white text-black border-white' : 'border-white/30 text-white/80 hover:text-white'
                                     }`}
-                                    title="Subtitles/CC"
+                                    title="Subtitles/CC (c)"
                                   >
                                     CC
                                   </button>
@@ -5927,7 +5924,7 @@ export default function StudentPortalPage() {
                                     type="button"
                                     onClick={handleToggleFullscreen}
                                     className="text-white hover:text-white/80 transition-transform active:scale-90 cursor-pointer flex items-center justify-center shrink-0"
-                                    title="Fullscreen"
+                                    title="Fullscreen (f)"
                                   >
                                     <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
