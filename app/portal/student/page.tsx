@@ -5438,11 +5438,11 @@ export default function StudentPortalPage() {
                       );
 
                       return (
-                        <div className="w-full flex flex-col items-center">
-                          {/* EXPANDED VIDEO PLAYER CONTAINER (Taller on mobile to use down space) */}
+                        <div className="w-full flex flex-col items-center space-y-2.5">
+                          {/* EXPANDED VIDEO PLAYER CONTAINER (Taller on mobile to utilize lower empty space) */}
                           <div
                             ref={playerContainerRef}
-                            className="relative w-full h-[45vh] min-h-[310px] max-h-[56vh] sm:h-auto sm:aspect-video sm:max-h-[78vh] bg-black rounded-xl sm:rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center select-none"
+                            className="relative w-full h-[52vh] min-h-[340px] max-h-[62vh] sm:h-auto sm:aspect-video sm:max-h-[78vh] bg-black rounded-xl sm:rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center select-none"
                           >
                             {/* Video Stream: Clean YouTube or Google Drive embed */}
                             {isYouTubeVideo ? (
@@ -5454,14 +5454,72 @@ export default function StudentPortalPage() {
                                 title={activePlayerClass.title}
                               />
                             ) : (
-                              <iframe
-                                src={formatGoogleDriveUrl(activePlayerClass.videoUrl)}
-                                className="w-full h-full border-0 pointer-events-auto"
-                                allow="autoplay; encrypted-media; fullscreen"
-                                allowFullScreen
-                                title={activePlayerClass.title}
-                              />
+                              <div className="relative w-full h-full overflow-hidden">
+                                <iframe
+                                  src={formatGoogleDriveUrl(activePlayerClass.videoUrl)}
+                                  className="w-full h-[calc(100%+56px)] -mt-[56px] border-0 pointer-events-auto"
+                                  allow="autoplay; encrypted-media; fullscreen"
+                                  allowFullScreen
+                                  title={activePlayerClass.title}
+                                />
+                                {/* Top-Right Shield preventing popout redirect */}
+                                <div
+                                  className="absolute top-0 right-0 w-28 h-16 z-30 pointer-events-auto select-none"
+                                  aria-hidden="true"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                  }}
+                                />
+                              </div>
                             )}
+                          </div>
+
+                          {/* MOBILE STUDENT ACTION STRIP (Utilizes down space with quick-tap controls) */}
+                          <div className="w-full flex sm:hidden items-center justify-between gap-2 bg-white p-2 rounded-xl border border-slate-200/90 shadow-xs">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (playerContainerRef.current) {
+                                  if (document.fullscreenElement) {
+                                    document.exitFullscreen?.();
+                                  } else {
+                                    playerContainerRef.current.requestFullscreen?.();
+                                  }
+                                }
+                              }}
+                              className="flex-1 py-2 px-3 rounded-lg bg-slate-900 hover:bg-black text-white text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 transition-all shadow-xs cursor-pointer"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                              </svg>
+                              <span>Full Screen</span>
+                            </button>
+
+                            {activePlayerClass.pdfUrl && (
+                              <button
+                                type="button"
+                                onClick={() => setStudentViewerMode('notes')}
+                                className="py-2 px-3 rounded-lg bg-rose-50 hover:bg-rose-100 text-[#EE2C3C] text-xs font-bold flex items-center gap-1.5 border border-rose-200 active:scale-95 transition-all cursor-pointer"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <span>Notes PDF</span>
+                              </button>
+                            )}
+
+                            <button
+                              type="button"
+                              onClick={() => handleToggleClassWatched(activePlayerClass.id, playerCourse.title, activePlayerClass.classNumber)}
+                              className={`py-2 px-3 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95 border cursor-pointer ${
+                                isCurrentClassWatched
+                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                  : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-300'
+                              }`}
+                            >
+                              <span>{isCurrentClassWatched ? '✓ Watched' : 'Mark Done'}</span>
+                            </button>
                           </div>
                         </div>
                       );
