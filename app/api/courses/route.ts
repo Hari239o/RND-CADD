@@ -150,7 +150,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'AutoCAD 2D Drafting Standards & Project Setup',
         duration: '45 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Industry-standard DWG setup, BIS title block standards, layer architecture, and precision snap tools.'
       },
       {
@@ -159,7 +159,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'Parametric Wall Assemblies, Slabs & Grids in Revit',
         duration: '55 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Modeling structural compound walls, core layers, elevation datum levels, and structural grid alignments.'
       },
       {
@@ -168,7 +168,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'Custom Family Creation & Curtain Glazing Systems',
         duration: '60 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Creating parametric window/door families, curtain wall mullion layout, and reference planes.'
       },
       {
@@ -177,7 +177,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'Navisworks Clash Matrix & Enscape 4K Walkthrough',
         duration: '50 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Multi-trade hard clash detection, 4D construction schedule simulation, and GPU real-time daylight rendering.'
       }
     ]
@@ -213,7 +213,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'SolidWorks 3D Parametric Sketching & Constraints',
         duration: '50 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Fully constrained 2D sketches, geometric relations, boss-extrude, cut-extrude, and thin features.'
       },
       {
@@ -222,7 +222,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'Sheet Metal Unfolding, K-Factor & Welded Structures',
         duration: '60 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Edge flanges, miter flanges, sheet metal gauge tables, flat pattern development, and structural weldments.'
       },
       {
@@ -231,7 +231,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'CATIA V5 Generative Shape Design & Wireframe Tools',
         duration: '65 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Splines, boundary curves, sweep surfaces, blend surfaces, multi-section surfaces, and curvature continuity.'
       },
       {
@@ -240,7 +240,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'ANSYS Static Structural Stress & Deflection Simulation',
         duration: '55 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Material library assignment, adaptive tetrahedral meshing, boundary conditions, and Von-Mises stress analysis.'
       }
     ]
@@ -276,7 +276,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'Single Line Diagram (SLD) Drafting & IEC Standards',
         duration: '45 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Substation busbar architecture, CT/PT transformer symbology, circuit breaker ratings, and earthing layouts.'
       },
       {
@@ -285,7 +285,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'Motor Control Center (MCC) & Control Logic Schematics',
         duration: '55 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'DOL starter circuits, star-delta control schematics, interlock relays, and wire numbering automation.'
       },
       {
@@ -294,7 +294,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'ETAP Balanced Load Flow & Short Circuit Calculations',
         duration: '60 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Industrial feeder load flow calculations, bus voltage drops, transformer tap adjustments, and fault currents.'
       }
     ]
@@ -330,7 +330,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'Ergonomic Space Planning & CAD Interior Layouts',
         duration: '45 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Anthropometric dimensions, circulation corridors, furniture clearance standards, and false ceiling grids.'
       },
       {
@@ -339,7 +339,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'SketchUp Modular Cabinetry & Hardware Fitting Details',
         duration: '50 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Tandem drawer mechanisms, carcass panels, shutter finishes, edge-banding, and hardware specifications.'
       },
       {
@@ -348,7 +348,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: '3ds Max Physically-Based Lighting & V-Ray 6 Materials',
         duration: '65 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'IES photometric spotlights, dome HDRI environment lighting, PBR reflection glossiness, and normal bump maps.'
       }
     ]
@@ -384,7 +384,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'Enterprise Project Structure (EPS) & WBS Hierarchy',
         duration: '45 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Organizational breakdown, defining multi-level WBS nodes, milestone dates, and work packages.'
       },
       {
@@ -393,7 +393,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'Activity Logic Ties, Critical Path (CPM) & Float Tracking',
         duration: '55 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Finish-to-Start (FS) / SS relationships, total float, free float, and early/late schedule date computations.'
       },
       {
@@ -402,7 +402,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'Resource Allocation, Leveling & Earned Value (EVA)',
         duration: '60 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Labor & non-labor resource curves, over-allocation leveling, Schedule Performance Index (SPI), and Cost Performance Index (CPI).'
       }
     ]
@@ -438,7 +438,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'P&ID Process Drafting & Instrumentation Standards',
         duration: '45 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'ISA symbology, valve designations, line numbering specifications, and instrumentation loops.'
       },
       {
@@ -447,7 +447,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: '3D Equipment Modeling & Pipe Rack Routing',
         duration: '55 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Horizontal vessel layout, pump suction/discharge routing, pipe rack tiers, and valve access stations.'
       },
       {
@@ -456,7 +456,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'Automated Isometrics, BOM & Caesar II Flexibility',
         duration: '60 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Extracting isometric sheets, cut pipe lengths, fitting counts, and pipe thermal expansion stress verification.'
       }
     ]
@@ -494,7 +494,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'Core BIM Concepts & Family Editor',
         duration: '50 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'BIM dimensions, UI setup, datum levels, grids, and parametric family creation.'
       }
     ]
@@ -531,7 +531,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'Municipal Sanction Standards & Plan Detailing',
         duration: '45 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'FAR computations, setback rules, and municipal submission sheets.'
       }
     ]
@@ -570,7 +570,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'Parametric Part Feature Trees & Constraints',
         duration: '50 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Advanced geometric constraints, sweeps, lofts, and multi-body dynamics.'
       }
     ]
@@ -607,7 +607,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'Class-A Surfacing Fundamentals in CATIA',
         duration: '55 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Surface curvature continuity (G0, G1, G2), blends, and styling fillets.'
       }
     ]
@@ -646,7 +646,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'Ladder Schematics & Wire Numbering',
         duration: '45 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Drawing ladder circuits, assigning component tags, and cross-reference contacts.'
       }
     ]
@@ -683,7 +683,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'Project Setup & Macro Creation in EPLAN',
         duration: '50 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'IEC 81346 designation, device tags, and creating reusable smart macros.'
       }
     ]
@@ -722,7 +722,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'Modular Kitchen Ergonomics & Carcass Sizing',
         duration: '45 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Standard carcass dimensions, tandem drawer clearances, and shutter fitting.'
       }
     ]
@@ -759,7 +759,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'IES Photometric Spotlights & Daylight Setup',
         duration: '50 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Placing manufacturer IES luminaire profiles and balancing interior daylight exposure.'
       }
     ]
@@ -798,7 +798,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'EPS, WBS Architecture & Calendars in P6',
         duration: '50 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Creating enterprise breakdown structure, defining calendars, and setting up WBS codes.'
       }
     ]
@@ -835,7 +835,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'Task Hierarchies & Predecessor Ties in MSP',
         duration: '45 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Building auto-scheduled tasks, milestones, finish-to-start logic, and lag durations.'
       }
     ]
@@ -874,7 +874,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'P&ID Drafting & Intelligent Equipment Tags',
         duration: '50 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Drawing ISA compliant P&IDs, tagging pumps, and validating pipeline continuity.'
       }
     ]
@@ -911,7 +911,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         title: 'Coordinate Architecture & Equipment in SP3D',
         duration: '55 mins',
         videoType: 'drive',
-        videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+        videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'SP3D coordinate grids, placing vertical drums, and nozzle radial orientations.'
       }
     ]
@@ -1121,7 +1121,7 @@ function normalizeCourse(raw: any): StoredCourse {
             title: `${raw.title} - Fundamentals & CAD Standards`,
             duration: '45 mins',
             videoType: 'drive',
-            videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+            videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
             description: 'Introduction to standard user interface, navigation shortcuts, template configurations, and BIS/ISO standards.',
             pdfUrl: undefined,
             pdfName: undefined,
@@ -1133,7 +1133,7 @@ function normalizeCourse(raw: any): StoredCourse {
             title: `${raw.title} - Core Parametric Modeling & Detailing`,
             duration: '60 mins',
             videoType: 'drive',
-            videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+            videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
             description: 'Advanced geometric constraints, dimensioning, layer management, and precision drafting workflows.',
             pdfUrl: '/uploads/sample-lab-drawings.pdf',
             pdfName: `${raw.code || 'CAD'}-Class-02-Drawings.pdf`,

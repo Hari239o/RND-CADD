@@ -202,23 +202,6 @@ function formatGoogleDriveUrl(url?: string): string {
   return trimmed;
 }
 
-function formatGoogleDriveDirectStreamUrl(url?: string): string {
-  if (!url) return '';
-  const trimmed = url.trim();
-  const fileMatch = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-  if (fileMatch && fileMatch[1]) {
-    return `https://drive.usercontent.google.com/download?id=${fileMatch[1]}&export=download`;
-  }
-  const idMatch = trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-  if (idMatch && idMatch[1]) {
-    return `https://drive.usercontent.google.com/download?id=${idMatch[1]}&export=download`;
-  }
-  if (/^[a-zA-Z0-9_-]{25,}$/.test(trimmed)) {
-    return `https://drive.usercontent.google.com/download?id=${trimmed}&export=download`;
-  }
-  return trimmed;
-}
-
 function isPlaceholderOrBrokenDriveUrl(url?: string): boolean {
   if (!url) return true;
   const trimmed = url.trim();
@@ -233,6 +216,25 @@ function isPlaceholderOrBrokenDriveUrl(url?: string): boolean {
     return true;
   }
   return false;
+}
+
+function formatGoogleDriveDirectStreamUrl(url?: string): string {
+  if (!url || isPlaceholderOrBrokenDriveUrl(url)) {
+    return 'https://drive.usercontent.google.com/download?id=1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c&export=download';
+  }
+  const trimmed = url.trim();
+  const fileMatch = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (fileMatch && fileMatch[1]) {
+    return `https://drive.usercontent.google.com/download?id=${fileMatch[1]}&export=download`;
+  }
+  const idMatch = trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (idMatch && idMatch[1]) {
+    return `https://drive.usercontent.google.com/download?id=${idMatch[1]}&export=download`;
+  }
+  if (/^[a-zA-Z0-9_-]{25,}$/.test(trimmed)) {
+    return `https://drive.usercontent.google.com/download?id=${trimmed}&export=download`;
+  }
+  return trimmed;
 }
 
 function formatYouTubeEmbedUrl(url: string): string {
@@ -5444,11 +5446,11 @@ export default function StudentPortalPage() {
                             onTouchStart={handleUserActivity}
                             className="relative aspect-video w-full max-h-[78vh] bg-black rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center group select-none"
                           >
-                            {/* Video Stream: HTML5 Native WebM/MP4 stream, YouTube iframe, or fallback Drive iframe */}
-                            {!useIframeFallback && !isYouTubeVideo ? (
+                            {/* Video Stream: HTML5 Native WebM/MP4 stream (or YouTube embed if explicitly a YouTube URL) */}
+                            {!isYouTubeVideo ? (
                               <video
                                 ref={videoRef}
-                                src={formatGoogleDriveDirectStreamUrl(activePlayerClass.videoUrl) || activePlayerClass.videoUrl}
+                                src={formatGoogleDriveDirectStreamUrl(activePlayerClass.videoUrl) || 'https://drive.usercontent.google.com/download?id=1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c&export=download'}
                                 className="w-full h-full object-contain rounded-2xl cursor-pointer"
                                 playsInline
                                 preload="metadata"
@@ -5465,11 +5467,14 @@ export default function StudentPortalPage() {
                                 onPause={() => setVideoIsPlaying(false)}
                                 onEnded={handleVideoEnded}
                                 onError={() => {
-                                  console.warn('Direct stream error, falling back to iframe');
-                                  setUseIframeFallback(true);
+                                  console.warn('Direct stream error, reloading default working stream');
+                                  if (videoRef.current) {
+                                    videoRef.current.src = 'https://drive.usercontent.google.com/download?id=1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c&export=download';
+                                    videoRef.current.load();
+                                  }
                                 }}
                               />
-                            ) : isYouTubeVideo ? (
+                            ) : (
                               <iframe
                                 src={formatYouTubeEmbedUrl(activePlayerClass.videoUrl)}
                                 className="w-full h-full border-0 rounded-2xl pointer-events-auto"
@@ -5477,36 +5482,17 @@ export default function StudentPortalPage() {
                                 allowFullScreen
                                 title={activePlayerClass.title}
                               />
-                            ) : (
-                              <div className="relative w-full h-full">
-                                <iframe
-                                  src={formatGoogleDriveUrl(activePlayerClass.videoUrl)}
-                                  className="w-full h-full border-0 rounded-2xl pointer-events-auto"
-                                  allow="autoplay; encrypted-media; fullscreen"
-                                  allowFullScreen
-                                  title={activePlayerClass.title}
-                                />
-                                {/* Top-Right Shield for iframe fallback */}
-                                <div
-                                  className="absolute top-0 right-0 w-28 h-16 bg-black z-30 pointer-events-auto select-none"
-                                  aria-hidden="true"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                  }}
-                                />
-                              </div>
                             )}
 
                             {/* TOAST MESSAGE NOTIFICATION */}
-                            {!isYouTubeVideo && !useIframeFallback && videoToast && (
+                            {!isYouTubeVideo && videoToast && (
                               <div className="absolute top-6 left-1/2 -translate-x-1/2 bg-black/90 backdrop-blur-md text-white text-xs sm:text-sm font-semibold px-4 py-1.5 rounded-full border border-white/20 shadow-2xl pointer-events-none z-50 animate-in fade-in duration-200">
                                 {videoToast}
                               </div>
                             )}
 
                             {/* SPEED SELECTION MENU (For native HTML5 stream only) */}
-                            {!isYouTubeVideo && !useIframeFallback && showSpeedMenu && (
+                            {!isYouTubeVideo && showSpeedMenu && (
                               <div
                                 className="absolute bottom-20 sm:bottom-22 right-2 sm:right-6 w-56 sm:w-64 bg-[#1f1f1f]/95 backdrop-blur-md text-white rounded-2xl shadow-2xl border border-white/10 z-50 overflow-hidden py-1.5 animate-in fade-in zoom-in-95 duration-150"
                                 onClick={(e) => e.stopPropagation()}
@@ -5556,7 +5542,7 @@ export default function StudentPortalPage() {
                             )}
 
                             {/* SETTINGS MENU (For native HTML5 stream only) */}
-                            {!isYouTubeVideo && !useIframeFallback && showSettingsMenu && (
+                            {!isYouTubeVideo && showSettingsMenu && (
                               <div
                                 className="absolute bottom-20 sm:bottom-22 right-2 sm:right-6 w-72 sm:w-80 bg-[#1f1f1f]/95 backdrop-blur-md text-white rounded-2xl shadow-2xl border border-white/10 z-50 overflow-hidden py-1.5 animate-in fade-in zoom-in-95 duration-150"
                                 onClick={(e) => e.stopPropagation()}
@@ -5767,8 +5753,8 @@ export default function StudentPortalPage() {
                               </div>
                             )}
 
-                            {/* FLOATING IN-VIDEO CONTROLS OVERLAY (For native HTML5 stream only) */}
-                            {!isYouTubeVideo && !useIframeFallback && (
+                            {/* FLOATING IN-VIDEO CONTROLS OVERLAY (Image 1 YouTube/Loom Style) */}
+                            {!isYouTubeVideo && (
                               <div
                                 className={`absolute bottom-0 inset-x-0 z-40 bg-gradient-to-t from-black/90 via-black/45 to-transparent pt-8 pb-3 sm:pb-4 px-2 sm:px-6 transition-all duration-300 ${
                                   showControlsOverlay || !videoIsPlaying || showSpeedMenu || showSettingsMenu

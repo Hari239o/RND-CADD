@@ -371,10 +371,10 @@ function formatGoogleDriveUrl(url: string): string {
 function isPlaceholderOrBrokenDriveUrl(url?: string): boolean {
   if (!url) return true;
   const trimmed = url.trim();
-  if (trimmed === '' || trimmed === 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview') {
+  if (trimmed === '' || trimmed === 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview') {
     return true;
   }
-  if (trimmed.includes('1w8o19vH1M9hP2nE5G4aBcDef') || trimmed.includes('placeholder') || trimmed.includes('sample.mp4')) {
+  if (trimmed.includes('1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c') || trimmed.includes('placeholder') || trimmed.includes('sample.mp4')) {
     return true;
   }
   return false;
@@ -2709,7 +2709,7 @@ export default function AdminPortalPage() {
           title: `${newCourse.title.trim()} - Fundamentals & Workspace`,
           duration: '45 mins',
           videoType: 'drive',
-          videoUrl: 'https://drive.google.com/file/d/1w8o19vH1M9hP2nE5G4aBcDef/preview',
+          videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
           description: 'Engineering standards, GUI navigation, and drafting templates setup.',
         },
       ],
