@@ -238,6 +238,23 @@ function formatVideoTime(seconds: number): string {
   return `${mStr}:${sStr}`;
 }
 
+function parseDurationSeconds(durationStr?: string): number {
+  if (!durationStr) return 351; // default ~5:51
+  const trimmed = durationStr.trim().toLowerCase();
+  const minMatch = trimmed.match(/^([\d.]+)\s*(?:min|mins|minute|minutes)$/);
+  if (minMatch) return Math.round(parseFloat(minMatch[1]) * 60);
+  const hrMatch = trimmed.match(/^([\d.]+)\s*(?:hr|hrs|hour|hours)$/);
+  if (hrMatch) return Math.round(parseFloat(hrMatch[1]) * 3600);
+  const parts = trimmed.split(':').map((p) => parseInt(p, 10));
+  if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+    return parts[0] * 60 + parts[1];
+  }
+  if (parts.length === 3 && !isNaN(parts[0]) && !isNaN(parts[1]) && !isNaN(parts[2])) {
+    return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  }
+  return 351;
+}
+
 const DEFAULT_COURSE_CLASSES: Record<string, CourseClass[]> = {
   'civil cadd & master bim': [
     {
@@ -2007,6 +2024,39 @@ export default function StudentPortalPage() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [playerCourse]);
 
+  // Sync active class duration and reset playback when switching classes
+  useEffect(() => {
+    if (activePlayerClass) {
+      const dur = parseDurationSeconds(activePlayerClass.duration);
+      setVideoDuration(dur);
+      setVideoCurrentTime(0);
+      setVideoIsPlaying(false);
+      setShowControlsOverlay(true);
+      setShowSpeedMenu(false);
+      setShowSettingsMenu(false);
+    }
+  }, [activePlayerClass]);
+
+  // Video progress timer interval for simulated & cross-origin playback
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+    if (videoIsPlaying) {
+      interval = setInterval(() => {
+        setVideoCurrentTime((prev) => {
+          const next = prev + 1 * videoPlaybackSpeed;
+          if (videoDuration > 0 && next >= videoDuration) {
+            setVideoIsPlaying(false);
+            return videoDuration;
+          }
+          return next;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [videoIsPlaying, videoPlaybackSpeed, videoDuration]);
+
   const handlePlayPause = () => {
     if (videoRef.current) {
       if (videoRef.current.paused) {
@@ -2085,8 +2135,28 @@ export default function StudentPortalPage() {
   const handleSeek = (newTime: number) => {
     if (videoRef.current) {
       videoRef.current.currentTime = newTime;
-      setVideoCurrentTime(newTime);
+    } else {
+      const iframe = playerContainerRef.current?.querySelector('iframe');
+      if (iframe && iframe.contentWindow) {
+        try {
+          iframe.contentWindow.postMessage(
+            JSON.stringify({ event: 'command', func: 'seekTo', args: [newTime, true] }),
+            '*'
+          );
+        } catch {}
+      }
     }
+    setVideoCurrentTime(newTime);
+  };
+
+  const handleScrubberClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const pct = Math.max(0, Math.min(1, clickX / rect.width));
+    const targetDuration = videoDuration > 0 ? videoDuration : 351;
+    const newTime = Math.round(pct * targetDuration);
+    handleSeek(newTime);
+    showVideoToast(`Seek: ${formatVideoTime(newTime)}`);
   };
 
   const handleSpeedChange = (speed: number) => {
@@ -5341,210 +5411,585 @@ export default function StudentPortalPage() {
                       );
 
                       return (
-                        <div className="w-full flex flex-col items-center space-y-2 sm:space-y-3">
-                          {isYouTubeVideo ? (
-                            /* YouTube Stream */
-                            <div ref={playerContainerRef} className="relative aspect-video w-full max-h-[78vh] bg-black rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center">
+                        <div className="w-full flex flex-col items-center">
+                          {/* YOUTUBE-STYLE FLOATING PLAYER CONTAINER (Images 2, 3, 4) */}
+                          <div
+                            ref={playerContainerRef}
+                            onMouseMove={handleUserActivity}
+                            onTouchStart={handleUserActivity}
+                            className="relative aspect-video w-full max-h-[78vh] bg-black rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center group select-none"
+                          >
+                            {/* Video Stream: HTML5 direct video or iframe */}
+                            {activePlayerClass.videoType === 'direct' ? (
+                              <video
+                                ref={videoRef}
+                                src={activePlayerClass.videoUrl}
+                                className="w-full h-full object-contain rounded-2xl"
+                                playsInline
+                                onTimeUpdate={() => {
+                                  if (videoRef.current) setVideoCurrentTime(videoRef.current.currentTime);
+                                }}
+                                onLoadedMetadata={() => {
+                                  if (videoRef.current) setVideoDuration(videoRef.current.duration);
+                                }}
+                                onEnded={handleVideoEnded}
+                              />
+                            ) : isYouTubeVideo ? (
                               <iframe
                                 src={formatYouTubeEmbedUrl(activePlayerClass.videoUrl)}
-                                className="w-full h-full border-0 rounded-2xl"
+                                className="w-full h-full border-0 rounded-2xl pointer-events-auto"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                 allowFullScreen
                                 title={activePlayerClass.title}
                               />
-                              {/* Top-Right Shield */}
-                              <div
-                                className="absolute top-0 right-0 w-28 h-16 bg-black z-30 pointer-events-auto select-none"
-                                aria-hidden="true"
-                              />
-                            </div>
-                          ) : (
-                            /* Permanent Google Drive Video Stream (Image 2) */
-                            <div ref={playerContainerRef} className="relative aspect-video w-full max-h-[78vh] bg-black rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center">
+                            ) : (
                               <iframe
                                 src={formatGoogleDriveUrl(activePlayerClass.videoUrl)}
-                                className="w-full h-full border-0 rounded-2xl"
+                                className="w-full h-full border-0 rounded-2xl pointer-events-auto"
                                 allow="autoplay; encrypted-media; fullscreen"
                                 allowFullScreen
                                 title={activePlayerClass.title}
                               />
-                              {/* Top-Right Shield: Hides & blocks Google Drive pop-out & external window button while playing */}
-                              <div
-                                className="absolute top-0 right-0 w-28 h-16 bg-black z-30 pointer-events-auto select-none"
-                                aria-hidden="true"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                }}
-                              />
-                            </div>
-                          )}
+                            )}
 
-                          {/* DEDICATED MNC PLAYBACK CONTROLS BAR (Stop/Play, Back/Forward, Settings/Speed, Quality, Fullscreen, Mark Done) */}
-                          <div className="w-full bg-slate-900 text-white rounded-xl p-2 sm:p-2.5 shadow-md flex items-center justify-between gap-1.5 sm:gap-2 border border-slate-800">
-                            {/* Left: Play/Stop, -10s, +10s */}
-                            <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+                            {/* Top-Right Shield: Hides & blocks Google Drive pop-out & external window button while playing */}
+                            <div
+                              className="absolute top-0 right-0 w-28 h-16 bg-black z-30 pointer-events-auto select-none"
+                              aria-hidden="true"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                              }}
+                            />
+
+                            {/* TOP OVERLAY BAR: Class title & Mark Done pill */}
+                            <div
+                              className={`absolute top-0 inset-x-0 z-35 bg-gradient-to-b from-black/85 via-black/40 to-transparent p-3 sm:p-4 flex items-center justify-between gap-3 transition-opacity duration-300 ${
+                                showControlsOverlay || !videoIsPlaying || showSpeedMenu || showSettingsMenu
+                                  ? 'opacity-100 pointer-events-auto'
+                                  : 'opacity-0 pointer-events-none'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2 min-w-0 pr-28">
+                                <span className="px-2 py-0.5 rounded bg-white/20 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider backdrop-blur-xs shrink-0">
+                                  {activePlayerClass.classNumber || 'Class'}
+                                </span>
+                                <h3 className="text-xs sm:text-sm md:text-base font-bold text-white truncate drop-shadow-sm">
+                                  {activePlayerClass.title}
+                                </h3>
+                              </div>
+
+                              {/* Quick Mark Done Button on Top Bar */}
                               <button
                                 type="button"
-                                onClick={handlePlayPause}
-                                className={`h-8 px-2.5 sm:px-3 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs ${
-                                  videoIsPlaying
-                                    ? 'bg-amber-500 hover:bg-amber-600 text-slate-950'
-                                    : 'bg-[#EE2C3C] hover:bg-[#D71E2E] text-white'
+                                onClick={() =>
+                                  handleToggleClassWatched(
+                                    activePlayerClass.id,
+                                    playerCourse?.title,
+                                    activePlayerClass.classNumber
+                                  )
+                                }
+                                className={`shrink-0 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-md active:scale-95 ${
+                                  isCurrentClassWatched
+                                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                                    : 'bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm border border-white/20'
                                 }`}
-                                title={videoIsPlaying ? 'Stop / Pause video' : 'Play video'}
+                                title="Toggle Mark Done status"
                               >
-                                {videoIsPlaying ? (
+                                {isCurrentClassWatched ? (
                                   <>
-                                    <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-                                      <rect x="6" y="5" width="4" height="14" rx="1" />
-                                      <rect x="14" y="5" width="4" height="14" rx="1" />
+                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                                     </svg>
-                                    <span>Stop</span>
+                                    <span>Done</span>
                                   </>
                                 ) : (
                                   <>
-                                    <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-                                      <path d="M8 5v14l11-7z" />
-                                    </svg>
-                                    <span>Play</span>
+                                    <span className="w-1.5 h-1.5 rounded-full bg-white/80" />
+                                    <span>Mark Done</span>
                                   </>
                                 )}
                               </button>
-
-                              <button
-                                type="button"
-                                onClick={handleSkipBackward}
-                                className="h-8 px-2 sm:px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-0.5 transition-all cursor-pointer border border-slate-700 active:scale-95"
-                                title="Back forward 10 seconds (-10s)"
-                              >
-                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.2} viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.333 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8l-5.334 4z" />
-                                </svg>
-                                <span>-10s</span>
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={handleSkipForward}
-                                className="h-8 px-2 sm:px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-0.5 transition-all cursor-pointer border border-slate-700 active:scale-95"
-                                title="Fast forward 10 seconds (+10s)"
-                              >
-                                <span>+10s</span>
-                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.2} viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M11.933 12.8a1 1 0 000-1.6L6.6 7.2A1 1 0 005 8v8a1 1 0 001.6.8l5.333-4zM19.933 12.8a1 1 0 000-1.6l-5.333-4A1 1 0 0013 8v8a1 1 0 001.6.8l5.333-4z" />
-                                </svg>
-                              </button>
                             </div>
 
-                            {/* Right: Speed/Settings, Quality, Fullscreen, Mark Done */}
-                            <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-                              {/* Speed Dropdown */}
-                              <div className="relative">
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setShowSpeedMenu(!showSpeedMenu);
-                                    setShowQualityMenu(false);
-                                  }}
-                                  className="h-8 px-2 sm:px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-1 transition-all cursor-pointer border border-slate-700"
-                                  title="Playback Speed & Settings"
-                                >
-                                  <span className="text-amber-400">⚡</span>
-                                  <span>{videoPlaybackSpeed}x</span>
-                                </button>
-                                {showSpeedMenu && (
-                                  <div className="absolute bottom-full mb-1 right-0 bg-slate-800 border border-slate-700 rounded-xl shadow-xl py-1 z-50 min-w-[100px]">
-                                    <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-700">
-                                      Speed
-                                    </div>
-                                    {[0.75, 1, 1.25, 1.5, 2].map((spd) => (
-                                      <button
-                                        key={spd}
-                                        type="button"
-                                        onClick={() => handleSpeedChange(spd)}
-                                        className={`w-full px-3 py-1.5 text-left text-xs font-bold flex items-center justify-between cursor-pointer transition-colors ${
-                                          videoPlaybackSpeed === spd
-                                            ? 'bg-[#EE2C3C] text-white'
-                                            : 'text-slate-200 hover:bg-slate-700'
-                                        }`}
-                                      >
-                                        <span>{spd}x</span>
-                                        {videoPlaybackSpeed === spd && <span>✓</span>}
-                                      </button>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* Quality Dropdown */}
-                              <div className="relative">
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setShowQualityMenu(!showQualityMenu);
-                                    setShowSpeedMenu(false);
-                                  }}
-                                  className="h-8 px-2 sm:px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-1 transition-all cursor-pointer border border-slate-700"
-                                  title="Resolution Quality"
-                                >
-                                  <span className="text-xs">⚙</span>
-                                  <span className="truncate max-w-[55px] sm:max-w-none">{videoQuality}</span>
-                                </button>
-                                {showQualityMenu && (
-                                  <div className="absolute bottom-full mb-1 right-0 bg-slate-800 border border-slate-700 rounded-xl shadow-xl py-1 z-50 min-w-[110px]">
-                                    <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-700">
-                                      Quality
-                                    </div>
-                                    {['1080p HD', '720p', '480p', 'Auto'].map((q) => (
-                                      <button
-                                        key={q}
-                                        type="button"
-                                        onClick={() => handleQualityChange(q)}
-                                        className={`w-full px-3 py-1.5 text-left text-xs font-bold flex items-center justify-between cursor-pointer transition-colors ${
-                                          videoQuality === q
-                                            ? 'bg-[#EE2C3C] text-white'
-                                            : 'text-slate-200 hover:bg-slate-700'
-                                        }`}
-                                      >
-                                        <span>{q}</span>
-                                        {videoQuality === q && <span>✓</span>}
-                                      </button>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* Fullscreen Button */}
+                            {/* CENTER PLAY BUTTON (When Paused) */}
+                            {!videoIsPlaying && (
                               <button
                                 type="button"
-                                onClick={handleToggleFullscreen}
-                                className="h-8 w-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center justify-center transition-all cursor-pointer border border-slate-700 active:scale-95"
-                                title="Fullscreen"
+                                onClick={handlePlayPause}
+                                className="absolute inset-0 m-auto w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-black/70 hover:bg-[#EE2C3C] text-white flex items-center justify-center transition-all duration-300 shadow-2xl backdrop-blur-xs scale-100 hover:scale-110 active:scale-95 cursor-pointer z-35 border border-white/20"
+                                title="Play Video"
                               >
-                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                                <svg className="w-8 h-8 sm:w-10 sm:h-10 fill-current translate-x-0.5" viewBox="0 0 24 24">
+                                  <path d="M8 5v14l11-7z" />
                                 </svg>
                               </button>
+                            )}
 
-                              {/* Mark Done / Completed Toggle Button */}
-                              {activePlayerClass && (
-                                <button
-                                  type="button"
-                                  onClick={() => handleToggleClassWatched(activePlayerClass.id, playerCourse.title, activePlayerClass.classNumber)}
-                                  className={`h-8 px-2.5 sm:px-3 rounded-lg text-xs font-bold flex items-center gap-1 transition-all cursor-pointer shadow-xs ${
-                                    isCurrentClassWatched
-                                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                                      : 'bg-white hover:bg-slate-100 text-slate-900 border border-slate-300'
-                                  }`}
-                                  title="Click to toggle watched completion status"
-                                >
-                                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                  </svg>
-                                  <span>{isCurrentClassWatched ? 'Done' : 'Mark Done'}</span>
-                                </button>
-                              )}
+                            {/* TOAST MESSAGE NOTIFICATION */}
+                            {videoToast && (
+                              <div className="absolute top-16 left-1/2 -translate-x-1/2 bg-black/90 backdrop-blur-md text-white text-xs sm:text-sm font-semibold px-4 py-1.5 rounded-full border border-white/20 shadow-2xl pointer-events-none z-50 animate-in fade-in duration-200">
+                                {videoToast}
+                              </div>
+                            )}
+
+                            {/* SPEED SELECTION MENU (Matching Image 3) */}
+                            {showSpeedMenu && (
+                              <div
+                                className="absolute bottom-16 sm:bottom-18 right-2 sm:right-6 w-56 sm:w-64 bg-[#1f1f1f]/95 backdrop-blur-md text-white rounded-2xl shadow-2xl border border-white/10 z-50 overflow-hidden py-1.5 animate-in fade-in zoom-in-95 duration-150"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <div className="px-4 py-2.5 flex items-center justify-between border-b border-white/10">
+                                  <span className="text-xs font-bold text-white/90">Playback speed</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => setShowSpeedMenu(false)}
+                                    className="w-6 h-6 rounded-full hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+                                  >
+                                    ✕
+                                  </button>
+                                </div>
+                                <div className="max-h-60 overflow-y-auto py-1">
+                                  {[
+                                    { val: 0.25, label: '0.25' },
+                                    { val: 0.5, label: '0.5' },
+                                    { val: 0.75, label: '0.75' },
+                                    { val: 1, label: 'Normal' },
+                                    { val: 1.25, label: '1.25' },
+                                    { val: 1.5, label: '1.5' },
+                                    { val: 1.75, label: '1.75' },
+                                    { val: 2, label: '2' },
+                                  ].map((item) => {
+                                    const isSelected = videoPlaybackSpeed === item.val;
+                                    return (
+                                      <button
+                                        key={item.val}
+                                        type="button"
+                                        onClick={() => handleSpeedChange(item.val)}
+                                        className={`w-full px-4 py-2 text-left text-xs sm:text-sm font-medium flex items-center justify-between transition-colors cursor-pointer ${
+                                          isSelected ? 'bg-white/15 text-white font-bold' : 'text-white/80 hover:bg-white/10 hover:text-white'
+                                        }`}
+                                      >
+                                        <span>{item.label}</span>
+                                        {isSelected && (
+                                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                          </svg>
+                                        )}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* SETTINGS MENU (Matching Image 4) */}
+                            {showSettingsMenu && (
+                              <div
+                                className="absolute bottom-16 sm:bottom-18 right-2 sm:right-6 w-72 sm:w-80 bg-[#1f1f1f]/95 backdrop-blur-md text-white rounded-2xl shadow-2xl border border-white/10 z-50 overflow-hidden py-1.5 animate-in fade-in zoom-in-95 duration-150"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {settingsActiveSubmenu === 'main' && (
+                                  <div>
+                                    <div className="px-4 py-2.5 flex items-center justify-between border-b border-white/10">
+                                      <span className="text-xs font-bold text-white/90">Settings</span>
+                                      <button
+                                        type="button"
+                                        onClick={() => setShowSettingsMenu(false)}
+                                        className="w-6 h-6 rounded-full hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+                                      >
+                                        ✕
+                                      </button>
+                                    </div>
+
+                                    <div className="py-1">
+                                      {/* Picture-in-picture */}
+                                      <button
+                                        type="button"
+                                        onClick={handleTogglePiP}
+                                        className="w-full px-4 py-2.5 text-left text-xs sm:text-sm font-medium flex items-center justify-between text-white/90 hover:bg-white/10 transition-colors cursor-pointer"
+                                      >
+                                        <div className="flex items-center gap-3">
+                                          <svg className="w-4 h-4 text-white/70" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                            <rect x="3" y="5" width="18" height="14" rx="2" />
+                                            <rect x="11" y="11" width="8" height="6" rx="1" fill="currentColor" fillOpacity={0.2} />
+                                          </svg>
+                                          <span>Picture-in-picture</span>
+                                        </div>
+                                        <span className="text-white/40 text-xs">&rarr;</span>
+                                      </button>
+
+                                      {/* Subtitles/CC */}
+                                      <button
+                                        type="button"
+                                        onClick={handleToggleCC}
+                                        className="w-full px-4 py-2.5 text-left text-xs sm:text-sm font-medium flex items-center justify-between text-white/90 hover:bg-white/10 transition-colors cursor-pointer"
+                                      >
+                                        <div className="flex items-center gap-3">
+                                          <span className="text-[10px] font-black border border-white/50 px-1 rounded">CC</span>
+                                          <span>Subtitles/CC</span>
+                                        </div>
+                                        <span className="text-xs text-white/60">{subtitlesEnabled ? 'English (Auto)' : 'Off'}</span>
+                                      </button>
+
+                                      {/* Quality */}
+                                      <button
+                                        type="button"
+                                        onClick={() => setSettingsActiveSubmenu('quality')}
+                                        className="w-full px-4 py-2.5 text-left text-xs sm:text-sm font-medium flex items-center justify-between text-white/90 hover:bg-white/10 transition-colors cursor-pointer"
+                                      >
+                                        <div className="flex items-center gap-3">
+                                          <svg className="w-4 h-4 text-white/70" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                          </svg>
+                                          <span>Quality</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 text-xs text-white/60">
+                                          <span>{videoQuality}</span>
+                                          <span>&rsaquo;</span>
+                                        </div>
+                                      </button>
+
+                                      {/* Playback speed */}
+                                      <button
+                                        type="button"
+                                        onClick={() => setSettingsActiveSubmenu('speed')}
+                                        className="w-full px-4 py-2.5 text-left text-xs sm:text-sm font-medium flex items-center justify-between text-white/90 hover:bg-white/10 transition-colors cursor-pointer"
+                                      >
+                                        <div className="flex items-center gap-3">
+                                          <svg className="w-4 h-4 text-white/70" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                          </svg>
+                                          <span>Playback speed</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 text-xs text-white/60">
+                                          <span>{videoPlaybackSpeed === 1 ? 'Normal' : `${videoPlaybackSpeed}x`}</span>
+                                          <span>&rsaquo;</span>
+                                        </div>
+                                      </button>
+
+                                      {/* Class Notes / Blueprint (PDF) */}
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setStudentViewerMode('notes');
+                                          setShowSettingsMenu(false);
+                                        }}
+                                        className="w-full px-4 py-2.5 text-left text-xs sm:text-sm font-medium flex items-center justify-between text-white/90 hover:bg-white/10 transition-colors cursor-pointer border-t border-white/5 mt-1"
+                                      >
+                                        <div className="flex items-center gap-3">
+                                          <svg className="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                          </svg>
+                                          <span>Class Notes / Blueprint (PDF)</span>
+                                        </div>
+                                        <span className="text-[11px] font-bold text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded">View</span>
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {settingsActiveSubmenu === 'quality' && (
+                                  <div>
+                                    <div className="px-4 py-2.5 flex items-center justify-between border-b border-white/10">
+                                      <button
+                                        type="button"
+                                        onClick={() => setSettingsActiveSubmenu('main')}
+                                        className="flex items-center gap-1.5 text-xs font-bold text-white/90 hover:text-white"
+                                      >
+                                        <span>&lsaquo;</span>
+                                        <span>Quality</span>
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => setShowSettingsMenu(false)}
+                                        className="w-6 h-6 rounded-full hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+                                      >
+                                        ✕
+                                      </button>
+                                    </div>
+                                    <div className="py-1">
+                                      {['1080p HD', '720p', '480p', 'Auto'].map((q) => {
+                                        const isSelected = videoQuality === q;
+                                        return (
+                                          <button
+                                            key={q}
+                                            type="button"
+                                            onClick={() => {
+                                              handleQualityChange(q);
+                                              setShowSettingsMenu(false);
+                                            }}
+                                            className={`w-full px-4 py-2 text-left text-xs sm:text-sm font-medium flex items-center justify-between transition-colors cursor-pointer ${
+                                              isSelected ? 'bg-white/15 text-white font-bold' : 'text-white/80 hover:bg-white/10 hover:text-white'
+                                            }`}
+                                          >
+                                            <span>{q}</span>
+                                            {isSelected && (
+                                              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                              </svg>
+                                            )}
+                                          </button>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {settingsActiveSubmenu === 'speed' && (
+                                  <div>
+                                    <div className="px-4 py-2.5 flex items-center justify-between border-b border-white/10">
+                                      <button
+                                        type="button"
+                                        onClick={() => setSettingsActiveSubmenu('main')}
+                                        className="flex items-center gap-1.5 text-xs font-bold text-white/90 hover:text-white"
+                                      >
+                                        <span>&lsaquo;</span>
+                                        <span>Playback speed</span>
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => setShowSettingsMenu(false)}
+                                        className="w-6 h-6 rounded-full hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+                                      >
+                                        ✕
+                                      </button>
+                                    </div>
+                                    <div className="max-h-60 overflow-y-auto py-1">
+                                      {[
+                                        { val: 0.25, label: '0.25' },
+                                        { val: 0.5, label: '0.5' },
+                                        { val: 0.75, label: '0.75' },
+                                        { val: 1, label: 'Normal' },
+                                        { val: 1.25, label: '1.25' },
+                                        { val: 1.5, label: '1.5' },
+                                        { val: 1.75, label: '1.75' },
+                                        { val: 2, label: '2' },
+                                      ].map((item) => {
+                                        const isSelected = videoPlaybackSpeed === item.val;
+                                        return (
+                                          <button
+                                            key={item.val}
+                                            type="button"
+                                            onClick={() => {
+                                              handleSpeedChange(item.val);
+                                              setShowSettingsMenu(false);
+                                            }}
+                                            className={`w-full px-4 py-2 text-left text-xs sm:text-sm font-medium flex items-center justify-between transition-colors cursor-pointer ${
+                                              isSelected ? 'bg-white/15 text-white font-bold' : 'text-white/80 hover:bg-white/10 hover:text-white'
+                                            }`}
+                                          >
+                                            <span>{item.label}</span>
+                                            {isSelected && (
+                                              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                              </svg>
+                                            )}
+                                          </button>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            {/* FLOATING IN-VIDEO CONTROLS OVERLAY (Matching Image 2 YouTube Player) */}
+                            <div
+                              className={`absolute bottom-0 inset-x-0 z-40 bg-gradient-to-t from-black/95 via-black/80 to-transparent pt-8 pb-3 px-3 sm:px-4 transition-all duration-300 ${
+                                showControlsOverlay || !videoIsPlaying || showSpeedMenu || showSettingsMenu
+                                  ? 'opacity-100 pointer-events-auto'
+                                  : 'opacity-0 pointer-events-none'
+                              }`}
+                            >
+                              {/* Scrubber Timeline Bar */}
+                              {(() => {
+                                const progressPct =
+                                  videoDuration > 0
+                                    ? Math.min(100, Math.max(0, (videoCurrentTime / videoDuration) * 100))
+                                    : 0;
+
+                                return (
+                                  <div
+                                    className="relative w-full h-4 sm:h-5 flex items-center cursor-pointer group/scrub select-none"
+                                    onClick={handleScrubberClick}
+                                  >
+                                    {/* Background track */}
+                                    <div className="w-full h-1 sm:h-1.5 bg-white/20 rounded-full overflow-hidden transition-all group-hover/scrub:h-2 sm:group-hover/scrub:h-2.5">
+                                      {/* Buffer bar */}
+                                      <div
+                                        className="h-full bg-white/30 transition-all"
+                                        style={{ width: `${Math.min(100, progressPct + 15)}%` }}
+                                      />
+                                    </div>
+                                    {/* Played progress fill */}
+                                    <div
+                                      className="absolute left-0 top-1/2 -translate-y-1/2 h-1 sm:h-1.5 bg-[#EE2C3C] rounded-full pointer-events-none transition-all group-hover/scrub:h-2 sm:group-hover/scrub:h-2.5"
+                                      style={{ width: `${progressPct}%` }}
+                                    />
+                                    {/* Scrubber thumb circle */}
+                                    <div
+                                      className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-[#EE2C3C] rounded-full shadow-md scale-0 group-hover/scrub:scale-100 transition-transform pointer-events-none border-2 border-white"
+                                      style={{ left: `${progressPct}%` }}
+                                    />
+                                  </div>
+                                );
+                              })()}
+
+                              {/* Buttons and Time Row */}
+                              <div className="w-full flex items-center justify-between gap-2 mt-1 sm:mt-1.5 text-white">
+                                {/* Left Controls: Play/Pause, -10s, +10s, Time, Chapters */}
+                                <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+                                  <button
+                                    type="button"
+                                    onClick={handlePlayPause}
+                                    className={`h-8 sm:h-9 px-2.5 sm:px-3 rounded-full text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-md active:scale-95 ${
+                                      videoIsPlaying
+                                        ? 'bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm'
+                                        : 'bg-[#EE2C3C] hover:bg-[#D71E2E] text-white'
+                                    }`}
+                                    title={videoIsPlaying ? 'Pause' : 'Play'}
+                                  >
+                                    {videoIsPlaying ? (
+                                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                        <rect x="6" y="5" width="4" height="14" rx="1" />
+                                        <rect x="14" y="5" width="4" height="14" rx="1" />
+                                      </svg>
+                                    ) : (
+                                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z" />
+                                      </svg>
+                                    )}
+                                  </button>
+
+                                  {/* -10s Skip Button */}
+                                  <button
+                                    type="button"
+                                    onClick={handleSkipBackward}
+                                    className="h-8 w-8 sm:h-9 sm:w-9 rounded-full hover:bg-white/15 text-white flex items-center justify-center transition-all cursor-pointer active:scale-90"
+                                    title="Back 10 seconds"
+                                  >
+                                    <div className="relative flex items-center justify-center">
+                                      <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12.5 4.5A8.5 8.5 0 1 0 21 13" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12.5 1.5v6l-4-3 4-3z" />
+                                      </svg>
+                                      <span className="absolute text-[8px] sm:text-[9px] font-black -bottom-0.5">10</span>
+                                    </div>
+                                  </button>
+
+                                  {/* +10s Skip Button */}
+                                  <button
+                                    type="button"
+                                    onClick={handleSkipForward}
+                                    className="h-8 w-8 sm:h-9 sm:w-9 rounded-full hover:bg-white/15 text-white flex items-center justify-center transition-all cursor-pointer active:scale-90"
+                                    title="Forward 10 seconds"
+                                  >
+                                    <div className="relative flex items-center justify-center">
+                                      <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M11.5 4.5A8.5 8.5 0 1 1 3 13" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M11.5 1.5v6l4-3-4-3z" />
+                                      </svg>
+                                      <span className="absolute text-[8px] sm:text-[9px] font-black -bottom-0.5">10</span>
+                                    </div>
+                                  </button>
+
+                                  {/* Time Display */}
+                                  <div className="text-[11px] sm:text-xs font-semibold text-white/90 tracking-wide select-none ml-1">
+                                    <span>{formatVideoTime(videoCurrentTime)}</span>
+                                    <span className="text-white/50 mx-1">/</span>
+                                    <span className="text-white/70">{formatVideoTime(videoDuration || 351)}</span>
+                                  </div>
+
+                                  {/* Chapters Pill (Desktop / Tablet) */}
+                                  <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/15 backdrop-blur-sm text-[11px] font-medium text-white/90 max-w-[200px] truncate select-none">
+                                    <span className="text-white/50">•</span>
+                                    <span className="truncate">{activePlayerClass.title}</span>
+                                  </div>
+                                </div>
+
+                                {/* Right Controls: Volume, CC, Speed pill, Settings Gear, Fullscreen */}
+                                <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+                                  <button
+                                    type="button"
+                                    onClick={handleToggleMute}
+                                    className="h-8 w-8 sm:h-9 sm:w-9 rounded-full hover:bg-white/15 text-white flex items-center justify-center transition-all cursor-pointer active:scale-90"
+                                    title={videoIsMuted ? 'Unmute' : 'Mute'}
+                                  >
+                                    {videoIsMuted || videoVolume === 0 ? (
+                                      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                                      </svg>
+                                    ) : (
+                                      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                                      </svg>
+                                    )}
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={handleToggleCC}
+                                    className={`h-7 px-2 rounded sm:rounded-md text-[11px] sm:text-xs font-black transition-all cursor-pointer border ${
+                                      subtitlesEnabled
+                                        ? 'bg-white text-black border-white'
+                                        : 'bg-transparent text-white/80 border-white/30 hover:border-white/60 hover:text-white'
+                                    }`}
+                                    title="Subtitles/CC"
+                                  >
+                                    CC
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setShowSpeedMenu(!showSpeedMenu);
+                                      setShowSettingsMenu(false);
+                                    }}
+                                    className={`h-7 sm:h-8 px-2 sm:px-2.5 rounded-full text-xs font-bold transition-all cursor-pointer border ${
+                                      showSpeedMenu
+                                        ? 'bg-white text-black border-white'
+                                        : 'bg-white/10 hover:bg-white/20 text-white border-white/20'
+                                    }`}
+                                    title="Playback Speed"
+                                  >
+                                    {videoPlaybackSpeed === 1 ? '1x' : `${videoPlaybackSpeed}x`}
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setShowSettingsMenu(!showSettingsMenu);
+                                      setShowSpeedMenu(false);
+                                      setSettingsActiveSubmenu('main');
+                                    }}
+                                    className={`h-8 w-8 sm:h-9 sm:w-9 rounded-full flex items-center justify-center transition-all cursor-pointer active:scale-90 ${
+                                      showSettingsMenu
+                                        ? 'bg-white text-black rotate-45'
+                                        : 'hover:bg-white/15 text-white'
+                                    }`}
+                                    title="Settings"
+                                  >
+                                    <svg className="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={handleToggleFullscreen}
+                                    className="h-8 w-8 sm:h-9 sm:w-9 rounded-full hover:bg-white/15 text-white flex items-center justify-center transition-all cursor-pointer active:scale-90"
+                                    title="Fullscreen"
+                                  >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
