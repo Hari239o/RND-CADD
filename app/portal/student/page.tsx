@@ -845,17 +845,7 @@ export default function StudentPortalPage() {
   const [studentViewerMode, setStudentViewerMode] = useState<'video' | 'notes'>('video');
 
   // Dynamic Course Progress & Video Player Functional States
-  const [watchedClassIds, setWatchedClassIds] = useState<string[]>([
-    'cls-civ-1',
-    'cls-auto-1',
-    'Class 01',
-    'Class 1',
-    'Class - 1',
-    'Civil CADD & Master BIM_Class 01',
-    'Civil CADD & Master BIM_Class 1',
-    'Civil CADD & Master BIM_0',
-    'Civil CADD & Master BIM_Class - 1',
-  ]);
+  const [watchedClassIds, setWatchedClassIds] = useState<string[]>([]);
   const [classDurations, setClassDurations] = useState<Record<string, number>>({});
   const [videoIsPlaying, setVideoIsPlaying] = useState<boolean>(false);
   const [videoCurrentTime, setVideoCurrentTime] = useState<number>(0);
@@ -1732,8 +1722,8 @@ export default function StudentPortalPage() {
         const saved = localStorage.getItem(`rnd_cadd_watched_${studentUser.email}`);
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setWatchedClassIds((prev) => Array.from(new Set([...prev, ...parsed])));
+          if (Array.isArray(parsed)) {
+            setWatchedClassIds(parsed);
           }
         }
       } catch (e) {
@@ -1937,11 +1927,6 @@ export default function StudentPortalPage() {
     setPlaylistSearchQuery('');
     setStudentViewerMode('video');
 
-    // Auto-mark the opened class as watched so progress is instantly reflected
-    if (defaultClass) {
-      markClassAsWatched(defaultClass.id, course.title, defaultClass.classNumber);
-    }
-
     if (typeof window !== 'undefined') {
       window.history.pushState(
         { rndStudio: true, courseId: course.id },
@@ -1972,16 +1957,6 @@ export default function StudentPortalPage() {
       })
       .catch((e) => console.warn('Background courses sync notice:', e));
   };
-
-  // Auto-mark active class as watched when opened or watched in the studio
-  useEffect(() => {
-    if (activePlayerClass && playerCourse) {
-      const timer = setTimeout(() => {
-        markClassAsWatched(activePlayerClass.id, playerCourse.title, activePlayerClass.classNumber);
-      }, 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [activePlayerClass?.id, playerCourse?.title]);
 
   // Preload video durations dynamically for all playlist classes
   useEffect(() => {
@@ -2033,61 +2008,110 @@ export default function StudentPortalPage() {
   }, [playerCourse]);
 
   const handlePlayPause = () => {
-    if (!videoRef.current) return;
-    if (videoRef.current.paused) {
-      videoRef.current
-        .play()
-        .then(() => {
-          setVideoIsPlaying(true);
-          showVideoToast('Playing ▶');
-        })
-        .catch((e) => {
-          console.log('Playback error:', e);
-          setVideoIsPlaying(false);
-        });
+    if (videoRef.current) {
+      if (videoRef.current.paused) {
+        videoRef.current
+          .play()
+          .then(() => {
+            setVideoIsPlaying(true);
+            showVideoToast('Playing ▶');
+          })
+          .catch((e) => {
+            console.log('Playback error:', e);
+            setVideoIsPlaying(false);
+          });
+      } else {
+        videoRef.current.pause();
+        setVideoIsPlaying(false);
+        showVideoToast('Stopped / Paused ⏸');
+      }
     } else {
-      videoRef.current.pause();
-      setVideoIsPlaying(false);
-      showVideoToast('Paused ⏸');
+      const next = !videoIsPlaying;
+      setVideoIsPlaying(next);
+      showVideoToast(next ? 'Playing ▶' : 'Stopped / Paused ⏸');
+      const iframe = playerContainerRef.current?.querySelector('iframe');
+      if (iframe && iframe.contentWindow) {
+        try {
+          iframe.contentWindow.postMessage(
+            JSON.stringify({ event: 'command', func: next ? 'playVideo' : 'pauseVideo', args: '' }),
+            '*'
+          );
+        } catch {}
+      }
     }
   };
 
   const handleSkipBackward = () => {
-    if (!videoRef.current) return;
-    videoRef.current.currentTime = Math.max(0, videoRef.current.currentTime - 10);
-    setVideoCurrentTime(videoRef.current.currentTime);
-    showVideoToast('↺ -10s');
+    if (videoRef.current) {
+      videoRef.current.currentTime = Math.max(0, videoRef.current.currentTime - 10);
+      setVideoCurrentTime(videoRef.current.currentTime);
+    } else {
+      const iframe = playerContainerRef.current?.querySelector('iframe');
+      if (iframe && iframe.contentWindow) {
+        try {
+          iframe.contentWindow.postMessage(
+            JSON.stringify({ event: 'command', func: 'seekTo', args: [Math.max(0, videoCurrentTime - 10), true] }),
+            '*'
+          );
+        } catch {}
+      }
+    }
+    setVideoCurrentTime((prev) => Math.max(0, prev - 10));
+    showVideoToast('↺ -10s Back Forward');
   };
 
   const handleSkipForward = () => {
-    if (!videoRef.current) return;
-    videoRef.current.currentTime = Math.min(
-      videoRef.current.duration || 99999,
-      videoRef.current.currentTime + 10
-    );
-    setVideoCurrentTime(videoRef.current.currentTime);
-    showVideoToast('↻ +10s');
+    if (videoRef.current) {
+      videoRef.current.currentTime = Math.min(
+        videoRef.current.duration || 99999,
+        videoRef.current.currentTime + 10
+      );
+      setVideoCurrentTime(videoRef.current.currentTime);
+    } else {
+      const iframe = playerContainerRef.current?.querySelector('iframe');
+      if (iframe && iframe.contentWindow) {
+        try {
+          iframe.contentWindow.postMessage(
+            JSON.stringify({ event: 'command', func: 'seekTo', args: [videoCurrentTime + 10, true] }),
+            '*'
+          );
+        } catch {}
+      }
+    }
+    setVideoCurrentTime((prev) => prev + 10);
+    showVideoToast('↻ +10s Fast Forward');
   };
 
   const handleSeek = (newTime: number) => {
-    if (!videoRef.current) return;
-    videoRef.current.currentTime = newTime;
-    setVideoCurrentTime(newTime);
+    if (videoRef.current) {
+      videoRef.current.currentTime = newTime;
+      setVideoCurrentTime(newTime);
+    }
   };
 
   const handleSpeedChange = (speed: number) => {
     if (videoRef.current) {
       videoRef.current.playbackRate = speed;
+    } else {
+      const iframe = playerContainerRef.current?.querySelector('iframe');
+      if (iframe && iframe.contentWindow) {
+        try {
+          iframe.contentWindow.postMessage(
+            JSON.stringify({ event: 'command', func: 'setPlaybackRate', args: [speed] }),
+            '*'
+          );
+        } catch {}
+      }
     }
     setVideoPlaybackSpeed(speed);
     setShowSpeedMenu(false);
-    showVideoToast(`Speed: ${speed}x`);
+    showVideoToast(`⚡ Speed: ${speed}x`);
   };
 
   const handleQualityChange = (quality: string) => {
     setVideoQuality(quality);
     setShowQualityMenu(false);
-    showVideoToast(`Quality: ${quality}`);
+    showVideoToast(`⚙ Quality: ${quality}`);
   };
 
   const handleVolumeChange = (vol: number) => {
@@ -5343,47 +5367,225 @@ export default function StudentPortalPage() {
                 {activePlayerClass ? (
                   <div className="w-full max-w-6xl 2xl:max-w-7xl mx-auto space-y-2 sm:space-y-4">
                     {/* MODE 1: PERMANENT CLASS VIDEO STREAM (Image 2 - Google Drive Recording Stream) */}
-                    {studentViewerMode === 'video' && (
-                      <div className="w-full flex flex-col items-center space-y-2 sm:space-y-4">
-                        {isYouTubeVideo ? (
-                          /* YouTube Stream */
-                          <div className="relative aspect-video w-full max-h-[78vh] bg-black rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center">
-                            <iframe
-                              src={formatYouTubeEmbedUrl(activePlayerClass.videoUrl)}
-                              className="w-full h-full border-0 rounded-2xl"
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                              allowFullScreen
-                              title={activePlayerClass.title}
-                            />
-                            {/* Top-Right Shield */}
-                            <div
-                              className="absolute top-0 right-0 w-28 h-16 bg-black z-30 pointer-events-auto select-none"
-                              aria-hidden="true"
-                            />
+                    {studentViewerMode === 'video' && (() => {
+                      const isCurrentClassWatched = Boolean(
+                        activePlayerClass && (
+                          watchedClassIds.includes(activePlayerClass.id) ||
+                          (activePlayerClass.classNumber && watchedClassIds.includes(activePlayerClass.classNumber)) ||
+                          (playerCourse && activePlayerClass.classNumber && watchedClassIds.includes(`${playerCourse.title}_${activePlayerClass.classNumber}`))
+                        )
+                      );
+
+                      return (
+                        <div className="w-full flex flex-col items-center space-y-2 sm:space-y-3">
+                          {isYouTubeVideo ? (
+                            /* YouTube Stream */
+                            <div ref={playerContainerRef} className="relative aspect-video w-full max-h-[78vh] bg-black rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center">
+                              <iframe
+                                src={formatYouTubeEmbedUrl(activePlayerClass.videoUrl)}
+                                className="w-full h-full border-0 rounded-2xl"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowFullScreen
+                                title={activePlayerClass.title}
+                              />
+                              {/* Top-Right Shield */}
+                              <div
+                                className="absolute top-0 right-0 w-28 h-16 bg-black z-30 pointer-events-auto select-none"
+                                aria-hidden="true"
+                              />
+                            </div>
+                          ) : (
+                            /* Permanent Google Drive Video Stream (Image 2) */
+                            <div ref={playerContainerRef} className="relative aspect-video w-full max-h-[78vh] bg-black rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center">
+                              <iframe
+                                src={formatGoogleDriveUrl(activePlayerClass.videoUrl)}
+                                className="w-full h-full border-0 rounded-2xl"
+                                allow="autoplay; encrypted-media; fullscreen"
+                                allowFullScreen
+                                title={activePlayerClass.title}
+                              />
+                              {/* Top-Right Shield: Hides & blocks Google Drive pop-out & external window button while playing */}
+                              <div
+                                className="absolute top-0 right-0 w-28 h-16 bg-black z-30 pointer-events-auto select-none"
+                                aria-hidden="true"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                }}
+                              />
+                            </div>
+                          )}
+
+                          {/* DEDICATED MNC PLAYBACK CONTROLS BAR (Stop/Play, Back/Forward, Settings/Speed, Quality, Fullscreen, Mark Done) */}
+                          <div className="w-full bg-slate-900 text-white rounded-xl p-2 sm:p-2.5 shadow-md flex items-center justify-between gap-1.5 sm:gap-2 border border-slate-800">
+                            {/* Left: Play/Stop, -10s, +10s */}
+                            <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+                              <button
+                                type="button"
+                                onClick={handlePlayPause}
+                                className={`h-8 px-2.5 sm:px-3 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs ${
+                                  videoIsPlaying
+                                    ? 'bg-amber-500 hover:bg-amber-600 text-slate-950'
+                                    : 'bg-[#EE2C3C] hover:bg-[#D71E2E] text-white'
+                                }`}
+                                title={videoIsPlaying ? 'Stop / Pause video' : 'Play video'}
+                              >
+                                {videoIsPlaying ? (
+                                  <>
+                                    <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                                      <rect x="6" y="5" width="4" height="14" rx="1" />
+                                      <rect x="14" y="5" width="4" height="14" rx="1" />
+                                    </svg>
+                                    <span>Stop</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                                      <path d="M8 5v14l11-7z" />
+                                    </svg>
+                                    <span>Play</span>
+                                  </>
+                                )}
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={handleSkipBackward}
+                                className="h-8 px-2 sm:px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-0.5 transition-all cursor-pointer border border-slate-700 active:scale-95"
+                                title="Back forward 10 seconds (-10s)"
+                              >
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.2} viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.333 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8l-5.334 4z" />
+                                </svg>
+                                <span>-10s</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={handleSkipForward}
+                                className="h-8 px-2 sm:px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-0.5 transition-all cursor-pointer border border-slate-700 active:scale-95"
+                                title="Fast forward 10 seconds (+10s)"
+                              >
+                                <span>+10s</span>
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.2} viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M11.933 12.8a1 1 0 000-1.6L6.6 7.2A1 1 0 005 8v8a1 1 0 001.6.8l5.333-4zM19.933 12.8a1 1 0 000-1.6l-5.333-4A1 1 0 0013 8v8a1 1 0 001.6.8l5.333-4z" />
+                                </svg>
+                              </button>
+                            </div>
+
+                            {/* Right: Speed/Settings, Quality, Fullscreen, Mark Done */}
+                            <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+                              {/* Speed Dropdown */}
+                              <div className="relative">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setShowSpeedMenu(!showSpeedMenu);
+                                    setShowQualityMenu(false);
+                                  }}
+                                  className="h-8 px-2 sm:px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-1 transition-all cursor-pointer border border-slate-700"
+                                  title="Playback Speed & Settings"
+                                >
+                                  <span className="text-amber-400">⚡</span>
+                                  <span>{videoPlaybackSpeed}x</span>
+                                </button>
+                                {showSpeedMenu && (
+                                  <div className="absolute bottom-full mb-1 right-0 bg-slate-800 border border-slate-700 rounded-xl shadow-xl py-1 z-50 min-w-[100px]">
+                                    <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-700">
+                                      Speed
+                                    </div>
+                                    {[0.75, 1, 1.25, 1.5, 2].map((spd) => (
+                                      <button
+                                        key={spd}
+                                        type="button"
+                                        onClick={() => handleSpeedChange(spd)}
+                                        className={`w-full px-3 py-1.5 text-left text-xs font-bold flex items-center justify-between cursor-pointer transition-colors ${
+                                          videoPlaybackSpeed === spd
+                                            ? 'bg-[#EE2C3C] text-white'
+                                            : 'text-slate-200 hover:bg-slate-700'
+                                        }`}
+                                      >
+                                        <span>{spd}x</span>
+                                        {videoPlaybackSpeed === spd && <span>✓</span>}
+                                      </button>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Quality Dropdown */}
+                              <div className="relative">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setShowQualityMenu(!showQualityMenu);
+                                    setShowSpeedMenu(false);
+                                  }}
+                                  className="h-8 px-2 sm:px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-1 transition-all cursor-pointer border border-slate-700"
+                                  title="Resolution Quality"
+                                >
+                                  <span className="text-xs">⚙</span>
+                                  <span className="truncate max-w-[55px] sm:max-w-none">{videoQuality}</span>
+                                </button>
+                                {showQualityMenu && (
+                                  <div className="absolute bottom-full mb-1 right-0 bg-slate-800 border border-slate-700 rounded-xl shadow-xl py-1 z-50 min-w-[110px]">
+                                    <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-700">
+                                      Quality
+                                    </div>
+                                    {['1080p HD', '720p', '480p', 'Auto'].map((q) => (
+                                      <button
+                                        key={q}
+                                        type="button"
+                                        onClick={() => handleQualityChange(q)}
+                                        className={`w-full px-3 py-1.5 text-left text-xs font-bold flex items-center justify-between cursor-pointer transition-colors ${
+                                          videoQuality === q
+                                            ? 'bg-[#EE2C3C] text-white'
+                                            : 'text-slate-200 hover:bg-slate-700'
+                                        }`}
+                                      >
+                                        <span>{q}</span>
+                                        {videoQuality === q && <span>✓</span>}
+                                      </button>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Fullscreen Button */}
+                              <button
+                                type="button"
+                                onClick={handleToggleFullscreen}
+                                className="h-8 w-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center justify-center transition-all cursor-pointer border border-slate-700 active:scale-95"
+                                title="Fullscreen"
+                              >
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                                </svg>
+                              </button>
+
+                              {/* Mark Done / Completed Toggle Button */}
+                              {activePlayerClass && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleToggleClassWatched(activePlayerClass.id, playerCourse.title, activePlayerClass.classNumber)}
+                                  className={`h-8 px-2.5 sm:px-3 rounded-lg text-xs font-bold flex items-center gap-1 transition-all cursor-pointer shadow-xs ${
+                                    isCurrentClassWatched
+                                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                                      : 'bg-white hover:bg-slate-100 text-slate-900 border border-slate-300'
+                                  }`}
+                                  title="Click to toggle watched completion status"
+                                >
+                                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                  </svg>
+                                  <span>{isCurrentClassWatched ? 'Done' : 'Mark Done'}</span>
+                                </button>
+                              )}
+                            </div>
                           </div>
-                        ) : (
-                          /* Permanent Google Drive Video Stream (Image 2) */
-                          <div className="relative aspect-video w-full max-h-[78vh] bg-black rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center">
-                            <iframe
-                              src={formatGoogleDriveUrl(activePlayerClass.videoUrl)}
-                              className="w-full h-full border-0 rounded-2xl"
-                              allow="autoplay; encrypted-media; fullscreen"
-                              allowFullScreen
-                              title={activePlayerClass.title}
-                            />
-                            {/* Top-Right Shield: Hides & blocks Google Drive pop-out & external window button while playing */}
-                            <div
-                              className="absolute top-0 right-0 w-28 h-16 bg-black z-30 pointer-events-auto select-none"
-                              aria-hidden="true"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                              }}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    )}
+                        </div>
+                      );
+                    })()}
 
                     {/* MODE 2: FULL NOTES & PDF READER STUDIO */}
                     {studentViewerMode === 'notes' && (
@@ -5542,7 +5744,6 @@ export default function StudentPortalPage() {
                               setVideoCurrentTime(0);
                               setVideoIsPlaying(false);
                               setStudentViewerMode('video');
-                              markClassAsWatched(cls.id, playerCourse.title, cls.classNumber);
                             }}
                             className={`block lg:hidden w-full p-3.5 transition-all select-none border-b border-slate-100 cursor-pointer ${
                               isCurrent
@@ -5676,7 +5877,6 @@ export default function StudentPortalPage() {
                               setVideoCurrentTime(0);
                               setVideoIsPlaying(false);
                               setStudentViewerMode('video');
-                              markClassAsWatched(cls.id, playerCourse.title, cls.classNumber);
                             }}
                             className={`hidden lg:flex w-full rounded-xl transition-all p-3.5 items-start gap-3 cursor-pointer select-none border ${
                               isCurrent
