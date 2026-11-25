@@ -2827,28 +2827,10 @@ export default function StudentPortalPage() {
 
               {/* Dynamic Assigned Courses by Admin - Professional LMS Course Cards (Image-2 Fix) */}
               <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-4 sm:p-7 space-y-5 sm:space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
-                  <div>
-                    <h3 className="text-lg font-bold text-[#131313]">
-                      Assigned Engineering Programs
-                    </h3>
-                  </div>
-                  <div className="flex items-center gap-2 self-start sm:self-auto">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        fetchCourses();
-                        showVideoToast('Syllabus updated from database ↻');
-                      }}
-                      className="px-3 py-1 rounded-full bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer"
-                      title="Sync latest classes added by Admin"
-                    >
-                      <span>↻ Sync Classes</span>
-                    </button>
-                    <span className="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold">
-                      {studentUser.assignedCourses.length} Enrolled {studentUser.assignedCourses.length === 1 ? 'Program' : 'Programs'}
-                    </span>
-                  </div>
+                <div className="pb-3 border-b border-slate-100">
+                  <h3 className="text-lg font-bold text-[#131313]">
+                    Assigned Engineering Programs
+                  </h3>
                 </div>
 
                 {enrolledCoursesData.length === 0 ? (
@@ -2933,10 +2915,6 @@ export default function StudentPortalPage() {
                             <h4 className="text-lg font-bold text-[#131313] group-hover:text-[#EE2C3C] transition-colors leading-snug">
                               {cName}
                             </h4>
-                            <p className="text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed font-normal">
-                              {matched?.overview ||
-                                'Full industrial syllabus with live lab exercises, 3D modeling, and capstone project submission.'}
-                            </p>
 
                             {/* Dynamic Course Progress Bar */}
                             <div className="pt-2 space-y-1.5">
@@ -2953,20 +2931,6 @@ export default function StudentPortalPage() {
                                 />
                               </div>
                             </div>
-
-                            {/* Software Tools Pills */}
-                            {matched?.software && (
-                              <div className="pt-2 flex flex-wrap gap-1.5">
-                                {matched.software.split(',').map((tool, tIdx) => (
-                                  <span
-                                    key={tIdx}
-                                    className="px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-medium"
-                                  >
-                                    {tool.trim()}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
                           </div>
 
                           {/* Card Action Footer */}
