@@ -742,13 +742,52 @@ export default function StudentPortalPage() {
 
   // Profile Edit & Security States
   
+  const compressImage = (file: File): Promise<string> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const raw = e.target?.result as string;
+        if (!raw) return resolve('');
+        const img = new Image();
+        img.onload = () => {
+          const maxDim = 500;
+          let { width, height } = img;
+          if (width > height) {
+            if (width > maxDim) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            }
+          } else {
+            if (height > maxDim) {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', 0.88));
+          } else {
+            resolve(raw);
+          }
+        };
+        img.onerror = () => resolve(raw);
+        img.src = raw;
+      };
+      reader.onerror = () => resolve('');
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleDirectPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      const dataUrl = event.target?.result as string;
+    try {
+      const dataUrl = await compressImage(file);
       if (dataUrl) {
         setStudentUser((prev) => ({ ...prev, photo: dataUrl }));
         setEditPhoto(dataUrl);
@@ -757,6 +796,7 @@ export default function StudentPortalPage() {
           try {
             const emailKey = (studentUser.email || 'student').toLowerCase().trim();
             localStorage.setItem(`rnd_cadd_student_photo_${emailKey}`, dataUrl);
+            localStorage.setItem('rnd_cadd_student_photo_custom', dataUrl);
             const saved = sessionStorage.getItem('rnd_cadd_user') || localStorage.getItem('rnd_cadd_user');
             const parsed = saved ? JSON.parse(saved) : {};
             parsed.photo = dataUrl;
@@ -764,30 +804,18 @@ export default function StudentPortalPage() {
             localStorage.setItem('rnd_cadd_user', JSON.stringify(parsed));
           } catch {}
         }
-      }
-    };
-    reader.readAsDataURL(file);
 
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await res.json();
-      if (data.success && data.url) {
-        setStudentUser((prev) => ({ ...prev, photo: data.url }));
-        setEditPhoto(data.url);
         if (studentUser.email) {
           fetch('/api/student/profile', {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: studentUser.email, photo: data.url }),
+            body: JSON.stringify({ action: 'update_profile', email: studentUser.email, photo: dataUrl }),
           }).catch(() => {});
         }
       }
-    } catch {}
+    } catch (err) {
+      console.error('Photo upload compression error:', err);
+    }
   };
 
   const [isEditingProfile, setIsEditingProfile] = useState<boolean>(false);
@@ -1125,6 +1153,14 @@ export default function StudentPortalPage() {
       const data = await res.json();
       if (data.success && data.profile) {
         const p = data.profile;
+        const localCustomPhoto = typeof window !== 'undefined'
+          ? (localStorage.getItem(`rnd_cadd_student_photo_${(p.email || email).toLowerCase().trim()}`) ||
+             localStorage.getItem('rnd_cadd_student_photo_custom'))
+          : null;
+        const resolvedPhoto = (localCustomPhoto && localCustomPhoto.trim().length > 0)
+          ? localCustomPhoto
+          : (p.photo || prev.photo);
+
         setStudentUser((prev) => ({
           ...prev,
           name: p.name || prev.name,
@@ -1136,7 +1172,7 @@ export default function StudentPortalPage() {
           nativePlace: p.nativePlace || prev.nativePlace,
           qualification: p.qualification || prev.qualification,
           admissionDate: p.admissionDate || prev.admissionDate,
-          photo: p.photo || prev.photo,
+          photo: resolvedPhoto,
           courseFee: p.courseFee !== undefined ? Number(p.courseFee) : prev.courseFee,
           paidFee: p.paidFee !== undefined ? Number(p.paidFee) : prev.paidFee,
           balanceFee: p.balanceFee !== undefined ? Number(p.balanceFee) : prev.balanceFee,
@@ -1154,7 +1190,7 @@ export default function StudentPortalPage() {
           setEditCollege(p.college || '');
           setEditNativePlace(p.nativePlace || '');
           setEditQualification(p.qualification || '');
-          setEditPhoto(p.photo || '');
+          setEditPhoto(resolvedPhoto);
         }
       }
     } catch (err) {
@@ -1204,6 +1240,11 @@ export default function StudentPortalPage() {
         // Persist to localStorage so student name and photo update globally across header, sidebar & portal
         if (typeof window !== 'undefined') {
           try {
+            const emailKey = (studentUser.email || '').toLowerCase().trim();
+            if (updatedPhoto) {
+              localStorage.setItem(`rnd_cadd_student_photo_${emailKey}`, updatedPhoto);
+              localStorage.setItem('rnd_cadd_student_photo_custom', updatedPhoto);
+            }
             const saved = localStorage.getItem('rnd_cadd_user');
             const parsed = saved ? JSON.parse(saved) : {};
             parsed.name = updatedName;
@@ -2243,23 +2284,23 @@ export default function StudentPortalPage() {
   // MNC Dashboard Menu Helpers for Student Portal
   const getStudentNavBadge = (id: string, isActive: boolean) => {
     const badgeClass = (colorClass: string) =>
-      `text-xs font-mono font-bold px-2.5 py-0.5 rounded-full shadow-2xs ${
+      `text-xs font-mono font-bold px-2.5 py-0.5 rounded-full ${
         isActive ? 'bg-slate-900 text-white shadow-2xs' : colorClass
       }`;
 
     switch (id) {
       case 'Home':
-        return <span className={badgeClass('bg-slate-100 text-slate-800 border border-slate-200')}>{studentUser.assignedCourses?.length || 0}</span>;
+        return <span className={badgeClass('bg-slate-100 text-slate-800')}>{studentUser.assignedCourses?.length || 0}</span>;
       case 'Profile':
-        return <span className={badgeClass('bg-emerald-50 text-emerald-700 border border-emerald-200')}>Active</span>;
+        return <span className={badgeClass('bg-emerald-50 text-emerald-700')}>Active</span>;
       case 'Jobs':
-        return <span className={badgeClass('bg-slate-100 text-slate-800 border border-slate-200')}>{studentJobs.filter((j) => j.status === 'Active').length}</span>;
+        return <span className={badgeClass('bg-slate-100 text-slate-800')}>{studentJobs.filter((j) => j.status === 'Active').length}</span>;
       case 'Certificates':
-        return <span className={badgeClass('bg-slate-100 text-slate-800 border border-slate-200')}>{studentCertificates.length}</span>;
+        return <span className={badgeClass('bg-slate-100 text-slate-800')}>{studentCertificates.length}</span>;
       case 'Assignments':
-        return <span className={badgeClass('bg-slate-100 text-slate-800 border border-slate-200')}>{studentAssignments.length}</span>;
+        return <span className={badgeClass('bg-slate-100 text-slate-800')}>{studentAssignments.length}</span>;
       case 'E-Books':
-        return <span className={badgeClass('bg-slate-100 text-slate-800 border border-slate-200')}>{studentEbooks.length}</span>;
+        return <span className={badgeClass('bg-slate-100 text-slate-800')}>{studentEbooks.length}</span>;
       case 'Live':
         return (
           <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 ${
@@ -2267,7 +2308,7 @@ export default function StudentPortalPage() {
               ? 'bg-emerald-500 text-white animate-pulse'
               : isActive
               ? 'bg-slate-900 text-white shadow-2xs'
-              : 'bg-slate-100 text-slate-700 border border-slate-200'
+              : 'bg-slate-100 text-slate-700'
           }`}>
             {liveClass?.status === 'Live Now' && liveClass?.isLive && <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />}
             {liveClass?.status === 'Live Now' && liveClass?.isLive ? 'LIVE' : 'Online'}
@@ -2275,20 +2316,19 @@ export default function StudentPortalPage() {
         );
       case 'Chat': {
         const openTickets = studentTickets.filter((t) => t.status !== 'Resolved').length;
-        return <span className={badgeClass('bg-slate-100 text-slate-800 border border-slate-200')}>{openTickets}</span>;
+        return <span className={badgeClass('bg-slate-100 text-slate-800')}>{openTickets}</span>;
       }
       case 'Refer & Earn':
-        return <span className={badgeClass('bg-slate-100 text-slate-800 border border-slate-200')}>Offers</span>;
+        return <span className={badgeClass('bg-slate-100 text-slate-800')}>Offers</span>;
       case 'Rate':
-        return <span className={badgeClass('bg-slate-100 text-slate-800 border border-slate-200')}>★</span>;
+        return <span className={badgeClass('bg-slate-100 text-slate-800')}>★</span>;
       default:
         return null;
     }
   };
 
   const getStudentIconBg = (id: string, isActive: boolean) => {
-    if (isActive) return 'bg-white text-slate-950 border border-slate-300 shadow-2xs';
-    return 'bg-slate-100/90 text-slate-950 border border-slate-200/80 hover:border-slate-300';
+    return 'w-6 h-6 flex items-center justify-center shrink-0 text-slate-900';
   };
 
   // Grouped Navigation Sections for Student Portal
@@ -2327,16 +2367,24 @@ export default function StudentPortalPage() {
         <div className="flex items-center space-x-2.5 min-w-0">
           <div
             onClick={() => setActiveTab('Profile')}
-            className="w-9 h-9 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 flex-shrink-0 cursor-pointer shadow-2xs"
+            className="w-9 h-9 min-w-[36px] min-h-[36px] max-w-[36px] max-h-[36px] rounded-xl overflow-hidden bg-slate-100 border border-slate-200 flex-shrink-0 cursor-pointer shadow-2xs aspect-square"
+            style={{ width: '36px', height: '36px', minWidth: '36px', minHeight: '36px' }}
             title="Profile"
           >
             <img
               src={getStudentAvatar(studentUser.photo, studentUser.name, studentUser.email, studentUser.id)}
               alt={studentUser.name}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover aspect-square"
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
-                if (target.src !== DEFAULT_STUDENT_AVATARS[0]) {
+                const customPhoto = typeof window !== 'undefined'
+                  ? (localStorage.getItem(`rnd_cadd_student_photo_${(studentUser.email || '').toLowerCase().trim()}`) ||
+                     localStorage.getItem('rnd_cadd_student_photo_custom'))
+                  : null;
+                if (customPhoto && target.src !== customPhoto) {
+                  target.src = customPhoto;
+                } else if (target.src !== DEFAULT_STUDENT_AVATARS[0]) {
                   target.src = DEFAULT_STUDENT_AVATARS[0];
                 }
               }}
@@ -2355,14 +2403,14 @@ export default function StudentPortalPage() {
         <div className="flex items-center gap-2">
           <Link
             href="/"
-            className="px-3 py-1.5 text-[11px] font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors border border-slate-200/80 shadow-2xs"
+            className="px-3 py-1.5 text-[11px] font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors shadow-2xs"
           >
             Home
           </Link>
           <button
             type="button"
             onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
-            className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center border border-slate-200 cursor-pointer shadow-2xs active:scale-95 transition-all"
+            className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center cursor-pointer shadow-2xs active:scale-95 transition-all"
             aria-label={isMobileNavOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
             aria-expanded={isMobileNavOpen}
           >
@@ -2387,42 +2435,43 @@ export default function StudentPortalPage() {
             className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
             onClick={() => setIsMobileNavOpen(false)}
           />
-          <div className="relative w-full max-w-[320px] sm:max-w-xs bg-white h-full z-10 flex flex-col justify-between p-5 overflow-y-auto no-scrollbar scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden safe-pb shadow-2xl rounded-r-3xl border-r border-slate-200/90 animate-in slide-in-from-left duration-300">
-            <div>
-              {/* Top Header Row - Uses the above empty space cleanly */}
-              <div className="flex items-center justify-between pb-3 mb-1 border-b border-slate-100">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <img src="/logo.png" alt="RND CADD" className="h-7 w-auto object-contain" />
-                  <div className="min-w-0">
-                    <span className="text-xs sm:text-sm font-extrabold text-slate-900 tracking-tight block truncate">RND CADD Portal</span>
-                    <span className="text-[11px] text-slate-500 font-medium block truncate">Ameerpet Campus</span>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setIsMobileNavOpen(false)}
-                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-base active:scale-95 transition-all cursor-pointer shadow-2xs shrink-0"
-                  aria-label="Close Menu"
-                >
-                  &times;
-                </button>
-              </div>
+          <div className="relative w-full max-w-[320px] sm:max-w-xs bg-white h-full z-10 flex flex-col justify-between p-4 pt-3.5 overflow-y-auto no-scrollbar scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden safe-pb shadow-2xl rounded-r-3xl border-r border-slate-200/90 animate-in slide-in-from-left duration-300">
+            {/* Minimal Close Button in Top-Right */}
+            <button
+              onClick={() => setIsMobileNavOpen(false)}
+              className="absolute top-3 right-3 z-20 w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-sm active:scale-95 transition-all cursor-pointer shadow-2xs"
+              aria-label="Close Menu"
+            >
+              &times;
+            </button>
 
-              {/* Student Info - MNC Executive Profile Card (Pleasant Clean UI) */}
+            <div>
+              {/* Student Info - MNC Executive Profile Card (Pushed right to top) */}
               <div
                 onClick={() => {
                   setActiveTab('Profile');
                   setIsMobileNavOpen(false);
                 }}
-                className="p-3.5 my-2.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs flex items-center gap-3.5 cursor-pointer hover:border-slate-300 transition-all active:scale-[0.99]"
+                className="p-3 pr-8 mb-3 rounded-2xl bg-white border border-slate-200/90 shadow-2xs flex items-center gap-3.5 cursor-pointer hover:border-slate-300 transition-all active:scale-[0.99]"
               >
-                <div className="w-13 h-13 rounded-2xl overflow-hidden border-2 border-slate-200 shrink-0 shadow-2xs relative">
+                <div
+                  className="w-14 h-14 min-w-[56px] min-h-[56px] max-w-[56px] max-h-[56px] rounded-2xl overflow-hidden border-2 border-slate-200 shrink-0 shadow-2xs relative aspect-square"
+                  style={{ width: '56px', height: '56px', minWidth: '56px', minHeight: '56px', maxWidth: '56px', maxHeight: '56px' }}
+                >
                   <img
                     src={getStudentAvatar(studentUser.photo, studentUser.name, studentUser.email, studentUser.id)}
                     alt={studentUser.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover aspect-square"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      if (target.src !== DEFAULT_STUDENT_AVATARS[0]) {
+                      const customPhoto = typeof window !== 'undefined'
+                        ? (localStorage.getItem(`rnd_cadd_student_photo_${(studentUser.email || '').toLowerCase().trim()}`) ||
+                           localStorage.getItem('rnd_cadd_student_photo_custom'))
+                        : null;
+                      if (customPhoto && target.src !== customPhoto) {
+                        target.src = customPhoto;
+                      } else if (target.src !== DEFAULT_STUDENT_AVATARS[0]) {
                         target.src = DEFAULT_STUDENT_AVATARS[0];
                       }
                     }}
@@ -2432,7 +2481,7 @@ export default function StudentPortalPage() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-1">
                     <h4 className="text-sm sm:text-base font-extrabold text-slate-900 truncate tracking-tight">{studentUser.name}</h4>
-                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">
                       Verified
                     </span>
                   </div>
@@ -2465,7 +2514,7 @@ export default function StudentPortalPage() {
                           }`}
                         >
                           <span className="flex items-center gap-3 min-w-0">
-                            <span className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors ${getStudentIconBg(item.id, isActive)}`}>
+                            <span className="w-6 h-6 flex items-center justify-center shrink-0 text-slate-900">
                               {item.icon}
                             </span>
                             <span className="truncate text-sm font-bold text-slate-900">{item.label}</span>
@@ -2507,16 +2556,24 @@ export default function StudentPortalPage() {
             <div className="flex items-center space-x-3.5">
               <div
                 onClick={() => setActiveTab('Profile')}
-                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl overflow-hidden bg-slate-100 border-2 border-slate-200 shadow-sm flex items-center justify-center flex-shrink-0 relative group cursor-pointer"
+                className="w-14 h-14 min-w-[56px] min-h-[56px] max-w-[56px] max-h-[56px] rounded-2xl overflow-hidden bg-slate-100 border-2 border-slate-200 shadow-sm flex items-center justify-center flex-shrink-0 relative group cursor-pointer aspect-square"
+                style={{ width: '56px', height: '56px', minWidth: '56px', minHeight: '56px' }}
                 title="Click to view & customize student profile"
               >
                 <img
                   src={getStudentAvatar(studentUser.photo, studentUser.name, studentUser.email, studentUser.id)}
                   alt={studentUser.name}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  className="w-full h-full object-cover aspect-square transition-transform duration-300 group-hover:scale-105"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    if (target.src !== DEFAULT_STUDENT_AVATARS[0]) {
+                    const customPhoto = typeof window !== 'undefined'
+                      ? (localStorage.getItem(`rnd_cadd_student_photo_${(studentUser.email || '').toLowerCase().trim()}`) ||
+                         localStorage.getItem('rnd_cadd_student_photo_custom'))
+                      : null;
+                    if (customPhoto && target.src !== customPhoto) {
+                      target.src = customPhoto;
+                    } else if (target.src !== DEFAULT_STUDENT_AVATARS[0]) {
                       target.src = DEFAULT_STUDENT_AVATARS[0];
                     }
                   }}
@@ -2563,9 +2620,7 @@ export default function StudentPortalPage() {
                       }`}
                     >
                       <span className="flex items-center space-x-3 min-w-0">
-                        <span
-                          className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors ${getStudentIconBg(item.id, isActive)}`}
-                        >
+                        <span className="w-6 h-6 flex items-center justify-center shrink-0 text-slate-900">
                           {item.icon}
                         </span>
                         <span className="truncate text-sm font-bold text-slate-900">{item.label}</span>
@@ -2941,10 +2996,17 @@ export default function StudentPortalPage() {
                         <img
                           src={getStudentAvatar(studentUser.photo, studentUser.name, studentUser.email, studentUser.id)}
                           alt={studentUser.name}
-                          className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 border-slate-200 shadow-sm"
+                          className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 border-slate-200 shadow-sm aspect-square"
+                          style={{ objectFit: 'cover' }}
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
-                            if (target.src !== DEFAULT_STUDENT_AVATARS[0]) {
+                            const customPhoto = typeof window !== 'undefined'
+                              ? (localStorage.getItem(`rnd_cadd_student_photo_${(studentUser.email || '').toLowerCase().trim()}`) ||
+                                 localStorage.getItem('rnd_cadd_student_photo_custom'))
+                              : null;
+                            if (customPhoto && target.src !== customPhoto) {
+                              target.src = customPhoto;
+                            } else if (target.src !== DEFAULT_STUDENT_AVATARS[0]) {
                               target.src = DEFAULT_STUDENT_AVATARS[0];
                             }
                           }}

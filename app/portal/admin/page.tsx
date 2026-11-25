@@ -3658,30 +3658,30 @@ export default function AdminPortalPage() {
   // MNC Dashboard Menu Helpers (Badge Counts & Icon Theming)
   const getAdminNavBadge = (id: string, isActive: boolean) => {
     const badgeClass = (colorClass: string) =>
-      `text-[11px] font-mono font-black px-2 py-0.5 rounded-full shadow-2xs ${
-        isActive ? 'bg-white/20 text-white' : colorClass
+      `text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full ${
+        isActive ? 'bg-slate-900 text-white shadow-2xs' : colorClass
       }`;
 
     switch (id) {
       case 'Student':
-        return <span className={badgeClass('bg-[#DCFCE7] text-[#166534]')}>{students.length}</span>;
+        return <span className={badgeClass('bg-emerald-50 text-emerald-800')}>{students.length}</span>;
       case 'Courses':
-        return <span className={badgeClass('bg-[#E0E7FF] text-[#1E1B4B]')}>{courses.length}</span>;
+        return <span className={badgeClass('bg-slate-100 text-slate-800')}>{courses.length}</span>;
       case 'Certificate':
-        return <span className={badgeClass('bg-[#FEF3C7] text-[#92400E]')}>{certificates.length}</span>;
+        return <span className={badgeClass('bg-amber-50 text-amber-800')}>{certificates.length}</span>;
       case 'Ebook':
-        return <span className={badgeClass('bg-[#FEE2E2] text-[#991B1B]')}>{ebooks.length}</span>;
+        return <span className={badgeClass('bg-slate-100 text-slate-800')}>{ebooks.length}</span>;
       case 'Jobs':
-        return <span className={badgeClass('bg-[#E0E7FF] text-[#3730A3]')}>{adminJobs.filter((j) => j.status === 'Active').length}</span>;
+        return <span className={badgeClass('bg-slate-100 text-slate-800')}>{adminJobs.filter((j) => j.status === 'Active').length}</span>;
       case 'Offers':
-        return <span className={badgeClass('bg-[#FEF3C7] text-[#92400E]')}>{adminOffers.filter((o) => o.status === 'Active').length}</span>;
+        return <span className={badgeClass('bg-rose-50 text-rose-800')}>{adminOffers.filter((o) => o.status === 'Active').length}</span>;
       case 'Live':
         return (
-          <span className={`text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 ${
+          <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 ${
             liveSession?.status === 'Live Now'
               ? 'bg-emerald-500 text-white animate-pulse'
               : isActive
-              ? 'bg-white/20 text-white'
+              ? 'bg-slate-900 text-white shadow-2xs'
               : 'bg-slate-100 text-slate-700'
           }`}>
             {liveSession?.status === 'Live Now' && <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />}
@@ -3690,35 +3690,21 @@ export default function AdminPortalPage() {
         );
       case 'Support': {
         const pending = adminTickets.filter((t) => t.status !== 'Resolved').length;
-        return <span className={badgeClass('bg-[#FEF3C7] text-[#B45309]')}>{pending}</span>;
+        return <span className={badgeClass('bg-amber-50 text-amber-800')}>{pending}</span>;
       }
       case 'Assignments':
-        return <span className={badgeClass('bg-[#DCFCE7] text-[#166534]')}>{adminAssignments.length}</span>;
+        return <span className={badgeClass('bg-emerald-50 text-emerald-800')}>{adminAssignments.length}</span>;
       case 'Reviews':
-        return <span className={badgeClass('bg-[#FEF3C7] text-[#92400E]')}>{adminReviews.length}</span>;
+        return <span className={badgeClass('bg-amber-50 text-amber-800')}>{adminReviews.length}</span>;
       case 'CMS':
-        return <span className={badgeClass('bg-slate-100 text-slate-700 font-bold')}>Live</span>;
+        return <span className={badgeClass('bg-slate-100 text-slate-800 font-bold')}>Live</span>;
       default:
         return null;
     }
   };
 
   const getAdminIconBg = (id: string, isActive: boolean) => {
-    if (isActive) return 'bg-[#EE2C3C] text-white shadow-xs';
-    switch (id) {
-      case 'Student': return 'bg-emerald-50 text-emerald-600 border border-emerald-200/60';
-      case 'Courses': return 'bg-indigo-50 text-indigo-600 border border-indigo-200/60';
-      case 'Certificate': return 'bg-amber-50 text-amber-600 border border-amber-200/60';
-      case 'Assignments': return 'bg-teal-50 text-teal-600 border border-teal-200/60';
-      case 'Ebook': return 'bg-purple-50 text-purple-600 border border-purple-200/60';
-      case 'Jobs': return 'bg-sky-50 text-sky-600 border border-sky-200/60';
-      case 'Offers': return 'bg-rose-50 text-rose-600 border border-rose-200/60';
-      case 'Live': return 'bg-red-50 text-red-600 border border-red-200/60';
-      case 'Support': return 'bg-orange-50 text-orange-600 border border-orange-200/60';
-      case 'Reviews': return 'bg-yellow-50 text-yellow-600 border border-yellow-200/60';
-      case 'CMS': return 'bg-slate-100 text-slate-700 border border-slate-200/60';
-      default: return 'bg-slate-100 text-slate-700 border border-slate-200/60';
-    }
+    return 'w-6 h-6 flex items-center justify-center shrink-0 text-slate-900';
   };
 
   // Grouped Navigation for MNC Corporate Structure
@@ -3796,14 +3782,14 @@ export default function AdminPortalPage() {
         <div className="flex items-center gap-2">
           <Link
             href="/"
-            className="px-3 py-1.5 text-[11px] font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors border border-slate-200/80 shadow-2xs"
+            className="px-3 py-1.5 text-[11px] font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors shadow-2xs"
           >
             Site
           </Link>
           <button
             type="button"
             onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
-            className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center border border-slate-200 cursor-pointer shadow-2xs active:scale-95 transition-all"
+            className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center cursor-pointer shadow-2xs active:scale-95 transition-all"
             aria-label={isMobileNavOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
             aria-expanded={isMobileNavOpen}
           >
@@ -3828,7 +3814,7 @@ export default function AdminPortalPage() {
             className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
             onClick={() => setIsMobileNavOpen(false)}
           />
-          <div className="relative w-full max-w-[320px] sm:max-w-xs bg-white h-full z-10 flex flex-col justify-between p-5 overflow-y-auto safe-pb shadow-2xl rounded-r-3xl border-r border-slate-200/90 animate-in slide-in-from-left duration-300">
+          <div className="relative w-full max-w-[320px] sm:max-w-xs bg-white h-full z-10 flex flex-col justify-between p-5 overflow-y-auto no-scrollbar scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden safe-pb shadow-2xl rounded-r-3xl border-r border-slate-200/90 animate-in slide-in-from-left duration-300">
             <div>
               <div className="flex items-center justify-between pb-4 border-b border-slate-200">
                 <div className="flex items-center gap-2.5">
@@ -3886,21 +3872,20 @@ export default function AdminPortalPage() {
                             setActiveTab(item.id);
                             setIsMobileNavOpen(false);
                           }}
-                          className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left ${
+                          className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-bold transition-all text-left cursor-pointer ${
                             isActive
-                              ? 'bg-[#131313] text-white shadow-sm border-l-4 border-l-[#EE2C3C]'
-                              : 'text-slate-800 hover:bg-slate-100/80 active:bg-slate-200/70'
+                              ? 'bg-white text-slate-950 font-extrabold shadow-xs border border-slate-200/90 ring-1 ring-slate-100'
+                              : 'text-slate-700 hover:bg-slate-50 hover:text-slate-950 active:bg-slate-100/70 font-semibold'
                           }`}
                         >
                           <span className="flex items-center gap-3 min-w-0">
-                            <span className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors ${getAdminIconBg(item.id, isActive)}`}>
+                            <span className="w-6 h-6 flex items-center justify-center shrink-0 text-slate-900">
                               {item.icon}
                             </span>
-                            <span className="truncate">{item.label}</span>
+                            <span className="truncate text-sm font-bold text-slate-900">{item.label}</span>
                           </span>
                           <div className="flex items-center gap-2 flex-shrink-0">
                             {getAdminNavBadge(item.id, isActive)}
-                            {isActive && <span className="text-[#EE2C3C] text-xs font-black">●</span>}
                           </div>
                         </button>
                       );
@@ -3953,7 +3938,7 @@ export default function AdminPortalPage() {
           </div>
 
           {/* Sidebar Navigation Items - MNC Corporate Grouped Design */}
-          <nav className="flex-1 px-3 py-3 space-y-4 overflow-y-auto">
+          <nav className="flex-1 px-3 py-3 space-y-4 overflow-y-auto no-scrollbar scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             {adminNavSections.map((sec, sIdx) => (
               <div key={sIdx} className="space-y-1">
                 <div className="px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center justify-between">
@@ -3966,19 +3951,17 @@ export default function AdminPortalPage() {
                     <button
                       key={item.id}
                       onClick={() => setActiveTab(item.id)}
-                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold transition-all text-left cursor-pointer ${
+                      className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-bold transition-all text-left cursor-pointer ${
                         isActive
-                          ? 'bg-[#131313] text-white shadow-sm border-l-4 border-l-[#EE2C3C]'
-                          : 'text-[#334155] hover:bg-slate-100 hover:text-slate-900'
+                          ? 'bg-white text-slate-950 font-extrabold shadow-xs border border-slate-200/90 ring-1 ring-slate-100'
+                          : 'text-slate-700 hover:bg-slate-50 hover:text-slate-950 active:bg-slate-100/70 font-semibold'
                       }`}
                     >
                       <span className="flex items-center space-x-3 min-w-0">
-                        <span
-                          className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors ${getAdminIconBg(item.id, isActive)}`}
-                        >
+                        <span className="w-6 h-6 flex items-center justify-center shrink-0 text-slate-900">
                           {item.icon}
                         </span>
-                        <span className="truncate">{item.label}</span>
+                        <span className="truncate text-sm font-bold text-slate-900">{item.label}</span>
                       </span>
                       <div className="flex items-center gap-2 flex-shrink-0">
                         {getAdminNavBadge(item.id, isActive)}

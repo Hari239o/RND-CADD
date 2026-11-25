@@ -204,7 +204,7 @@ export async function PATCH(request: NextRequest) {
       });
     }
 
-    if (action === 'update_profile') {
+    if (action === 'update_profile' || data.photo !== undefined || !action) {
       const { name, phone, college, nativePlace, qualification, photo, labWorkstation, leadInstructor } = data;
 
       const { db, isConnected } = await connectToDatabase();

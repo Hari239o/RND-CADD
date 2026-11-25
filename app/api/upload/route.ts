@@ -79,22 +79,25 @@ export async function POST(request: Request) {
       console.warn('[Upload API] MongoDB media storage error, using serverless fallback:', dbErr);
     }
 
-    // 3. FALLBACK: Data URL / Local disk
+    // 3. FALLBACK: Data URL (Guaranteed 100% persistent across serverless instances)
     const dataUrl = `data:${mimeType};base64,${base64Data}`;
     let fileUrl = dataUrl;
     let provider = 'base64';
 
-    try {
-      const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-      await fs.mkdir(uploadDir, { recursive: true });
-      const filename = `${Date.now()}-${safeName}`;
-      const filePath = path.join(uploadDir, filename);
-      await fs.writeFile(filePath, buffer);
-      fileUrl = `/uploads/${filename}`;
-      provider = 'local-disk';
-    } catch {
-      fileUrl = dataUrl;
-      provider = 'base64';
+    // Only use local disk in local development; on serverless production, dataUrl is 100% permanent
+    if (process.env.NODE_ENV === 'development') {
+      try {
+        const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+        await fs.mkdir(uploadDir, { recursive: true });
+        const filename = `${Date.now()}-${safeName}`;
+        const filePath = path.join(uploadDir, filename);
+        await fs.writeFile(filePath, buffer);
+        fileUrl = `/uploads/${filename}`;
+        provider = 'local-disk';
+      } catch {
+        fileUrl = dataUrl;
+        provider = 'base64';
+      }
     }
 
     return NextResponse.json({
