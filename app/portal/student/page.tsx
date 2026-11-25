@@ -668,21 +668,37 @@ const DEFAULT_STUDENT_AVATARS = [
 const getStudentAvatar = (photo?: string | null, name?: string, email?: string, id?: string): string => {
   if (photo && typeof photo === 'string' && photo.trim().length > 0) {
     const trimmed = photo.trim();
-    const isGenericLetterAvatar =
-      trimmed.includes('googleusercontent.com/a/') ||
-      trimmed.includes('ui-avatars.com') ||
-      trimmed.includes('dicebear.com/initials') ||
-      trimmed.includes('avatar.vercel.sh');
-
-    if (!isGenericLetterAvatar) {
+    // Allow all real dynamic images (Google OAuth photos, base64 data, uploads)
+    if (!trimmed.includes('ui-avatars.com') && !trimmed.includes('dicebear.com/initials')) {
       return trimmed;
     }
   }
 
-  const key = (email || id || name || 'student').toLowerCase();
-  if (key.includes('student1') || key.includes('stu-001') || key.includes('harikishore') || key.includes('kamatham') || key.includes('kishore')) {
-    return DEFAULT_STUDENT_AVATARS[0];
+  // Dynamic fallback: Check client-side storage for active student user photo
+  if (typeof window !== 'undefined') {
+    try {
+      const emailKey = (email || '').toLowerCase().trim();
+      const stored = localStorage.getItem(`rnd_cadd_student_photo_${emailKey}`) ||
+                     localStorage.getItem('rnd_cadd_student_photo_custom');
+      if (stored && stored.trim().length > 0) return stored.trim();
+
+      const sessionRaw = sessionStorage.getItem('rnd_cadd_user');
+      if (sessionRaw) {
+        const parsed = JSON.parse(sessionRaw);
+        if (parsed?.photo && typeof parsed.photo === 'string' && parsed.photo.trim().length > 0) return parsed.photo.trim();
+        if (parsed?.image && typeof parsed.image === 'string' && parsed.image.trim().length > 0) return parsed.image.trim();
+      }
+
+      const localRaw = localStorage.getItem('rnd_cadd_user');
+      if (localRaw) {
+        const parsed = JSON.parse(localRaw);
+        if (parsed?.photo && typeof parsed.photo === 'string' && parsed.photo.trim().length > 0) return parsed.photo.trim();
+        if (parsed?.image && typeof parsed.image === 'string' && parsed.image.trim().length > 0) return parsed.image.trim();
+      }
+    } catch {}
   }
+
+  const key = (email || id || name || 'student').toLowerCase();
   if (key.includes('student2') || key.includes('stu-002')) return DEFAULT_STUDENT_AVATARS[1];
   if (key.includes('student3') || key.includes('stu-003')) return DEFAULT_STUDENT_AVATARS[2];
 
@@ -1610,8 +1626,15 @@ export default function StudentPortalPage() {
           : (studentLocalCourses.length > 0 ? studentLocalCourses : (activeUser.stream ? [activeUser.stream] : []));
 
         const savedPhoto = typeof window !== 'undefined'
-          ? (localStorage.getItem(`rnd_cadd_student_photo_${emailToUse}`) || '')
-          : '';
+          ? (localStorage.getItem(`rnd_cadd_student_photo_${emailToUse}`) ||
+             localStorage.getItem('rnd_cadd_student_photo_custom') ||
+             activeUser.photo ||
+             activeUser.image ||
+             sessionUser?.photo ||
+             sessionUser?.image ||
+             localUser?.photo ||
+             localUser?.image || '')
+          : (activeUser.photo || activeUser.image || '');
 
         setStudentUser((prev) => ({
           ...prev,
@@ -2220,31 +2243,31 @@ export default function StudentPortalPage() {
   // MNC Dashboard Menu Helpers for Student Portal
   const getStudentNavBadge = (id: string, isActive: boolean) => {
     const badgeClass = (colorClass: string) =>
-      `text-[11px] font-mono font-bold px-2 py-0.5 rounded-full shadow-2xs ${
-        isActive ? 'bg-[#EE2C3C] text-white shadow-2xs' : colorClass
+      `text-xs font-mono font-bold px-2.5 py-0.5 rounded-full shadow-2xs ${
+        isActive ? 'bg-slate-900 text-white shadow-2xs' : colorClass
       }`;
 
     switch (id) {
       case 'Home':
-        return <span className={badgeClass('bg-indigo-100 text-indigo-800')}>{studentUser.assignedCourses?.length || 0}</span>;
+        return <span className={badgeClass('bg-slate-100 text-slate-800 border border-slate-200')}>{studentUser.assignedCourses?.length || 0}</span>;
       case 'Profile':
-        return <span className={badgeClass('bg-emerald-100 text-emerald-800')}>Active</span>;
+        return <span className={badgeClass('bg-emerald-50 text-emerald-700 border border-emerald-200')}>Active</span>;
       case 'Jobs':
-        return <span className={badgeClass('bg-sky-100 text-sky-800')}>{studentJobs.filter((j) => j.status === 'Active').length}</span>;
+        return <span className={badgeClass('bg-slate-100 text-slate-800 border border-slate-200')}>{studentJobs.filter((j) => j.status === 'Active').length}</span>;
       case 'Certificates':
-        return <span className={badgeClass('bg-amber-100 text-amber-800')}>{studentCertificates.length}</span>;
+        return <span className={badgeClass('bg-slate-100 text-slate-800 border border-slate-200')}>{studentCertificates.length}</span>;
       case 'Assignments':
-        return <span className={badgeClass('bg-emerald-100 text-emerald-800')}>{studentAssignments.length}</span>;
+        return <span className={badgeClass('bg-slate-100 text-slate-800 border border-slate-200')}>{studentAssignments.length}</span>;
       case 'E-Books':
-        return <span className={badgeClass('bg-rose-100 text-rose-800')}>{studentEbooks.length}</span>;
+        return <span className={badgeClass('bg-slate-100 text-slate-800 border border-slate-200')}>{studentEbooks.length}</span>;
       case 'Live':
         return (
-          <span className={`text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 ${
+          <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 ${
             liveClass?.status === 'Live Now' && liveClass?.isLive
               ? 'bg-emerald-500 text-white animate-pulse'
               : isActive
-              ? 'bg-[#EE2C3C] text-white shadow-2xs'
-              : 'bg-slate-100 text-slate-600'
+              ? 'bg-slate-900 text-white shadow-2xs'
+              : 'bg-slate-100 text-slate-700 border border-slate-200'
           }`}>
             {liveClass?.status === 'Live Now' && liveClass?.isLive && <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />}
             {liveClass?.status === 'Live Now' && liveClass?.isLive ? 'LIVE' : 'Online'}
@@ -2252,32 +2275,20 @@ export default function StudentPortalPage() {
         );
       case 'Chat': {
         const openTickets = studentTickets.filter((t) => t.status !== 'Resolved').length;
-        return <span className={badgeClass('bg-orange-100 text-orange-800')}>{openTickets}</span>;
+        return <span className={badgeClass('bg-slate-100 text-slate-800 border border-slate-200')}>{openTickets}</span>;
       }
       case 'Refer & Earn':
-        return <span className={badgeClass('bg-rose-100 text-rose-800')}>Offers</span>;
+        return <span className={badgeClass('bg-slate-100 text-slate-800 border border-slate-200')}>Offers</span>;
       case 'Rate':
-        return <span className={badgeClass('bg-yellow-100 text-yellow-800')}>★</span>;
+        return <span className={badgeClass('bg-slate-100 text-slate-800 border border-slate-200')}>★</span>;
       default:
         return null;
     }
   };
 
   const getStudentIconBg = (id: string, isActive: boolean) => {
-    if (isActive) return 'bg-[#EE2C3C] text-white shadow-xs';
-    switch (id) {
-      case 'Home': return 'bg-indigo-50 text-indigo-600 border border-indigo-200/60';
-      case 'Profile': return 'bg-emerald-50 text-emerald-600 border border-emerald-200/60';
-      case 'Certificates': return 'bg-amber-50 text-amber-600 border border-amber-200/60';
-      case 'Assignments': return 'bg-teal-50 text-teal-600 border border-teal-200/60';
-      case 'E-Books': return 'bg-purple-50 text-purple-600 border border-purple-200/60';
-      case 'Live': return 'bg-red-50 text-red-600 border border-red-200/60';
-      case 'Jobs': return 'bg-sky-50 text-sky-600 border border-sky-200/60';
-      case 'Chat': return 'bg-orange-50 text-orange-600 border border-orange-200/60';
-      case 'Refer & Earn': return 'bg-rose-50 text-rose-600 border border-rose-200/60';
-      case 'Rate': return 'bg-yellow-50 text-yellow-600 border border-yellow-200/60';
-      default: return 'bg-slate-100 text-slate-700 border border-slate-200/60';
-    }
+    if (isActive) return 'bg-white text-slate-950 border border-slate-300 shadow-2xs';
+    return 'bg-slate-100/90 text-slate-950 border border-slate-200/80 hover:border-slate-300';
   };
 
   // Grouped Navigation Sections for Student Portal
@@ -2332,10 +2343,10 @@ export default function StudentPortalPage() {
             />
           </div>
           <div className="min-w-0">
-            <span className="text-xs font-black text-slate-900 block truncate leading-tight">
+            <span className="text-sm font-black text-slate-900 block truncate leading-tight">
               {studentUser.name}
             </span>
-            <span className="text-[10px] font-mono font-bold text-slate-500 block truncate">
+            <span className="text-xs font-mono font-bold text-slate-500 block truncate">
               ID: {studentUser.id}
             </span>
           </div>
@@ -2376,13 +2387,20 @@ export default function StudentPortalPage() {
             className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
             onClick={() => setIsMobileNavOpen(false)}
           />
-          <div className="relative w-full max-w-[320px] sm:max-w-xs bg-white h-full z-10 flex flex-col justify-between p-5 overflow-y-auto safe-pb shadow-2xl rounded-r-3xl border-r border-slate-200/90 animate-in slide-in-from-left duration-300">
+          <div className="relative w-full max-w-[320px] sm:max-w-xs bg-white h-full z-10 flex flex-col justify-between p-5 overflow-y-auto no-scrollbar scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden safe-pb shadow-2xl rounded-r-3xl border-r border-slate-200/90 animate-in slide-in-from-left duration-300">
             <div>
-              {/* Close Button Header */}
-              <div className="flex items-center justify-end pb-1.5">
+              {/* Top Header Row - Uses the above empty space cleanly */}
+              <div className="flex items-center justify-between pb-3 mb-1 border-b border-slate-100">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <img src="/logo.png" alt="RND CADD" className="h-7 w-auto object-contain" />
+                  <div className="min-w-0">
+                    <span className="text-xs sm:text-sm font-extrabold text-slate-900 tracking-tight block truncate">RND CADD Portal</span>
+                    <span className="text-[11px] text-slate-500 font-medium block truncate">Ameerpet Campus</span>
+                  </div>
+                </div>
                 <button
                   onClick={() => setIsMobileNavOpen(false)}
-                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-lg active:scale-95 transition-all cursor-pointer shadow-2xs"
+                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-base active:scale-95 transition-all cursor-pointer shadow-2xs shrink-0"
                   aria-label="Close Menu"
                 >
                   &times;
@@ -2395,9 +2413,9 @@ export default function StudentPortalPage() {
                   setActiveTab('Profile');
                   setIsMobileNavOpen(false);
                 }}
-                className="p-3.5 my-2.5 rounded-2xl bg-gradient-to-br from-white via-slate-50/90 to-slate-100/60 border border-slate-200/90 shadow-2xs flex items-center gap-3.5 cursor-pointer hover:border-slate-300 transition-all active:scale-[0.99]"
+                className="p-3.5 my-2.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs flex items-center gap-3.5 cursor-pointer hover:border-slate-300 transition-all active:scale-[0.99]"
               >
-                <div className="w-12 h-12 rounded-xl overflow-hidden border-2 border-slate-200 shrink-0 shadow-2xs relative">
+                <div className="w-13 h-13 rounded-2xl overflow-hidden border-2 border-slate-200 shrink-0 shadow-2xs relative">
                   <img
                     src={getStudentAvatar(studentUser.photo, studentUser.name, studentUser.email, studentUser.id)}
                     alt={studentUser.name}
@@ -2409,17 +2427,17 @@ export default function StudentPortalPage() {
                       }
                     }}
                   />
-                  <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white" />
+                  <div className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-1">
-                    <h4 className="text-xs font-extrabold text-slate-900 truncate tracking-tight">{studentUser.name}</h4>
-                    <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <h4 className="text-sm sm:text-base font-extrabold text-slate-900 truncate tracking-tight">{studentUser.name}</h4>
+                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                       Verified
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-500 font-mono mt-0.5 truncate font-semibold">ID: {studentUser.id}</p>
-                  <p className="text-[10px] text-slate-600 truncate mt-0.5 font-medium">{studentUser.stream || 'Certified CAD Trainee'}</p>
+                  <p className="text-xs text-slate-500 font-mono mt-0.5 truncate font-semibold">ID: {studentUser.id}</p>
+                  <p className="text-xs text-slate-600 truncate mt-0.5 font-medium">{studentUser.stream || 'Certified CAD Trainee'}</p>
                 </div>
               </div>
 
@@ -2427,7 +2445,7 @@ export default function StudentPortalPage() {
               <div className="space-y-4">
                 {studentNavSections.map((sec, sIdx) => (
                   <div key={sIdx} className="space-y-1">
-                    <div className="px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center justify-between">
+                    <div className="px-3 py-1 text-xs font-black uppercase tracking-wider text-slate-400 flex items-center justify-between">
                       <span>{sec.category}</span>
                       <span className="w-8 h-px bg-slate-200" />
                     </div>
@@ -2440,21 +2458,20 @@ export default function StudentPortalPage() {
                             setActiveTab(item.id);
                             setIsMobileNavOpen(false);
                           }}
-                          className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left ${
+                          className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-bold transition-all text-left cursor-pointer ${
                             isActive
-                              ? 'bg-red-50/90 text-[#EE2C3C] shadow-2xs border-l-4 border-l-[#EE2C3C] font-extrabold'
-                              : 'text-slate-700 hover:bg-slate-100/80 hover:text-slate-900 active:bg-slate-200/70 font-semibold'
+                              ? 'bg-white text-slate-950 font-extrabold shadow-xs border border-slate-200/90 ring-1 ring-slate-100'
+                              : 'text-slate-700 hover:bg-slate-50 hover:text-slate-950 active:bg-slate-100/70 font-semibold'
                           }`}
                         >
                           <span className="flex items-center gap-3 min-w-0">
                             <span className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors ${getStudentIconBg(item.id, isActive)}`}>
                               {item.icon}
                             </span>
-                            <span className="truncate">{item.label}</span>
+                            <span className="truncate text-sm font-bold text-slate-900">{item.label}</span>
                           </span>
                           <div className="flex items-center gap-2 flex-shrink-0">
                             {getStudentNavBadge(item.id, isActive)}
-                            {isActive && <span className="text-[#EE2C3C] text-xs font-black">●</span>}
                           </div>
                         </button>
                       );
@@ -2526,10 +2543,10 @@ export default function StudentPortalPage() {
           </div>
 
           {/* Sidebar Navigation Items - MNC Corporate Grouped Design */}
-          <nav className="flex-1 px-3 py-3 space-y-4 overflow-y-auto">
+          <nav className="flex-1 px-3 py-3 space-y-4 overflow-y-auto no-scrollbar scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             {studentNavSections.map((sec, sIdx) => (
               <div key={sIdx} className="space-y-1">
-                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center justify-between">
+                <div className="px-3 py-1 text-xs font-black uppercase tracking-wider text-slate-400 flex items-center justify-between">
                   <span>{sec.category}</span>
                   <span className="w-10 h-px bg-slate-200" />
                 </div>
@@ -2539,10 +2556,10 @@ export default function StudentPortalPage() {
                     <button
                       key={item.id}
                       onClick={() => setActiveTab(item.id)}
-                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold transition-all text-left cursor-pointer ${
+                      className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-bold transition-all text-left cursor-pointer ${
                         isActive
-                          ? 'bg-red-50/90 text-[#EE2C3C] shadow-2xs border-l-4 border-l-[#EE2C3C] font-extrabold'
-                          : 'text-slate-700 hover:bg-slate-100/80 hover:text-slate-900 active:bg-slate-200/70 font-semibold'
+                          ? 'bg-white text-slate-950 font-extrabold shadow-xs border border-slate-200/90 ring-1 ring-slate-100'
+                          : 'text-slate-700 hover:bg-slate-50 hover:text-slate-950 active:bg-slate-100/70 font-semibold'
                       }`}
                     >
                       <span className="flex items-center space-x-3 min-w-0">
@@ -2551,7 +2568,7 @@ export default function StudentPortalPage() {
                         >
                           {item.icon}
                         </span>
-                        <span className="truncate">{item.label}</span>
+                        <span className="truncate text-sm font-bold text-slate-900">{item.label}</span>
                       </span>
                       <div className="flex items-center gap-2 flex-shrink-0">
                         {getStudentNavBadge(item.id, isActive)}
