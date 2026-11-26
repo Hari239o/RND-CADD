@@ -4369,146 +4369,72 @@ export default function StudentPortalPage() {
 
           {/* TAB: CERTIFICATES & CREDENTIALS (Real-Time Synced) */}
           {activeTab === 'Certificates' && (
-            <div className="space-y-6">
-              {/* Top Banner */}
-              <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 sm:p-8 space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+            <div className="space-y-4 sm:space-y-6">
+              {studentCertificates.length === 0 ? (
+                <div className="p-8 sm:p-12 text-center rounded-2xl border border-dashed border-slate-300 bg-white space-y-4 shadow-xs">
+                  <div className="w-16 h-16 rounded-2xl bg-rose-50 text-[#EE2C3C] flex items-center justify-center mx-auto border border-rose-200 shadow-2xs">
+                    <svg className="w-8 h-8 text-[#EE2C3C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                    </svg>
+                  </div>
                   <div>
-                    <h3 className="text-xl sm:text-2xl font-bold text-[#131313] tracking-tight">
-                      Official Student Certificates &amp; Credentials
-                    </h3>
-                  </div>
-
-                  <div className="flex items-center space-x-3 flex-shrink-0">
-                    <span className="px-3.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold">
-                      {studentCertificates.length} {studentCertificates.length === 1 ? 'Verified Certificate' : 'Verified Certificates'}
-                    </span>
-                  </div>
-                </div>
-
-                {studentCertificates.length === 0 ? (
-                  <div className="p-12 text-center rounded-2xl border border-dashed border-slate-300 bg-slate-50/50 space-y-4">
-                    <div className="w-16 h-16 rounded-2xl bg-rose-50 text-[#EE2C3C] flex items-center justify-center mx-auto border border-rose-200 shadow-2xs">
-                      <svg className="w-8 h-8 text-[#EE2C3C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                      </svg>
-                    </div>
-                    <h4 className="text-lg font-bold text-[#131313]">
+                    <h4 className="text-base sm:text-lg font-bold text-[#131313]">
                       No Official Certificates Uploaded Yet
                     </h4>
-                    <div className="pt-2">
-                      <button
-                        onClick={() => setActiveTab('Home')}
-                        className="px-6 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-[#131313] border border-slate-300 text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer"
+                    <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">
+                      Your course completion certificates will appear here once verified by the academic director.
+                    </p>
+                  </div>
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('Home')}
+                      className="px-6 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-[#131313] border border-slate-300 text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all cursor-pointer"
+                    >
+                      Back to Dashboard &rarr;
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-6">
+                  {studentCertificates.map((cert) => {
+                    return (
+                      <div
+                        key={cert.id || cert.certId}
+                        className="bg-white rounded-2xl border border-slate-200/90 hover:border-slate-300 p-4 sm:p-6 flex flex-col justify-between gap-4 transition-all shadow-xs"
                       >
-                        Back to Dashboard &rarr;
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-2">
-                    {studentCertificates.map((cert) => {
-                      return (
-                        <div
-                          key={cert.id || cert.certId}
-                          className="bg-white rounded-2xl border border-slate-200/90 hover:border-slate-400 hover:shadow-md p-6 flex flex-col justify-between space-y-5 transition-all shadow-xs"
-                        >
-                          <div className="space-y-4">
-                            {/* Badges row */}
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 inline-flex items-center space-x-1">
-                                <svg className="w-3 h-3 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                </svg>
-                                <span>Verified Credential</span>
-                              </span>
-                              <span className="px-2.5 py-1 rounded-md text-[11px] font-mono font-bold bg-rose-50 text-[#EE2C3C] border border-rose-200">
-                                {cert.certId}
-                              </span>
-                            </div>
-
-                            {/* Course Title & Track */}
-                            <div>
-                              <h4 className="text-lg font-bold text-[#131313] leading-snug">
-                                {cert.course}
-                              </h4>
-                              {cert.track && (
-                                <span className="text-xs font-semibold text-[#EE2C3C] block mt-1">
-                                  Track: {cert.track}
-                                </span>
-                              )}
-                            </div>
-
-                            {/* Recipient Details */}
-                            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 space-y-2 text-xs text-slate-600">
-                              <div className="flex items-center justify-between">
-                                <span className="font-medium text-slate-500">Student:</span>
-                                <span className="font-bold text-[#131313]">{cert.studentName} ({cert.studentId})</span>
-                              </div>
-                              <div className="flex items-center justify-between">
-                                <span className="font-medium text-slate-500">Performance:</span>
-                                <span className="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">{cert.grade}</span>
-                              </div>
-                              <div className="flex items-center justify-between">
-                                <span className="font-medium text-slate-500">Issued On:</span>
-                                <span className="font-medium text-slate-700">{cert.issueDate}</span>
-                              </div>
-                              <div className="flex items-center justify-between">
-                                <span className="font-medium text-slate-500">Issuer:</span>
-                                <span className="font-medium text-slate-700 truncate max-w-[170px]">{cert.issuer || 'Academic Director'}</span>
-                              </div>
-                            </div>
-
-                            {/* Document Info */}
-                            <div className="flex items-center space-x-2 text-xs font-medium text-slate-500">
-                              <span>{cert.fileName || `${cert.certId}.pdf`}</span>
-                              <span>&bull;</span>
-                              <span>{cert.fileSize || 'Verified PDF'}</span>
-                            </div>
-
-                            {/* Remarks if any */}
-                            {cert.notes && (
-                              <p className="text-xs text-slate-600 font-normal italic bg-amber-50/60 p-2.5 rounded-lg border border-amber-200/50">
-                                &ldquo;{cert.notes}&rdquo;
-                              </p>
-                            )}
-                          </div>
-
-                          {/* Action Buttons: View Certificate & Download */}
-                          <div className="pt-3 border-t border-slate-100">
-                            <div className="grid grid-cols-2 gap-2.5">
-                              <button
-                                type="button"
-                                onClick={() => setSelectedCertificateForView(cert)}
-                                className="w-full py-2.5 rounded-xl bg-white hover:bg-slate-50 text-[#131313] border border-slate-300 text-xs font-bold transition-all flex items-center justify-center space-x-1.5 cursor-pointer shadow-xs"
-                              >
-                                <svg className="w-4 h-4 text-[#131313]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                                <span>View</span>
-                              </button>
-
-                              <a
-                                href={cert.fileUrl || '#'}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                download={cert.fileName || `${cert.certId || 'Certificate'}.pdf`}
-                                className="w-full py-2.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs font-bold transition-all flex items-center justify-center space-x-1.5 cursor-pointer shadow-xs"
-                              >
-                                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                </svg>
-                                <span>Download</span>
-                              </a>
-                            </div>
-                          </div>
+                        {/* Course Title & Track */}
+                        <div>
+                          <h4 className="text-base sm:text-lg font-bold text-[#131313] leading-snug tracking-tight">
+                            {cert.course}
+                          </h4>
+                          {cert.track && (
+                            <span className="text-xs font-semibold text-[#EE2C3C] block mt-1">
+                              Track: {cert.track}
+                            </span>
+                          )}
                         </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+
+                        {/* Action: Only Download Button */}
+                        <div className="pt-2">
+                          <a
+                            href={cert.fileUrl || '#'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            download={cert.fileName || `${cert.certId || 'Certificate'}.pdf`}
+                            className="w-full py-2.5 sm:py-3 px-4 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] active:scale-95 text-white text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                          >
+                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            <span>Download</span>
+                          </a>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
 
