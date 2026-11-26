@@ -220,21 +220,23 @@ function isPlaceholderOrBrokenDriveUrl(url?: string): boolean {
 
 function formatGoogleDriveDirectStreamUrl(url?: string): string {
   if (!url || isPlaceholderOrBrokenDriveUrl(url)) {
-    return 'https://drive.usercontent.google.com/download?id=1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c&export=download';
+    return '/api/video-stream?id=1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c';
   }
   const trimmed = url.trim();
   const fileMatch = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
   if (fileMatch && fileMatch[1]) {
-    return `https://drive.usercontent.google.com/download?id=${fileMatch[1]}&export=download`;
+    return `/api/video-stream?id=${fileMatch[1]}`;
   }
   const idMatch = trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/);
   if (idMatch && idMatch[1]) {
-    return `https://drive.usercontent.google.com/download?id=${idMatch[1]}&export=download`;
+    return `/api/video-stream?id=${idMatch[1]}`;
   }
   if (/^[a-zA-Z0-9_-]{25,}$/.test(trimmed)) {
-    return `https://drive.usercontent.google.com/download?id=${trimmed}&export=download`;
+    return `/api/video-stream?id=${trimmed}`;
   }
-  return trimmed;
+  return trimmed.startsWith('http') || trimmed.startsWith('/')
+    ? trimmed
+    : `/api/video-stream?id=${trimmed}`;
 }
 
 function formatYouTubeEmbedUrl(url: string): string {
@@ -2067,7 +2069,7 @@ export default function StudentPortalPage() {
   // Video progress timer interval for simulated & cross-origin playback
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
-    if (videoIsPlaying) {
+    if (videoIsPlaying && !videoRef.current) {
       interval = setInterval(() => {
         setVideoCurrentTime((prev) => {
           const next = prev + 1 * videoPlaybackSpeed;
@@ -5509,6 +5511,7 @@ export default function StudentPortalPage() {
                               />
                             ) : !useIframeFallback ? (
                               <video
+                                key={activePlayerClass?.id || 'class-video'}
                                 ref={videoRef}
                                 src={formatGoogleDriveDirectStreamUrl(activePlayerClass.videoUrl)}
                                 className="w-full h-full object-contain cursor-pointer bg-black"
@@ -5518,13 +5521,15 @@ export default function StudentPortalPage() {
                                   setVideoCurrentTime(e.currentTarget.currentTime);
                                 }}
                                 onLoadedMetadata={(e) => {
-                                  if (e.currentTarget.duration && !isNaN(e.currentTarget.duration)) {
-                                    setVideoDuration(e.currentTarget.duration);
+                                  const dur = e.currentTarget.duration;
+                                  if (dur && !isNaN(dur) && dur > 0 && isFinite(dur)) {
+                                    setVideoDuration(Math.round(dur));
                                   }
                                 }}
                                 onDurationChange={(e) => {
-                                  if (e.currentTarget.duration && !isNaN(e.currentTarget.duration)) {
-                                    setVideoDuration(e.currentTarget.duration);
+                                  const dur = e.currentTarget.duration;
+                                  if (dur && !isNaN(dur) && dur > 0 && isFinite(dur)) {
+                                    setVideoDuration(Math.round(dur));
                                   }
                                 }}
                                 onPlay={() => setVideoIsPlaying(true)}
@@ -5534,8 +5539,8 @@ export default function StudentPortalPage() {
                                   handleToggleClassWatched(activePlayerClass.id, playerCourse.title, activePlayerClass.classNumber);
                                 }}
                                 onClick={handlePlayPause}
-                                onError={() => {
-                                  console.warn('Direct stream fallback to iframe');
+                                onError={(e) => {
+                                  console.warn('Direct stream fallback to iframe:', e);
                                   setUseIframeFallback(true);
                                 }}
                               />
