@@ -3947,15 +3947,15 @@ export default function StudentPortalPage() {
                 {/* Top Row: Quick Count & Refresh */}
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/90 text-xs font-bold flex items-center gap-1.5 shadow-2xs">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span className="px-3 py-1 rounded-full bg-white text-slate-800 border border-slate-300 text-xs font-bold flex items-center gap-1.5 shadow-2xs">
+                      <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
                       <span>{studentJobs.filter((j) => j.status === 'Active').length} Active Vacancies</span>
                     </span>
                   </div>
                   <button
                     onClick={() => fetchStudentJobs()}
                     disabled={isLoadingJobs}
-                    className="px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                    className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 shadow-2xs"
                     title="Refresh Job Openings"
                   >
                     <svg className={`w-3.5 h-3.5 ${isLoadingJobs ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3972,7 +3972,7 @@ export default function StudentPortalPage() {
                     value={jobSearchQuery}
                     onChange={(e) => setJobSearchQuery(e.target.value)}
                     placeholder="Search role, company, CAD software, city..."
-                    className="w-full pl-9 pr-9 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:border-[#EE2C3C] bg-slate-50/70 focus:bg-white transition-all"
+                    className="w-full pl-9 pr-9 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:outline-none focus:border-[#EE2C3C] bg-white transition-all"
                   />
                   <svg className="absolute left-3 top-3 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -3993,7 +3993,7 @@ export default function StudentPortalPage() {
                     <select
                       value={jobStreamFilter}
                       onChange={(e) => setJobStreamFilter(e.target.value)}
-                      className="w-full px-2.5 sm:px-3 py-2 rounded-xl border border-slate-200 bg-white text-[11px] sm:text-xs font-bold text-slate-800 focus:outline-none focus:border-[#EE2C3C] appearance-none cursor-pointer pr-7 truncate shadow-2xs"
+                      className="w-full px-2.5 sm:px-3 py-2 rounded-xl border border-slate-300 bg-white text-[11px] sm:text-xs font-bold text-slate-800 focus:outline-none focus:border-[#EE2C3C] appearance-none cursor-pointer pr-7 truncate shadow-2xs"
                     >
                       <option value="all">All Disciplines</option>
                       <option value="Mechanical">Mechanical</option>
@@ -4011,7 +4011,7 @@ export default function StudentPortalPage() {
                     <select
                       value={jobModeFilter}
                       onChange={(e) => setJobModeFilter(e.target.value)}
-                      className="w-full px-2.5 sm:px-3 py-2 rounded-xl border border-slate-200 bg-white text-[11px] sm:text-xs font-bold text-slate-800 focus:outline-none focus:border-[#EE2C3C] appearance-none cursor-pointer pr-7 truncate shadow-2xs"
+                      className="w-full px-2.5 sm:px-3 py-2 rounded-xl border border-slate-300 bg-white text-[11px] sm:text-xs font-bold text-slate-800 focus:outline-none focus:border-[#EE2C3C] appearance-none cursor-pointer pr-7 truncate shadow-2xs"
                     >
                       <option value="all">All Work Modes</option>
                       <option value="On-site">On-site</option>
@@ -4024,7 +4024,7 @@ export default function StudentPortalPage() {
                   </div>
                 </div>
 
-                {/* Quick Stream Filter Chips (Swipeable horizontally on mobile) */}
+                {/* Quick Stream Filter Chips (Swipeable horizontally on mobile - Clean White, No Smoke Color) */}
                 <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-0.5 no-scrollbar select-none">
                   {[
                     { id: 'all', label: 'All' },
@@ -4042,8 +4042,8 @@ export default function StudentPortalPage() {
                         onClick={() => setJobStreamFilter(chip.id)}
                         className={`px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold shrink-0 transition-all cursor-pointer ${
                           isSelected
-                            ? 'bg-[#131313] text-white shadow-xs'
-                            : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                            ? 'bg-[#131313] text-white border border-[#131313] shadow-xs'
+                            : 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-300'
                         }`}
                       >
                         {chip.label}
@@ -4080,7 +4080,7 @@ export default function StudentPortalPage() {
                 if (filtered.length === 0) {
                   return (
                     <div className="py-10 px-4 text-center rounded-2xl border border-dashed border-slate-300 bg-white space-y-3 shadow-xs">
-                      <div className="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 text-slate-500 flex items-center justify-center mx-auto">
+                      <div className="w-12 h-12 rounded-2xl bg-white border border-slate-300 text-slate-500 flex items-center justify-center mx-auto">
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
@@ -4117,136 +4117,117 @@ export default function StudentPortalPage() {
                       const isClosed = job.status === 'Closed';
                       const isExpanded = expandedJobId === job.id;
 
-                      const streamColors: Record<string, string> = {
-                        Mechanical: 'bg-amber-50 text-amber-800 border-amber-200',
-                        Civil: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-                        Electrical: 'bg-sky-50 text-sky-800 border-sky-200',
-                        Architectural: 'bg-violet-50 text-violet-800 border-violet-200',
-                        Piping: 'bg-rose-50 text-rose-800 border-rose-200',
-                      };
-                      const streamStyle =
-                        (job.stream && streamColors[job.stream]) || 'bg-slate-50 text-slate-800 border-slate-200';
-
                       return (
                         <div
                           key={job.id}
-                          className={`p-3.5 sm:p-5 rounded-2xl border transition-all bg-white shadow-xs hover:shadow-md ${
+                          className={`p-4 sm:p-5 rounded-xl border transition-all bg-white shadow-xs hover:border-slate-300 ${
                             hasApplied
-                              ? 'border-emerald-300 bg-emerald-50/20'
+                              ? 'border-emerald-300'
                               : isClosed
                               ? 'border-slate-200 opacity-75'
-                              : isExpanded
-                              ? 'border-[#EE2C3C]/50 ring-1 ring-[#EE2C3C]/20 shadow-sm'
-                              : 'border-slate-200/90 hover:border-slate-300'
+                              : 'border-slate-200'
                           }`}
                         >
                           <div className="flex flex-col gap-2.5">
-                            {/* SIMPLE CARD VIEW (Always Visible) - Tap to Expand/Collapse */}
+                            {/* NAUKRI-STYLE SIMPLE CARD (Pure White, No Smoke Color, No Light Green) */}
                             <div
                               onClick={() => setExpandedJobId(isExpanded ? null : job.id)}
                               className="cursor-pointer select-none"
                             >
                               <div className="flex items-start gap-3 sm:gap-4">
-                                {/* Company Logo / Initials Avatar */}
-                                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#131313] text-white flex items-center justify-center font-bold text-sm sm:text-base flex-shrink-0 shadow-xs overflow-hidden">
+                                {/* Company Logo / Initials */}
+                                <div className="w-12 h-12 rounded-lg bg-white border border-slate-200 flex items-center justify-center font-bold text-slate-800 text-sm sm:text-base flex-shrink-0 overflow-hidden">
                                   {job.companyLogo ? (
                                     <img
                                       src={job.companyLogo}
                                       alt={job.company}
-                                      className="w-full h-full object-contain p-1 rounded-xl"
+                                      className="w-full h-full object-contain p-1"
                                       onError={(e) => {
                                         (e.target as HTMLElement).style.display = 'none';
                                       }}
                                     />
                                   ) : (
-                                    job.company.substring(0, 2).toUpperCase()
+                                    <span className="font-extrabold">{job.company.substring(0, 2).toUpperCase()}</span>
                                   )}
                                 </div>
 
                                 <div className="min-w-0 flex-1">
-                                  <div className="flex items-start justify-between gap-2 flex-wrap sm:flex-nowrap">
-                                    <div>
-                                      <h3 className="text-base sm:text-lg font-bold text-[#131313] tracking-tight leading-snug">
-                                        {job.title}
-                                      </h3>
-                                      <div className="flex items-center gap-2 text-xs text-slate-600 mt-0.5 flex-wrap">
-                                        <span className="font-semibold text-slate-900">{job.company}</span>
-                                        <span>&bull;</span>
-                                        <span className="flex items-center gap-1">
-                                          <svg className="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                          </svg>
-                                          <span>{job.location}</span>
-                                        </span>
-                                      </div>
-                                    </div>
-
-                                    {/* Badges on mobile */}
-                                    <div className="flex items-center gap-1.5 flex-wrap">
-                                      <span className={`px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs font-semibold border ${streamStyle}`}>
-                                        {job.stream}
-                                      </span>
-                                      <span className="px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-medium bg-slate-100 text-slate-700">
-                                        {job.workMode}
-                                      </span>
-                                      <span className="px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-medium bg-blue-50 text-blue-700 border border-blue-200">
-                                        {job.jobType}
-                                      </span>
-                                      {hasApplied && (
-                                        <span className="px-2.5 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 inline-flex items-center gap-1">
-                                          <svg className="w-3 h-3 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                          </svg>
-                                          <span>Applied</span>
-                                        </span>
-                                      )}
+                                  {/* Title & Company */}
+                                  <div>
+                                    <h3 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight leading-snug">
+                                      {job.title}
+                                    </h3>
+                                    <div className="text-xs sm:text-sm font-semibold text-slate-700 mt-0.5">
+                                      {job.company}
                                     </div>
                                   </div>
-                                </div>
-                              </div>
 
-                              {/* Simple Highlights Bar (Package & Openings) */}
-                              <div className="grid grid-cols-2 gap-2 pt-2.5">
-                                <div className="bg-emerald-50/70 border border-emerald-200/80 rounded-xl px-3 py-2 flex items-center justify-between">
-                                  <span className="text-[10px] text-emerald-700 font-bold uppercase tracking-wider">Package / CTC</span>
-                                  <span className="text-xs sm:text-sm font-black font-mono text-emerald-950">{job.salary}</span>
-                                </div>
-                                <div className="bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2 flex items-center justify-between">
-                                  <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Openings</span>
-                                  <span className="text-xs sm:text-sm font-bold text-slate-900">{job.vacancies} {job.vacancies === 1 ? 'Opening' : 'Openings'}</span>
+                                  {/* Signature Naukri-Style Metadata Row (Inline Text, Clean Separators, No Colored Boxes) */}
+                                  <div className="flex items-center gap-2.5 text-xs sm:text-sm text-slate-700 flex-wrap pt-2 font-medium">
+                                    <span className="flex items-center gap-1">
+                                      <span className="text-slate-500">Exp:</span>
+                                      <span className="font-semibold text-slate-900">{job.experience || '0-2 Yrs'}</span>
+                                    </span>
+                                    <span className="text-slate-300">|</span>
+                                    <span className="flex items-center gap-1">
+                                      <span className="text-slate-500">₹</span>
+                                      <span className="font-semibold text-slate-900">{job.salary}</span>
+                                    </span>
+                                    <span className="text-slate-300">|</span>
+                                    <span className="text-slate-800">{job.location}</span>
+                                  </div>
+
+                                  {/* Secondary Stream & Mode Row */}
+                                  <div className="flex items-center gap-2 text-xs text-slate-500 flex-wrap pt-1.5">
+                                    <span>{job.stream} Engineering</span>
+                                    <span>&bull;</span>
+                                    <span>{job.workMode}</span>
+                                    <span>&bull;</span>
+                                    <span>{job.jobType}</span>
+                                    <span>&bull;</span>
+                                    <span>{job.vacancies} {job.vacancies === 1 ? 'Opening' : 'Openings'}</span>
+                                    {hasApplied && (
+                                      <>
+                                        <span>&bull;</span>
+                                        <span className="font-bold text-emerald-700">Applied ✓</span>
+                                      </>
+                                    )}
+                                  </div>
+
+                                  {/* Skills Tags (Pure White with Thin Border, No Smoke Background) */}
+                                  {((job.skills || job.tools || []).length > 0) && (
+                                    <div className="flex items-center gap-1.5 flex-wrap pt-2">
+                                      {(job.skills || job.tools || []).map((skill: string, sIdx: number) => (
+                                        <span
+                                          key={sIdx}
+                                          className="px-2.5 py-0.5 rounded text-xs text-slate-700 bg-white border border-slate-200"
+                                        >
+                                          {skill}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             </div>
 
-                            {/* Simple Card Action Bar: [ View Details Button / Toggle ] & [ Quick Apply Button ] */}
-                            <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-100">
+                            {/* Action Bar: View Details Button & Quick Apply */}
+                            <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-slate-100 mt-1">
                               <button
                                 type="button"
                                 onClick={() => setExpandedJobId(isExpanded ? null : job.id)}
-                                className="px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 active:scale-95 text-slate-700 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                                className="px-3.5 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-semibold cursor-pointer transition-all"
                               >
-                                <span>{isExpanded ? 'Hide Details' : 'View Full Details'}</span>
-                                <svg
-                                  className={`w-3.5 h-3.5 text-slate-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-                                </svg>
+                                <span>{isExpanded ? 'Hide Details ▴' : 'View Details ▾'}</span>
                               </button>
 
                               <div>
                                 {hasApplied ? (
-                                  <span className="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-800 inline-flex items-center gap-1">
-                                    <svg className="w-3 h-3 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    <span>Applied</span>
+                                  <span className="px-3.5 py-1.5 rounded-lg bg-white border border-emerald-300 text-xs font-bold text-emerald-700 inline-flex items-center gap-1">
+                                    <span>Applied ✓</span>
                                   </span>
                                 ) : isClosed ? (
-                                  <span className="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-500 text-xs font-bold">
+                                  <span className="px-3.5 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-500 text-xs font-bold">
                                     Closed
                                   </span>
                                 ) : (
@@ -4256,92 +4237,49 @@ export default function StudentPortalPage() {
                                       e.stopPropagation();
                                       setApplyingJob(job);
                                     }}
-                                    className="px-4 py-1.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs font-bold shadow-xs active:scale-95 transition-all cursor-pointer flex items-center gap-1"
+                                    className="px-5 py-2 rounded-lg bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all cursor-pointer"
                                   >
-                                    <span>Quick Apply</span>
-                                    <span>&rarr;</span>
+                                    Quick Apply
                                   </button>
                                 )}
                               </div>
                             </div>
 
-                            {/* EXPANDED FULL DETAILS (Shown when user clicks card or View Full Details) */}
+                            {/* EXPANDED FULL DETAILS (Clean White Background, No Smoke Boxes, No Light Green) */}
                             {isExpanded && (
-                              <div className="pt-3 border-t border-slate-100 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
-                                {/* Experience Highlight Box */}
-                                <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5">
-                                  <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Required Experience</span>
-                                  <span className="text-xs font-semibold text-slate-800 block mt-0.5">{job.experience}</span>
-                                </div>
-
-                                {/* Skills Tag Pills */}
-                                {((job.skills || job.tools || []).length > 0) && (
-                                  <div>
-                                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
-                                      CAD Software &amp; Tools:
-                                    </span>
-                                    <div className="flex items-center gap-1.5 flex-wrap">
-                                      {(job.skills || job.tools || []).map((skill: string, sIdx: number) => (
-                                        <span
-                                          key={sIdx}
-                                          className="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[11px] sm:text-xs font-medium"
-                                        >
-                                          {skill}
-                                        </span>
-                                      ))}
-                                    </div>
-                                  </div>
-                                )}
-
-                                {/* Full Job Description */}
+                              <div className="pt-3 border-t border-slate-100 space-y-3">
                                 {job.description && (
-                                  <div>
-                                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
-                                      Job Description:
-                                    </span>
-                                    <p className="text-xs text-slate-600 leading-relaxed font-normal bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                      {job.description}
-                                    </p>
+                                  <div className="text-xs text-slate-700">
+                                    <span className="font-bold text-slate-900 block mb-1">Job Description:</span>
+                                    <p className="leading-relaxed text-slate-600">{job.description}</p>
                                   </div>
                                 )}
 
-                                {/* Key Requirements bullets */}
                                 {job.requirements && job.requirements.length > 0 && (
-                                  <div>
-                                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
-                                      Key Requirements:
-                                    </span>
-                                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-xs text-slate-600 bg-slate-50/50 p-3 rounded-xl border border-slate-100">
+                                  <div className="text-xs text-slate-700">
+                                    <span className="font-bold text-slate-900 block mb-1">Key Requirements:</span>
+                                    <ul className="space-y-1 list-disc pl-4 text-slate-600">
                                       {job.requirements.map((req, rIdx) => (
-                                        <li key={rIdx} className="flex items-center gap-1.5">
-                                          <span className="text-emerald-600 font-bold">&bull;</span>
-                                          <span>{req}</span>
-                                        </li>
+                                        <li key={rIdx}>{req}</li>
                                       ))}
                                     </ul>
                                   </div>
                                 )}
 
-                                {/* Deadline & Primary Action Footer in Expanded View */}
-                                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2 border-t border-slate-100">
-                                  <div className="text-xs text-slate-500 flex items-center justify-between sm:justify-start gap-3">
-                                    <span className="flex items-center gap-1 text-slate-600">
-                                      <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                      </svg>
-                                      <span>Deadline: <strong className="text-slate-800">{job.deadline}</strong></span>
-                                    </span>
-                                    <span className="text-[11px] text-slate-400">Posted: {job.postedDate}</span>
+                                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-2 border-t border-slate-100 text-xs text-slate-500">
+                                  <div>
+                                    <span>Deadline: <strong className="text-slate-800">{job.deadline}</strong></span>
+                                    <span className="mx-2">&bull;</span>
+                                    <span>Posted: {job.postedDate}</span>
                                   </div>
 
                                   {!hasApplied && !isClosed && (
                                     <button
                                       type="button"
                                       onClick={() => setApplyingJob(job)}
-                                      className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                                      className="w-full sm:w-auto px-6 py-2 rounded-lg bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all cursor-pointer text-center"
                                     >
-                                      <span>Quick Apply Now</span>
-                                      <span>&rarr;</span>
+                                      Quick Apply
                                     </button>
                                   )}
                                 </div>
@@ -4385,7 +4323,7 @@ export default function StudentPortalPage() {
                     {/* Form */}
                     <form onSubmit={handleApplyToJob} className="p-6 space-y-4">
                       {/* Read-Only Pre-filled Info */}
-                      <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                      <div className="p-4 rounded-xl bg-white border border-slate-300 space-y-2">
                         <span className="text-xs font-bold uppercase tracking-wide text-[#131313] block">
                           Verified Student Profile Data
                         </span>
