@@ -1152,6 +1152,7 @@ export default function AdminPortalPage() {
   const [assignmentSearchQuery, setAssignmentSearchQuery] = useState<string>('');
   const [assignmentCourseFilter, setAssignmentCourseFilter] = useState<string>('all');
   const [showAddAssignmentModal, setShowAddAssignmentModal] = useState<boolean>(false);
+  const [editingAssignmentId, setEditingAssignmentId] = useState<string | null>(null);
   const [selectedAssignmentForView, setSelectedAssignmentForView] = useState<AssignmentItem | null>(null);
   const [newAssignmentTitle, setNewAssignmentTitle] = useState<string>('');
   const [newAssignmentCourse, setNewAssignmentCourse] = useState<string>('Civil CADD & Master BIM');
@@ -1812,7 +1813,21 @@ export default function AdminPortalPage() {
     }
   };
 
-  // Admin creates a course assignment
+  // Open Edit Assignment Modal
+  const handleOpenEditAssignment = (assignment: AssignmentItem) => {
+    setEditingAssignmentId(assignment.id);
+    setNewAssignmentTitle(assignment.title);
+    setNewAssignmentCourse(assignment.course);
+    setNewAssignmentDescription(assignment.description || '');
+    setNewAssignmentPdfUrl(assignment.pdfUrl);
+    setNewAssignmentPdfName(assignment.pdfName || '');
+    setNewAssignmentPdfSize(assignment.pdfSize || '2.5 MB');
+    setNewAssignmentDueDate(assignment.dueDate || '');
+    setNewAssignmentMaxScore(assignment.maxScore || 100);
+    setShowAddAssignmentModal(true);
+  };
+
+  // Admin creates or updates a course assignment
   const handleCreateAssignment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newAssignmentTitle.trim() || !newAssignmentCourse || !newAssignmentPdfUrl.trim()) {
@@ -1822,6 +1837,7 @@ export default function AdminPortalPage() {
     setIsSubmittingAssignment(true);
     try {
       const payload = {
+        id: editingAssignmentId || undefined,
         title: newAssignmentTitle.trim(),
         course: newAssignmentCourse.trim(),
         description: newAssignmentDescription.trim(),
@@ -1833,25 +1849,33 @@ export default function AdminPortalPage() {
       };
 
       const res = await fetch('/api/assignments', {
-        method: 'POST',
+        method: editingAssignmentId ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (data.success) {
-        showToast(`Assignment created and assigned to students of "${newAssignmentCourse}"!`);
+        showToast(
+          editingAssignmentId
+            ? 'Assignment updated and synced across all student portals!'
+            : `Assignment created and assigned to students of "${newAssignmentCourse}"!`
+        );
         fetchAdminAssignments();
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('rnd_cadd_assignment_sync', Date.now().toString());
+        }
         setShowAddAssignmentModal(false);
+        setEditingAssignmentId(null);
         setNewAssignmentTitle('');
         setNewAssignmentDescription('');
         setNewAssignmentPdfUrl('');
         setNewAssignmentPdfName('');
         setNewAssignmentDueDate('');
       } else {
-        alert(data.message || 'Failed to publish assignment');
+        alert(data.message || 'Failed to save assignment');
       }
     } catch (err: any) {
-      alert(`Error publishing assignment: ${err.message}`);
+      alert(`Error saving assignment: ${err.message}`);
     } finally {
       setIsSubmittingAssignment(false);
     }
@@ -1868,6 +1892,9 @@ export default function AdminPortalPage() {
       if (data.success) {
         showToast(`Assignment "${assignment.title}" deleted.`);
         fetchAdminAssignments();
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('rnd_cadd_assignment_sync', Date.now().toString());
+        }
       } else {
         alert(data.message || 'Failed to delete assignment');
       }
@@ -4048,6 +4075,12 @@ export default function AdminPortalPage() {
               {activeTab === 'Assignments' && (
                 <button
                   onClick={() => {
+                    setEditingAssignmentId(null);
+                    setNewAssignmentTitle('');
+                    setNewAssignmentDescription('');
+                    setNewAssignmentPdfUrl('');
+                    setNewAssignmentPdfName('');
+                    setNewAssignmentDueDate('');
                     setNewAssignmentCourse(courses[0]?.title || 'Civil CADD & Master BIM');
                     setShowAddAssignmentModal(true);
                   }}
@@ -6614,6 +6647,12 @@ export default function AdminPortalPage() {
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => {
+                        setEditingAssignmentId(null);
+                        setNewAssignmentTitle('');
+                        setNewAssignmentDescription('');
+                        setNewAssignmentPdfUrl('');
+                        setNewAssignmentPdfName('');
+                        setNewAssignmentDueDate('');
                         setNewAssignmentCourse(courses[0]?.title || 'Civil CADD & Master BIM');
                         setShowAddAssignmentModal(true);
                       }}
@@ -6712,6 +6751,14 @@ export default function AdminPortalPage() {
                                 >
                                   Download
                                 </a>
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenEditAssignment(a)}
+                                  className="px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 transition-all cursor-pointer"
+                                  title="Edit Assignment"
+                                >
+                                  Edit
+                                </button>
                                 <button
                                   type="button"
                                   onClick={() => setSelectedAssignmentForView(a)}
@@ -13513,13 +13560,18 @@ export default function AdminPortalPage() {
             <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-white flex-shrink-0">
               <div>
                 <span className="text-[11px] font-bold text-[#EE2C3C] uppercase tracking-wider block">
-                  New Project Assignment
+                  {editingAssignmentId ? 'Update Assignment' : 'New Project Assignment'}
                 </span>
                 <h3 className="text-xl font-bold text-[#131313] mt-0.5">
-                  Upload Assignment PDF &amp; Select Target Course
+                  {editingAssignmentId ? 'Edit Assignment & Target Course' : 'Upload Assignment PDF & Select Target Course'}
                 </h3>
               </div>
-              <RedCrossCloseButton onClick={() => setShowAddAssignmentModal(false)} />
+              <RedCrossCloseButton
+                onClick={() => {
+                  setShowAddAssignmentModal(false);
+                  setEditingAssignmentId(null);
+                }}
+              />
             </div>
 
             {/* Modal Body */}
@@ -13679,7 +13731,10 @@ export default function AdminPortalPage() {
               <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-3 flex-shrink-0">
                 <button
                   type="button"
-                  onClick={() => setShowAddAssignmentModal(false)}
+                  onClick={() => {
+                    setShowAddAssignmentModal(false);
+                    setEditingAssignmentId(null);
+                  }}
                   className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-all cursor-pointer"
                 >
                   Cancel
@@ -13689,7 +13744,11 @@ export default function AdminPortalPage() {
                   disabled={isSubmittingAssignment || isUploadingAssignmentPdf}
                   className="px-6 py-2.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50"
                 >
-                  {isSubmittingAssignment ? 'Publishing...' : 'Publish Assignment to Students'}
+                  {isSubmittingAssignment
+                    ? 'Saving...'
+                    : editingAssignmentId
+                    ? 'Update & Save Assignment'
+                    : 'Publish Assignment to Students'}
                 </button>
               </div>
             </form>

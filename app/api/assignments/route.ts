@@ -25,7 +25,7 @@ async function ensureDbSeeded(db: any) {
     await db.collection('assignments').deleteMany({
       $or: [
         { id: { $in: ['asgn-init-1', 'asgn-init-2', 'asgn-init-3'] } },
-        { pdfUrl: { $regex: 'dummy\.pdf', $options: 'i' } }
+        { pdfUrl: { $regex: 'dummy\\.pdf', $options: 'i' } }
       ]
     });
   } catch (err) {
@@ -33,7 +33,11 @@ async function ensureDbSeeded(db: any) {
   }
 }
 
-// GET: Fetch assignments (admin gets all, student gets filtered by enrolled courses)
+function escapeRegex(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// GET: Fetch assignments (admin gets all, student gets filtered by enrolled courses or all if requested)
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const coursesParam = searchParams.get('courses');
@@ -59,11 +63,28 @@ export async function GET(request: NextRequest) {
           });
         }
 
-        // Match if course matches or assignment is for 'All Courses'
-        query.$or = [
-          { course: 'All Courses' },
-          { course: { $in: courseList.map((c) => new RegExp(`^${c}$`, 'i')) } },
-        ];
+        const isRequestingAll =
+          courseList.length === 0 ||
+          courseList.some((c) => c.toLowerCase() === 'all' || c.toLowerCase() === 'all courses');
+
+        if (!isRequestingAll) {
+          const matchConditions: any[] = [
+            { course: 'All Courses' },
+            { course: 'all' },
+            { course: { $in: ['All Courses', 'all', 'All'] } },
+          ];
+
+          courseList.forEach((c) => {
+            const safe = escapeRegex(c);
+            matchConditions.push({ course: new RegExp(`^${safe}$`, 'i') });
+            // Flexible match for partial titles e.g. "Primavera" in "Oracle Primavera P6 Professional Enterprise"
+            if (c.length > 4) {
+              matchConditions.push({ course: new RegExp(safe, 'i') });
+            }
+          });
+
+          query.$or = matchConditions;
+        }
       }
 
       const assignments = await db
@@ -71,6 +92,13 @@ export async function GET(request: NextRequest) {
         .find(query)
         .sort({ createdAt: -1 })
         .toArray();
+
+      // Sync in-memory fallback
+      assignments.forEach((a: any) => {
+        const { _id, ...rest } = a;
+        const exists = inMemoryAssignments.some((m) => m.id === rest.id);
+        if (!exists) inMemoryAssignments.push(rest);
+      });
 
       return NextResponse.json({
         success: true,
@@ -95,10 +123,17 @@ export async function GET(request: NextRequest) {
         });
       }
 
-      results = results.filter((a) => {
-        const c = (a.course || '').toLowerCase();
-        return c === 'all courses' || courseList.includes(c);
-      });
+      const isRequestingAll =
+        courseList.length === 0 ||
+        courseList.some((c) => c === 'all' || c === 'all courses');
+
+      if (!isRequestingAll) {
+        results = results.filter((a) => {
+          const c = (a.course || '').toLowerCase().trim();
+          if (c === 'all courses' || c === 'all') return true;
+          return courseList.some((target) => c === target || c.includes(target) || target.includes(c));
+        });
+      }
     }
 
     results.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -165,6 +200,52 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+// PATCH / PUT: Admin updates an existing assignment
+export async function PATCH(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { id, title, course, description, pdfUrl, pdfName, pdfSize, dueDate, maxScore } = body;
+
+    if (!id) {
+      return NextResponse.json({ success: false, message: 'Assignment ID required' }, { status: 400 });
+    }
+
+    const updateFields: any = { updatedAt: new Date().toISOString() };
+    if (title !== undefined) updateFields.title = title.trim();
+    if (course !== undefined) updateFields.course = course.trim();
+    if (description !== undefined) updateFields.description = description.trim();
+    if (pdfUrl !== undefined) updateFields.pdfUrl = pdfUrl.trim();
+    if (pdfName !== undefined) updateFields.pdfName = pdfName.trim();
+    if (pdfSize !== undefined) updateFields.pdfSize = pdfSize.trim();
+    if (dueDate !== undefined) updateFields.dueDate = dueDate;
+    if (maxScore !== undefined) updateFields.maxScore = Number(maxScore);
+
+    // Update in-memory
+    inMemoryAssignments = inMemoryAssignments.map((a) => (a.id === id ? { ...a, ...updateFields } : a));
+
+    const { db, isConnected } = await connectToDatabase();
+    if (isConnected && db) {
+      await db.collection('assignments').updateOne({ id }, { $set: updateFields });
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Assignment updated successfully',
+      updatedFields: updateFields,
+    });
+  } catch (error: any) {
+    console.error('Error updating assignment:', error);
+    return NextResponse.json(
+      { success: false, message: 'Failed to update assignment', error: error.message },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  return PATCH(request);
 }
 
 // DELETE: Admin removes an assignment
