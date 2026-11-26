@@ -6050,11 +6050,8 @@ export default function StudentPortalPage() {
                         : `Class - ${cIdx + 1}`;
                       const classDurSeconds =
                         classDurations[cls.id] ||
-                        (isCurrent && videoDuration > 0 ? videoDuration : 0);
-                      const displayDuration =
-                        classDurSeconds > 0
-                          ? formatVideoTime(classDurSeconds)
-                          : (cls.duration && cls.duration !== '45 mins' ? cls.duration : (videoDuration > 0 ? formatVideoTime(videoDuration) : ''));
+                        (isCurrent && videoDuration > 0 ? videoDuration : parseDurationSeconds(cls.duration));
+                      const displayDuration = formatVideoTime(classDurSeconds);
 
                       return (
                         <div key={cls.id || cIdx}>
