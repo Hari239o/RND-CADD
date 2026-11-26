@@ -266,20 +266,36 @@ function formatVideoTime(seconds: number): string {
 }
 
 function parseDurationSeconds(durationStr?: string): number {
-  if (!durationStr) return 351; // default ~5:51
+  if (!durationStr) return 868; // default to actual class recording ~14:28
   const trimmed = durationStr.trim().toLowerCase();
+
+  // Handle format like "14 mins 28 secs" or "14m 28s"
+  const complexMatch = trimmed.match(/^(\d+)\s*(?:min|mins|m)\s*(\d+)?\s*(?:sec|secs|s)?/);
+  if (complexMatch && complexMatch[1]) {
+    const m = parseInt(complexMatch[1], 10);
+    const s = complexMatch[2] ? parseInt(complexMatch[2], 10) : 0;
+    if (m === 50 || m === 45) return 868; // Override legacy 50m placeholder to actual 14:28 video
+    return m * 60 + s;
+  }
+
   const minMatch = trimmed.match(/^([\d.]+)\s*(?:min|mins|minute|minutes)$/);
-  if (minMatch) return Math.round(parseFloat(minMatch[1]) * 60);
+  if (minMatch) {
+    const mins = parseFloat(minMatch[1]);
+    if (mins === 50 || mins === 45) return 868; // Override legacy 50m placeholder to actual 14:28 video
+    return Math.round(mins * 60);
+  }
   const hrMatch = trimmed.match(/^([\d.]+)\s*(?:hr|hrs|hour|hours)$/);
   if (hrMatch) return Math.round(parseFloat(hrMatch[1]) * 3600);
   const parts = trimmed.split(':').map((p) => parseInt(p, 10));
   if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
-    return parts[0] * 60 + parts[1];
+    const total = parts[0] * 60 + parts[1];
+    if (total === 3000 || total === 2700) return 868;
+    return total;
   }
   if (parts.length === 3 && !isNaN(parts[0]) && !isNaN(parts[1]) && !isNaN(parts[2])) {
     return parts[0] * 3600 + parts[1] * 60 + parts[2];
   }
-  return 351;
+  return 868;
 }
 
 const DEFAULT_COURSE_CLASSES: Record<string, CourseClass[]> = {
@@ -306,7 +322,7 @@ const DEFAULT_COURSE_CLASSES: Record<string, CourseClass[]> = {
       id: 'cls-civ-3',
       classNumber: 'Class 03',
       title: 'Custom Family Creation & Curtain Glazing Systems',
-      duration: '50 mins',
+      duration: '14 mins 28 secs',
       videoType: 'drive',
       videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
       description: 'Creating parametric window/door families, curtain wall mullion layout, and reference planes.',
@@ -326,7 +342,7 @@ const DEFAULT_COURSE_CLASSES: Record<string, CourseClass[]> = {
       id: 'cls-mec-1',
       classNumber: 'Class 01',
       title: 'SolidWorks 3D Parametric Sketching & Constraints',
-      duration: '50 mins',
+      duration: '14 mins 28 secs',
       videoType: 'drive',
       videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
       description: 'Fully constrained 2D sketches, geometric relations, boss-extrude, cut-extrude, and thin features.',
@@ -451,7 +467,7 @@ const DEFAULT_COURSE_CLASSES: Record<string, CourseClass[]> = {
       id: 'cls-int-2',
       classNumber: 'Class 02',
       title: 'SketchUp Modular Cabinetry & Hardware Fitting Details',
-      duration: '50 mins',
+      duration: '14 mins 28 secs',
       videoType: 'drive',
       videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
       description: 'Tandem drawer mechanisms, carcass panels, shutter finishes, edge-banding, and hardware specifications.',
@@ -5524,12 +5540,16 @@ export default function StudentPortalPage() {
                                   const dur = e.currentTarget.duration;
                                   if (dur && !isNaN(dur) && dur > 0 && isFinite(dur)) {
                                     setVideoDuration(Math.round(dur));
+                                  } else {
+                                    setVideoDuration(868);
                                   }
                                 }}
                                 onDurationChange={(e) => {
                                   const dur = e.currentTarget.duration;
                                   if (dur && !isNaN(dur) && dur > 0 && isFinite(dur)) {
                                     setVideoDuration(Math.round(dur));
+                                  } else {
+                                    setVideoDuration(868);
                                   }
                                 }}
                                 onPlay={() => setVideoIsPlaying(true)}
@@ -5632,7 +5652,7 @@ export default function StudentPortalPage() {
 
                                 return (
                                   <div
-                                    className="relative w-full h-5 flex items-center cursor-pointer group/scrub select-none px-0.5"
+                                    className="relative w-full h-6 flex items-center cursor-pointer group/scrub select-none px-0.5"
                                     onClick={handleScrubberClick}
                                     onTouchMove={(e) => {
                                       const touch = e.touches[0];
@@ -5643,7 +5663,7 @@ export default function StudentPortalPage() {
                                     }}
                                   >
                                     {/* Background track */}
-                                    <div className="w-full h-1 bg-white/25 rounded-full overflow-hidden transition-all group-hover/scrub:h-1.5">
+                                    <div className="w-full h-1.5 sm:h-2 bg-white/25 rounded-full overflow-hidden transition-all group-hover/scrub:h-2 sm:group-hover/scrub:h-2.5">
                                       {/* Played progress fill */}
                                       <div
                                         className="h-full bg-[#EE2C3C] transition-all rounded-full"
@@ -5652,76 +5672,76 @@ export default function StudentPortalPage() {
                                     </div>
                                     {/* Scrubber Thumb Indicator */}
                                     <div
-                                      className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3.5 h-3.5 bg-white rounded-full shadow-lg border-2 border-[#EE2C3C] pointer-events-none transition-transform"
+                                      className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 sm:w-5 sm:h-5 bg-white rounded-full shadow-xl border-2 border-[#EE2C3C] pointer-events-none transition-transform"
                                       style={{ left: `${progressPct}%` }}
                                     />
                                   </div>
                                 );
                               })()}
 
-                              {/* CONTROLS ROW (Neat, Balanced, Mobile-Engineered Capsule Bar) */}
-                              <div className="w-full flex items-center justify-between gap-1.5 sm:gap-3 mt-1">
+                              {/* CONTROLS ROW (Neat, Balanced, Mobile & Laptop High-Definition Bar) */}
+                              <div className="w-full flex items-center justify-between gap-2 sm:gap-4 mt-1">
                                 {/* LEFT GROUP: High-Contrast White Pill Play/Pause Button + Dark Frosted Glass Capsule with [ ⟲10 | ⟳10 | Timer ] */}
-                                <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+                                <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                                   {/* Prominent White Pill Play/Pause Button */}
                                   <button
                                     type="button"
                                     onClick={handlePlayPause}
-                                    className="h-8.5 sm:h-9 px-4 sm:px-5 rounded-full bg-white hover:bg-slate-100 text-slate-950 font-black flex items-center justify-center shadow-md active:scale-90 transition-all cursor-pointer shrink-0"
+                                    className="h-10 sm:h-11 px-5 sm:px-6 rounded-full bg-white hover:bg-slate-100 text-slate-950 font-black flex items-center justify-center shadow-lg active:scale-90 transition-all cursor-pointer shrink-0"
                                     title={videoIsPlaying ? 'Pause (k)' : 'Play (k)'}
                                   >
                                     {videoIsPlaying ? (
-                                      <svg className="w-4 h-4 fill-slate-950" viewBox="0 0 24 24">
+                                      <svg className="w-5 h-5 sm:w-6 sm:h-6 fill-slate-950" viewBox="0 0 24 24">
                                         <rect x="6" y="4" width="4" height="16" rx="1.5" />
                                         <rect x="14" y="4" width="4" height="16" rx="1.5" />
                                       </svg>
                                     ) : (
-                                      <svg className="w-4 h-4 fill-slate-950 translate-x-0.5" viewBox="0 0 24 24">
+                                      <svg className="w-5 h-5 sm:w-6 sm:h-6 fill-slate-950 translate-x-0.5" viewBox="0 0 24 24">
                                         <path d="M8 5v14l11-7z" />
                                       </svg>
                                     )}
                                   </button>
 
                                   {/* Dark Capsule: [ ⟲10 | ⟳10 | Live Timer ] */}
-                                  <div className="bg-[#18181b]/95 hover:bg-[#18181b] backdrop-blur-xl rounded-full border border-white/15 px-2.5 sm:px-3.5 py-1 sm:py-1.5 flex items-center gap-1.5 sm:gap-2.5 text-white shadow-xl shrink-0">
+                                  <div className="bg-[#18181b]/95 hover:bg-[#18181b] backdrop-blur-xl rounded-full border border-white/20 px-3 sm:px-4 py-1.5 sm:py-2 flex items-center gap-2 sm:gap-3 text-white shadow-xl shrink-0">
                                     {/* Rewind 10s Button */}
                                     <button
                                       type="button"
                                       onClick={handleSkipBackward}
-                                      className="w-7 h-7 rounded-full hover:bg-white/15 active:scale-85 text-white/90 hover:text-white transition-all cursor-pointer flex items-center justify-center shrink-0 relative"
+                                      className="w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-white/20 active:scale-85 text-white/90 hover:text-white transition-all cursor-pointer flex items-center justify-center shrink-0 relative"
                                       title="Rewind 10s"
                                     >
-                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                      <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" strokeWidth={2.2} viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M12.5 4.5A8.5 8.5 0 1 0 21 13" />
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M12.5 1.5v6l-4-3 4-3z" />
                                       </svg>
-                                      <span className="absolute text-[6.5px] font-black top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pt-0.5">10</span>
+                                      <span className="absolute text-[8px] sm:text-[9.5px] font-black font-sans top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pt-0.5 select-none pointer-events-none">10</span>
                                     </button>
 
                                     {/* Forward 10s Button */}
                                     <button
                                       type="button"
                                       onClick={handleSkipForward}
-                                      className="w-7 h-7 rounded-full hover:bg-white/15 active:scale-85 text-white/90 hover:text-white transition-all cursor-pointer flex items-center justify-center shrink-0 relative"
+                                      className="w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-white/20 active:scale-85 text-white/90 hover:text-white transition-all cursor-pointer flex items-center justify-center shrink-0 relative"
                                       title="Forward 10s"
                                     >
-                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                      <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" strokeWidth={2.2} viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M11.5 4.5A8.5 8.5 0 1 1 3 13" />
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M11.5 1.5v6l4-3-4-3z" />
                                       </svg>
-                                      <span className="absolute text-[6.5px] font-black top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pt-0.5">10</span>
+                                      <span className="absolute text-[8px] sm:text-[9.5px] font-black font-sans top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pt-0.5 select-none pointer-events-none">10</span>
                                     </button>
 
                                     {/* Subtle Divider */}
-                                    <div className="w-[1px] h-3.5 bg-white/20 mx-0.5" />
+                                    <div className="w-[1.5px] h-4 bg-white/25 mx-1" />
 
                                     {/* Live Dynamic Time Display */}
                                     {(() => {
                                       const totalDurationSecs = videoDuration > 0 ? videoDuration : parseDurationSeconds(activePlayerClass?.duration);
                                       return (
-                                        <div className="text-[10px] sm:text-xs font-mono font-semibold text-white/95 select-none tracking-tight whitespace-nowrap">
-                                          <span className="text-white font-bold">{formatVideoTime(videoCurrentTime)}</span>
-                                          <span className="text-white/40 mx-0.5">/</span>
+                                        <div className="text-xs sm:text-sm font-mono font-bold text-white/95 select-none tracking-tight whitespace-nowrap">
+                                          <span className="text-white font-extrabold">{formatVideoTime(videoCurrentTime)}</span>
+                                          <span className="text-white/40 mx-1">/</span>
                                           <span className="text-white/70">{formatVideoTime(totalDurationSecs)}</span>
                                         </div>
                                       );
@@ -5730,27 +5750,27 @@ export default function StudentPortalPage() {
                                 </div>
 
                                 {/* RIGHT GROUP: Dark Capsule with [ 🔊 | 1x | ⛶ ] */}
-                                <div className="bg-[#18181b]/95 hover:bg-[#18181b] backdrop-blur-xl rounded-full border border-white/15 px-2 sm:px-3 py-1 sm:py-1.5 flex items-center gap-1.5 sm:gap-2 text-white shadow-xl shrink-0">
+                                <div className="bg-[#18181b]/95 hover:bg-[#18181b] backdrop-blur-xl rounded-full border border-white/20 px-3 sm:px-4 py-1.5 sm:py-2 flex items-center gap-2 sm:gap-2.5 text-white shadow-xl shrink-0">
                                   {/* Mute / Unmute Button */}
                                   <button
                                     type="button"
                                     onClick={handleToggleMute}
-                                    className="w-7 h-7 rounded-full hover:bg-white/15 active:scale-85 text-white/90 hover:text-white transition-all cursor-pointer flex items-center justify-center shrink-0"
+                                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-white/20 active:scale-85 text-white/90 hover:text-white transition-all cursor-pointer flex items-center justify-center shrink-0"
                                     title={videoIsMuted ? 'Unmute' : 'Mute'}
                                   >
                                     {videoIsMuted ? (
-                                      <svg className="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                      <svg className="w-5 h-5 sm:w-6 sm:h-6 text-rose-400" fill="none" stroke="currentColor" strokeWidth={2.2} viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
                                       </svg>
                                     ) : (
-                                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                      <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" strokeWidth={2.2} viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                                       </svg>
                                     )}
                                   </button>
 
-                                  {/* Speed Pill (Tap to cycle speeds on mobile with instant feedback!) */}
+                                  {/* Speed Pill (Tap to cycle speeds on mobile & laptop with instant feedback!) */}
                                   <button
                                     type="button"
                                     onClick={() => {
@@ -5758,7 +5778,7 @@ export default function StudentPortalPage() {
                                       const nextIdx = (speeds.indexOf(videoPlaybackSpeed) + 1) % speeds.length;
                                       handleSpeedChange(speeds[nextIdx]);
                                     }}
-                                    className="px-2 py-0.5 rounded-full bg-white/15 hover:bg-white/25 active:scale-90 text-[10px] sm:text-xs font-mono font-bold text-white transition-all cursor-pointer"
+                                    className="h-8 sm:h-9 px-3 sm:px-3.5 rounded-full bg-white/20 hover:bg-white/30 active:scale-90 text-xs sm:text-sm font-mono font-black text-white transition-all cursor-pointer flex items-center justify-center shadow-xs"
                                     title="Tap to cycle playback speed"
                                   >
                                     {videoPlaybackSpeed === 1 ? '1x' : `${videoPlaybackSpeed}x`}
@@ -5768,10 +5788,10 @@ export default function StudentPortalPage() {
                                   <button
                                     type="button"
                                     onClick={handleToggleFullscreen}
-                                    className="w-7 h-7 rounded-full hover:bg-white/15 active:scale-85 text-white/90 hover:text-white transition-all cursor-pointer flex items-center justify-center shrink-0"
+                                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-white/20 active:scale-85 text-white/90 hover:text-white transition-all cursor-pointer flex items-center justify-center shrink-0"
                                     title="Full screen"
                                   >
-                                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" strokeWidth={2.2} viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                                     </svg>
                                   </button>

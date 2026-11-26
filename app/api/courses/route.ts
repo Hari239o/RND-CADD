@@ -175,7 +175,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         id: 'cls-civ-4',
         classNumber: 'Class 04',
         title: 'Navisworks Clash Matrix & Enscape 4K Walkthrough',
-        duration: '50 mins',
+        duration: '14 mins 28 secs',
         videoType: 'drive',
         videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Multi-trade hard clash detection, 4D construction schedule simulation, and GPU real-time daylight rendering.'
@@ -211,7 +211,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         id: 'cls-mec-1',
         classNumber: 'Class 01',
         title: 'SolidWorks 3D Parametric Sketching & Constraints',
-        duration: '50 mins',
+        duration: '14 mins 28 secs',
         videoType: 'drive',
         videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Fully constrained 2D sketches, geometric relations, boss-extrude, cut-extrude, and thin features.'
@@ -337,7 +337,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         id: 'cls-int-2',
         classNumber: 'Class 02',
         title: 'SketchUp Modular Cabinetry & Hardware Fitting Details',
-        duration: '50 mins',
+        duration: '14 mins 28 secs',
         videoType: 'drive',
         videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Tandem drawer mechanisms, carcass panels, shutter finishes, edge-banding, and hardware specifications.'
@@ -492,7 +492,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         id: 'cls-civ2-1',
         classNumber: 'Class 01',
         title: 'Core BIM Concepts & Family Editor',
-        duration: '50 mins',
+        duration: '14 mins 28 secs',
         videoType: 'drive',
         videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'BIM dimensions, UI setup, datum levels, grids, and parametric family creation.'
@@ -568,7 +568,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         id: 'cls-mec1-1',
         classNumber: 'Class 01',
         title: 'Parametric Part Feature Trees & Constraints',
-        duration: '50 mins',
+        duration: '14 mins 28 secs',
         videoType: 'drive',
         videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Advanced geometric constraints, sweeps, lofts, and multi-body dynamics.'
@@ -681,7 +681,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         id: 'cls-ele2-1',
         classNumber: 'Class 01',
         title: 'Project Setup & Macro Creation in EPLAN',
-        duration: '50 mins',
+        duration: '14 mins 28 secs',
         videoType: 'drive',
         videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'IEC 81346 designation, device tags, and creating reusable smart macros.'
@@ -757,7 +757,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         id: 'cls-int2-1',
         classNumber: 'Class 01',
         title: 'IES Photometric Spotlights & Daylight Setup',
-        duration: '50 mins',
+        duration: '14 mins 28 secs',
         videoType: 'drive',
         videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Placing manufacturer IES luminaire profiles and balancing interior daylight exposure.'
@@ -796,7 +796,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         id: 'cls-ppm1-1',
         classNumber: 'Class 01',
         title: 'EPS, WBS Architecture & Calendars in P6',
-        duration: '50 mins',
+        duration: '14 mins 28 secs',
         videoType: 'drive',
         videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Creating enterprise breakdown structure, defining calendars, and setting up WBS codes.'
@@ -872,7 +872,7 @@ const INITIAL_SEEDED_COURSES: StoredCourse[] = [
         id: 'cls-pip1-1',
         classNumber: 'Class 01',
         title: 'P&ID Drafting & Intelligent Equipment Tags',
-        duration: '50 mins',
+        duration: '14 mins 28 secs',
         videoType: 'drive',
         videoUrl: 'https://drive.google.com/file/d/1-tNZoMwAYd1jXLuVka8Lhkgqaxlj1V0c/preview',
         description: 'Drawing ISA compliant P&IDs, tagging pumps, and validating pipeline continuity.'

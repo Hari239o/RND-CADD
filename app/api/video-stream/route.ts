@@ -60,6 +60,10 @@ export async function GET(request: NextRequest) {
     outgoingHeaders.set('Content-Disposition', 'inline');
     outgoingHeaders.set('Accept-Ranges', 'bytes');
     outgoingHeaders.set('Access-Control-Allow-Origin', '*');
+    outgoingHeaders.set('Access-Control-Expose-Headers', 'X-Video-Duration, Content-Range, Content-Length');
+    outgoingHeaders.set('X-Video-Duration', '868');
+    outgoingHeaders.set('Access-Control-Expose-Headers', 'X-Video-Duration, Content-Range, Content-Length');
+    outgoingHeaders.set('X-Video-Duration', '868');
     outgoingHeaders.set('Cache-Control', 'public, max-age=3600');
 
     const contentRange = driveRes.headers.get('content-range');
@@ -101,6 +105,8 @@ export async function HEAD(request: NextRequest) {
     outgoingHeaders.set('Content-Type', 'video/webm');
     outgoingHeaders.set('Accept-Ranges', 'bytes');
     outgoingHeaders.set('Access-Control-Allow-Origin', '*');
+    outgoingHeaders.set('Access-Control-Expose-Headers', 'X-Video-Duration, Content-Range, Content-Length');
+    outgoingHeaders.set('X-Video-Duration', '868');
     const contentLength = driveRes.headers.get('content-length');
     if (contentLength) {
       outgoingHeaders.set('Content-Length', contentLength);
