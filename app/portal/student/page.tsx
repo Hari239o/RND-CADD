@@ -976,6 +976,7 @@ export default function StudentPortalPage() {
   const [jobSearchQuery, setJobSearchQuery] = useState<string>('');
   const [jobStreamFilter, setJobStreamFilter] = useState<string>('all');
   const [jobModeFilter, setJobModeFilter] = useState<string>('all');
+  const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
   const [applyingJob, setApplyingJob] = useState<JobPost | null>(null);
   const [applyStudentPhone, setApplyStudentPhone] = useState<string>('');
   const [applyPortfolioUrl, setApplyPortfolioUrl] = useState<string>('');
@@ -4114,6 +4115,7 @@ export default function StudentPortalPage() {
                           a.email?.toLowerCase() === studentUser.email?.toLowerCase()
                       );
                       const isClosed = job.status === 'Closed';
+                      const isExpanded = expandedJobId === job.id;
 
                       const streamColors: Record<string, string> = {
                         Mechanical: 'bg-amber-50 text-amber-800 border-amber-200',
@@ -4128,160 +4130,133 @@ export default function StudentPortalPage() {
                       return (
                         <div
                           key={job.id}
-                          className={`p-4 sm:p-6 rounded-2xl border transition-all bg-white shadow-xs hover:shadow-md ${
+                          className={`p-3.5 sm:p-5 rounded-2xl border transition-all bg-white shadow-xs hover:shadow-md ${
                             hasApplied
                               ? 'border-emerald-300 bg-emerald-50/20'
                               : isClosed
                               ? 'border-slate-200 opacity-75'
-                              : 'border-slate-200/90 hover:border-slate-400'
+                              : isExpanded
+                              ? 'border-[#EE2C3C]/50 ring-1 ring-[#EE2C3C]/20 shadow-sm'
+                              : 'border-slate-200/90 hover:border-slate-300'
                           }`}
                         >
-                          <div className="flex flex-col gap-3 sm:gap-4">
-                            {/* Top Row: Avatar + Title & Badges */}
-                            <div className="flex items-start gap-3 sm:gap-4">
-                              <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#131313] text-white flex items-center justify-center font-bold text-sm sm:text-base flex-shrink-0 shadow-xs overflow-hidden">
-                                {job.companyLogo ? (
-                                  <img
-                                    src={job.companyLogo}
-                                    alt={job.company}
-                                    className="w-full h-full object-contain p-1 rounded-xl"
-                                    onError={(e) => {
-                                      (e.target as HTMLElement).style.display = 'none';
-                                    }}
-                                  />
-                                ) : (
-                                  job.company.substring(0, 2).toUpperCase()
-                                )}
-                              </div>
+                          <div className="flex flex-col gap-2.5">
+                            {/* SIMPLE CARD VIEW (Always Visible) - Tap to Expand/Collapse */}
+                            <div
+                              onClick={() => setExpandedJobId(isExpanded ? null : job.id)}
+                              className="cursor-pointer select-none"
+                            >
+                              <div className="flex items-start gap-3 sm:gap-4">
+                                {/* Company Logo / Initials Avatar */}
+                                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#131313] text-white flex items-center justify-center font-bold text-sm sm:text-base flex-shrink-0 shadow-xs overflow-hidden">
+                                  {job.companyLogo ? (
+                                    <img
+                                      src={job.companyLogo}
+                                      alt={job.company}
+                                      className="w-full h-full object-contain p-1 rounded-xl"
+                                      onError={(e) => {
+                                        (e.target as HTMLElement).style.display = 'none';
+                                      }}
+                                    />
+                                  ) : (
+                                    job.company.substring(0, 2).toUpperCase()
+                                  )}
+                                </div>
 
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-start justify-between gap-2 flex-wrap sm:flex-nowrap">
-                                  <div>
-                                    <h3 className="text-base sm:text-lg font-bold text-[#131313] tracking-tight leading-snug">
-                                      {job.title}
-                                    </h3>
-                                    <div className="flex items-center gap-2 text-xs text-slate-600 mt-0.5 flex-wrap">
-                                      <span className="font-semibold text-slate-900">{job.company}</span>
-                                      <span>&bull;</span>
-                                      <span className="flex items-center gap-1">
-                                        <svg className="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                        <span>{job.location}</span>
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-start justify-between gap-2 flex-wrap sm:flex-nowrap">
+                                    <div>
+                                      <h3 className="text-base sm:text-lg font-bold text-[#131313] tracking-tight leading-snug">
+                                        {job.title}
+                                      </h3>
+                                      <div className="flex items-center gap-2 text-xs text-slate-600 mt-0.5 flex-wrap">
+                                        <span className="font-semibold text-slate-900">{job.company}</span>
+                                        <span>&bull;</span>
+                                        <span className="flex items-center gap-1">
+                                          <svg className="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                          </svg>
+                                          <span>{job.location}</span>
+                                        </span>
+                                      </div>
+                                    </div>
+
+                                    {/* Badges on mobile */}
+                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                      <span className={`px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs font-semibold border ${streamStyle}`}>
+                                        {job.stream}
                                       </span>
+                                      <span className="px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-medium bg-slate-100 text-slate-700">
+                                        {job.workMode}
+                                      </span>
+                                      <span className="px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                                        {job.jobType}
+                                      </span>
+                                      {hasApplied && (
+                                        <span className="px-2.5 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 inline-flex items-center gap-1">
+                                          <svg className="w-3 h-3 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                          </svg>
+                                          <span>Applied</span>
+                                        </span>
+                                      )}
                                     </div>
                                   </div>
+                                </div>
+                              </div>
 
-                                  {/* Badges on mobile */}
-                                  <div className="flex items-center gap-1.5 flex-wrap">
-                                    <span className={`px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs font-semibold border ${streamStyle}`}>
-                                      {job.stream}
-                                    </span>
-                                    <span className="px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-medium bg-slate-100 text-slate-700">
-                                      {job.workMode}
-                                    </span>
-                                    <span className="px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-medium bg-blue-50 text-blue-700 border border-blue-200">
-                                      {job.jobType}
-                                    </span>
-                                    {hasApplied && (
-                                      <span className="px-2.5 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 inline-flex items-center gap-1">
-                                        <svg className="w-3 h-3 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        <span>Applied</span>
-                                      </span>
-                                    )}
-                                  </div>
+                              {/* Simple Highlights Bar (Package & Openings) */}
+                              <div className="grid grid-cols-2 gap-2 pt-2.5">
+                                <div className="bg-emerald-50/70 border border-emerald-200/80 rounded-xl px-3 py-2 flex items-center justify-between">
+                                  <span className="text-[10px] text-emerald-700 font-bold uppercase tracking-wider">Package / CTC</span>
+                                  <span className="text-xs sm:text-sm font-black font-mono text-emerald-950">{job.salary}</span>
+                                </div>
+                                <div className="bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2 flex items-center justify-between">
+                                  <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Openings</span>
+                                  <span className="text-xs sm:text-sm font-bold text-slate-900">{job.vacancies} {job.vacancies === 1 ? 'Opening' : 'Openings'}</span>
                                 </div>
                               </div>
                             </div>
 
-                            {/* Key Highlights Grid on Mobile (Package, Vacancies, Experience) */}
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
-                              <div className="bg-emerald-50/70 border border-emerald-200/80 rounded-xl p-2.5">
-                                <span className="text-[10px] text-emerald-700 font-bold uppercase tracking-wider block">Package / CTC</span>
-                                <span className="text-xs sm:text-sm font-black font-mono text-emerald-950 block">{job.salary}</span>
-                              </div>
-                              <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5">
-                                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Openings</span>
-                                <span className="text-xs sm:text-sm font-bold text-slate-900 block">{job.vacancies} {job.vacancies === 1 ? 'Opening' : 'Openings'}</span>
-                              </div>
-                              <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 col-span-2 sm:col-span-1">
-                                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Experience</span>
-                                <span className="text-xs font-semibold text-slate-800 truncate block">Exp: {job.experience}</span>
-                              </div>
-                            </div>
+                            {/* Simple Card Action Bar: [ View Details Button / Toggle ] & [ Quick Apply Button ] */}
+                            <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-100">
+                              <button
+                                type="button"
+                                onClick={() => setExpandedJobId(isExpanded ? null : job.id)}
+                                className="px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 active:scale-95 text-slate-700 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                              >
+                                <span>{isExpanded ? 'Hide Details' : 'View Full Details'}</span>
+                                <svg
+                                  className={`w-3.5 h-3.5 text-slate-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                                </svg>
+                              </button>
 
-                            {/* Skills Tag Pills */}
-                            {((job.skills || job.tools || []).length > 0) && (
-                              <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
-                                {(job.skills || job.tools || []).map((skill: string, sIdx: number) => (
-                                  <span
-                                    key={sIdx}
-                                    className="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[11px] sm:text-xs font-medium"
-                                  >
-                                    {skill}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-
-                            {/* Description */}
-                            {job.description && (
-                              <p className="text-xs text-slate-600 leading-relaxed font-normal">
-                                {job.description}
-                              </p>
-                            )}
-
-                            {/* Requirements bullets */}
-                            {job.requirements && job.requirements.length > 0 && (
-                              <div className="pt-1">
-                                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
-                                  Key Requirements:
-                                </span>
-                                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-xs text-slate-600">
-                                  {job.requirements.map((req, rIdx) => (
-                                    <li key={rIdx} className="flex items-center gap-1.5">
-                                      <span className="text-emerald-600 font-bold">&bull;</span>
-                                      <span>{req}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-
-                            {/* Footer: Deadline & Apply Button (Full width on mobile!) */}
-                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3 border-t border-slate-100 mt-1">
-                              <div className="text-xs text-slate-500 flex items-center justify-between sm:justify-start gap-3">
-                                <span className="flex items-center gap-1 text-slate-600">
-                                  <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                  </svg>
-                                  <span>Deadline: <strong className="text-slate-800">{job.deadline}</strong></span>
-                                </span>
-                                <span className="text-[11px] text-slate-400">Posted: {job.postedDate}</span>
-                              </div>
-
-                              <div className="w-full sm:w-auto">
+                              <div>
                                 {hasApplied ? (
-                                  <div className="w-full sm:w-auto px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-center">
-                                    <span className="text-xs font-bold text-emerald-800 flex items-center justify-center gap-1.5">
-                                      <svg className="w-3.5 h-3.5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                      </svg>
-                                      <span>Applied &bull; Forwarded to HR</span>
-                                    </span>
-                                  </div>
+                                  <span className="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-800 inline-flex items-center gap-1">
+                                    <svg className="w-3 h-3 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span>Applied</span>
+                                  </span>
                                 ) : isClosed ? (
-                                  <div className="w-full sm:w-auto px-4 py-2 rounded-xl bg-slate-100 text-slate-500 text-xs font-bold text-center">
-                                    Position Closed
-                                  </div>
+                                  <span className="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-500 text-xs font-bold">
+                                    Closed
+                                  </span>
                                 ) : (
                                   <button
                                     type="button"
-                                    onClick={() => setApplyingJob(job)}
-                                    className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setApplyingJob(job);
+                                    }}
+                                    className="px-4 py-1.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs font-bold shadow-xs active:scale-95 transition-all cursor-pointer flex items-center gap-1"
                                   >
                                     <span>Quick Apply</span>
                                     <span>&rarr;</span>
@@ -4289,6 +4264,89 @@ export default function StudentPortalPage() {
                                 )}
                               </div>
                             </div>
+
+                            {/* EXPANDED FULL DETAILS (Shown when user clicks card or View Full Details) */}
+                            {isExpanded && (
+                              <div className="pt-3 border-t border-slate-100 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                                {/* Experience Highlight Box */}
+                                <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5">
+                                  <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Required Experience</span>
+                                  <span className="text-xs font-semibold text-slate-800 block mt-0.5">{job.experience}</span>
+                                </div>
+
+                                {/* Skills Tag Pills */}
+                                {((job.skills || job.tools || []).length > 0) && (
+                                  <div>
+                                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                                      CAD Software &amp; Tools:
+                                    </span>
+                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                      {(job.skills || job.tools || []).map((skill: string, sIdx: number) => (
+                                        <span
+                                          key={sIdx}
+                                          className="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[11px] sm:text-xs font-medium"
+                                        >
+                                          {skill}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Full Job Description */}
+                                {job.description && (
+                                  <div>
+                                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                                      Job Description:
+                                    </span>
+                                    <p className="text-xs text-slate-600 leading-relaxed font-normal bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                      {job.description}
+                                    </p>
+                                  </div>
+                                )}
+
+                                {/* Key Requirements bullets */}
+                                {job.requirements && job.requirements.length > 0 && (
+                                  <div>
+                                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                                      Key Requirements:
+                                    </span>
+                                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-xs text-slate-600 bg-slate-50/50 p-3 rounded-xl border border-slate-100">
+                                      {job.requirements.map((req, rIdx) => (
+                                        <li key={rIdx} className="flex items-center gap-1.5">
+                                          <span className="text-emerald-600 font-bold">&bull;</span>
+                                          <span>{req}</span>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                )}
+
+                                {/* Deadline & Primary Action Footer in Expanded View */}
+                                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2 border-t border-slate-100">
+                                  <div className="text-xs text-slate-500 flex items-center justify-between sm:justify-start gap-3">
+                                    <span className="flex items-center gap-1 text-slate-600">
+                                      <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                      </svg>
+                                      <span>Deadline: <strong className="text-slate-800">{job.deadline}</strong></span>
+                                    </span>
+                                    <span className="text-[11px] text-slate-400">Posted: {job.postedDate}</span>
+                                  </div>
+
+                                  {!hasApplied && !isClosed && (
+                                    <button
+                                      type="button"
+                                      onClick={() => setApplyingJob(job)}
+                                      className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                                    >
+                                      <span>Quick Apply Now</span>
+                                      <span>&rarr;</span>
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
                       );
