@@ -2853,39 +2853,102 @@ export default function StudentPortalPage() {
       <main className="flex-1 md:ml-80 flex flex-col min-h-0 md:h-screen overflow-y-auto bg-[#F9FAFB]">
         
 
-        {/* REAL-TIME JOB NOTIFICATION ALERT BANNER */}
+        {/* REAL-TIME JOB NOTIFICATION ALERT BANNER (MNC-Style Executive Layout) */}
         {(() => {
           const unread = jobNotifications.filter((n) => !dismissedNotificationIds.includes(n.id));
           if (unread.length === 0) return null;
           const latest = unread[0];
+          const matchedJob = studentJobs.find(
+            (j) => j.id === latest.jobId || j.company?.toLowerCase() === latest.company?.toLowerCase()
+          );
+          const companyLogo = matchedJob?.companyLogo;
+          const companyName = latest.company || matchedJob?.company || 'Partner EPC';
+          const jobTitle = matchedJob?.title || latest.title?.replace(/^New Placement Drive:\s*/i, '') || 'Engineering Trainee';
+          const jobSalary = matchedJob?.salary;
+          const jobLocation = matchedJob?.location;
+          const jobStream = matchedJob?.stream || latest.discipline || 'All Streams';
+
           return (
-            <div className="mx-3.5 sm:mx-8 mt-3.5 sm:mt-6 p-3.5 sm:p-4 rounded-2xl bg-white border border-emerald-200/90 shadow-xs transition-all hover:border-emerald-300">
-              <div className="flex items-start justify-between gap-2.5 sm:gap-3">
-                {/* Left: Icon + Tag & Formatted Relative Time */}
-                <div className="flex items-start gap-2.5 sm:gap-3 min-w-0 flex-1">
-                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-sm flex-shrink-0 shadow-2xs mt-0.5">
-                    <svg className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                    </svg>
+            <div className="mx-3.5 sm:mx-8 mt-3.5 sm:mt-6 p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-slate-300 shadow-xs transition-all relative overflow-hidden">
+              {/* Top Accent Stripe */}
+              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-emerald-500 via-[#EE2C3C] to-[#131313]" />
+
+              <div className="flex items-start justify-between gap-3">
+                {/* Brand / Company Logo & Notification Content */}
+                <div className="flex items-start gap-3 min-w-0 flex-1">
+                  {/* MNC Company Logo / Initials Tile */}
+                  <div className="relative shrink-0 mt-0.5">
+                    <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#131313] text-white flex items-center justify-center font-black text-sm sm:text-base shadow-xs border border-slate-200/80 overflow-hidden">
+                      {companyLogo ? (
+                        <img
+                          src={companyLogo}
+                          alt={companyName}
+                          className="w-full h-full object-contain p-1 rounded-xl"
+                          onError={(e) => {
+                            (e.target as HTMLElement).style.display = 'none';
+                          }}
+                        />
+                      ) : (
+                        <span>{companyName.substring(0, 2).toUpperCase()}</span>
+                      )}
+                    </div>
+                    {/* Verified Placement Badge */}
+                    <span
+                      className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center shadow-2xs"
+                      title="Verified Partner Placement"
+                    >
+                      <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </span>
                   </div>
+
+                  {/* Text & Meta Information */}
                   <div className="min-w-0 flex-1">
+                    {/* Top Row: Category Pill & Relative Time */}
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider flex items-center gap-1">
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/90 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider flex items-center gap-1.5 shadow-2xs">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        <span>New Placement Opening</span>
+                        <span>Verified Placement Drive</span>
                       </span>
                       <span className="text-[11px] font-semibold text-slate-500 flex items-center gap-1">
                         <span>&bull;</span>
                         <span>{formatNotificationTime(latest.timestamp)}</span>
                       </span>
                     </div>
-                    <p className="text-xs sm:text-sm font-bold text-[#131313] mt-1.5 leading-snug">
-                      {latest.message}
-                    </p>
+
+                    {/* Company & Role Headline */}
+                    <h4 className="text-sm sm:text-base font-bold text-[#131313] mt-1 tracking-tight leading-snug">
+                      <span className="text-slate-900 font-extrabold">{companyName}</span>
+                      <span className="text-slate-500 font-normal"> is hiring for </span>
+                      <span className="text-[#EE2C3C] font-extrabold">{jobTitle}</span>
+                    </h4>
+
+                    {/* High-Density Highlights Pill Grid on Mobile */}
+                    <div className="flex items-center gap-2 flex-wrap mt-2">
+                      {jobSalary && (
+                        <span className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-900 border border-emerald-200 text-xs font-mono font-bold flex items-center gap-1">
+                          <span>₹</span>
+                          <span>{jobSalary}</span>
+                        </span>
+                      )}
+                      <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold">
+                        {jobStream} Stream
+                      </span>
+                      {jobLocation && (
+                        <span className="px-2 py-1 rounded-lg bg-slate-50 text-slate-600 border border-slate-200/80 text-[11px] sm:text-xs font-medium flex items-center gap-1">
+                          <svg className="w-3 h-3 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          <span>{jobLocation}</span>
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                {/* Right: Quick Dismiss (✕) Icon for 1-tap mobile close */}
+                {/* Quick Dismiss (✕) Button */}
                 <button
                   type="button"
                   onClick={() =>
@@ -2898,12 +2961,12 @@ export default function StudentPortalPage() {
                 </button>
               </div>
 
-              {/* Bottom Actions Row: Full-width / primary CTA on mobile, plus desktop dismiss */}
-              <div className="flex items-center justify-between sm:justify-start gap-2.5 mt-3 pt-2.5 border-t border-slate-100">
+              {/* Bottom Actions Row */}
+              <div className="flex items-center justify-between sm:justify-start gap-2.5 mt-3 pt-3 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setActiveTab('Jobs')}
-                  className="w-full sm:w-auto px-4 py-2 rounded-xl bg-[#131313] hover:bg-[#EE2C3C] text-white text-xs font-bold shadow-xs active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <span>View Vacancies &amp; Apply</span>
                   <span className="text-sm font-normal">&rarr;</span>
