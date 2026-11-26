@@ -265,6 +265,33 @@ function formatVideoTime(seconds: number): string {
   return `${mStr}:${sStr}`;
 }
 
+function formatNotificationTime(timestampStr?: string): string {
+  if (!timestampStr) return 'Just now';
+  try {
+    const date = new Date(timestampStr);
+    if (isNaN(date.getTime())) return timestampStr;
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffSecs = Math.floor(diffMs / 1000);
+    const diffMins = Math.floor(diffSecs / 60);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffSecs < 60) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays}d ago`;
+
+    return date.toLocaleDateString('en-IN', {
+      month: 'short',
+      day: 'numeric',
+    });
+  } catch {
+    return 'Just now';
+  }
+}
+
 function parseDurationSeconds(durationStr?: string): number {
   if (!durationStr) return 868; // default to actual class recording ~14:28
   const trimmed = durationStr.trim().toLowerCase();
@@ -2832,41 +2859,61 @@ export default function StudentPortalPage() {
           if (unread.length === 0) return null;
           const latest = unread[0];
           return (
-            <div className="mx-6 sm:mx-8 mt-6 p-4 rounded-2xl bg-white border border-emerald-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex items-center space-x-3.5">
-                <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-lg flex-shrink-0 shadow-xs">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                  </svg>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[11px] font-bold uppercase tracking-wide text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded">
-                      New Placement Opening
-                    </span>
-                    <span className="text-xs text-slate-500 font-mono font-medium">
-                      {latest.timestamp}
-                    </span>
+            <div className="mx-3.5 sm:mx-8 mt-3.5 sm:mt-6 p-3.5 sm:p-4 rounded-2xl bg-white border border-emerald-200/90 shadow-xs transition-all hover:border-emerald-300">
+              <div className="flex items-start justify-between gap-2.5 sm:gap-3">
+                {/* Left: Icon + Tag & Formatted Relative Time */}
+                <div className="flex items-start gap-2.5 sm:gap-3 min-w-0 flex-1">
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-sm flex-shrink-0 shadow-2xs mt-0.5">
+                    <svg className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
                   </div>
-                  <span className="text-sm font-bold text-[#131313] block mt-0.5">
-                    {latest.message}
-                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <span>New Placement Opening</span>
+                      </span>
+                      <span className="text-[11px] font-semibold text-slate-500 flex items-center gap-1">
+                        <span>&bull;</span>
+                        <span>{formatNotificationTime(latest.timestamp)}</span>
+                      </span>
+                    </div>
+                    <p className="text-xs sm:text-sm font-bold text-[#131313] mt-1.5 leading-snug">
+                      {latest.message}
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex items-center gap-2 flex-shrink-0">
+                {/* Right: Quick Dismiss (✕) Icon for 1-tap mobile close */}
                 <button
-                  onClick={() => setActiveTab('Jobs')}
-                  className="px-4 py-2 rounded-xl bg-[#131313] hover:bg-[#EE2C3C] text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
-                >
-                  <span>View Vacancies &amp; Apply</span>
-                  <span>&rarr;</span>
-                </button>
-                <button
+                  type="button"
                   onClick={() =>
                     setDismissedNotificationIds((prev) => [...prev, ...unread.map((u) => u.id)])
                   }
-                  className="px-3 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                  className="w-7 h-7 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center text-xs font-bold transition-colors cursor-pointer shrink-0 -mt-0.5 -mr-0.5"
+                  title="Dismiss notification"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Bottom Actions Row: Full-width / primary CTA on mobile, plus desktop dismiss */}
+              <div className="flex items-center justify-between sm:justify-start gap-2.5 mt-3 pt-2.5 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('Jobs')}
+                  className="w-full sm:w-auto px-4 py-2 rounded-xl bg-[#131313] hover:bg-[#EE2C3C] text-white text-xs font-bold shadow-xs active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <span>View Vacancies &amp; Apply</span>
+                  <span className="text-sm font-normal">&rarr;</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setDismissedNotificationIds((prev) => [...prev, ...unread.map((u) => u.id)])
+                  }
+                  className="hidden sm:inline-flex px-3 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
                   title="Dismiss notification"
                 >
                   Dismiss
