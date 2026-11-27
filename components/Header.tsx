@@ -453,23 +453,23 @@ export const Header: React.FC<HeaderProps> = ({
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
               onClick={() => setMobileMenuOpen(false)}
-              className="absolute inset-0 bg-black/50 backdrop-blur-xs"
+              className="absolute inset-0 bg-slate-950/40 backdrop-blur-md"
               aria-hidden="true"
             />
 
-            {/* Drawer Content */}
+            {/* Glassmorphic Drawer Container */}
             <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-              className="absolute top-0 right-0 bottom-0 w-full max-w-[360px] sm:max-w-sm bg-white shadow-2xl flex flex-col justify-between overflow-y-auto pt-9 xs:pt-11 sm:pt-12 px-5 sm:px-6 pb-6 rounded-l-3xl border-l border-slate-200/80"
+              className="absolute top-0 right-0 bottom-0 w-full max-w-[360px] sm:max-w-sm bg-white/88 backdrop-blur-2xl shadow-[-16px_0_48px_rgba(0,0,0,0.18)] flex flex-col justify-between overflow-y-auto pt-9 xs:pt-11 sm:pt-12 px-5 sm:px-6 pb-6 rounded-l-3xl border-l border-white/60"
             >
               <div>
-                {/* Drawer Header with Generous Top Clearance */}
-                <div className="flex items-center justify-between pb-3.5 border-b border-slate-200/90">
+                {/* Drawer Header */}
+                <div className="flex items-center justify-between pb-3.5 border-b border-slate-200/50">
                   <div className="flex items-center gap-3">
-                    <img src="/logo.png" alt="RND CADD" className="h-10 sm:h-12 w-auto object-contain" />
+                    <img src="/logo.png" alt="RND CADD" className="h-10 sm:h-12 w-auto object-contain drop-shadow-xs" />
                     <div>
                       <span className="text-sm font-black text-[#15304C] uppercase tracking-wide block leading-tight">
                         RND CADD
@@ -482,7 +482,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <button
                     type="button"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-all cursor-pointer active:scale-90"
+                    className="w-9 h-9 rounded-full bg-white/80 hover:bg-white text-slate-700 flex items-center justify-center transition-all cursor-pointer active:scale-90 border border-white/80 shadow-2xs backdrop-blur-md"
                     aria-label="Close Menu"
                   >
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
@@ -491,25 +491,25 @@ export const Header: React.FC<HeaderProps> = ({
                   </button>
                 </div>
 
-                {/* User Status / Portal Card in Drawer */}
-                <div className="my-3.5 p-3 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-2xs">
+                {/* User Status Card with Pure Glassmorphism (No dull smoke gray) */}
+                <div className="my-3.5 p-3.5 rounded-2xl bg-white/75 backdrop-blur-xl border border-white/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
                   {currentUser ? (
-                    <div className="flex items-center justify-between">
-                      <div className="min-w-0 pr-2">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="min-w-0 pr-1">
+                        <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">
                           Signed in as
                         </span>
                         <p className="text-xs font-black text-slate-900 truncate">
                           {currentUser.name || currentUser.email}
                         </p>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-[#EE2C3C] uppercase inline-block mt-0.5">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-50 text-[#EE2C3C] border border-red-200/60 uppercase inline-block mt-0.5 font-mono">
                           {currentUser.role || 'Student'}
                         </span>
                       </div>
                       <Link
                         href={isAdmin ? '/portal/admin' : (currentUser?.email ? `/portal/student?email=${encodeURIComponent(currentUser.email)}` : '/portal/student')}
                         onClick={() => setMobileMenuOpen(false)}
-                        className="px-3.5 py-1.5 rounded-xl bg-[#15304C] text-white text-xs font-bold shrink-0 hover:bg-[#EE2C3C] transition-colors"
+                        className="px-3.5 py-1.5 rounded-xl bg-[#15304C] text-white text-xs font-bold shrink-0 hover:bg-[#EE2C3C] transition-all shadow-xs active:scale-95"
                       >
                         Dashboard
                       </Link>
@@ -519,14 +519,14 @@ export const Header: React.FC<HeaderProps> = ({
                       <Link
                         href="/signin"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex-1 py-2.5 text-center rounded-xl bg-white border border-slate-300 text-xs font-bold text-[#15304C] hover:bg-slate-50 shadow-2xs transition-all active:scale-95"
+                        className="flex-1 py-2.5 text-center rounded-xl bg-white/80 border border-white/80 text-xs font-bold text-[#15304C] hover:bg-white shadow-2xs transition-all active:scale-95 backdrop-blur-md"
                       >
                         Sign In
                       </Link>
                       <Link
                         href="/signup"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex-1 py-2.5 text-center rounded-xl bg-[#EE2C3C] hover:bg-[#D20A0B] text-white text-xs font-bold shadow-sm shadow-red-500/20 transition-all active:scale-95"
+                        className="flex-1 py-2.5 text-center rounded-xl bg-[#EE2C3C] hover:bg-[#D20A0B] text-white text-xs font-bold shadow-md shadow-red-500/20 transition-all active:scale-95"
                       >
                         Sign Up
                       </Link>
@@ -534,9 +534,9 @@ export const Header: React.FC<HeaderProps> = ({
                   )}
                 </div>
 
-                {/* Primary Quick Links */}
-                <div className="space-y-1.5 mb-4">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block px-1 mb-1">
+                {/* Primary Quick Links with Pure Glassmorphism */}
+                <div className="space-y-2 mb-4">
+                  <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block px-1 mb-1">
                     Quick Navigation
                   </span>
                   
@@ -545,13 +545,13 @@ export const Header: React.FC<HeaderProps> = ({
                     <Link
                       href="/jobs"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-slate-50/80 hover:bg-slate-100/90 border border-slate-200/70 text-xs font-bold text-slate-900 transition-colors"
+                      className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-white/75 hover:bg-white/95 backdrop-blur-xl border border-white/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] text-xs font-bold text-slate-900 transition-all active:scale-[0.99]"
                     >
                       <span className="flex items-center gap-2.5">
                         <span className="w-2 h-2 rounded-full bg-[#EE2C3C] animate-pulse"></span>
                         <span>Verified Jobs &amp; Placement Portal</span>
                       </span>
-                      <span className="text-[9px] bg-red-100 text-[#EE2C3C] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                      <span className="text-[9px] bg-red-50 border border-red-200/70 text-[#EE2C3C] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">
                         LIVE
                       </span>
                     </Link>
@@ -560,7 +560,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <button
                     type="button"
                     onClick={handleEnrollClick}
-                    className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-slate-50/80 hover:bg-slate-100/90 border border-slate-200/70 text-xs font-bold text-slate-900 transition-colors text-left"
+                    className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-white/75 hover:bg-white/95 backdrop-blur-xl border border-white/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] text-xs font-bold text-slate-900 transition-all text-left active:scale-[0.99]"
                   >
                     <span className="flex items-center gap-2.5">
                       <span className="w-2 h-2 rounded-full bg-blue-500"></span>
@@ -570,9 +570,9 @@ export const Header: React.FC<HeaderProps> = ({
                   </button>
                 </div>
 
-                {/* Engineering Disciplines Grid Pattern (Clean 2-Column Responsive Chips) */}
+                {/* Engineering Disciplines Glassmorphism Grid */}
                 <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block px-1 mb-2">
+                  <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block px-1 mb-2">
                     Browse Engineering Domains
                   </span>
                   <div className="grid grid-cols-2 gap-2">
@@ -587,8 +587,8 @@ export const Header: React.FC<HeaderProps> = ({
                             isAll ? 'col-span-2' : ''
                           } ${
                             isSelected
-                              ? 'bg-[#EE2C3C] text-white shadow-md shadow-red-500/20'
-                              : 'bg-slate-50/90 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
+                              ? 'bg-[#EE2C3C] text-white shadow-md shadow-red-500/25 border border-red-500/40'
+                              : 'bg-white/75 hover:bg-white/95 backdrop-blur-xl text-slate-800 border border-white/80 shadow-[0_2px_8px_rgba(0,0,0,0.02)]'
                           }`}
                         >
                           <span className="truncate">{item.label}</span>
@@ -601,7 +601,7 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
 
               {/* Drawer Footer */}
-              <div className="pt-3.5 border-t border-slate-200/80 mt-4">
+              <div className="pt-3.5 border-t border-slate-200/50 mt-4">
                 {currentUser && (
                   <button
                     type="button"
@@ -609,7 +609,7 @@ export const Header: React.FC<HeaderProps> = ({
                       handleSignOut();
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full py-2.5 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-bold transition-colors mb-2 cursor-pointer"
+                    className="w-full py-2.5 rounded-xl bg-white/75 hover:bg-rose-50/80 backdrop-blur-xl border border-rose-200/80 text-rose-600 text-xs font-bold transition-all mb-2 cursor-pointer shadow-2xs active:scale-[0.99]"
                   >
                     Sign Out
                   </button>
