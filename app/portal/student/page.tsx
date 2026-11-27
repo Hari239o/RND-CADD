@@ -6790,33 +6790,28 @@ export default function StudentPortalPage() {
         </div>
       )}
 
-      {/* DEDICATED E-BOOK PURCHASE & PROPER ROUTING MODAL */}
+      {/* DEDICATED E-BOOK PURCHASE & UNLOCK MODAL */}
       {selectedEbookForPurchase && (
-        <div className="fixed inset-0 z-50 bg-[#0F172A]/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
-          <div className="bg-white w-full max-w-xl rounded-2xl border border-slate-200/90 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden my-auto animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 bg-[#0F172A]/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white w-full max-w-md rounded-2xl border border-slate-200/90 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden my-auto animate-in fade-in duration-200">
             {/* Modal Header */}
-            <div className="px-6 py-4 bg-white text-[#131313] flex items-center justify-between border-b border-slate-200 flex-shrink-0">
-              <div className="flex items-center space-x-3 min-w-0">
-                <span className="w-10 h-10 rounded-xl bg-[#EE2C3C] text-white font-bold flex items-center justify-center text-xs shadow-xs flex-shrink-0">
-                  BUY
+            <div className="px-5 py-4 bg-white text-slate-900 flex items-center justify-between border-b border-slate-100 flex-shrink-0">
+              <div>
+                <span className="text-[10px] font-bold text-[#EE2C3C] uppercase tracking-wider block">
+                  Official CAD Manual
                 </span>
-                <div className="min-w-0">
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
-                    Premium CAD Handbook
-                  </span>
-                  <h3 className="text-base sm:text-lg font-bold text-[#131313] truncate mt-0.5">
-                    Purchase &amp; Unlock Handbook
-                  </h3>
-                </div>
+                <h3 className="text-base sm:text-lg font-bold text-slate-900 mt-0.5">
+                  Unlock Paid Handbook
+                </h3>
               </div>
               <RedCrossCloseButton onClick={() => setSelectedEbookForPurchase(null)} />
             </div>
 
-            {/* Modal Body: Book Overview & Proper Routing Paths */}
-            <div className="p-6 overflow-y-auto space-y-5 bg-slate-50/60">
+            {/* Modal Body */}
+            <div className="p-5 space-y-4 overflow-y-auto bg-white">
               {/* Book Summary Card */}
-              <div className="p-4 rounded-xl bg-white border border-slate-200 flex items-center space-x-4 shadow-2xs">
-                <div className="w-16 h-20 rounded-lg overflow-hidden flex-shrink-0 border border-slate-200 bg-slate-100 flex items-center justify-center">
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-3 shadow-2xs">
+                <div className="w-12 h-14 rounded-lg overflow-hidden flex-shrink-0 border border-slate-200 bg-white flex items-center justify-center">
                   {selectedEbookForPurchase.coverImage ? (
                     <img
                       src={selectedEbookForPurchase.coverImage}
@@ -6824,93 +6819,58 @@ export default function StudentPortalPage() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full bg-slate-100 p-1.5 flex flex-col justify-between text-[7px] text-slate-800 font-bold border border-slate-200">
-                      <span className="text-[#EE2C3C]">CAD</span>
-                      <span className="line-clamp-2 leading-tight">{selectedEbookForPurchase.title}</span>
+                    <div className="w-full h-full p-1.5 flex flex-col justify-between items-center text-center">
+                      <span className="text-[9px] font-black text-[#EE2C3C]">PDF</span>
+                      <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                      </svg>
                     </div>
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <span className="text-xs font-semibold text-[#EE2C3C] block truncate">
+                  <span className="text-xs font-bold text-[#EE2C3C] block truncate">
                     {selectedEbookForPurchase.course}
                   </span>
-                  <h4 className="text-sm font-bold text-[#131313] line-clamp-2 mt-0.5">
+                  <h4 className="text-sm font-bold text-slate-900 truncate mt-0.5">
                     {selectedEbookForPurchase.title}
                   </h4>
-                  <span className="text-xs font-medium text-slate-500 mt-1 block">
-                    {selectedEbookForPurchase.pages || 'Handbook'} &bull; Industrial Reference Standard
+                  <span className="text-[11px] text-slate-500 font-medium">
+                    {selectedEbookForPurchase.pages || 'CAD Manual'} &bull; Paid Edition
                   </span>
                 </div>
               </div>
 
-              {/* Proper Routing Options */}
-              <div className="space-y-3">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                  Choose How You Would Like to Unlock:
-                </span>
+              {/* Instant WhatsApp Unlock Action */}
+              <a
+                href={`https://wa.me/919908123456?text=${encodeURIComponent(`Hello RND CADD Academy, I am student ${studentUser.name} (${studentUser.id}). I want to unlock the handbook: "${selectedEbookForPurchase.title}". Please provide unlock access details.`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+              >
+                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                  <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86.173.086.275.072.376-.043.101-.116.433-.506.549-.68.116-.173.231-.145.39-.086s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824z" />
+                </svg>
+                <span>Unlock via WhatsApp</span>
+              </a>
 
-                {/* ROUTE 1: Route to Main Website Course Enrollment */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    window.location.href = '/#enrollment';
-                  }}
-                  className="w-full p-4 rounded-xl bg-white border-2 border-slate-200 hover:border-[#EE2C3C] hover:shadow-sm text-left transition-all flex items-center justify-between group cursor-pointer"
-                >
-                  <div className="space-y-0.5">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm font-bold text-[#131313] group-hover:text-[#EE2C3C] transition-colors">
-                        1. Enroll in Full Course Program
-                      </span>
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                        All Books Included
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-500 font-medium">
-                      Full course enrollment unlocks all official Autodesk &amp; Dassault reference books for free.
-                    </p>
-                  </div>
-                  <span className="text-slate-400 group-hover:text-[#EE2C3C] group-hover:translate-x-1 transition-all text-sm font-bold">
-                    &rarr;
-                  </span>
-                </button>
-
-                {/* ROUTE 2: Instant WhatsApp / Campus Desk Contact */}
-                <a
-                  href={`https://wa.me/919908123456?text=${encodeURIComponent(`Hello RND CADD Academy, I am student ${studentUser.name} (${studentUser.id}). I want to purchase and unlock the handbook: "${selectedEbookForPurchase.title}". Please share the payment QR code / invoice details.`)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full p-4 rounded-xl bg-white border-2 border-slate-200 hover:border-emerald-500 hover:shadow-sm text-left transition-all flex items-center justify-between group cursor-pointer block"
-                >
-                  <div className="space-y-0.5">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm font-bold text-[#131313] group-hover:text-emerald-600 transition-colors">
-                        2. WhatsApp Admissions Desk Directly
-                      </span>
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500 text-white">
-                        Instant QR
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-500 font-medium">
-                      Message Academic Director Er. Swamy Naidu for instant handbook unlock and receipt.
-                    </p>
-                  </div>
-                  <span className="text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all text-sm font-bold">
-                    &rarr;
-                  </span>
-                </a>
-              </div>
+              {/* Direct Phone Call to Campus Desk */}
+              <a
+                href="tel:+919908123456"
+                className="w-full py-2.5 px-4 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold transition-all shadow-2xs flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+              >
+                <svg className="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+                <span>Call Campus Desk (+91 99081 23456)</span>
+              </a>
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 bg-white border-t border-slate-200 flex items-center justify-between flex-shrink-0">
-              <span className="text-xs font-semibold text-slate-500">
-                Campus Desk: <strong className="text-[#131313]">+91 99081 23456</strong>
-              </span>
+            <div className="px-5 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-end flex-shrink-0">
               <button
                 type="button"
                 onClick={() => setSelectedEbookForPurchase(null)}
-                className="px-5 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs sm:text-sm font-bold cursor-pointer transition-all shadow-xs"
+                className="px-4 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs font-semibold cursor-pointer transition-all shadow-2xs"
               >
                 Close
               </button>
