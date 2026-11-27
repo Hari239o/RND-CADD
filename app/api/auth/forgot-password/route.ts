@@ -100,8 +100,8 @@ export async function POST(request: NextRequest) {
         success: true,
         message: `Verification code sent to ${identifier}`,
         emailSent: emailResult.success,
-        // Only surface the OTP directly if SMTP is not configured
-        otp: !isConfigured ? generatedOtp : undefined,
+        // Only surface the OTP directly in local development when SMTP is not configured
+        otp: process.env.NODE_ENV === 'development' && !isConfigured ? generatedOtp : undefined,
       });
     }
 
@@ -116,9 +116,9 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      if (!newPassword || newPassword.length < 4) {
+      if (!newPassword || newPassword.length < 6) {
         return NextResponse.json(
-          { success: false, message: 'New password must be at least 4 characters' },
+          { success: false, message: 'New password must be at least 6 characters' },
           { status: 400 }
         );
       }
@@ -141,12 +141,10 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // 2. Fallback to in-memory check or master bypass
+      // 2. Fallback to active in-memory record if MongoDB was not connected during request
       if (!isValid) {
         const mem = inMemoryOtps[identifier];
         if (mem && mem.code === trimmedOtp && Date.now() <= mem.expiresAt) {
-          isValid = true;
-        } else if (trimmedOtp === '849201' || trimmedOtp === '9908') {
           isValid = true;
         }
       }

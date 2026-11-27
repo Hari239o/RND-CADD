@@ -60,10 +60,12 @@ export async function GET(request: NextRequest) {
     }
 
     const normEmail = googleUser.email.toLowerCase().trim();
-    const isAdmin =
-      normEmail === 'harikishorereddy9908@gmail.com' ||
-      normEmail.includes('admin') ||
-      normEmail.includes('rndcadd');
+    // Strictly whitelist verified executive admin emails to prevent privilege escalation
+    const ADMIN_ALLOWLIST = [
+      'harikishorereddy9908@gmail.com',
+      'admin@rndcadd.com',
+    ];
+    const isAdmin = ADMIN_ALLOWLIST.includes(normEmail);
 
     const userRole = isAdmin ? 'admin' : 'student';
 

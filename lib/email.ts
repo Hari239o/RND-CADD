@@ -47,7 +47,7 @@ export async function sendEmail({
         secure: port === 465,
         auth: { user, pass },
         tls: {
-          rejectUnauthorized: false,
+          rejectUnauthorized: process.env.NODE_ENV === 'production',
         },
       });
 

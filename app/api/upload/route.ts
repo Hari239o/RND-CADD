@@ -19,9 +19,31 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'No file uploaded' }, { status: 400 });
     }
 
+    // Defensive Security: Enforce 10MB file size limit to prevent memory exhaustion DoS
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { success: false, message: 'File size exceeds maximum allowed limit (10 MB)' },
+        { status: 413 }
+      );
+    }
+
+    // Defensive Security: Block executable and dangerous script extensions
+    const ext = path.extname(file.name).toLowerCase();
+    const DISALLOWED_EXTENSIONS = [
+      '.exe', '.bat', '.cmd', '.sh', '.php', '.phtml', '.jsp', '.asp', '.aspx',
+      '.html', '.htm', '.js', '.mjs', '.vbs', '.scr', '.dll'
+    ];
+    if (DISALLOWED_EXTENSIONS.includes(ext)) {
+      return NextResponse.json(
+        { success: false, message: 'Security restriction: executable and script file types are blocked.' },
+        { status: 400 }
+      );
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const mimeType = file.type || 'image/png';
+    const mimeType = file.type || 'application/octet-stream';
     const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
     const base64Data = buffer.toString('base64');
 

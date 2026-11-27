@@ -24,20 +24,22 @@ export function getRazorpay(): Razorpay {
 }
 
 /**
- * Verify Razorpay HMAC-SHA256 signature
+ * Verify Razorpay HMAC-SHA256 signature using timing-safe comparison
  */
 export function verifySignature(
   orderId: string,
   paymentId: string,
   signature: string
 ): boolean {
-  if (!orderId || !paymentId) return false;
+  if (!orderId || !paymentId || !signature) return false;
 
-  // In test/sandbox mode where mock signature is used
+  // Only allow test bypass in non-production local development environments
+  const isDevEnvironment = process.env.NODE_ENV === 'development';
   if (
-    orderId.startsWith('order_test_') ||
-    paymentId.startsWith('pay_test_') ||
-    signature === 'mock_verified_signature'
+    isDevEnvironment &&
+    (orderId.startsWith('order_test_') ||
+      paymentId.startsWith('pay_test_') ||
+      signature === 'mock_verified_signature')
   ) {
     return true;
   }
@@ -48,7 +50,14 @@ export function verifySignature(
       .update(`${orderId}|${paymentId}`)
       .digest('hex');
 
-    return generatedSignature === signature;
+    const expectedBuffer = Buffer.from(generatedSignature, 'utf8');
+    const actualBuffer = Buffer.from(signature, 'utf8');
+
+    if (expectedBuffer.length !== actualBuffer.length) {
+      return false;
+    }
+
+    return crypto.timingSafeEqual(expectedBuffer, actualBuffer);
   } catch (err) {
     console.error('[Razorpay verifySignature] Error:', err);
     return false;

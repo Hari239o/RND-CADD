@@ -114,8 +114,8 @@ export async function POST(request: NextRequest) {
         phone: mobile ? String(mobile).trim() : '',
         stream: stream ? String(stream).trim() : '',
         courseName: '', // Empty until officially enrolled in a course
-        role: role === 'admin' ? 'admin' : 'student',
-        password, // stored securely
+        role: 'student', // Public registrations are strictly student accounts (prevents privilege escalation)
+        password, // user password
         createdAt: new Date(),
         status: 'active',
         accessStatus: 'pending_enrollment',
@@ -139,7 +139,7 @@ export async function POST(request: NextRequest) {
           stream: newUser.stream,
           assignedCourses: [],
         },
-        redirectUrl: newUser.role === 'admin' ? '/portal/admin' : '/portal/student',
+        redirectUrl: '/portal/student',
       });
     }
 

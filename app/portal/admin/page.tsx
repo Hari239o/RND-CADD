@@ -2031,8 +2031,8 @@ export default function AdminPortalPage() {
         } catch {}
       }
 
-      // Only accept admin sessions, never let a student session overwrite the admin portal
-      if (savedUser && (savedUser.role === 'admin' || savedUser.email?.includes('admin') || savedUser.email?.includes('harikishore'))) {
+      // Only accept authenticated admin sessions, never let unauthenticated visitors into the admin portal
+      if (savedUser && (savedUser.role === 'admin' || savedUser.email === 'harikishorereddy9908@gmail.com' || savedUser.email === 'admin@rndcadd.com')) {
         setAdminUser((prev) => ({
           ...prev,
           name: savedUser.name || 'Hari Kishore Reddy',
@@ -2045,13 +2045,8 @@ export default function AdminPortalPage() {
         }));
         sessionStorage.setItem('rnd_cadd_role', 'admin');
       } else {
-        // Default clean admin session for this window
-        sessionStorage.setItem('rnd_cadd_user', JSON.stringify({
-          name: 'Hari Kishore Reddy',
-          email: 'harikishorereddy9908@gmail.com',
-          role: 'admin',
-        }));
-        sessionStorage.setItem('rnd_cadd_role', 'admin');
+        // Unauthenticated or non-admin visitor -> redirect to sign-in
+        window.location.replace('/signin?redirect=/portal/admin');
       }
     }
   }, []);

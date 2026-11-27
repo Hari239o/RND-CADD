@@ -35,24 +35,11 @@ export async function GET() {
     database: {
       provider: 'MongoDB',
       connected: mongoTest.connected,
-      dbName: mongoTest.dbName || dbName,
-      pingMs: mongoTest.pingMs,
-      collections: mongoTest.collections || [],
-      error: mongoTest.error,
-      uriPreview: maskedMongoUri,
+      status: mongoTest.connected ? 'Operational' : 'Disconnected',
     },
     cloudStorage: {
       provider: 'Cloudflare',
-      r2: {
-        configured: r2Configured,
-        bucketName: r2Config.bucketName,
-        publicUrl: r2Config.publicUrl || null,
-        accountId: r2Config.accountId ? maskString(r2Config.accountId) : null,
-        accessKeyId: r2Config.accessKeyId ? maskString(r2Config.accessKeyId) : null,
-      },
-      images: {
-        configured: imagesConfigured,
-      },
+      configured: r2Configured || imagesConfigured,
       activeProvider: r2Configured
         ? 'Cloudflare R2 Object Storage'
         : imagesConfigured
