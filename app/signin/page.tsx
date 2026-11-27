@@ -74,13 +74,13 @@ export default function SignInPage() {
       }
     };
 
-    // Direct Instant Handling for Designated Administrator
-    if (
-      normEmail.includes('harikishore') ||
-      normEmail.includes('admin') ||
-      normEmail === 'harikishorereddy9908@gmial.com' ||
-      normEmail === 'harikishorereddy9908@gmail.com'
-    ) {
+    // Direct Verification for Designated Administrator
+    const ADMIN_ACCOUNTS = [
+      'harikishorereddy9908@gmail.com',
+      'admin@rndcadd.com',
+      'admin@gmail.com',
+    ];
+    if (ADMIN_ACCOUNTS.includes(normEmail)) {
       if (trimmedPassword === '9908') {
         const userObj = {
           name: 'Hari Kishore Reddy',

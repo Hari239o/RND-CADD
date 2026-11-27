@@ -1365,8 +1365,8 @@ export default function StudentPortalPage() {
       setPasswordStatusMsg({ type: 'error', text: 'Please enter a new password.' });
       return;
     }
-    if (newPassword.length < 4) {
-      setPasswordStatusMsg({ type: 'error', text: 'New password must be at least 4 characters.' });
+    if (newPassword.length < 6) {
+      setPasswordStatusMsg({ type: 'error', text: 'New password must be at least 6 characters.' });
       return;
     }
     if (newPassword !== confirmPassword) {

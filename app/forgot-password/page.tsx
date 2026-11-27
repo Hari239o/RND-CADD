@@ -63,9 +63,7 @@ export default function ForgotPasswordPage() {
         setErrorMessage(data.message || 'Unable to send verification code.');
       }
     } catch (err: any) {
-      setOtp('849201');
-      setSuccessMessage('Verification code generated. Please set your new password.');
-      setStep(2);
+      setErrorMessage('Network error: Unable to reach recovery service. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -80,8 +78,8 @@ export default function ForgotPasswordPage() {
       setErrorMessage('Please enter the 6-digit verification code.');
       return;
     }
-    if (newPassword.length < 4) {
-      setErrorMessage('New password must be at least 4 characters.');
+    if (newPassword.length < 6) {
+      setErrorMessage('New password must be at least 6 characters.');
       return;
     }
     if (newPassword !== confirmPassword) {
@@ -115,10 +113,8 @@ export default function ForgotPasswordPage() {
         setLoading(false);
       }
     } catch (err: any) {
-      setSuccessMessage('Password updated! Redirecting to Sign In...');
-      setTimeout(() => {
-        router.push('/signin');
-      }, 700);
+      setErrorMessage('Network error: Could not complete password reset. Please try again.');
+      setLoading(false);
     }
   };
 
