@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
         fileSize: doc.fileSize || '',
         fileType: 'pdf',
         isVerified: doc.isVerified ?? true,
-        issuer: doc.issuer || 'Er. Swamy Naidu (Academic Director)',
+        issuer: doc.issuer || 'Academic Director',
         notes: doc.notes || '',
         createdAt: doc.createdAt || new Date().toISOString(),
       }));
@@ -152,7 +152,7 @@ export async function POST(request: NextRequest) {
       fileSize: (fileSize || 'PDF Document').trim(),
       fileType: 'pdf',
       isVerified: true,
-      issuer: 'Er. Swamy Naidu (Academic Director)',
+      issuer: 'Academic Director',
       notes: (notes || '').trim(),
       createdAt: new Date().toISOString(),
     };

@@ -24,14 +24,14 @@ export interface LiveClassSession {
 const DEFAULT_OFFLINE_SESSION: LiveClassSession = {
   id: 'live-default-1',
   title: 'Parametric Family Creation & Advanced Modeling in Autodesk Revit',
-  trainer: 'Er. Swamy Naidu',
+  trainer: 'Senior CAD Faculty',
   course: 'Civil CADD & Master BIM',
   status: 'Ended',
   isLive: false,
   streamUrl: 'https://meet.google.com/new',
   platform: 'Virtual CAD Workstation',
   timing: 'Batch Schedule: Mon-Fri 10:00 AM',
-  description: 'Trainer Er. Swamy Naidu demonstrates Parametric Family Creation in Autodesk Revit.',
+  description: 'Faculty mentor demonstrates Parametric Family Creation in Autodesk Revit.',
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 };
@@ -92,7 +92,7 @@ export async function GET() {
       const formatSession = (doc: any): LiveClassSession => ({
         id: doc.id || doc._id?.toString() || `live-${Date.now()}`,
         title: doc.title || 'Parametric Family Creation in Autodesk Revit',
-        trainer: doc.trainer || 'Er. Swamy Naidu',
+        trainer: doc.trainer || 'Senior CAD Faculty',
         course: doc.course || 'All Enrolled Students',
         status: doc.status === 'Live Now' ? 'Live Now' : (doc.status === 'Scheduled' ? 'Scheduled' : 'Ended'),
         isLive: doc.status === 'Live Now' && Boolean(doc.isLive !== false),
@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
     const newSession: LiveClassSession = {
       id: body.id || `live-${Date.now()}`,
       title: title.trim(),
-      trainer: trainer?.trim() || 'Er. Swamy Naidu',
+      trainer: trainer?.trim() || 'Senior CAD Faculty',
       course: course?.trim() || 'All Enrolled Students',
       status: sessionStatus,
       isLive,

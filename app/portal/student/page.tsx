@@ -736,7 +736,7 @@ const BookCoverGraphic = ({ book, onClick }: { book: EbookItem; onClick?: () => 
       {/* Bottom Specifications Bar */}
       <div className="relative z-10 pl-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-medium">
         <span className="font-mono text-slate-600">{book.pages || 'Handbook'}</span>
-        <span className="text-[10px] text-slate-500">Er. Swamy Naidu (Dir.)</span>
+        <span className="text-[10px] text-slate-500">Official CAD Edition</span>
       </div>
     </div>
   );
@@ -3051,7 +3051,7 @@ export default function StudentPortalPage() {
                   Workstation Access Revoked By Administrator
                 </span>
                 <span className="text-xs sm:text-sm font-medium text-rose-700">
-                  Your CAD lab workstation privileges and software license access are currently suspended. Please contact Er. Swamy Naidu or Ameerpet center administration to reactivate your access.
+                  Your CAD lab workstation privileges and software license access are currently suspended. Please contact the Ameerpet center administration to reactivate your access.
                 </span>
               </div>
             </div>
@@ -5774,7 +5774,7 @@ export default function StudentPortalPage() {
                   Video Lectures &amp; Workstation Access Revoked
                 </h4>
                 <p className="text-sm text-slate-600 font-medium">
-                  Your access to online class recordings and laboratory sessions has been suspended by the administrator. Please contact Er. Swamy Naidu or Ameerpet branch front desk to reactivate your credentials.
+                  Your access to online class recordings and laboratory sessions has been suspended by the administrator. Please contact the Ameerpet branch front desk to reactivate your credentials.
                 </p>
                 <button
                   type="button"
@@ -7146,8 +7146,8 @@ export default function StudentPortalPage() {
                   </p>
                 </div>
                 <div className="text-left sm:text-right">
-                  <div className="font-bold text-[#131313]">Er. Swamy Naidu</div>
-                  <div className="text-[11px] text-slate-500">Director &amp; Chief BIM Architect</div>
+                  <div className="font-bold text-[#131313]">Authorized Signatory</div>
+                  <div className="text-[11px] text-slate-500">Academic Director &amp; Head of Training</div>
                   <div className="text-[10px] text-slate-400 font-mono">R&amp;D CADD CENTRE HYDERABAD</div>
                 </div>
               </div>

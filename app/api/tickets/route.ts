@@ -196,7 +196,7 @@ export async function PATCH(request: NextRequest) {
     if (status === 'Resolved') {
       updateFields.resolvedAt = now;
       if (!resolvedBy) {
-        updateFields.resolvedBy = 'Er. Swamy Naidu (Director / Chief Architect)';
+        updateFields.resolvedBy = 'CAD Faculty Desk';
       }
     }
 

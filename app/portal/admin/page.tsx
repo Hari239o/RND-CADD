@@ -1143,7 +1143,7 @@ export default function AdminPortalPage() {
   const [selectedTicketForReply, setSelectedTicketForReply] = useState<SupportTicket | null>(null);
   const [replyText, setReplyText] = useState<string>('');
   const [replyStatus, setReplyStatus] = useState<'In Progress' | 'Resolved'>('Resolved');
-  const [replyFaculty, setReplyFaculty] = useState<string>('Er. Swamy Naidu (Director / Chief Architect)');
+  const [replyFaculty, setReplyFaculty] = useState<string>('CAD Faculty Desk');
   const [isSubmittingTicketReply, setIsSubmittingTicketReply] = useState<boolean>(false);
 
   // Assignments Management State (Real-time DB synced with /api/assignments)
@@ -1204,12 +1204,12 @@ export default function AdminPortalPage() {
   const [isLoadingLive, setIsLoadingLive] = useState<boolean>(false);
   const [isBroadcasting, setIsBroadcasting] = useState<boolean>(false);
   const [liveFormTitle, setLiveFormTitle] = useState<string>('Parametric Family Creation in Autodesk Revit');
-  const [liveFormTrainer, setLiveFormTrainer] = useState<string>('Er. Swamy Naidu');
+  const [liveFormTrainer, setLiveFormTrainer] = useState<string>('Senior CAD Faculty');
   const [liveFormCourse, setLiveFormCourse] = useState<string>('Civil CADD & Master BIM');
   const [liveFormUrl, setLiveFormUrl] = useState<string>('https://meet.google.com/new');
   const [liveFormPlatform, setLiveFormPlatform] = useState<'Virtual CAD Workstation' | 'Google Meet' | 'Zoom' | 'YouTube Live' | 'Microsoft Teams'>('Virtual CAD Workstation');
   const [liveFormTiming, setLiveFormTiming] = useState<string>('Live Broadcast Active (Lab Session)');
-  const [liveFormDescription, setLiveFormDescription] = useState<string>('Trainer Er. Swamy Naidu is currently live demonstrating Parametric Family Creation in Autodesk Revit. Connect to your dedicated CAD workstation screen.');
+  const [liveFormDescription, setLiveFormDescription] = useState<string>('Faculty mentor is currently live demonstrating Parametric CAD/BIM modeling. Connect to your workstation screen.');
 
 
   const showToast = (msg: string) => {
@@ -1741,7 +1741,7 @@ export default function AdminPortalPage() {
           id: selectedTicketForReply.id,
           status: replyStatus,
           adminReply: replyText.trim(),
-          resolvedBy: replyFaculty.trim() || 'Er. Swamy Naidu (Director / Chief Architect)',
+          resolvedBy: replyFaculty.trim() || 'CAD Faculty Desk',
         }),
       });
       const data = await res.json();
@@ -4050,7 +4050,7 @@ export default function AdminPortalPage() {
                   onClick={() => {
                     setEditingLiveId(null);
                     setLiveFormTitle('');
-                    setLiveFormTrainer('Er. Swamy Naidu');
+                    setLiveFormTrainer('Senior CAD Faculty');
                     setLiveFormCourse('Civil CADD & Master BIM');
                     setLiveFormUrl('https://meet.google.com/new');
                     setLiveFormPlatform('Virtual CAD Workstation');
@@ -5331,31 +5331,20 @@ export default function AdminPortalPage() {
           {/* TAB 6: JOBS & PLACEMENT BOARD (Full real-time management synced to live website & student notifications) */}
           {activeTab === 'Jobs' && (
             <div className="space-y-6">
-              {/* Top Banner & Header */}
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                  <div className="flex items-center space-x-2 mb-1.5">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                      Live Website Sync Active
-                    </span>
-                    <span className="text-xs font-medium text-slate-500">
-                      Reflects instantly on <span className="font-mono text-slate-700 font-semibold">/#jobs-portal</span> &amp; Student Portal
-                    </span>
-                  </div>
-                  <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-                    Placement &amp; Core Engineering Job Board
-                  </h2>
-                  <p className="text-sm text-slate-600 mt-1">
-                    Manage core CAD/BIM hiring openings from partner EPC companies, view candidate applications, and broadcast instant alerts.
-                  </p>
+              {/* Clean Actions Toolbar */}
+              <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold flex items-center gap-1.5 shadow-2xs">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>{jobs.filter((j) => j.status === 'Active').length} Active Vacancies</span>
+                  </span>
                 </div>
 
-                <div className="flex items-center gap-3 flex-wrap">
+                <div className="flex items-center gap-2.5 flex-wrap">
                   <button
                     onClick={() => fetchJobs()}
                     disabled={isLoadingJobs}
-                    className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold transition-colors cursor-pointer flex items-center gap-2 shadow-2xs"
+                    className="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold transition-colors cursor-pointer flex items-center gap-2 shadow-2xs"
                     title="Refresh Job Vacancies"
                   >
                     <svg
@@ -5373,20 +5362,19 @@ export default function AdminPortalPage() {
                     href="/#jobs-portal"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-sm font-semibold transition-colors flex items-center gap-2"
+                    className="px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs sm:text-sm font-semibold transition-colors flex items-center gap-2"
                   >
-                    <span>View Live Website</span>
-                    <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <span>View Live Site</span>
+                    <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
                   </a>
 
                   <button
                     onClick={() => setShowAddJobModal(true)}
-                    className="px-5 py-2.5 rounded-xl bg-[#15304C] hover:bg-[#0F2038] text-white text-sm font-bold shadow-sm transition-all cursor-pointer flex items-center gap-2"
+                    className="px-4 py-2 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
                   >
-                    <span className="text-lg leading-none font-bold">+</span>
-                    <span>Post New Job Vacancy</span>
+                    <span>+ Post Opening</span>
                   </button>
                 </div>
               </div>
@@ -6242,25 +6230,7 @@ export default function AdminPortalPage() {
 
           {/* TAB 7: SUPPORT & HELPDESK TICKETS */}
           {(activeTab === 'Support' || activeTab === 'CADDESK Channel') && (
-            <div className="space-y-6">
-              {/* Header Box */}
-              <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-[#EE2C3C] text-white uppercase tracking-wider">
-                      Faculty Resolution Desk
-                    </span>
-                    <span className="text-xs font-semibold text-slate-500">Live Student Helpdesk</span>
-                  </div>
-                  <h3 className="text-2xl font-bold text-[#131313] tracking-tight">
-                    Student Support &amp; Doubt Clearance Tickets
-                  </h3>
-                  <p className="text-sm text-slate-500 font-medium mt-1">
-                    Incoming technical queries regarding software licenses, workstation errors, and design projects. Review problem details, provide official solutions, and mark as resolved.
-                  </p>
-                </div>
-              </div>
-
+            <div className="space-y-4 sm:space-y-6">
               {/* Dynamic Stats Row */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-2xs">
@@ -6502,7 +6472,7 @@ export default function AdminPortalPage() {
                                     setSelectedTicketForReply(t);
                                     setReplyText(t.adminReply || '');
                                     setReplyStatus(isResolved ? 'Resolved' : 'Resolved');
-                                    setReplyFaculty(t.resolvedBy || 'Er. Swamy Naidu (Director / Chief Architect)');
+                                    setReplyFaculty(t.resolvedBy || 'CAD Faculty Desk');
                                   }}
                                   className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1.5 ${
                                     isResolved
@@ -6521,54 +6491,6 @@ export default function AdminPortalPage() {
                   );
                 })()
               )}
-
-              {/* Collapsible Campus Broadcast Container */}
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="text-base font-bold text-[#131313]">Campus Broadcast Announcements</h4>
-                    <p className="text-xs text-slate-500 font-medium mt-0.5">
-                      Send batch-wide urgent notices to all active student portal dashboards
-                    </p>
-                  </div>
-                </div>
-                <div className="p-4 border border-slate-200 rounded-xl bg-slate-50/70 space-y-3">
-                  <input
-                    type="text"
-                    value={broadcastTitle}
-                    onChange={(e) => setBroadcastTitle(e.target.value)}
-                    placeholder="Broadcast Title: e.g. Autodesk Certified Professional Exam Slots Announced..."
-                    className="w-full p-3 rounded-xl border border-slate-200 text-sm font-semibold bg-white focus:outline-none focus:border-[#EE2C3C]"
-                  />
-                  <textarea
-                    rows={2}
-                    value={broadcastMessage}
-                    onChange={(e) => setBroadcastMessage(e.target.value)}
-                    placeholder="Announcement message for all Civil, Mechanical, and Electrical students..."
-                    className="w-full p-3 rounded-xl border border-slate-200 text-sm font-semibold bg-white focus:outline-none focus:border-[#EE2C3C]"
-                  />
-                  <button
-                    onClick={() => {
-                      if (!broadcastTitle) {
-                        alert('Please provide an announcement title.');
-                        return;
-                      }
-                      setBroadcastSent(true);
-                      showToast('Broadcast published to active student portals!');
-                      setBroadcastTitle('');
-                      setBroadcastMessage('');
-                    }}
-                    className="px-5 py-2.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs font-bold uppercase tracking-wider shadow-xs cursor-pointer"
-                  >
-                    Broadcast to Students &rarr;
-                  </button>
-                  {broadcastSent && (
-                    <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-bold text-emerald-800">
-                      Broadcast live! Displayed on active student portal dashboards.
-                    </div>
-                  )}
-                </div>
-              </div>
             </div>
           )}
 
@@ -7375,7 +7297,7 @@ export default function AdminPortalPage() {
                     Lead Trainer
                   </span>
                   <span className="text-sm font-bold text-[#131313] block mt-1 truncate">
-                    {liveSession?.trainer || 'Er. Swamy Naidu'}
+                    {liveSession?.trainer || 'Senior CAD Faculty'}
                   </span>
                   <span className="text-xs sm:text-sm text-slate-400 block mt-0.5 font-medium">
                     Faculty Mentor
@@ -13502,7 +13424,7 @@ export default function AdminPortalPage() {
                   type="text"
                   value={replyFaculty}
                   onChange={(e) => setReplyFaculty(e.target.value)}
-                  placeholder="e.g. Er. Swamy Naidu (Director / Chief Architect)"
+                  placeholder="e.g. CAD Faculty Desk"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-[#131313] bg-white focus:outline-none focus:border-[#EE2C3C]"
                   required
                 />
@@ -14140,7 +14062,7 @@ export default function AdminPortalPage() {
                     type="text"
                     value={liveFormTrainer}
                     onChange={(e) => setLiveFormTrainer(e.target.value)}
-                    placeholder="e.g. Er. Swamy Naidu"
+                    placeholder="e.g. Senior CAD Faculty"
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#EE2C3C] shadow-2xs"
                   />
                 </div>
@@ -14217,7 +14139,7 @@ export default function AdminPortalPage() {
                   rows={3}
                   value={liveFormDescription}
                   onChange={(e) => setLiveFormDescription(e.target.value)}
-                  placeholder="e.g. Trainer Er. Swamy Naidu is demonstrating Parametric Revit Families. Connect to workstation screen."
+                  placeholder="e.g. Faculty mentor is demonstrating Parametric Revit Families. Connect to workstation screen."
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:border-[#EE2C3C] shadow-2xs resize-none"
                 />
               </div>
