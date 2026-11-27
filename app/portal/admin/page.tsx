@@ -3577,6 +3577,200 @@ export default function AdminPortalPage() {
     }
   };
 
+  // Multi-select bulk delete state across all admin sections
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isBulkDeleting, setIsBulkDeleting] = useState<boolean>(false);
+
+  // Clear selections when switching sidebar tabs
+  useEffect(() => {
+    setSelectedIds([]);
+  }, [activeTab]);
+
+  const toggleSelectItem = (id: string) => {
+    if (!id) return;
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const toggleSelectAll = (allIds: string[]) => {
+    const validIds = allIds.filter(Boolean);
+    if (validIds.length > 0 && selectedIds.length === validIds.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds([...validIds]);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.length === 0) return;
+    const count = selectedIds.length;
+    if (
+      !confirm(
+        `Are you sure you want to permanently delete ${count} selected item(s) from ${activeTab}? This cannot be undone.`
+      )
+    ) {
+      return;
+    }
+
+    setIsBulkDeleting(true);
+
+    try {
+      if (activeTab === 'Student') {
+        const toDelete = students.filter(
+          (s) => selectedIds.includes(s.id) || selectedIds.includes(s.email) || selectedIds.includes(s.studentId)
+        );
+        await Promise.all(
+          toDelete.map((s) =>
+            fetch(`/api/admin/students?id=${encodeURIComponent(s.id)}&email=${encodeURIComponent(s.email)}`, {
+              method: 'DELETE',
+            }).catch((err) => console.error(err))
+          )
+        );
+        setStudents((prev) =>
+          prev.filter(
+            (s) => !selectedIds.includes(s.id) && !selectedIds.includes(s.email) && !selectedIds.includes(s.studentId)
+          )
+        );
+        showToast(`Successfully deleted ${count} student(s).`);
+      } else if (activeTab === 'Courses') {
+        const toDelete = courses.filter((c) => selectedIds.includes(c.id));
+        await Promise.all(
+          toDelete.map((c) =>
+            fetch(
+              `/api/courses?id=${encodeURIComponent(c.id)}&title=${encodeURIComponent(c.title)}&code=${encodeURIComponent(c.code || '')}`,
+              { method: 'DELETE' }
+            ).catch((err) => console.error(err))
+          )
+        );
+        const nextList = courses.filter((c) => !selectedIds.includes(c.id));
+        setCourses(nextList);
+        persistLiveCourses(nextList);
+        showToast(`Successfully deleted ${count} course(s).`);
+      } else if (activeTab === 'Certificate') {
+        const toDelete = certificates.filter(
+          (c) => selectedIds.includes(c.id) || selectedIds.includes(c.certId)
+        );
+        await Promise.all(
+          toDelete.map((c) =>
+            fetch(`/api/certificates?id=${encodeURIComponent(c.id || c.certId)}`, { method: 'DELETE' }).catch((err) => console.error(err))
+          )
+        );
+        setCertificates((prev) =>
+          prev.filter(
+            (c) => !selectedIds.includes(c.id) && !selectedIds.includes(c.certId)
+          )
+        );
+        showToast(`Successfully revoked & deleted ${count} certificate(s).`);
+      } else if (activeTab === 'Assignments') {
+        await Promise.all(
+          selectedIds.map((id) =>
+            fetch(`/api/assignments?id=${encodeURIComponent(id)}`, { method: 'DELETE' }).catch((err) => console.error(err))
+          )
+        );
+        setAdminAssignments((prev) => prev.filter((a) => !selectedIds.includes(a.id)));
+        showToast(`Successfully deleted ${count} assignment(s).`);
+        fetchAdminAssignments(true);
+      } else if (activeTab === 'Jobs') {
+        await Promise.all(
+          selectedIds.map((id) =>
+            fetch(`/api/jobs?id=${encodeURIComponent(id)}`, { method: 'DELETE' }).catch((err) => console.error(err))
+          )
+        );
+        setAdminJobs((prev) => prev.filter((j) => !selectedIds.includes(j.id)));
+        showToast(`Successfully deleted ${count} job vacancy(ies).`);
+      } else if (activeTab === 'Ebook') {
+        await Promise.all(
+          selectedIds.map((id) =>
+            fetch(`/api/ebooks?id=${encodeURIComponent(id)}`, { method: 'DELETE' }).catch((err) => console.error(err))
+          )
+        );
+        setEbooks((prev) => prev.filter((b) => !selectedIds.includes(b.id)));
+        showToast(`Successfully deleted ${count} E-Book(s).`);
+      } else if (activeTab === 'Live') {
+        await Promise.all(
+          selectedIds.map((id) =>
+            fetch(`/api/live-classes?id=${encodeURIComponent(id)}`, { method: 'DELETE' }).catch((err) =>
+              console.error(err)
+            )
+          )
+        );
+        setLiveHistory((prev) => prev.filter((h) => !selectedIds.includes(h.id)));
+        showToast(`Successfully deleted ${count} live session(s).`);
+      } else if (activeTab === 'Offers') {
+        await Promise.all(
+          selectedIds.map((id) =>
+            fetch(`/api/offers?id=${encodeURIComponent(id)}`, { method: 'DELETE' }).catch((err) => console.error(err))
+          )
+        );
+        setAdminOffers((prev) => prev.filter((o) => !selectedIds.includes(o.id)));
+        showToast(`Successfully deleted ${count} offer(s).`);
+      } else if (activeTab === 'Support' || activeTab === 'CADDESK Channel') {
+        await Promise.all(
+          selectedIds.map((id) =>
+            fetch(`/api/tickets?id=${encodeURIComponent(id)}`, { method: 'DELETE' }).catch((err) => console.error(err))
+          )
+        );
+        setAdminTickets((prev) => prev.filter((t) => !selectedIds.includes(t.id)));
+        showToast(`Successfully deleted ${count} ticket(s).`);
+        fetchAdminTickets(true);
+      } else if (activeTab === 'Reviews') {
+        await Promise.all(
+          selectedIds.map((id) =>
+            fetch(`/api/reviews?id=${encodeURIComponent(id)}`, { method: 'DELETE' }).catch((err) => console.error(err))
+          )
+        );
+        setAdminReviews((prev) => prev.filter((r) => !selectedIds.includes(r.id)));
+        showToast(`Successfully deleted ${count} review(s).`);
+      }
+      setSelectedIds([]);
+    } catch (err: any) {
+      console.error('Bulk delete error:', err);
+      alert('Error during bulk deletion: ' + (err?.message || 'Unknown error'));
+    } finally {
+      setIsBulkDeleting(false);
+    }
+  };
+
+  const renderBulkActionBar = (currentAllIds: string[], itemNoun: string) => {
+    if (selectedIds.length === 0) return null;
+    const isAll = currentAllIds.length > 0 && selectedIds.length === currentAllIds.length;
+    return (
+      <div className="mb-4 p-3.5 bg-rose-50/95 border-2 border-rose-200 rounded-2xl flex flex-wrap items-center justify-between gap-3 shadow-xs animate-in fade-in">
+        <div className="flex items-center gap-3">
+          <input
+            type="checkbox"
+            checked={isAll}
+            onChange={() => toggleSelectAll(currentAllIds)}
+            className="w-4 h-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500 cursor-pointer"
+            title={isAll ? 'Deselect All' : 'Select All'}
+          />
+          <span className="text-xs sm:text-sm font-bold text-rose-950">
+            {selectedIds.length} of {currentAllIds.length} {itemNoun}{selectedIds.length > 1 ? 's' : ''} selected
+          </span>
+          <button
+            type="button"
+            onClick={() => setSelectedIds([])}
+            className="text-xs text-slate-600 hover:text-slate-900 underline font-semibold cursor-pointer"
+          >
+            Clear selection
+          </button>
+        </div>
+        <button
+          type="button"
+          disabled={isBulkDeleting}
+          onClick={handleBulkDelete}
+          className="px-4 py-2 bg-[#EE2C3C] hover:bg-[#D71E2E] active:scale-95 text-white text-xs sm:text-sm font-bold rounded-xl transition-all shadow-xs flex items-center gap-2 cursor-pointer disabled:opacity-60"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+          <span>{isBulkDeleting ? 'Deleting Selected...' : `Delete Selected (${selectedIds.length})`}</span>
+        </button>
+      </div>
+    );
+  };
+
   // Navigation Items - Clean 9 Core Management Modules with Dedicated Professional Icons
   const adminNavItems = [
     {
@@ -4225,11 +4419,23 @@ export default function AdminPortalPage() {
                   </div>
                 </div>
 
+                {/* Multi-Select Bulk Delete Action Bar */}
+                {renderBulkActionBar(filteredStudents.map((s) => s.id || s.email), 'student')}
+
                 {/* Table */}
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-slate-50/90 text-[#2B2B2B] font-bold uppercase text-xs sm:text-sm tracking-wider border-b border-slate-200">
+                        <th className="py-3.5 px-3 w-10 text-center">
+                          <input
+                            type="checkbox"
+                            checked={filteredStudents.length > 0 && filteredStudents.every((s) => selectedIds.includes(s.id || s.email))}
+                            onChange={() => toggleSelectAll(filteredStudents.map((s) => s.id || s.email))}
+                            className="w-4 h-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500 cursor-pointer"
+                            title="Select all students"
+                          />
+                        </th>
                         <th className="py-3.5 px-5">Student</th>
                         <th className="py-3.5 px-5">Phone Number</th>
                         <th className="py-3.5 px-5">Assigned Courses</th>
@@ -4241,13 +4447,13 @@ export default function AdminPortalPage() {
                     <tbody className="divide-y divide-slate-100">
                       {isLoadingStudents ? (
                         <tr>
-                          <td colSpan={6} className="py-12 text-center text-sm sm:text-base font-medium text-[#666666]">
+                          <td colSpan={7} className="py-12 text-center text-sm sm:text-base font-medium text-[#666666]">
                             Loading students from database...
                           </td>
                         </tr>
                       ) : filteredStudents.length === 0 ? (
                         <tr>
-                          <td colSpan={6} className="py-12 text-center">
+                          <td colSpan={7} className="py-12 text-center">
                             <div className="text-base sm:text-lg font-semibold text-[#131313]">No students registered yet.</div>
                             <p className="text-sm text-[#666666] mt-1">
                               Click &quot;+ New Admission&quot; above to enroll a student, or have trainees register via the portal.
@@ -4265,8 +4471,20 @@ export default function AdminPortalPage() {
                               (c.studentEmail && sEmail && c.studentEmail.toLowerCase() === sEmail)
                           );
 
+                          const isStudentSelected = selectedIds.includes(stu.id || stu.email);
+
                           return (
-                            <tr key={stu.id} className="hover:bg-slate-50/70 transition-colors">
+                            <tr key={stu.id} className={`transition-colors ${isStudentSelected ? 'bg-rose-50/40' : 'hover:bg-slate-50/70'}`}>
+                              {/* Multi-Select Checkbox */}
+                              <td className="py-4 px-3 w-10 text-center">
+                                <input
+                                  type="checkbox"
+                                  checked={isStudentSelected}
+                                  onChange={() => toggleSelectItem(stu.id || stu.email)}
+                                  className="w-4 h-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500 cursor-pointer"
+                                />
+                              </td>
+
                               {/* Student Name & ID */}
                               <td className="py-4 px-5">
                                 <div className="font-bold text-[#131313] text-base sm:text-lg">{stu.name}</div>
@@ -4630,7 +4848,21 @@ export default function AdminPortalPage() {
                         </button>
                       </div>
                     ) : (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      <>
+                        {/* Multi-Select Bulk Delete Action Bar for Courses */}
+                        {(() => {
+                          const visibleCourses = courses.filter(
+                            (c) =>
+                              (currentFolderView === 'all' || c.folder === currentFolderView) &&
+                              (!courseSearchQuery ||
+                                c.title.toLowerCase().includes(courseSearchQuery.toLowerCase()) ||
+                                c.code.toLowerCase().includes(courseSearchQuery.toLowerCase()) ||
+                                c.software.toLowerCase().includes(courseSearchQuery.toLowerCase()))
+                          );
+                          return renderBulkActionBar(visibleCourses.map((c) => c.id), 'course');
+                        })()}
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {courses
                           .filter(
                             (c) =>
@@ -4648,15 +4880,28 @@ export default function AdminPortalPage() {
                             ).length;
 
                             const classCount = course.classes?.length || 0;
+                            const isCourseSelected = selectedIds.includes(course.id);
 
                             return (
                               <div
                                 key={course.id}
-                                className="bg-white rounded-3xl border border-slate-200/90 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden group"
+                                className={`bg-white rounded-3xl border shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden group ${
+                                  isCourseSelected ? 'border-rose-400 ring-2 ring-rose-200' : 'border-slate-200/90'
+                                }`}
                               >
                                 <div>
-                                  {/* Card Banner Image with Floating Circular Badge */}
+                                  {/* Card Banner Image with Floating Circular Badge & Checkbox */}
                                   <div className="relative h-44 w-full overflow-hidden bg-slate-100">
+                                    {/* Multi-Select Checkbox */}
+                                    <div className="absolute top-3 left-3 z-20 bg-white/95 backdrop-blur-xs px-2 py-1 rounded-lg shadow-sm border border-slate-200 flex items-center gap-1.5">
+                                      <input
+                                        type="checkbox"
+                                        checked={isCourseSelected}
+                                        onChange={() => toggleSelectItem(course.id)}
+                                        className="w-4 h-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500 cursor-pointer"
+                                      />
+                                      <span className="text-[10px] font-bold text-slate-700">Select</span>
+                                    </div>
                                     <img
                                       src={
                                         (course.image && !course.image.includes('1541888946425') && !course.image.includes('1581092335397') && !course.image.includes('1504917599217'))
@@ -4783,6 +5028,7 @@ export default function AdminPortalPage() {
                             );
                           })}
                       </div>
+                      </>
                     )}
                   </div>
                 </div>
@@ -4853,42 +5099,68 @@ export default function AdminPortalPage() {
                 </div>
 
                 {/* Students List */}
-                {certStudentRows.length === 0 ? (
-                  <div className="p-10 text-center space-y-2">
-                    <div className="text-base font-bold text-[#131313]">No Students Found in Academy Registry</div>
-                    <p className="text-sm text-[#666666]">
-                      Please admit students in the Student tab first to upload certificates.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="divide-y divide-slate-100">
-                    {certStudentRows
-                      .filter((item) => {
-                        if (!certSearchQuery.trim()) return true;
-                        const q = certSearchQuery.toLowerCase();
-                        return (
-                          item.name.toLowerCase().includes(q) ||
-                          item.studentId.toLowerCase().includes(q) ||
-                          item.email.toLowerCase().includes(q) ||
-                          item.course.toLowerCase().includes(q) ||
-                          (item.certificate && item.certificate.certId.toLowerCase().includes(q))
-                        );
-                      })
-                      .map((item) => {
-                        const isUploadingThis = uploadingCertStudentId === (item.studentId || item.id);
-                        return (
-                          <div
-                            key={item.studentId || item.id}
-                            className="p-5 hover:bg-slate-50/60 flex flex-col lg:flex-row lg:items-center justify-between gap-4 transition-colors"
-                          >
-                            {/* Student & Course Details */}
-                            <div className="flex items-center space-x-3.5 min-w-0">
-                              <div className="w-10 h-10 rounded-full bg-[#131313] text-white font-bold flex items-center justify-center text-sm flex-shrink-0">
-                                {item.name.charAt(0).toUpperCase()}
-                              </div>
-                              <div className="min-w-0">
-                                <div className="flex items-center space-x-2">
-                                  <h4 className="text-base sm:text-lg font-bold text-[#131313] truncate">
+                {(() => {
+                  const filteredCertRows = certStudentRows.filter((item) => {
+                    if (!certSearchQuery.trim()) return true;
+                    const q = certSearchQuery.toLowerCase();
+                    return (
+                      item.name.toLowerCase().includes(q) ||
+                      item.studentId.toLowerCase().includes(q) ||
+                      item.email.toLowerCase().includes(q) ||
+                      item.course.toLowerCase().includes(q) ||
+                      (item.certificate && item.certificate.certId.toLowerCase().includes(q))
+                    );
+                  });
+
+                  const certIds = filteredCertRows
+                    .filter((r) => !!r.certificate)
+                    .map((r) => r.certificate!.id || r.certificate!.certId);
+
+                  if (certStudentRows.length === 0) {
+                    return (
+                      <div className="p-10 text-center space-y-2">
+                        <div className="text-base font-bold text-[#131313]">No Students Found in Academy Registry</div>
+                        <p className="text-sm text-[#666666]">
+                          Please admit students in the Student tab first to upload certificates.
+                        </p>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div className="p-4 sm:p-5">
+                      {renderBulkActionBar(certIds, 'certificate')}
+                      <div className="divide-y divide-slate-100">
+                        {filteredCertRows.map((item) => {
+                          const certKey = item.certificate ? (item.certificate.id || item.certificate.certId) : null;
+                          const isCertSelected = certKey ? selectedIds.includes(certKey) : false;
+                          const isUploadingThis = uploadingCertStudentId === (item.studentId || item.id);
+                          return (
+                            <div
+                              key={item.studentId || item.id}
+                              className={`p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 transition-colors rounded-xl ${
+                                isCertSelected ? 'bg-rose-50/60 border border-rose-200' : 'hover:bg-slate-50/60'
+                              }`}
+                            >
+                              {/* Student & Course Details */}
+                              <div className="flex items-center space-x-3.5 min-w-0">
+                                {item.certificate ? (
+                                  <input
+                                    type="checkbox"
+                                    checked={isCertSelected}
+                                    onChange={() => toggleSelectItem(certKey!)}
+                                    className="w-4 h-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500 cursor-pointer flex-shrink-0"
+                                    title="Select certificate for bulk deletion"
+                                  />
+                                ) : (
+                                  <div className="w-4 h-4 flex-shrink-0 opacity-20" />
+                                )}
+                                <div className="w-10 h-10 rounded-full bg-[#131313] text-white font-bold flex items-center justify-center text-sm flex-shrink-0">
+                                  {item.name.charAt(0).toUpperCase()}
+                                </div>
+                                <div className="min-w-0">
+                                  <div className="flex items-center space-x-2">
+                                    <h4 className="text-base sm:text-lg font-bold text-[#131313] truncate">
                                     {item.name}
                                   </h4>
                                   <span className="px-2 py-0.5 rounded text-xs sm:text-sm font-mono font-medium bg-slate-100 text-[#2B2B2B]">
@@ -5005,8 +5277,10 @@ export default function AdminPortalPage() {
                           </div>
                         );
                       })}
-                  </div>
-                )}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           )}
@@ -5236,94 +5510,126 @@ export default function AdminPortalPage() {
                 </div>
 
                 {/* Table Body */}
-                {ebooks.length === 0 ? (
-                  <div className="p-8 text-center text-[#666666] text-sm">
-                    No e-books uploaded yet. Use the form above to add your first book.
-                  </div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm border-collapse">
-                      <thead>
-                        <tr className="bg-slate-50/80 text-slate-600 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
-                          <th className="px-5 py-3">Book Title</th>
-                          <th className="px-5 py-3">Subject</th>
-                          <th className="px-5 py-3">Access</th>
-                          <th className="px-5 py-3">File Size</th>
-                          <th className="px-5 py-3 text-right">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100">
-                        {ebooks
-                          .filter((b) => {
-                            if (ebookFilterAccess === 'free' && b.accessType !== 'free') return false;
-                            if (ebookFilterAccess === 'locked' && b.accessType !== 'locked') return false;
-                            if (!ebookSearchQuery.trim()) return true;
-                            const q = ebookSearchQuery.toLowerCase();
-                            return (
-                              b.title.toLowerCase().includes(q) ||
-                              b.course.toLowerCase().includes(q)
-                            );
-                          })
-                          .map((book) => (
-                            <tr key={book.id} className="hover:bg-slate-50/60 transition-colors">
-                              <td className="px-5 py-3.5 font-medium text-[#131313]">
-                                {book.title}
-                              </td>
-                              <td className="px-5 py-3.5 text-slate-600 font-medium">
-                                {book.course}
-                              </td>
-                              <td className="px-5 py-3.5">
-                                <span
-                                  className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                                    book.accessType === 'free'
-                                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                      : 'bg-amber-50 text-amber-700 border border-amber-200'
-                                  }`}
-                                >
-                                  {book.accessType === 'free' ? 'Free' : 'Locked'}
-                                </span>
-                              </td>
-                              <td className="px-5 py-3.5 text-[#666666] text-xs">
-                                {book.pdfSize || 'Document'}
-                              </td>
-                              <td className="px-5 py-3.5 text-right whitespace-nowrap space-x-2">
-                                <button
-                                  type="button"
-                                  onClick={() => setViewingEbook(book)}
-                                  className="px-2.5 py-1 text-xs font-medium text-[#2B2B2B] border border-slate-200 rounded-md hover:bg-slate-50 cursor-pointer"
-                                >
-                                  View PDF
-                                </button>
-                                <a
-                                  href={book.pdfUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  download
-                                  className="inline-block px-2.5 py-1 text-xs font-medium text-[#2B2B2B] border border-slate-200 rounded-md hover:bg-slate-50 cursor-pointer"
-                                >
-                                  Download
-                                </a>
-                                <button
-                                  type="button"
-                                  onClick={() => handleToggleEbookAccess(book)}
-                                  className="px-3 py-1.5 text-xs font-medium text-[#2B2B2B] border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer"
-                                >
-                                  {book.accessType === 'free' ? 'Make Locked' : 'Make Free'}
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteEbook(book)}
-                                  className="px-3 py-1.5 text-xs font-medium text-rose-600 border border-transparent hover:border-rose-200 hover:bg-rose-50 rounded-lg transition-colors shadow-2xs cursor-pointer"
-                                >
-                                  Delete
-                                </button>
-                              </td>
+                {(() => {
+                  const visibleEbooks = ebooks.filter((b) => {
+                    if (ebookFilterAccess === 'free' && b.accessType !== 'free') return false;
+                    if (ebookFilterAccess === 'locked' && b.accessType !== 'locked') return false;
+                    if (!ebookSearchQuery.trim()) return true;
+                    const q = ebookSearchQuery.toLowerCase();
+                    return (
+                      b.title.toLowerCase().includes(q) ||
+                      b.course.toLowerCase().includes(q)
+                    );
+                  });
+
+                  if (ebooks.length === 0) {
+                    return (
+                      <div className="p-8 text-center text-[#666666] text-sm">
+                        No e-books uploaded yet. Use the form above to add your first book.
+                      </div>
+                    );
+                  }
+
+                  const visibleEbookIds = visibleEbooks.map((b) => b.id);
+                  const isAllSelected = visibleEbookIds.length > 0 && selectedIds.length === visibleEbookIds.length;
+
+                  return (
+                    <div className="p-4">
+                      {renderBulkActionBar(visibleEbookIds, 'e-book')}
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-sm border-collapse">
+                          <thead>
+                            <tr className="bg-slate-50/80 text-slate-600 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
+                              <th className="py-3 px-3 w-10 text-center">
+                                <input
+                                  type="checkbox"
+                                  checked={isAllSelected}
+                                  onChange={() => toggleSelectAll(visibleEbookIds)}
+                                  className="w-4 h-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500 cursor-pointer"
+                                  title={isAllSelected ? 'Deselect All' : 'Select All'}
+                                />
+                              </th>
+                              <th className="px-5 py-3">Book Title</th>
+                              <th className="px-5 py-3">Subject</th>
+                              <th className="px-5 py-3">Access</th>
+                              <th className="px-5 py-3">File Size</th>
+                              <th className="px-5 py-3 text-right">Actions</th>
                             </tr>
-                          ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
+                          </thead>
+                          <tbody className="divide-y divide-slate-100">
+                            {visibleEbooks.map((book) => {
+                              const isBookSelected = selectedIds.includes(book.id);
+                              return (
+                                <tr key={book.id} className={`transition-colors ${isBookSelected ? 'bg-rose-50/50' : 'hover:bg-slate-50/60'}`}>
+                                  <td className="py-3.5 px-3 w-10 text-center">
+                                    <input
+                                      type="checkbox"
+                                      checked={isBookSelected}
+                                      onChange={() => toggleSelectItem(book.id)}
+                                      className="w-4 h-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500 cursor-pointer"
+                                    />
+                                  </td>
+                                  <td className="px-5 py-3.5 font-medium text-[#131313]">
+                                    {book.title}
+                                  </td>
+                                  <td className="px-5 py-3.5 text-slate-600 font-medium">
+                                    {book.course}
+                                  </td>
+                                  <td className="px-5 py-3.5">
+                                    <span
+                                      className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                                        book.accessType === 'free'
+                                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                          : 'bg-amber-50 text-amber-700 border border-amber-200'
+                                      }`}
+                                    >
+                                      {book.accessType === 'free' ? 'Free' : 'Locked'}
+                                    </span>
+                                  </td>
+                                  <td className="px-5 py-3.5 text-[#666666] text-xs">
+                                    {book.pdfSize || 'Document'}
+                                  </td>
+                                  <td className="px-5 py-3.5 text-right whitespace-nowrap space-x-2">
+                                    <button
+                                      type="button"
+                                      onClick={() => setViewingEbook(book)}
+                                      className="px-2.5 py-1 text-xs font-medium text-[#2B2B2B] border border-slate-200 rounded-md hover:bg-slate-50 cursor-pointer"
+                                    >
+                                      View PDF
+                                    </button>
+                                    <a
+                                      href={book.pdfUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      download
+                                      className="inline-block px-2.5 py-1 text-xs font-medium text-[#2B2B2B] border border-slate-200 rounded-md hover:bg-slate-50 cursor-pointer"
+                                    >
+                                      Download
+                                    </a>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleToggleEbookAccess(book)}
+                                      className="px-3 py-1.5 text-xs font-medium text-[#2B2B2B] border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer"
+                                    >
+                                      {book.accessType === 'free' ? 'Make Locked' : 'Make Free'}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDeleteEbook(book)}
+                                      className="px-3 py-1.5 text-xs font-medium text-rose-600 border border-transparent hover:border-rose-200 hover:bg-rose-50 rounded-lg transition-colors shadow-2xs cursor-pointer"
+                                    >
+                                      Delete
+                                    </button>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           )}
@@ -5600,9 +5906,11 @@ export default function AdminPortalPage() {
 
                 return (
                   <div className="space-y-4">
+                    {renderBulkActionBar(filtered.map((j) => j.id), 'job vacancy')}
                     {filtered.map((job) => {
                       const applicantsCount = job.applicants?.length || 0;
                       const isClosed = job.status === 'Closed';
+                      const isJobSelected = selectedIds.includes(job.id);
                       const jobSkills = job.skills || job.tools || [];
                       const jobStream = job.stream || job.discipline || 'Mechanical';
 
@@ -5621,14 +5929,25 @@ export default function AdminPortalPage() {
                         <div
                           key={job.id}
                           className={`bg-white rounded-2xl border transition-all p-5 sm:p-6 shadow-2xs hover:shadow-md ${
-                            isClosed
+                            isJobSelected
+                              ? 'border-rose-400 ring-2 ring-rose-200 bg-rose-50/20'
+                              : isClosed
                               ? 'border-slate-200 bg-slate-50/60 opacity-80'
                               : 'border-slate-200 hover:border-slate-300'
                           }`}
                         >
                           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                            {/* Left: Company & Title */}
+                            {/* Left: Checkbox & Company & Title */}
                             <div className="flex items-start gap-4">
+                              <div className="pt-3">
+                                <input
+                                  type="checkbox"
+                                  checked={isJobSelected}
+                                  onChange={() => toggleSelectItem(job.id)}
+                                  className="w-4 h-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500 cursor-pointer"
+                                  title="Select job vacancy for bulk deletion"
+                                />
+                              </div>
                               <div className="w-12 h-12 rounded-xl bg-[#15304C] text-white flex items-center justify-center font-black text-lg flex-shrink-0 shadow-2xs">
                                 {job.companyLogo ? (
                                   <img
@@ -6359,18 +6678,31 @@ export default function AdminPortalPage() {
 
                   return (
                     <div className="space-y-4">
+                      {renderBulkActionBar(filtered.map((t) => t.id), 'ticket')}
                       {filtered.map((t) => {
                         const isResolved = t.status === 'Resolved';
                         const isInProgress = t.status === 'In Progress';
+                        const isTicketSelected = selectedIds.includes(t.id);
 
                         return (
                           <div
                             key={t.id}
-                            className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-2xs hover:border-slate-300 transition-all"
+                            className={`bg-white rounded-2xl border p-6 space-y-4 shadow-2xs transition-all ${
+                              isTicketSelected
+                                ? 'border-rose-400 ring-2 ring-rose-200 bg-rose-50/20'
+                                : 'border-slate-200 hover:border-slate-300'
+                            }`}
                           >
                             {/* Card Top Header */}
                             <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
                               <div className="flex flex-wrap items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  checked={isTicketSelected}
+                                  onChange={() => toggleSelectItem(t.id)}
+                                  className="w-4 h-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500 cursor-pointer mr-1"
+                                  title="Select ticket for bulk deletion"
+                                />
                                 <span className="font-mono text-xs font-bold px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200">
                                   {t.ticketNumber}
                                 </span>
@@ -6586,123 +6918,149 @@ export default function AdminPortalPage() {
                 </div>
 
                 {/* Table View */}
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="bg-slate-50/90 text-[#2B2B2B] font-bold uppercase text-xs sm:text-sm tracking-wider border-b border-slate-200">
-                        <th className="py-3.5 px-5">Assignment Title &amp; Brief</th>
-                        <th className="py-3.5 px-5">Target Course</th>
-                        <th className="py-3.5 px-5">Due Date</th>
-                        <th className="py-3.5 px-5">PDF Document</th>
-                        <th className="py-3.5 px-5 text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 text-xs sm:text-sm">
-                      {isLoadingAssignments ? (
-                        <tr>
-                          <td colSpan={5} className="py-12 text-center text-sm sm:text-base font-medium text-[#666666]">
-                            Loading course assignments...
-                          </td>
-                        </tr>
-                      ) : (() => {
-                        const filtered = adminAssignments.filter((a) => {
-                          const matchCourse =
-                            assignmentCourseFilter === 'all' ||
-                            a.course.toLowerCase() === assignmentCourseFilter.toLowerCase() ||
-                            a.course === 'All Courses';
+                {(() => {
+                  const filtered = adminAssignments.filter((a) => {
+                    const matchCourse =
+                      assignmentCourseFilter === 'all' ||
+                      a.course.toLowerCase() === assignmentCourseFilter.toLowerCase() ||
+                      a.course === 'All Courses';
 
-                          const q = assignmentSearchQuery.toLowerCase();
-                          const matchQuery =
-                            !q ||
-                            a.title.toLowerCase().includes(q) ||
-                            a.course.toLowerCase().includes(q) ||
-                            a.description.toLowerCase().includes(q);
+                    const q = assignmentSearchQuery.toLowerCase();
+                    const matchQuery =
+                      !q ||
+                      a.title.toLowerCase().includes(q) ||
+                      a.course.toLowerCase().includes(q) ||
+                      a.description.toLowerCase().includes(q);
 
-                          return matchCourse && matchQuery;
-                        });
+                    return matchCourse && matchQuery;
+                  });
 
-                        if (filtered.length === 0) {
-                          return (
-                            <tr>
-                              <td colSpan={5} className="py-12 text-center">
-                                <div className="text-base sm:text-lg font-semibold text-[#131313]">No assignments found</div>
-                                <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                                  Click &quot;Upload Assignment&quot; to publish drawing sheets and project tasks to students.
-                                </p>
-                              </td>
+                  const filteredIds = filtered.map((a) => a.id);
+                  const isAllSelected = filteredIds.length > 0 && selectedIds.length === filteredIds.length;
+
+                  return (
+                    <div className="p-4 sm:p-5">
+                      {renderBulkActionBar(filteredIds, 'assignment')}
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                          <thead>
+                            <tr className="bg-slate-50/90 text-[#2B2B2B] font-bold uppercase text-xs sm:text-sm tracking-wider border-b border-slate-200">
+                              <th className="py-3.5 px-3 w-10 text-center">
+                                <input
+                                  type="checkbox"
+                                  checked={isAllSelected}
+                                  onChange={() => toggleSelectAll(filteredIds)}
+                                  className="w-4 h-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500 cursor-pointer"
+                                  title={isAllSelected ? 'Deselect All' : 'Select All'}
+                                />
+                              </th>
+                              <th className="py-3.5 px-5">Assignment Title &amp; Brief</th>
+                              <th className="py-3.5 px-5">Target Course</th>
+                              <th className="py-3.5 px-5">Due Date</th>
+                              <th className="py-3.5 px-5">PDF Document</th>
+                              <th className="py-3.5 px-5 text-right">Actions</th>
                             </tr>
-                          );
-                        }
-
-                        return filtered.map((a) => (
-                          <tr key={a.id} className="hover:bg-slate-50/70 transition-colors">
-                            <td className="py-4 px-5">
-                              <div className="font-bold text-[#131313] text-sm sm:text-base">{a.title}</div>
-                              {a.description && (
-                                <p className="text-xs text-slate-500 mt-1 line-clamp-2 max-w-lg">
-                                  {a.description}
-                                </p>
-                              )}
-                            </td>
-                            <td className="py-4 px-5 whitespace-nowrap">
-                              <span className="px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-200">
-                                {a.course}
-                              </span>
-                            </td>
-                            <td className="py-4 px-5 whitespace-nowrap font-mono text-xs text-slate-600">
-                              {a.dueDate || 'Open'}
-                            </td>
-                            <td className="py-4 px-5 whitespace-nowrap">
-                              <div className="flex flex-col">
-                                <span className="font-semibold text-slate-800 text-xs max-w-[200px] truncate" title={a.pdfName}>
-                                  {a.pdfName || 'assignment.pdf'}
-                                </span>
-                                <span className="text-[11px] text-slate-400 font-mono">
-                                  {a.pdfSize || 'PDF'}
-                                </span>
-                              </div>
-                            </td>
-                            <td className="py-4 px-5 whitespace-nowrap text-right">
-                              <div className="flex items-center justify-end space-x-2">
-                                <a
-                                  href={a.pdfUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  download
-                                  className="px-3 py-1.5 rounded-lg text-xs font-semibold text-[#131313] bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all cursor-pointer"
-                                >
-                                  Download
-                                </a>
-                                <button
-                                  type="button"
-                                  onClick={() => handleOpenEditAssignment(a)}
-                                  className="px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 transition-all cursor-pointer"
-                                  title="Edit Assignment"
-                                >
-                                  Edit
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => setSelectedAssignmentForView(a)}
-                                  className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-[#131313] hover:bg-slate-800 transition-all cursor-pointer"
-                                >
-                                  View
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteAssignment(a)}
-                                  className="px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 transition-all cursor-pointer"
-                                >
-                                  Delete
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ));
-                      })()}
-                    </tbody>
-                  </table>
-                </div>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 text-xs sm:text-sm">
+                            {isLoadingAssignments ? (
+                              <tr>
+                                <td colSpan={6} className="py-12 text-center text-sm sm:text-base font-medium text-[#666666]">
+                                  Loading course assignments...
+                                </td>
+                              </tr>
+                            ) : filtered.length === 0 ? (
+                              <tr>
+                                <td colSpan={6} className="py-12 text-center">
+                                  <div className="text-base sm:text-lg font-semibold text-[#131313]">No assignments found</div>
+                                  <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                                    Click &quot;Upload Assignment&quot; to publish drawing sheets and project tasks to students.
+                                  </p>
+                                </td>
+                              </tr>
+                            ) : (
+                              filtered.map((a) => {
+                                const isAssignmentSelected = selectedIds.includes(a.id);
+                                return (
+                                  <tr key={a.id} className={`transition-colors ${isAssignmentSelected ? 'bg-rose-50/50' : 'hover:bg-slate-50/70'}`}>
+                                    <td className="py-4 px-3 w-10 text-center">
+                                      <input
+                                        type="checkbox"
+                                        checked={isAssignmentSelected}
+                                        onChange={() => toggleSelectItem(a.id)}
+                                        className="w-4 h-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500 cursor-pointer"
+                                      />
+                                    </td>
+                                    <td className="py-4 px-5">
+                                      <div className="font-bold text-[#131313] text-sm sm:text-base">{a.title}</div>
+                                      {a.description && (
+                                        <p className="text-xs text-slate-500 mt-1 line-clamp-2 max-w-lg">
+                                          {a.description}
+                                        </p>
+                                      )}
+                                    </td>
+                                    <td className="py-4 px-5 whitespace-nowrap">
+                                      <span className="px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-200">
+                                        {a.course}
+                                      </span>
+                                    </td>
+                                    <td className="py-4 px-5 whitespace-nowrap font-mono text-xs text-slate-600">
+                                      {a.dueDate || 'Open'}
+                                    </td>
+                                    <td className="py-4 px-5 whitespace-nowrap">
+                                      <div className="flex flex-col">
+                                        <span className="font-semibold text-slate-800 text-xs max-w-[200px] truncate" title={a.pdfName}>
+                                          {a.pdfName || 'assignment.pdf'}
+                                        </span>
+                                        <span className="text-[11px] text-slate-400 font-mono">
+                                          {a.pdfSize || 'PDF'}
+                                        </span>
+                                      </div>
+                                    </td>
+                                    <td className="py-4 px-5 whitespace-nowrap text-right">
+                                      <div className="flex items-center justify-end space-x-2">
+                                        <a
+                                          href={a.pdfUrl}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          download
+                                          className="px-3 py-1.5 rounded-lg text-xs font-semibold text-[#131313] bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all cursor-pointer"
+                                        >
+                                          Download
+                                        </a>
+                                        <button
+                                          type="button"
+                                          onClick={() => handleOpenEditAssignment(a)}
+                                          className="px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 transition-all cursor-pointer"
+                                          title="Edit Assignment"
+                                        >
+                                          Edit
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => setSelectedAssignmentForView(a)}
+                                          className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-[#131313] hover:bg-slate-800 transition-all cursor-pointer"
+                                        >
+                                          View
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => handleDeleteAssignment(a)}
+                                          className="px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 transition-all cursor-pointer"
+                                        >
+                                          Delete
+                                        </button>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                );
+                              })
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           )}
@@ -6860,35 +7218,50 @@ export default function AdminPortalPage() {
                 }
 
                 return (
-                  <div className="grid grid-cols-1 gap-4">
-                    {filtered.map((rev) => (
-                      <div
-                        key={rev.id}
-                        className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-5 sm:p-6 space-y-4 hover:border-slate-300 transition-all"
-                      >
-                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                          <div className="flex items-center space-x-3.5">
-                            {rev.studentPhoto ? (
-                              <img
-                                src={rev.studentPhoto}
-                                alt={rev.studentName}
-                                className="w-11 h-11 rounded-xl object-cover border border-slate-200 shadow-2xs"
-                              />
-                            ) : (
-                              <div className="w-11 h-11 rounded-xl bg-[#131313] text-white flex items-center justify-center font-bold text-sm shadow-2xs">
-                                {rev.studentName.charAt(0).toUpperCase()}
+                  <div className="space-y-4">
+                    {renderBulkActionBar(filtered.map((r) => r.id), 'review')}
+                    <div className="grid grid-cols-1 gap-4">
+                      {filtered.map((rev) => {
+                        const isReviewSelected = selectedIds.includes(rev.id);
+                        return (
+                          <div
+                            key={rev.id}
+                            className={`bg-white rounded-2xl border shadow-2xs p-5 sm:p-6 space-y-4 transition-all ${
+                              isReviewSelected
+                                ? 'border-rose-400 ring-2 ring-rose-200 bg-rose-50/20'
+                                : 'border-slate-200/90 hover:border-slate-300'
+                            }`}
+                          >
+                            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                              <div className="flex items-center space-x-3.5">
+                                <input
+                                  type="checkbox"
+                                  checked={isReviewSelected}
+                                  onChange={() => toggleSelectItem(rev.id)}
+                                  className="w-4 h-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500 cursor-pointer flex-shrink-0"
+                                  title="Select review for bulk deletion"
+                                />
+                                {rev.studentPhoto ? (
+                                  <img
+                                    src={rev.studentPhoto}
+                                    alt={rev.studentName}
+                                    className="w-11 h-11 rounded-xl object-cover border border-slate-200 shadow-2xs"
+                                  />
+                                ) : (
+                                  <div className="w-11 h-11 rounded-xl bg-[#131313] text-white flex items-center justify-center font-bold text-sm shadow-2xs">
+                                    {rev.studentName.charAt(0).toUpperCase()}
+                                  </div>
+                                )}
+                                <div>
+                                  <div className="flex items-center space-x-2">
+                                    <h4 className="text-base font-bold text-[#131313]">{rev.studentName}</h4>
+                                    <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">
+                                      {rev.studentId}
+                                    </span>
+                                  </div>
+                                  <span className="text-xs text-slate-500 font-medium block">{rev.studentEmail}</span>
+                                </div>
                               </div>
-                            )}
-                            <div>
-                              <div className="flex items-center space-x-2">
-                                <h4 className="text-base font-bold text-[#131313]">{rev.studentName}</h4>
-                                <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">
-                                  {rev.studentId}
-                                </span>
-                              </div>
-                              <span className="text-xs text-slate-500 font-medium block">{rev.studentEmail}</span>
-                            </div>
-                          </div>
 
                           <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
                             <span className="text-xs font-bold px-3 py-1 rounded-lg bg-[#131313] text-white font-mono">
@@ -6955,10 +7328,12 @@ export default function AdminPortalPage() {
                           </button>
                         </div>
                       </div>
-                    ))}
+                    );
+                  })}
                   </div>
-                );
-              })()}
+                </div>
+              );
+            })()}
             </div>
           )}
 
@@ -7080,53 +7455,74 @@ export default function AdminPortalPage() {
               </div>
 
               {/* Offers Enterprise Data Table */}
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse text-xs sm:text-sm">
-                    <thead>
-                      <tr className="bg-slate-50/80 border-b border-slate-200 text-[#666666] font-bold text-[11px] sm:text-xs uppercase tracking-wider">
-                        <th className="py-3.5 px-4 sm:px-6">Campaign / Offer &amp; Code</th>
-                        <th className="py-3.5 px-4">Offer Type</th>
-                        <th className="py-3.5 px-4">Discount / Benefit</th>
-                        <th className="py-3.5 px-4">Target Course</th>
-                        <th className="py-3.5 px-4">Generated Referral / Promo Link</th>
-                        <th className="py-3.5 px-4">Status</th>
-                        <th className="py-3.5 px-4 sm:px-6 text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {(() => {
-                        const filtered = adminOffers.filter((o) => {
-                          const matchesQuery =
-                            o.title.toLowerCase().includes(offersSearchQuery.toLowerCase()) ||
-                            o.code.toLowerCase().includes(offersSearchQuery.toLowerCase()) ||
-                            o.targetCourse.toLowerCase().includes(offersSearchQuery.toLowerCase());
-                          if (!matchesQuery) return false;
-                          if (offersTypeFilter === 'course_discount') return o.type === 'course_discount';
-                          if (offersTypeFilter === 'referral') return o.type === 'referral';
-                          if (offersTypeFilter === 'active') return o.status === 'Active';
-                          if (offersTypeFilter === 'inactive') return o.status === 'Inactive';
-                          return true;
-                        });
+              {(() => {
+                const filtered = adminOffers.filter((o) => {
+                  const matchesQuery =
+                    o.title.toLowerCase().includes(offersSearchQuery.toLowerCase()) ||
+                    o.code.toLowerCase().includes(offersSearchQuery.toLowerCase()) ||
+                    o.targetCourse.toLowerCase().includes(offersSearchQuery.toLowerCase());
+                  if (!matchesQuery) return false;
+                  if (offersTypeFilter === 'course_discount') return o.type === 'course_discount';
+                  if (offersTypeFilter === 'referral') return o.type === 'referral';
+                  if (offersTypeFilter === 'active') return o.status === 'Active';
+                  if (offersTypeFilter === 'inactive') return o.status === 'Inactive';
+                  return true;
+                });
 
-                        if (filtered.length === 0) {
-                          return (
-                            <tr>
-                              <td colSpan={7} className="py-12 text-center text-slate-400">
-                                <div className="max-w-sm mx-auto space-y-2">
-                                  <p className="font-semibold text-slate-600">No offers found</p>
-                                  <p className="text-xs">Click &quot;Create New Offer / Referral&quot; above to launch a discount code or student referral link.</p>
-                                </div>
-                              </td>
+                const filteredIds = filtered.map((o) => o.id);
+                const isAllSelected = filteredIds.length > 0 && selectedIds.length === filteredIds.length;
+
+                return (
+                  <div className="space-y-4">
+                    {renderBulkActionBar(filteredIds, 'offer')}
+                    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse text-xs sm:text-sm">
+                          <thead>
+                            <tr className="bg-slate-50/80 border-b border-slate-200 text-[#666666] font-bold text-[11px] sm:text-xs uppercase tracking-wider">
+                              <th className="py-3.5 px-3 w-10 text-center">
+                                <input
+                                  type="checkbox"
+                                  checked={isAllSelected}
+                                  onChange={() => toggleSelectAll(filteredIds)}
+                                  className="w-4 h-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500 cursor-pointer"
+                                  title={isAllSelected ? 'Deselect All' : 'Select All'}
+                                />
+                              </th>
+                              <th className="py-3.5 px-4 sm:px-6">Campaign / Offer &amp; Code</th>
+                              <th className="py-3.5 px-4">Offer Type</th>
+                              <th className="py-3.5 px-4">Discount / Benefit</th>
+                              <th className="py-3.5 px-4">Target Course</th>
+                              <th className="py-3.5 px-4">Generated Referral / Promo Link</th>
+                              <th className="py-3.5 px-4">Status</th>
+                              <th className="py-3.5 px-4 sm:px-6 text-right">Actions</th>
                             </tr>
-                          );
-                        }
-
-                        return filtered.map((offer) => {
-                          const isCopied = copiedOfferId === offer.id;
-                          return (
-                            <tr key={offer.id} className="hover:bg-slate-50/60 transition-colors">
-                              <td className="py-4 px-4 sm:px-6">
+                          </thead>
+                          <tbody className="divide-y divide-slate-100">
+                            {filtered.length === 0 ? (
+                              <tr>
+                                <td colSpan={8} className="py-12 text-center text-slate-400">
+                                  <div className="max-w-sm mx-auto space-y-2">
+                                    <p className="font-semibold text-slate-600">No offers found</p>
+                                    <p className="text-xs">Click &quot;Create New Offer / Referral&quot; above to launch a discount code or student referral link.</p>
+                                  </div>
+                                </td>
+                              </tr>
+                            ) : (
+                              filtered.map((offer) => {
+                                const isCopied = copiedOfferId === offer.id;
+                                const isOfferSelected = selectedIds.includes(offer.id);
+                                return (
+                                  <tr key={offer.id} className={`transition-colors ${isOfferSelected ? 'bg-rose-50/50' : 'hover:bg-slate-50/60'}`}>
+                                    <td className="py-4 px-3 w-10 text-center">
+                                      <input
+                                        type="checkbox"
+                                        checked={isOfferSelected}
+                                        onChange={() => toggleSelectItem(offer.id)}
+                                        className="w-4 h-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500 cursor-pointer"
+                                      />
+                                    </td>
+                                    <td className="py-4 px-4 sm:px-6">
                                 <div className="space-y-1">
                                   <span className="font-bold text-[#131313] block leading-snug">
                                     {offer.title}
@@ -7238,13 +7634,16 @@ export default function AdminPortalPage() {
                                 </div>
                               </td>
                             </tr>
-                          );
-                        });
-                      })()}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+                                );
+                              })
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           )}
 
@@ -7409,51 +7808,72 @@ export default function AdminPortalPage() {
               </div>
 
               {/* Live Sessions Enterprise Data Table */}
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse text-xs sm:text-sm">
-                    <thead>
-                      <tr className="bg-slate-50/80 border-b border-slate-200 text-[#666666] font-bold text-[11px] sm:text-xs uppercase tracking-wider">
-                        <th className="py-3.5 px-4 sm:px-6">Session Topic &amp; Platform</th>
-                        <th className="py-3.5 px-4">Instructor</th>
-                        <th className="py-3.5 px-4">Target Course</th>
-                        <th className="py-3.5 px-4">Timing &amp; Schedule</th>
-                        <th className="py-3.5 px-4">Status</th>
-                        <th className="py-3.5 px-4 sm:px-6 text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {(() => {
-                        const filtered = liveHistory.filter((s) => {
-                          const matchesQuery =
-                            s.title.toLowerCase().includes(liveSearchQuery.toLowerCase()) ||
-                            s.trainer.toLowerCase().includes(liveSearchQuery.toLowerCase()) ||
-                            s.course.toLowerCase().includes(liveSearchQuery.toLowerCase());
-                          if (!matchesQuery) return false;
-                          if (liveStatusFilter === 'live') return s.status === 'Live Now' && s.isLive;
-                          if (liveStatusFilter === 'scheduled') return s.status === 'Scheduled' && !s.isLive;
-                          if (liveStatusFilter === 'ended') return s.status === 'Ended' || !s.isLive;
-                          return true;
-                        });
+              {(() => {
+                const filtered = liveHistory.filter((s) => {
+                  const matchesQuery =
+                    s.title.toLowerCase().includes(liveSearchQuery.toLowerCase()) ||
+                    s.trainer.toLowerCase().includes(liveSearchQuery.toLowerCase()) ||
+                    s.course.toLowerCase().includes(liveSearchQuery.toLowerCase());
+                  if (!matchesQuery) return false;
+                  if (liveStatusFilter === 'live') return s.status === 'Live Now' && s.isLive;
+                  if (liveStatusFilter === 'scheduled') return s.status === 'Scheduled' && !s.isLive;
+                  if (liveStatusFilter === 'ended') return s.status === 'Ended' || !s.isLive;
+                  return true;
+                });
 
-                        if (filtered.length === 0) {
-                          return (
-                            <tr>
-                              <td colSpan={6} className="py-12 text-center text-slate-400">
-                                <div className="max-w-sm mx-auto space-y-2">
-                                  <p className="font-semibold text-slate-600">No live sessions found</p>
-                                  <p className="text-xs">Click &quot;Broadcast / Schedule Live Class&quot; above to create an active workstation stream.</p>
-                                </div>
-                              </td>
+                const filteredIds = filtered.map((s) => s.id);
+                const isAllSelected = filteredIds.length > 0 && selectedIds.length === filteredIds.length;
+
+                return (
+                  <div className="space-y-4">
+                    {renderBulkActionBar(filteredIds, 'live session')}
+                    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse text-xs sm:text-sm">
+                          <thead>
+                            <tr className="bg-slate-50/80 border-b border-slate-200 text-[#666666] font-bold text-[11px] sm:text-xs uppercase tracking-wider">
+                              <th className="py-3.5 px-3 w-10 text-center">
+                                <input
+                                  type="checkbox"
+                                  checked={isAllSelected}
+                                  onChange={() => toggleSelectAll(filteredIds)}
+                                  className="w-4 h-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500 cursor-pointer"
+                                  title={isAllSelected ? 'Deselect All' : 'Select All'}
+                                />
+                              </th>
+                              <th className="py-3.5 px-4 sm:px-6">Session Topic &amp; Platform</th>
+                              <th className="py-3.5 px-4">Instructor</th>
+                              <th className="py-3.5 px-4">Target Course</th>
+                              <th className="py-3.5 px-4">Timing &amp; Schedule</th>
+                              <th className="py-3.5 px-4">Status</th>
+                              <th className="py-3.5 px-4 sm:px-6 text-right">Actions</th>
                             </tr>
-                          );
-                        }
-
-                        return filtered.map((session) => {
-                          const isCurrentlyLive = session.status === 'Live Now' && session.isLive;
-                          return (
-                            <tr key={session.id} className="hover:bg-slate-50/60 transition-colors">
-                              <td className="py-4 px-4 sm:px-6">
+                          </thead>
+                          <tbody className="divide-y divide-slate-100">
+                            {filtered.length === 0 ? (
+                              <tr>
+                                <td colSpan={7} className="py-12 text-center text-slate-400">
+                                  <div className="max-w-sm mx-auto space-y-2">
+                                    <p className="font-semibold text-slate-600">No live sessions found</p>
+                                    <p className="text-xs">Click &quot;Broadcast / Schedule Live Class&quot; above to create an active workstation stream.</p>
+                                  </div>
+                                </td>
+                              </tr>
+                            ) : (
+                              filtered.map((session) => {
+                                const isCurrentlyLive = session.status === 'Live Now' && session.isLive;
+                                const isSessionSelected = selectedIds.includes(session.id);
+                                return (
+                                  <tr key={session.id} className={`transition-colors ${isSessionSelected ? 'bg-rose-50/50' : 'hover:bg-slate-50/60'}`}>
+                                    <td className="py-4 px-3 w-10 text-center">
+                                      <input
+                                        type="checkbox"
+                                        checked={isSessionSelected}
+                                        onChange={() => toggleSelectItem(session.id)}
+                                        className="w-4 h-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500 cursor-pointer"
+                                      />
+                                    </td>
+                                    <td className="py-4 px-4 sm:px-6">
                                 <div className="space-y-1">
                                   <span className="font-bold text-[#131313] block leading-snug">
                                     {session.title}
@@ -7564,14 +7984,17 @@ export default function AdminPortalPage() {
                                </td>
                              </tr>
                            );
-                         });
-                       })()}
-                     </tbody>
-                   </table>
-                 </div>
-               </div>
-             </div>
-           )}
+                          })
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      )}
 
           {/* TAB: CMS (LIVE WEBSITE CONTENT, IMAGES, SECTIONS & VISIBILITY CONTROLLER) */}
           {activeTab === 'CMS' && (
