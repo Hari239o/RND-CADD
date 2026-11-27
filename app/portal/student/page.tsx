@@ -2926,7 +2926,7 @@ export default function StudentPortalPage() {
           return (
             <div className="mx-3.5 sm:mx-8 mt-3.5 sm:mt-6 p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-slate-300 shadow-xs transition-all relative overflow-hidden">
               {/* Top Accent Stripe */}
-              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-emerald-500 via-[#EE2C3C] to-[#131313]" />
+              <div className="absolute top-0 inset-x-0 h-0.5 bg-[#EE2C3C]" />
 
               <div className="flex items-start justify-between gap-3">
                 {/* Brand / Company Logo & Notification Content */}
@@ -5080,96 +5080,98 @@ export default function StudentPortalPage() {
             <div className="space-y-3.5 sm:space-y-5">
               {/* Dynamic Compact Stats Row (3 Columns on Mobile & Desktop) */}
               <div className="grid grid-cols-3 gap-2 sm:gap-4">
-                <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs text-center sm:text-left">
+                <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs text-center sm:text-left">
                   <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider block">
                     Total
                   </span>
-                  <span className="text-xl sm:text-3xl font-extrabold text-slate-900 block mt-0.5">
+                  <span className="text-lg sm:text-2xl lg:text-3xl font-extrabold text-slate-900 block mt-0.5">
                     {studentTickets.length}
                   </span>
                 </div>
 
-                <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs text-center sm:text-left">
+                <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs text-center sm:text-left">
                   <span className="text-[10px] sm:text-xs font-bold text-amber-700 uppercase tracking-wider block">
                     Under Review
                   </span>
-                  <span className="text-xl sm:text-3xl font-extrabold text-amber-600 block mt-0.5">
+                  <span className="text-lg sm:text-2xl lg:text-3xl font-extrabold text-amber-600 block mt-0.5">
                     {studentTickets.filter((t) => t.status !== 'Resolved').length}
                   </span>
                 </div>
 
-                <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs text-center sm:text-left">
+                <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs text-center sm:text-left">
                   <span className="text-[10px] sm:text-xs font-bold text-emerald-700 uppercase tracking-wider block">
                     Resolved
                   </span>
-                  <span className="text-xl sm:text-3xl font-extrabold text-emerald-600 block mt-0.5">
+                  <span className="text-lg sm:text-2xl lg:text-3xl font-extrabold text-emerald-600 block mt-0.5">
                     {studentTickets.filter((t) => t.status === 'Resolved').length}
                   </span>
                 </div>
               </div>
 
               {/* Enterprise Tickets Container */}
-              <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden">
-                {/* Compact Mobile & Desktop Filter Toolbar */}
-                <div className="p-3 sm:p-4 border-b border-slate-100 space-y-3 bg-white">
-                  <div className="flex items-center justify-between gap-2 flex-wrap">
-                    {/* Filter Chips */}
-                    <div className="inline-flex rounded-xl border border-slate-200 bg-slate-50/80 p-1 text-xs font-semibold">
+              <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+                {/* Mobile & Desktop Filter & Actions Toolbar */}
+                <div className="p-3.5 sm:p-4 border-b border-slate-200 bg-white space-y-3">
+                  {/* Row 1: Segmented Tabs (Full width on mobile, inline on desktop) + Actions */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                    {/* Segmented Filter Control */}
+                    <div className="grid grid-cols-3 sm:flex items-center rounded-xl border border-slate-200 bg-slate-50 p-1 text-xs font-semibold gap-1">
                       <button
                         onClick={() => setTicketFilter('all')}
-                        className={`px-2.5 sm:px-3 py-1 rounded-lg transition-all cursor-pointer whitespace-nowrap text-xs font-bold ${
+                        className={`py-1.5 px-3 rounded-lg transition-all cursor-pointer text-center text-xs font-bold ${
                           ticketFilter === 'all'
                             ? 'bg-slate-900 text-white shadow-2xs'
-                            : 'text-slate-600 hover:bg-slate-200/60'
+                            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
                         }`}
                       >
                         All ({studentTickets.length})
                       </button>
                       <button
                         onClick={() => setTicketFilter('open')}
-                        className={`px-2.5 sm:px-3 py-1 rounded-lg transition-all cursor-pointer whitespace-nowrap text-xs font-bold ${
+                        className={`py-1.5 px-3 rounded-lg transition-all cursor-pointer text-center text-xs font-bold ${
                           ticketFilter === 'open'
                             ? 'bg-amber-600 text-white shadow-2xs'
-                            : 'text-slate-600 hover:bg-slate-200/60'
+                            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
                         }`}
                       >
                         Pending ({studentTickets.filter((t) => t.status !== 'Resolved').length})
                       </button>
                       <button
                         onClick={() => setTicketFilter('resolved')}
-                        className={`px-2.5 sm:px-3 py-1 rounded-lg transition-all cursor-pointer whitespace-nowrap text-xs font-bold ${
+                        className={`py-1.5 px-3 rounded-lg transition-all cursor-pointer text-center text-xs font-bold ${
                           ticketFilter === 'resolved'
                             ? 'bg-emerald-700 text-white shadow-2xs'
-                            : 'text-slate-600 hover:bg-slate-200/60'
+                            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
                         }`}
                       >
                         Resolved ({studentTickets.filter((t) => t.status === 'Resolved').length})
                       </button>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    {/* Actions: Refresh & Raise Ticket */}
+                    <div className="flex items-center gap-2 justify-end">
                       <button
                         onClick={() => fetchStudentTickets()}
                         disabled={isLoadingTickets}
-                        className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                        className="px-3 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 shadow-2xs"
                         title="Refresh Tickets"
                       >
                         <svg className={`w-3.5 h-3.5 ${isLoadingTickets ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                         </svg>
-                        <span className="hidden sm:inline">Refresh</span>
+                        <span className="hidden xs:inline">Refresh</span>
                       </button>
 
                       <button
                         onClick={() => setIsRaiseTicketModalOpen(true)}
-                        className="px-3.5 sm:px-4 py-1.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs font-bold shadow-xs transition-all cursor-pointer active:scale-95 flex items-center gap-1"
+                        className="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs font-bold shadow-xs transition-all cursor-pointer active:scale-95 flex items-center justify-center gap-1 whitespace-nowrap"
                       >
                         <span>+ Raise Ticket</span>
                       </button>
                     </div>
                   </div>
 
-                  {/* Search Input */}
+                  {/* Row 2: Search Input */}
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -5181,7 +5183,7 @@ export default function StudentPortalPage() {
                       value={ticketSearchQuery}
                       onChange={(e) => setTicketSearchQuery(e.target.value)}
                       placeholder="Search tickets by ID, subject, or query..."
-                      className="w-full pl-9 pr-8 py-2 rounded-xl border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#EE2C3C] bg-white shadow-2xs"
+                      className="w-full pl-9 pr-8 py-2 rounded-xl border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-800 bg-white shadow-2xs"
                     />
                     {ticketSearchQuery && (
                       <button
@@ -5240,84 +5242,103 @@ export default function StudentPortalPage() {
                         {filtered.map((t) => {
                           const isResolved = t.status === 'Resolved';
                           const isInProgress = t.status === 'In Progress';
+                          const facultyName = (() => {
+                            const name = t.resolvedBy || '';
+                            return (!name || name.toLowerCase().includes('swamy')) ? 'CAD Faculty Desk' : name;
+                          })();
 
                           return (
                             <div
                               key={t.id}
-                              className="p-4 sm:p-5 hover:bg-slate-50/60 transition-colors space-y-2.5"
+                              className="p-4 sm:p-5 hover:bg-slate-50/50 transition-colors space-y-3"
                             >
-                              {/* Ticket Header Meta */}
-                              <div className="flex flex-wrap items-center justify-between gap-2">
-                                <div className="flex flex-wrap items-center gap-1.5">
-                                  <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-800 border border-slate-200">
+                              {/* Ticket Header Meta - MNC Clean Two-row Responsive */}
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                                  <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-800 border border-slate-200 shrink-0">
                                     {t.ticketNumber}
                                   </span>
-                                  <span className="px-2 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                                  <span className="px-2 py-0.5 rounded text-xs font-medium bg-slate-50 text-slate-700 border border-slate-200 truncate max-w-[200px] sm:max-w-none">
                                     {t.category}
                                   </span>
                                   <span
-                                    className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                                    className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider shrink-0 border ${
                                       t.priority === 'Urgent'
-                                        ? 'bg-rose-100 text-rose-800 border border-rose-300'
+                                        ? 'bg-rose-50 text-rose-700 border-rose-200'
                                         : t.priority === 'High'
-                                        ? 'bg-amber-100 text-amber-800 border border-amber-300'
-                                        : 'bg-slate-100 text-slate-700 border border-slate-200'
+                                        ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                        : 'bg-slate-50 text-slate-700 border-slate-200'
                                     }`}
                                   >
                                     {t.priority}
                                   </span>
                                 </div>
 
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
                                   <span className="text-[11px] text-slate-400 font-medium">
-                                    {new Date(t.createdAt).toLocaleDateString()}
+                                    {new Date(t.createdAt).toLocaleDateString('en-IN', {
+                                      month: 'short',
+                                      day: 'numeric',
+                                      year: 'numeric',
+                                    })}
                                   </span>
-                                  {isResolved ? (
-                                    <span className="px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                                      Resolved
-                                    </span>
-                                  ) : isInProgress ? (
-                                    <span className="px-2 py-0.5 rounded text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
-                                      Under Review
-                                    </span>
-                                  ) : (
-                                    <span className="px-2 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">
-                                      Open
-                                    </span>
-                                  )}
+                                  <span
+                                    className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${
+                                      isResolved
+                                        ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                                        : isInProgress
+                                        ? 'bg-amber-50 text-amber-800 border-amber-200'
+                                        : 'bg-slate-100 text-slate-700 border-slate-200'
+                                    }`}
+                                  >
+                                    {isResolved ? 'Resolved' : isInProgress ? 'Under Review' : 'Open'}
+                                  </span>
                                 </div>
                               </div>
 
                               {/* Ticket Subject & Problem Query */}
-                              <div>
+                              <div className="space-y-1">
                                 <h4 className="text-sm sm:text-base font-bold text-slate-900 leading-snug">
                                   {t.subject}
                                 </h4>
-                                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mt-1 whitespace-pre-line">
+                                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed whitespace-pre-line">
                                   {t.description}
                                 </p>
                               </div>
 
-                              {/* Official Resolution from Faculty */}
+                              {/* Official Resolution from Faculty (NO LEFT BORDER, PURE MNC CONTAINER) */}
                               {t.adminReply ? (
-                                <div className="mt-2.5 p-3 sm:p-3.5 rounded-xl bg-slate-50 border-l-4 border-emerald-500 space-y-1">
-                                  <div className="flex flex-wrap items-center justify-between gap-2">
-                                    <span className="text-xs font-bold text-emerald-900">
-                                      Official Resolution &bull; {t.resolvedBy || 'CAD Faculty Desk'}
-                                    </span>
+                                <div className="mt-3 p-3.5 sm:p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                                  <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-200/70">
+                                    <div className="flex items-center gap-2 min-w-0">
+                                      <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                                      <span className="text-xs font-bold text-slate-900">
+                                        Faculty Resolution
+                                      </span>
+                                      <span className="text-xs text-slate-500 truncate">
+                                        &bull; {facultyName}
+                                      </span>
+                                    </div>
                                     {t.resolvedAt && (
-                                      <span className="text-[11px] font-mono text-slate-400">
-                                        {new Date(t.resolvedAt).toLocaleString()}
+                                      <span className="text-[11px] font-mono text-slate-400 shrink-0">
+                                        {new Date(t.resolvedAt).toLocaleString('en-IN', {
+                                          month: 'short',
+                                          day: 'numeric',
+                                          year: 'numeric',
+                                          hour: '2-digit',
+                                          minute: '2-digit',
+                                        })}
                                       </span>
                                     )}
                                   </div>
-                                  <p className="text-xs sm:text-sm text-slate-800 leading-relaxed whitespace-pre-line">
+                                  <p className="text-xs sm:text-sm text-slate-800 leading-relaxed whitespace-pre-line pt-0.5">
                                     {t.adminReply}
                                   </p>
                                 </div>
                               ) : (
-                                <div className="mt-2 p-2.5 rounded-lg bg-amber-50/70 border border-amber-200 text-xs text-amber-900 font-medium">
-                                  Your query is assigned to the CAD faculty desk. Expected resolution within 2-4 lab hours.
+                                <div className="mt-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 font-medium flex items-center gap-2">
+                                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
+                                  <span>Ticket assigned to CAD Faculty Desk. Expected turnaround within 2-4 lab hours.</span>
                                 </div>
                               )}
                             </div>
@@ -6299,14 +6320,14 @@ export default function StudentPortalPage() {
                             }}
                             className={`block lg:hidden w-full p-3.5 transition-all select-none border-b border-slate-100 cursor-pointer ${
                               isCurrent
-                                ? 'bg-gradient-to-r from-rose-50/80 via-red-50/30 to-white border-l-4 border-l-[#EE2C3C]'
+                                ? 'bg-slate-50'
                                 : 'bg-white hover:bg-slate-50/90 active:bg-slate-100'
                             }`}
                           >
                             <div className="flex items-center gap-3">
                               {/* Left: MNC Animated Soundwave / Checkmark / 2-Digit Number */}
                               {isCurrent ? (
-                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#EE2C3C] to-[#C91827] text-white flex items-center justify-center shadow-xs flex-shrink-0">
+                                <div className="w-10 h-10 rounded-xl bg-[#EE2C3C] text-white flex items-center justify-center shadow-xs flex-shrink-0">
                                   <div className="flex items-end gap-[3px] h-3.5">
                                     <span className="w-0.5 h-2 bg-white rounded-full animate-pulse" />
                                     <span className="w-0.5 h-3.5 bg-white rounded-full animate-bounce" />
@@ -6432,7 +6453,7 @@ export default function StudentPortalPage() {
                             }}
                             className={`hidden lg:flex w-full rounded-xl transition-all p-3.5 items-start gap-3 cursor-pointer select-none border ${
                               isCurrent
-                                ? 'bg-white border-slate-300 border-l-[5px] border-l-[#EE2C3C] shadow-sm'
+                                ? 'bg-slate-50 border-slate-400 font-bold shadow-2xs'
                                 : 'bg-white hover:bg-slate-50/90 border-slate-200/90'
                             }`}
                           >
