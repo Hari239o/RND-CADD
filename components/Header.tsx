@@ -457,13 +457,13 @@ export const Header: React.FC<HeaderProps> = ({
               aria-hidden="true"
             />
 
-            {/* Solid Pure White Drawer Container (Crisp MNC Corporate Layout) */}
+            {/* Solid Pure White Drawer Container (Full-width Mobile Overlay & MNC Corporate Layout) */}
             <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 320 }}
-              className="absolute top-0 right-0 bottom-0 w-full max-w-[340px] sm:max-w-sm bg-white shadow-2xl flex flex-col justify-between overflow-y-auto pt-8 xs:pt-10 px-5 sm:px-6 pb-6 border-l border-slate-200"
+              className="absolute top-0 right-0 bottom-0 w-full sm:max-w-md bg-white shadow-2xl flex flex-col justify-between overflow-y-auto pt-6 px-5 sm:px-6 pb-6 border-l border-slate-200"
             >
               <div className="space-y-4">
                 {/* Drawer Header */}
@@ -475,7 +475,7 @@ export const Header: React.FC<HeaderProps> = ({
                         RND CADD
                       </span>
                       <span className="text-[11px] text-slate-500 font-semibold block leading-tight mt-0.5">
-                        Training Institute
+                        Training Institute • Ameerpet
                       </span>
                     </div>
                   </div>
@@ -491,20 +491,20 @@ export const Header: React.FC<HeaderProps> = ({
                   </button>
                 </div>
 
-                {/* User Status / Portal Identity Card */}
+                {/* User Status / Portal Identity Strip */}
                 {currentUser ? (
-                  <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-between gap-3">
+                  <div className="p-3.5 rounded-2xl bg-slate-900 text-white flex items-center justify-between gap-3 shadow-xs">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-10 h-10 rounded-xl bg-[#15304C] text-white flex items-center justify-center font-black text-sm uppercase shrink-0 shadow-2xs">
+                      <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/15 text-white flex items-center justify-center font-black text-sm uppercase shrink-0">
                         {(currentUser.name || currentUser.email || 'U').charAt(0)}
                       </div>
                       <div className="min-w-0">
-                        <span className="text-xs font-bold text-slate-900 truncate block">
+                        <span className="text-xs font-bold text-white truncate block">
                           {currentUser.name || currentUser.email}
                         </span>
                         <div className="flex items-center gap-1.5 mt-0.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300">
                             {currentUser.role || 'Student'}
                           </span>
                         </div>
@@ -513,7 +513,7 @@ export const Header: React.FC<HeaderProps> = ({
                     <Link
                       href={isAdmin ? '/portal/admin' : (currentUser?.email ? `/portal/student?email=${encodeURIComponent(currentUser.email)}` : '/portal/student')}
                       onClick={() => setMobileMenuOpen(false)}
-                      className="px-3 py-1.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs font-bold shrink-0 transition-all shadow-2xs active:scale-95"
+                      className="px-3.5 py-1.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs font-bold shrink-0 transition-all shadow-xs active:scale-95"
                     >
                       Dashboard &rarr;
                     </Link>
@@ -523,7 +523,7 @@ export const Header: React.FC<HeaderProps> = ({
                     <Link
                       href="/signin"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex-1 py-2.5 text-center rounded-xl bg-white border border-slate-300 text-xs font-bold text-slate-800 hover:bg-slate-50 shadow-2xs transition-all active:scale-95"
+                      className="flex-1 py-2.5 text-center rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold text-slate-800 hover:bg-slate-200 shadow-2xs transition-all active:scale-95"
                     >
                       Sign In
                     </Link>
@@ -532,106 +532,111 @@ export const Header: React.FC<HeaderProps> = ({
                       onClick={() => setMobileMenuOpen(false)}
                       className="flex-1 py-2.5 text-center rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs font-bold shadow-xs transition-all active:scale-95"
                     >
-                      Sign Up
+                      Sign Up (Free)
                     </Link>
                   </div>
                 )}
 
-                {/* Section 1: Portals & Career Navigation */}
-                <div className="space-y-2">
+                {/* Section 1: Navigation & Portals Grouped List (MNC Style) */}
+                <div className="space-y-1.5">
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block px-1">
                     Portals &amp; Workstations
                   </span>
 
-                  {currentUser && (
-                    <Link
-                      href="/jobs"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-between p-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 transition-all shadow-2xs group"
+                  <div className="rounded-2xl border border-slate-200 bg-white divide-y divide-slate-100 shadow-2xs overflow-hidden">
+                    {currentUser && (
+                      <Link
+                        href="/jobs"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="flex items-center justify-between p-3.5 hover:bg-slate-50 transition-colors group"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-9 h-9 rounded-xl bg-red-50 text-[#EE2C3C] flex items-center justify-center shrink-0 border border-red-100">
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-bold text-slate-900 group-hover:text-[#EE2C3C] transition-colors">
+                                Jobs &amp; Placement Board
+                              </span>
+                              <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-red-100 text-[#EE2C3C] uppercase">
+                                LIVE
+                              </span>
+                            </div>
+                            <span className="text-[11px] text-slate-500 block truncate">
+                              Core CAD/BIM hiring openings
+                            </span>
+                          </div>
+                        </div>
+                        <svg className="w-4 h-4 text-slate-400 group-hover:text-[#EE2C3C] group-hover:translate-x-0.5 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                      </Link>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={handleEnrollClick}
+                      className="w-full flex items-center justify-between p-3.5 hover:bg-slate-50 transition-colors text-left group cursor-pointer"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-9 h-9 rounded-lg bg-red-50 text-[#EE2C3C] flex items-center justify-center shrink-0 border border-red-100">
+                        <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                           </svg>
                         </div>
                         <div className="min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-slate-900 group-hover:text-[#EE2C3C] transition-colors">
-                              Jobs &amp; Placement Board
+                            <span className="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors block">
+                              Reserve Workstation &amp; Demo
                             </span>
-                            <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-red-100 text-[#EE2C3C] uppercase">
-                              LIVE
+                            <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 uppercase">
+                              FREE
                             </span>
                           </div>
-                          <span className="text-[11px] text-slate-400 block truncate">
-                            Core CAD/BIM hiring openings
+                          <span className="text-[11px] text-slate-500 block truncate">
+                            Ameerpet Lab Session Booking
                           </span>
                         </div>
                       </div>
-                      <span className="text-slate-400 text-sm font-bold group-hover:translate-x-0.5 transition-transform">
-                        &rarr;
-                      </span>
-                    </Link>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={handleEnrollClick}
-                    className="w-full flex items-center justify-between p-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 transition-all text-left shadow-2xs group cursor-pointer"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                      <div className="min-w-0">
-                        <span className="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors block">
-                          Reserve Workstation / Demo
-                        </span>
-                        <span className="text-[11px] text-slate-400 block truncate">
-                          Ameerpet Lab Session Booking
-                        </span>
-                      </div>
-                    </div>
-                    <span className="text-slate-400 text-sm font-bold group-hover:translate-x-0.5 transition-transform">
-                      &rarr;
-                    </span>
-                  </button>
+                      <svg className="w-4 h-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
 
-                {/* Section 2: Engineering Disciplines Navigation */}
+                {/* Section 2: Engineering Disciplines (Modern MNC Filter Chips Format) */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between px-1">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                       Engineering Disciplines
                     </span>
-                    <span className="text-[10px] text-slate-400 font-medium">Select to filter</span>
+                    <span className="text-[10px] text-slate-400 font-medium">Filter courses</span>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="flex flex-wrap gap-2">
                     {NAV_ITEMS.map((item) => {
                       const isSelected = activeStream === item.id;
-                      const isAll = item.id === 'all';
                       return (
                         <button
                           key={item.id}
+                          type="button"
                           onClick={() => handleStreamClick(item.id)}
-                          className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all text-left cursor-pointer active:scale-95 ${
-                            isAll ? 'col-span-2' : ''
-                          } ${
+                          className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 ${
                             isSelected
-                              ? 'bg-[#EE2C3C] text-white shadow-xs'
-                              : 'bg-white hover:bg-slate-50 text-slate-800 border border-slate-200'
+                              ? 'bg-[#EE2C3C] text-white shadow-xs font-bold'
+                              : 'bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200/60'
                           }`}
                         >
-                          <span className="truncate">{item.label}</span>
-                          {isSelected ? (
-                            <span className="text-white text-xs ml-1 shrink-0">✓</span>
-                          ) : (
-                            <span className="text-slate-300 text-xs shrink-0">›</span>
+                          {isSelected && (
+                            <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
                           )}
+                          <span>{item.label}</span>
                         </button>
                       );
                     })}
@@ -641,27 +646,31 @@ export const Header: React.FC<HeaderProps> = ({
                 {/* Direct Campus Helpline Contact Tile */}
                 <a
                   href="tel:+919908123456"
-                  className="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/90 transition-all text-left"
+                  className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-all text-left group"
                 >
-                  <div className="flex items-center gap-2.5">
-                    <span className="text-base">📞</span>
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                      </svg>
+                    </div>
                     <div>
                       <span className="text-xs font-bold text-slate-900 block leading-tight">
-                        Admissions Helpline
+                        Admissions &amp; Faculty Desk
                       </span>
                       <span className="text-[11px] text-slate-500 font-medium">
-                        +91 99081 23456 (Ameerpet)
+                        +91 99081 23456 (Ameerpet Campus)
                       </span>
                     </div>
                   </div>
-                  <span className="text-xs font-bold text-slate-600 bg-white px-2 py-1 rounded border border-slate-200">
+                  <span className="text-xs font-bold text-slate-700 bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 group-hover:border-slate-300 shadow-2xs">
                     Call
                   </span>
                 </a>
               </div>
 
               {/* Drawer Footer */}
-              <div className="pt-4 border-t border-slate-200 mt-4 space-y-2">
+              <div className="pt-4 border-t border-slate-200 mt-4 space-y-2.5">
                 {currentUser && (
                   <button
                     type="button"
@@ -669,7 +678,7 @@ export const Header: React.FC<HeaderProps> = ({
                       handleSignOut();
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full py-2.5 rounded-xl border border-rose-200 bg-rose-50/50 hover:bg-rose-100/70 text-rose-700 text-xs font-bold transition-all cursor-pointer text-center"
+                    className="w-full py-2.5 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-[#EE2C3C] text-xs font-bold transition-all cursor-pointer text-center active:scale-98"
                   >
                     Sign Out
                   </button>
