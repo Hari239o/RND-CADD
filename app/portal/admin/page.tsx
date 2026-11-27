@@ -5336,7 +5336,7 @@ export default function AdminPortalPage() {
                 <div className="flex items-center gap-2">
                   <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold flex items-center gap-1.5 shadow-2xs">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span>{jobs.filter((j) => j.status === 'Active').length} Active Vacancies</span>
+                    <span>{adminJobs.filter((j) => j.status === 'Active').length} Active Vacancies</span>
                   </span>
                 </div>
 

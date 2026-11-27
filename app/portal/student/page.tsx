@@ -1239,7 +1239,7 @@ export default function StudentPortalPage() {
           : null;
         const resolvedPhoto = (localCustomPhoto && localCustomPhoto.trim().length > 0)
           ? localCustomPhoto
-          : (p.photo || prev.photo);
+          : (p.photo || studentUser.photo || '');
 
         setStudentUser((prev) => ({
           ...prev,
@@ -1252,7 +1252,7 @@ export default function StudentPortalPage() {
           nativePlace: p.nativePlace || prev.nativePlace,
           qualification: p.qualification || prev.qualification,
           admissionDate: p.admissionDate || prev.admissionDate,
-          photo: resolvedPhoto,
+          photo: resolvedPhoto || prev.photo,
           courseFee: p.courseFee !== undefined ? Number(p.courseFee) : prev.courseFee,
           paidFee: p.paidFee !== undefined ? Number(p.paidFee) : prev.paidFee,
           balanceFee: p.balanceFee !== undefined ? Number(p.balanceFee) : prev.balanceFee,
