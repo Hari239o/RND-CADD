@@ -855,19 +855,8 @@ export default function AdminPortalPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'revoked'>('all');
 
-  // Interactive Courses Catalog State (loaded dynamically from /api/courses)
-  const [courses, setCourses] = useState<CourseItem[]>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const stored = localStorage.getItem('rnd_cadd_live_courses');
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-        }
-      } catch {}
-    }
-    return DEFAULT_COURSES;
-  });
+  // Interactive Courses Catalog State (loaded dynamically from /api/courses and hydrated on mount)
+  const [courses, setCourses] = useState<CourseItem[]>(DEFAULT_COURSES);
   const [foldersList, setFoldersList] = useState<any[]>([...MAIN_FOLDERS]);
   const [showAddFolderModal, setShowAddFolderModal] = useState<boolean>(false);
   const [newFolderForm, setNewFolderForm] = useState({
@@ -6718,8 +6707,8 @@ export default function AdminPortalPage() {
                               </div>
 
                               <div className="flex items-center gap-2">
-                                <span className="text-xs text-slate-500 font-medium">
-                                  Created: {new Date(t.createdAt).toLocaleDateString()}
+                                <span className="text-xs text-slate-500 font-medium" suppressHydrationWarning>
+                                  Created: {t.createdAt ? new Date(t.createdAt).toLocaleDateString('en-GB') : 'Recently'}
                                 </span>
                                 {isResolved ? (
                                   <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">

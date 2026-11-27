@@ -5050,8 +5050,8 @@ export default function StudentPortalPage() {
                           </div>
 
                           <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
-                            <span className="text-[11px] text-slate-400">
-                              {a.createdAt ? `Posted: ${new Date(a.createdAt).toLocaleDateString()}` : ''}
+                            <span className="text-[11px] text-slate-400" suppressHydrationWarning>
+                              {a.createdAt ? `Posted: ${new Date(a.createdAt).toLocaleDateString('en-GB')}` : ''}
                             </span>
                             <a
                               href={a.pdfUrl}
@@ -5731,7 +5731,7 @@ export default function StudentPortalPage() {
                             <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">
                               {rev.status}
                             </span>
-                            <span>{new Date(rev.createdAt).toLocaleDateString()}</span>
+                            <span suppressHydrationWarning>{rev.createdAt ? new Date(rev.createdAt).toLocaleDateString('en-GB') : ''}</span>
                           </div>
                         </div>
                         <p className="text-xs text-slate-700 leading-relaxed">{rev.review}</p>
