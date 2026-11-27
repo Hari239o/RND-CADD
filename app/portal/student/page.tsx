@@ -4306,22 +4306,12 @@ export default function StudentPortalPage() {
                                   </div>
                                 )}
 
-                                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-2 border-t border-slate-100 text-xs text-slate-500">
+                                <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100 text-xs text-slate-500">
                                   <div>
                                     <span>Deadline: <strong className="text-slate-800">{job.deadline}</strong></span>
                                     <span className="mx-2">&bull;</span>
                                     <span>Posted: {job.postedDate}</span>
                                   </div>
-
-                                  {!hasApplied && !isClosed && (
-                                    <button
-                                      type="button"
-                                      onClick={() => setApplyingJob(job)}
-                                      className="w-full sm:w-auto px-6 py-2 rounded-lg bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all cursor-pointer text-center"
-                                    >
-                                      Quick Apply
-                                    </button>
-                                  )}
                                 </div>
                               </div>
                             )}
