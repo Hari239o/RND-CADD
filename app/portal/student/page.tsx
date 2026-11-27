@@ -1536,12 +1536,14 @@ export default function StudentPortalPage() {
 
   // Fetch real-time support tickets raised by student
   const fetchStudentTickets = async (userEmail?: string, stuId?: string) => {
+    setIsLoadingTickets(true);
     try {
       const email = userEmail || studentUser.email;
       const id = stuId || studentUser.id;
       const params = new URLSearchParams();
       if (id) params.append('studentId', id);
       if (email) params.append('email', email);
+      params.append('t', Date.now().toString());
 
       const res = await fetch(`/api/tickets?${params.toString()}`);
       const data = await res.json();
@@ -1789,13 +1791,25 @@ export default function StudentPortalPage() {
     fetchStudentAssignments(undefined, true);
   }, []);
 
-  // Auto-fetch assignments when switching to the Assignments tab
+  // Dynamic real-time auto-fetch when switching tabs
   useEffect(() => {
     if (activeTab === 'Assignments') {
       fetchStudentAssignments(studentUser.assignedCourses);
     }
     if (activeTab === 'E-Books') {
       fetchStudentEbooks(studentUser.email, studentUser.id, studentUser.assignedCourses);
+    }
+    if (activeTab === 'Chat') {
+      fetchStudentTickets(studentUser.email, studentUser.id);
+    }
+    if (activeTab === 'Refer & Earn') {
+      fetchStudentOffers();
+    }
+    if (activeTab === 'Rate') {
+      fetchStudentReviews(studentUser.email);
+    }
+    if (activeTab === 'Jobs') {
+      fetchStudentJobs();
     }
   }, [activeTab, studentUser.assignedCourses, studentUser.email, studentUser.id]);
 
@@ -5084,108 +5098,127 @@ export default function StudentPortalPage() {
           )}
 
           {/* TAB 6: SUPPORT & TICKETS (Doubt Clearance Channel) */}
-          {/* TAB 6: SUPPORT & TICKETS (Doubt Clearance Channel) */}
           {activeTab === 'Chat' && (
-            <div className="space-y-6">
-              {/* Dynamic Stats Row */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm">
-                  <span className="text-xs sm:text-sm font-bold text-[#666666] uppercase tracking-wider block">
-                    Total Tickets
+            <div className="space-y-3.5 sm:space-y-5">
+              {/* Dynamic Compact Stats Row (3 Columns on Mobile & Desktop) */}
+              <div className="grid grid-cols-3 gap-2 sm:gap-4">
+                <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs text-center sm:text-left">
+                  <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider block">
+                    Total
                   </span>
-                  <span className="text-3xl sm:text-4xl font-extrabold text-[#131313] block mt-1">
+                  <span className="text-xl sm:text-3xl font-extrabold text-slate-900 block mt-0.5">
                     {studentTickets.length}
                   </span>
-                  <span className="text-xs sm:text-sm text-slate-400 block mt-0.5 font-medium">
-                    All Helpdesk Inquiries
-                  </span>
                 </div>
 
-                <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm">
-                  <span className="text-xs sm:text-sm font-bold text-amber-800 uppercase tracking-wider block">
+                <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs text-center sm:text-left">
+                  <span className="text-[10px] sm:text-xs font-bold text-amber-700 uppercase tracking-wider block">
                     Under Review
                   </span>
-                  <span className="text-3xl sm:text-4xl font-extrabold text-amber-600 block mt-1">
+                  <span className="text-xl sm:text-3xl font-extrabold text-amber-600 block mt-0.5">
                     {studentTickets.filter((t) => t.status !== 'Resolved').length}
-                  </span>
-                  <span className="text-xs sm:text-sm text-slate-400 block mt-0.5 font-medium">
-                    Awaiting Faculty Reply
                   </span>
                 </div>
 
-                <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm">
-                  <span className="text-xs sm:text-sm font-bold text-emerald-800 uppercase tracking-wider block">
-                    Solved &amp; Resolved
+                <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs text-center sm:text-left">
+                  <span className="text-[10px] sm:text-xs font-bold text-emerald-700 uppercase tracking-wider block">
+                    Resolved
                   </span>
-                  <span className="text-3xl sm:text-4xl font-extrabold text-emerald-600 block mt-1">
+                  <span className="text-xl sm:text-3xl font-extrabold text-emerald-600 block mt-0.5">
                     {studentTickets.filter((t) => t.status === 'Resolved').length}
-                  </span>
-                  <span className="text-xs sm:text-sm text-slate-400 block mt-0.5 font-medium">
-                    Solutions Published
                   </span>
                 </div>
               </div>
 
               {/* Enterprise Tickets Container */}
-              <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden">
-                {/* Filter Toolbar */}
-                <div className="p-4 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-white">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <div className="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-1 text-xs font-semibold">
+              <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden">
+                {/* Compact Mobile & Desktop Filter Toolbar */}
+                <div className="p-3 sm:p-4 border-b border-slate-100 space-y-3 bg-white">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    {/* Filter Chips */}
+                    <div className="inline-flex rounded-xl border border-slate-200 bg-slate-50/80 p-1 text-xs font-semibold">
                       <button
                         onClick={() => setTicketFilter('all')}
-                        className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+                        className={`px-2.5 sm:px-3 py-1 rounded-lg transition-all cursor-pointer whitespace-nowrap text-xs font-bold ${
                           ticketFilter === 'all'
-                            ? 'bg-[#131313] text-white shadow-2xs font-bold'
-                            : 'text-slate-600 hover:bg-slate-100'
+                            ? 'bg-slate-900 text-white shadow-2xs'
+                            : 'text-slate-600 hover:bg-slate-200/60'
                         }`}
                       >
                         All ({studentTickets.length})
                       </button>
                       <button
                         onClick={() => setTicketFilter('open')}
-                        className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+                        className={`px-2.5 sm:px-3 py-1 rounded-lg transition-all cursor-pointer whitespace-nowrap text-xs font-bold ${
                           ticketFilter === 'open'
-                            ? 'bg-amber-600 text-white shadow-2xs font-bold'
-                            : 'text-slate-600 hover:bg-slate-100'
+                            ? 'bg-amber-600 text-white shadow-2xs'
+                            : 'text-slate-600 hover:bg-slate-200/60'
                         }`}
                       >
                         Pending ({studentTickets.filter((t) => t.status !== 'Resolved').length})
                       </button>
                       <button
                         onClick={() => setTicketFilter('resolved')}
-                        className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+                        className={`px-2.5 sm:px-3 py-1 rounded-lg transition-all cursor-pointer whitespace-nowrap text-xs font-bold ${
                           ticketFilter === 'resolved'
-                            ? 'bg-emerald-700 text-white shadow-2xs font-bold'
-                            : 'text-slate-600 hover:bg-slate-100'
+                            ? 'bg-emerald-700 text-white shadow-2xs'
+                            : 'text-slate-600 hover:bg-slate-200/60'
                         }`}
                       >
                         Resolved ({studentTickets.filter((t) => t.status === 'Resolved').length})
                       </button>
                     </div>
 
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => fetchStudentTickets()}
+                        disabled={isLoadingTickets}
+                        className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                        title="Refresh Tickets"
+                      >
+                        <svg className={`w-3.5 h-3.5 ${isLoadingTickets ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        <span className="hidden sm:inline">Refresh</span>
+                      </button>
+
+                      <button
+                        onClick={() => setIsRaiseTicketModalOpen(true)}
+                        className="px-3.5 sm:px-4 py-1.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs font-bold shadow-xs transition-all cursor-pointer active:scale-95 flex items-center gap-1"
+                      >
+                        <span>+ Raise Ticket</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Search Input */}
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </div>
                     <input
                       type="text"
                       value={ticketSearchQuery}
                       onChange={(e) => setTicketSearchQuery(e.target.value)}
-                      placeholder="Search ticket #, subject, or query..."
-                      className="px-3.5 py-1.5 rounded-xl border border-slate-300 text-xs text-[#131313] focus:outline-none focus:border-[#EE2C3C] bg-white w-48 sm:w-64 shadow-2xs"
+                      placeholder="Search tickets by ID, subject, or query..."
+                      className="w-full pl-9 pr-8 py-2 rounded-xl border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#EE2C3C] bg-white shadow-2xs"
                     />
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => setIsRaiseTicketModalOpen(true)}
-                      className="px-4 py-2 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs sm:text-sm font-semibold shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-[0.98]"
-                    >
-                      Raise Support Ticket
-                    </button>
+                    {ticketSearchQuery && (
+                      <button
+                        onClick={() => setTicketSearchQuery('')}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 text-sm font-bold"
+                      >
+                        &times;
+                      </button>
+                    )}
                   </div>
                 </div>
 
                 {/* Tickets Content List */}
                 {isLoadingTickets ? (
-                  <div className="p-12 text-center text-sm font-medium text-slate-500">
+                  <div className="p-8 text-center text-xs font-semibold text-slate-500">
                     Syncing your support tickets...
                   </div>
                 ) : (
@@ -5209,11 +5242,17 @@ export default function StudentPortalPage() {
 
                     if (filtered.length === 0) {
                       return (
-                        <div className="p-12 text-center space-y-2">
-                          <h4 className="text-base font-bold text-[#131313]">No support tickets found</h4>
-                          <p className="text-xs text-slate-500 max-w-md mx-auto">
-                            Need help with software errors, workstation access, or design doubts? Click &quot;Raise Support Ticket&quot; to contact faculty mentors.
+                        <div className="p-8 sm:p-12 text-center space-y-3">
+                          <h4 className="text-sm sm:text-base font-bold text-slate-900">No support tickets found</h4>
+                          <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                            Need guidance on CAD commands, errors, or workstation access?
                           </p>
+                          <button
+                            onClick={() => setIsRaiseTicketModalOpen(true)}
+                            className="px-4 py-2 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs font-bold shadow-xs transition-all cursor-pointer inline-flex items-center gap-1"
+                          >
+                            <span>+ Raise Support Ticket</span>
+                          </button>
                         </div>
                       );
                     }
@@ -5227,15 +5266,15 @@ export default function StudentPortalPage() {
                           return (
                             <div
                               key={t.id}
-                              className="p-6 hover:bg-slate-50/60 transition-colors space-y-3"
+                              className="p-4 sm:p-5 hover:bg-slate-50/60 transition-colors space-y-2.5"
                             >
                               {/* Ticket Header Meta */}
-                              <div className="flex flex-wrap items-center justify-between gap-3">
-                                <div className="flex flex-wrap items-center gap-2">
-                                  <span className="font-mono text-xs font-bold px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200">
+                              <div className="flex flex-wrap items-center justify-between gap-2">
+                                <div className="flex flex-wrap items-center gap-1.5">
+                                  <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-800 border border-slate-200">
                                     {t.ticketNumber}
                                   </span>
-                                  <span className="px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                                  <span className="px-2 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
                                     {t.category}
                                   </span>
                                   <span
@@ -5247,24 +5286,24 @@ export default function StudentPortalPage() {
                                         : 'bg-slate-100 text-slate-700 border border-slate-200'
                                     }`}
                                   >
-                                    {t.priority} Priority
+                                    {t.priority}
                                   </span>
                                 </div>
 
                                 <div className="flex items-center gap-2">
-                                  <span className="text-xs text-slate-400 font-medium">
-                                    Raised on {new Date(t.createdAt).toLocaleDateString()}
+                                  <span className="text-[11px] text-slate-400 font-medium">
+                                    {new Date(t.createdAt).toLocaleDateString()}
                                   </span>
                                   {isResolved ? (
-                                    <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                    <span className="px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
                                       Resolved
                                     </span>
                                   ) : isInProgress ? (
-                                    <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                                    <span className="px-2 py-0.5 rounded text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
                                       Under Review
                                     </span>
                                   ) : (
-                                    <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">
+                                    <span className="px-2 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">
                                       Open
                                     </span>
                                   )}
@@ -5273,24 +5312,24 @@ export default function StudentPortalPage() {
 
                               {/* Ticket Subject & Problem Query */}
                               <div>
-                                <h4 className="text-base font-bold text-[#131313] leading-snug">
+                                <h4 className="text-sm sm:text-base font-bold text-slate-900 leading-snug">
                                   {t.subject}
                                 </h4>
-                                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mt-1.5 whitespace-pre-line">
+                                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mt-1 whitespace-pre-line">
                                   {t.description}
                                 </p>
                               </div>
 
                               {/* Official Resolution from Faculty */}
                               {t.adminReply ? (
-                                <div className="mt-3 p-4 rounded-xl bg-slate-50 border-l-4 border-emerald-500 space-y-1.5">
+                                <div className="mt-2.5 p-3 sm:p-3.5 rounded-xl bg-slate-50 border-l-4 border-emerald-500 space-y-1">
                                   <div className="flex flex-wrap items-center justify-between gap-2">
                                     <span className="text-xs font-bold text-emerald-900">
-                                      Official Resolution &bull; {t.resolvedBy || 'Er. Swamy Naidu (Director / Chief Architect)'}
+                                      Official Resolution &bull; {t.resolvedBy || 'CAD Faculty Desk'}
                                     </span>
                                     {t.resolvedAt && (
                                       <span className="text-[11px] font-mono text-slate-400">
-                                        Resolved: {new Date(t.resolvedAt).toLocaleString()}
+                                        {new Date(t.resolvedAt).toLocaleString()}
                                       </span>
                                     )}
                                   </div>
@@ -5299,7 +5338,7 @@ export default function StudentPortalPage() {
                                   </p>
                                 </div>
                               ) : (
-                                <div className="mt-2.5 p-3 rounded-xl bg-amber-50/60 border-l-4 border-amber-400 text-xs text-amber-800 font-medium">
+                                <div className="mt-2 p-2.5 rounded-lg bg-amber-50/70 border border-amber-200 text-xs text-amber-900 font-medium">
                                   Your query is assigned to the CAD faculty desk. Expected resolution within 2-4 lab hours.
                                 </div>
                               )}
@@ -5325,37 +5364,34 @@ export default function StudentPortalPage() {
             const courseDiscounts = activeStudentOffers.filter((o) => o.type === 'course_discount');
 
             return (
-              <div className="space-y-6">
-                {/* Main Student Referral Card (shown only if not hidden by Admin) */}
+              <div className="space-y-3.5 sm:space-y-5">
+                {/* Main Student Referral Card */}
                 {referralProgram ? (
-                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-5">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                  <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs p-4 sm:p-6 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
                       <div>
-                        <span className="text-xs font-bold uppercase tracking-wider text-slate-700 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200 inline-block mb-2">
-                          Official Student Referral Program
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 inline-block mb-1">
+                          Student Referral
                         </span>
-                        <h3 className="text-xl sm:text-2xl font-bold text-[#131313] tracking-tight">
-                          {referralProgram.title || 'Refer Engineering Peers & Earn Benefits'}
+                        <h3 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
+                          {referralProgram.title || 'Peer Referral Program'}
                         </h3>
                       </div>
 
                       {referralProgram.referrerReward && (
-                        <div className="bg-slate-50 rounded-xl p-3.5 sm:text-right border border-slate-200 shrink-0">
-                          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wide block">Your Benefit</span>
-                          <span className="text-sm font-extrabold text-[#131313] font-mono">
+                        <div className="bg-slate-50 rounded-xl px-3.5 py-1.5 border border-slate-200 shadow-2xs self-start sm:self-auto flex items-center gap-2">
+                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Benefit:</span>
+                          <span className="text-xs sm:text-sm font-extrabold text-emerald-700 font-mono">
                             {referralProgram.referrerReward}
                           </span>
                         </div>
                       )}
                     </div>
 
-                    {/* Referral Link Box with Working 1-Click Copy */}
-                    <div className="p-4 sm:p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
-                      <span className="text-xs font-bold text-slate-700 block uppercase tracking-wider">
-                        Your Unique Referral Link:
-                      </span>
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 rounded-lg border border-slate-200 shadow-xs">
-                        <span className="font-mono text-xs sm:text-sm font-bold text-[#131313] break-all select-all">
+                    {/* Referral Link & Code Box */}
+                    <div className="space-y-2.5">
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-slate-200">
+                        <span className="font-mono text-xs text-slate-800 break-all select-all flex-1 px-1 py-1">
                           {referralLink}
                         </span>
                         <button
@@ -5364,70 +5400,91 @@ export default function StudentPortalPage() {
                             if (typeof navigator !== 'undefined' && navigator.clipboard) {
                               navigator.clipboard.writeText(referralLink);
                               setCopiedReferral(true);
-                              setTimeout(() => setCopiedReferral(false), 3000);
+                              setTimeout(() => setCopiedReferral(false), 2500);
                             }
                           }}
-                          className={`px-6 py-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-xs whitespace-nowrap self-start sm:self-auto ${
+                          className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-2xs whitespace-nowrap ${
                             copiedReferral
                               ? 'bg-emerald-600 text-white'
-                              : 'bg-[#EE2C3C] hover:bg-[#D71E2E] text-white'
+                              : 'bg-[#EE2C3C] hover:bg-[#D71E2E] text-white active:scale-95'
                           }`}
                         >
-                          {copiedReferral ? 'Copied to Clipboard! ✓' : 'Copy Link'}
+                          {copiedReferral ? 'Copied! ✓' : 'Copy Link'}
                         </button>
                       </div>
-                      <p className="text-[11px] text-slate-500 font-medium">
-                        Your referral code is embedded as <span className="font-mono font-bold text-slate-800">{studentRefCode}</span>. When friends enroll through this link, benefits are credited to your student ledger.
-                      </p>
+
+                      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+                        <div className="flex items-center gap-1.5">
+                          <span>Referral Code:</span>
+                          <span className="font-mono font-bold text-slate-900 bg-white px-2 py-0.5 rounded border border-slate-200">
+                            {studentRefCode}
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-slate-400">Share with colleagues and students enrolling in CAD courses</span>
+                      </div>
                     </div>
                   </div>
                 ) : null}
 
-                {/* Active Promotional Discounts & Course Offers (only active, unhidden offers) */}
+                {/* Active Promotional Discounts & Course Offers */}
                 {courseDiscounts.length > 0 && (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-base font-bold text-[#131313]">
-                        Active Course Offers &amp; Discounts You Can Share
-                      </h4>
-                      <span className="text-xs font-semibold text-slate-500 font-mono">
-                        {courseDiscounts.length} Active {courseDiscounts.length === 1 ? 'Discount' : 'Discounts'}
-                      </span>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-sm sm:text-base font-bold text-slate-900">
+                          Course Discounts You Can Share
+                        </h4>
+                        <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                          {courseDiscounts.length} Active
+                        </span>
+                      </div>
+
+                      <button
+                        onClick={() => fetchStudentOffers()}
+                        disabled={isLoadingOffers}
+                        className="px-3 py-1 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                        title="Refresh Offers"
+                      >
+                        <svg className={`w-3.5 h-3.5 ${isLoadingOffers ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        <span className="hidden sm:inline">Refresh</span>
+                      </button>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                       {courseDiscounts.map((offer) => {
                         const isCopied = copiedOfferCode === offer.code;
                         return (
                           <div
                             key={offer.id}
-                            className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col justify-between space-y-4 hover:border-slate-300 transition-all"
+                            className="bg-white rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs p-4 flex flex-col justify-between space-y-3 hover:border-slate-300 transition-all"
                           >
-                            <div>
-                              <div className="flex items-center justify-between gap-2 mb-2">
+                            <div className="space-y-1.5">
+                              <div className="flex items-center justify-between gap-2">
                                 <span className="text-xs font-extrabold uppercase tracking-wide text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200">
                                   {offer.discountType === 'percentage' ? `${offer.discountValue}% OFF` : `Rs ${offer.discountValue} Flat Discount`}
                                 </span>
                                 {offer.expiryDate && (
-                                  <span className="text-[11px] font-mono text-slate-500">
+                                  <span className="text-[11px] font-mono text-slate-400">
                                     Till {offer.expiryDate}
                                   </span>
                                 )}
                               </div>
-                              <h5 className="text-base font-bold text-[#131313] leading-snug">
+                              <h5 className="text-sm sm:text-base font-bold text-slate-900 leading-snug">
                                 {offer.title}
                               </h5>
-                              <p className="text-xs text-slate-600 font-medium mt-1">
-                                Course: <span className="font-bold text-slate-800">{offer.targetCourse}</span>
+                              <p className="text-xs text-[#EE2C3C] font-semibold">
+                                {offer.targetCourse}
                               </p>
                               {offer.description && (
-                                <p className="text-xs text-slate-500 mt-2 line-clamp-2">
+                                <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
                                   {offer.description}
                                 </p>
                               )}
                             </div>
 
-                            <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                            <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
                               <div className="flex items-center space-x-1.5">
                                 <span className="text-[10px] uppercase font-bold text-slate-400">Coupon:</span>
                                 <span className="font-mono text-xs font-black text-[#EE2C3C] bg-rose-50 border border-rose-200 px-2 py-0.5 rounded">
@@ -5438,7 +5495,7 @@ export default function StudentPortalPage() {
                                 type="button"
                                 onClick={() => {
                                   if (typeof navigator !== 'undefined' && navigator.clipboard) {
-                                    navigator.clipboard.writeText(offer.shareUrl);
+                                    navigator.clipboard.writeText(offer.shareUrl || offer.code);
                                     setCopiedOfferCode(offer.code);
                                     setTimeout(() => setCopiedOfferCode(null), 2500);
                                   }
@@ -5446,10 +5503,10 @@ export default function StudentPortalPage() {
                                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-2xs whitespace-nowrap ${
                                   isCopied
                                     ? 'bg-emerald-600 text-white'
-                                    : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                                    : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 active:scale-95'
                                 }`}
                               >
-                                {isCopied ? 'Link Copied! ✓' : 'Copy Offer Link'}
+                                {isCopied ? 'Copied! ✓' : 'Copy Offer Link'}
                               </button>
                             </div>
                           </div>
@@ -5461,9 +5518,9 @@ export default function StudentPortalPage() {
 
                 {/* If all offers & referral are hidden by Admin */}
                 {!referralProgram && courseDiscounts.length === 0 && (
-                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-12 text-center space-y-2">
-                    <p className="text-base font-bold text-slate-700">No active offers or referral campaigns right now.</p>
-                    <p className="text-xs text-slate-400">Please check back later or contact your training coordinator.</p>
+                  <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs p-8 sm:p-12 text-center space-y-2">
+                    <p className="text-sm sm:text-base font-bold text-slate-800">No active offers or referral campaigns right now.</p>
+                    <p className="text-xs text-slate-400">Check back later or contact your training coordinator.</p>
                   </div>
                 )}
               </div>
@@ -5472,177 +5529,195 @@ export default function StudentPortalPage() {
 
           {/* TAB 8: RATE */}
           {activeTab === 'Rate' && (
-            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 sm:p-8 space-y-6">
-              <div>
-                <h3 className="text-xl sm:text-2xl font-bold text-[#131313] tracking-tight">
-                  Rate Your Training Experience
-                </h3>
+            <div className="space-y-3.5 sm:space-y-5">
+              <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs p-4 sm:p-6 space-y-4">
+                <div className="pb-3 border-b border-slate-100 flex items-center justify-between gap-2">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 inline-block mb-1">
+                      Student Feedback
+                    </span>
+                    <h3 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
+                      Rate Your Training Experience
+                    </h3>
+                  </div>
+                </div>
+
+                {reviewSuccessMsg && (
+                  <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm font-semibold flex items-center justify-between animate-fadeIn">
+                    <div className="flex items-center space-x-2">
+                      <span className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-black">✓</span>
+                      <span>{reviewSuccessMsg}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setReviewSuccessMsg(null)}
+                      className="text-emerald-700 hover:text-emerald-950 text-xs font-bold uppercase tracking-wider ml-2 cursor-pointer"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmitReview} className="space-y-4">
+                  {/* Course Selector */}
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                      Select Course <span className="text-[#EE2C3C]">*</span>
+                    </label>
+                    <select
+                      value={rateCourseName || (studentUser.assignedCourses?.[0] || studentUser.stream || 'Civil CADD & Master BIM')}
+                      onChange={(e) => setRateCourseName(e.target.value)}
+                      className="w-full sm:max-w-md px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold text-slate-900 bg-white focus:outline-none focus:border-[#EE2C3C] shadow-2xs transition-all"
+                    >
+                      {studentUser.assignedCourses && studentUser.assignedCourses.length > 0 ? (
+                        studentUser.assignedCourses.map((cName) => (
+                          <option key={cName} value={cName}>
+                            {cName}
+                          </option>
+                        ))
+                      ) : (
+                        <option value={studentUser.stream || 'Civil CADD & Master BIM'}>
+                          {studentUser.stream || 'Civil CADD & Master BIM'}
+                        </option>
+                      )}
+                    </select>
+                  </div>
+
+                  {/* Star Rating Selector */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                        Course Rating
+                      </label>
+                      <span className="text-xs font-extrabold text-amber-600 font-mono bg-amber-50 px-2 py-0.5 rounded border border-amber-200/80">
+                        ★ {rateHoverScore || rateScore}.0 / 5.0
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                      <div className="flex space-x-1 text-amber-400">
+                        {[1, 2, 3, 4, 5].map((star) => {
+                          const isFilled = (rateHoverScore || rateScore) >= star;
+                          return (
+                            <button
+                              key={star}
+                              type="button"
+                              onClick={() => setRateScore(star)}
+                              onMouseEnter={() => setRateHoverScore(star)}
+                              onMouseLeave={() => setRateHoverScore(0)}
+                              className="p-1 hover:scale-110 active:scale-95 transition-transform focus:outline-none cursor-pointer"
+                              title={`Rate ${star} Star${star > 1 ? 's' : ''}`}
+                            >
+                              <svg
+                                className={`w-7 h-7 sm:w-8 sm:h-8 transition-colors ${
+                                  isFilled ? 'fill-amber-400 text-amber-400' : 'fill-slate-200 text-slate-200'
+                                }`}
+                                viewBox="0 0 20 20"
+                              >
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <span className="text-xs sm:text-sm font-bold text-slate-700">
+                        {(rateHoverScore || rateScore) === 5 && 'Outstanding Experience'}
+                        {(rateHoverScore || rateScore) === 4 && 'Very Good Quality'}
+                        {(rateHoverScore || rateScore) === 3 && 'Good & Informative'}
+                        {(rateHoverScore || rateScore) === 2 && 'Average / Needs Improvement'}
+                        {(rateHoverScore || rateScore) === 1 && 'Poor Experience'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Review Textarea */}
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                      Detailed Review &amp; Lab Experience <span className="text-[#EE2C3C]">*</span>
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={rateReviewText}
+                      onChange={(e) => setRateReviewText(e.target.value)}
+                      placeholder="Share your feedback about the syllabus, hands-on CAD exercises, and workstation labs..."
+                      className="w-full p-3.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:border-[#EE2C3C] bg-white transition-all shadow-2xs"
+                      required
+                    />
+                  </div>
+
+                  {/* Trainer / Faculty Feedback */}
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                      Faculty &amp; Mentor Feedback (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={rateTrainerFeedback}
+                      onChange={(e) => setRateTrainerFeedback(e.target.value)}
+                      placeholder="e.g. Faculty explained 3D modeling and detailing clearly (Optional)"
+                      className="w-full p-3 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:border-[#EE2C3C] bg-white transition-all shadow-2xs"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSubmittingReview}
+                    className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 active:scale-95"
+                  >
+                    {isSubmittingReview ? (
+                      <span>Submitting Review...</span>
+                    ) : (
+                      <>
+                        <span>Submit Review</span>
+                        <span>&rarr;</span>
+                      </>
+                    )}
+                  </button>
+                </form>
               </div>
 
-              {reviewSuccessMsg && (
-                <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-semibold flex items-center justify-between animate-fadeIn">
-                  <div className="flex items-center space-x-2.5">
-                    <span className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-black">✓</span>
-                    <span>{reviewSuccessMsg}</span>
+              {/* Submitted Reviews History */}
+              <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs p-4 sm:p-6 space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <h4 className="text-sm sm:text-base font-bold text-slate-900">Your Submitted Reviews</h4>
+                    <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                      {mySubmittedReviews.length}
+                    </span>
                   </div>
+
                   <button
-                    type="button"
-                    onClick={() => setReviewSuccessMsg(null)}
-                    className="text-emerald-700 hover:text-emerald-950 text-xs font-bold uppercase tracking-wider ml-3 cursor-pointer"
+                    onClick={() => fetchStudentReviews()}
+                    disabled={isLoadingReviews}
+                    className="px-3 py-1 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                    title="Refresh Reviews"
                   >
-                    Dismiss
+                    <svg className={`w-3.5 h-3.5 ${isLoadingReviews ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span className="hidden sm:inline">Refresh</span>
                   </button>
-                </div>
-              )}
-
-              <form onSubmit={handleSubmitReview} className="space-y-5 bg-slate-50/60 p-5 sm:p-6 rounded-2xl border border-slate-200/80">
-                {/* Course Selector */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                    Select Course to Rate &amp; Review <span className="text-[#EE2C3C]">*</span>
-                  </label>
-                  <select
-                    value={rateCourseName || (studentUser.assignedCourses?.[0] || studentUser.stream || 'Civil CADD & Master BIM')}
-                    onChange={(e) => setRateCourseName(e.target.value)}
-                    className="w-full sm:w-96 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-[#131313] bg-white focus:outline-none focus:border-[#EE2C3C] shadow-2xs transition-all"
-                  >
-                    {studentUser.assignedCourses && studentUser.assignedCourses.length > 0 ? (
-                      studentUser.assignedCourses.map((cName) => (
-                        <option key={cName} value={cName}>
-                          {cName}
-                        </option>
-                      ))
-                    ) : (
-                      <option value={studentUser.stream || 'Civil CADD & Master BIM'}>
-                        {studentUser.stream || 'Civil CADD & Master BIM'}
-                      </option>
-                    )}
-                  </select>
-                </div>
-
-                {/* Star Rating Selector */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                      Course Rating Score
-                    </label>
-                    <span className="text-xs font-extrabold text-amber-600 font-mono bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-200/80">
-                      ★ {rateHoverScore || rateScore}.0 / 5.0 Rating
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="flex space-x-1.5 text-amber-400">
-                      {[1, 2, 3, 4, 5].map((star) => {
-                        const isFilled = (rateHoverScore || rateScore) >= star;
-                        return (
-                          <button
-                            key={star}
-                            type="button"
-                            onClick={() => setRateScore(star)}
-                            onMouseEnter={() => setRateHoverScore(star)}
-                            onMouseLeave={() => setRateHoverScore(0)}
-                            className="p-1 hover:scale-110 active:scale-95 transition-transform focus:outline-none cursor-pointer"
-                            title={`Rate ${star} Star${star > 1 ? 's' : ''}`}
-                          >
-                            <svg
-                              className={`w-8 h-8 transition-colors ${
-                                isFilled ? 'fill-amber-400 text-amber-400' : 'fill-slate-200 text-slate-200'
-                              }`}
-                              viewBox="0 0 20 20"
-                            >
-                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                          </button>
-                        );
-                      })}
-                    </div>
-                    <span className="text-sm font-bold text-slate-700 ml-2">
-                      {(rateHoverScore || rateScore) === 5 && 'Outstanding Experience'}
-                      {(rateHoverScore || rateScore) === 4 && 'Very Good Quality'}
-                      {(rateHoverScore || rateScore) === 3 && 'Good & Informative'}
-                      {(rateHoverScore || rateScore) === 2 && 'Average / Needs Improvement'}
-                      {(rateHoverScore || rateScore) === 1 && 'Poor Experience'}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Review Textarea */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                    Detailed Review &amp; Lab Workstation Experience <span className="text-[#EE2C3C]">*</span>
-                  </label>
-                  <textarea
-                    rows={4}
-                    value={rateReviewText}
-                    onChange={(e) => setRateReviewText(e.target.value)}
-                    placeholder="Write your review about the syllabus, hands-on CAD exercises, speed of workstations, and support..."
-                    className="w-full p-4 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#EE2C3C] bg-white transition-all shadow-2xs"
-                    required
-                  />
-                </div>
-
-                {/* Trainer / Faculty Feedback */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                    Trainer &amp; Faculty Feedback (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={rateTrainerFeedback}
-                    onChange={(e) => setRateTrainerFeedback(e.target.value)}
-                    placeholder="e.g. Er. Swamy Naidu explained BIM coordinates and multi-storey structural layout clearly"
-                    className="w-full p-3.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#EE2C3C] bg-white transition-all shadow-2xs"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSubmittingReview}
-                  className="px-6 py-3 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-sm font-bold shadow-xs transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-                >
-                  {isSubmittingReview ? (
-                    <span>Submitting Review to Admin...</span>
-                  ) : (
-                    <>
-                      <span>Submit Review to Admin</span>
-                      <span>&rarr;</span>
-                    </>
-                  )}
-                </button>
-              </form>
-
-              {/* Submitted Reviews History for this Student */}
-              <div className="pt-6 border-t border-slate-200/80 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="text-base font-bold text-[#131313]">Your Submitted Ratings &amp; Reviews</h4>
-                    <p className="text-xs text-slate-500">Live feedback synced with R&amp;D CADD Administration</p>
-                  </div>
-                  <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
-                    {mySubmittedReviews.length} Recorded
-                  </span>
                 </div>
 
                 {isLoadingReviews ? (
                   <div className="p-6 text-center text-xs text-slate-400">Loading your reviews...</div>
                 ) : mySubmittedReviews.length === 0 ? (
                   <div className="p-6 rounded-xl bg-slate-50 border border-dashed border-slate-200 text-center text-xs text-slate-500">
-                    You haven't submitted any course reviews yet. Select your course above and submit your rating!
+                    You haven&apos;t submitted any course reviews yet. Select your course above and submit your rating!
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 gap-3">
+                  <div className="grid grid-cols-1 gap-2.5">
                     {mySubmittedReviews.map((rev) => (
-                      <div key={rev.id} className="p-4 rounded-xl border border-slate-200 bg-white space-y-2 shadow-2xs">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                          <div className="flex items-center space-x-3">
-                            <span className="text-xs font-bold px-2.5 py-0.5 rounded-md bg-[#131313] text-white font-mono">
+                      <div key={rev.id} className="p-3.5 sm:p-4 rounded-xl border border-slate-200 bg-white space-y-2 shadow-2xs">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                          <div className="flex items-center space-x-2 flex-wrap">
+                            <span className="text-xs font-bold px-2 py-0.5 rounded bg-slate-900 text-white font-mono">
                               {rev.courseName}
                             </span>
-                            <div className="flex items-center space-x-1 text-amber-500">
+                            <div className="flex items-center space-x-0.5 text-amber-500">
                               {[...Array(5)].map((_, i) => (
                                 <svg
                                   key={i}
-                                  className={`w-4 h-4 ${
+                                  className={`w-3.5 h-3.5 ${
                                     i < rev.rating ? 'fill-amber-400 text-amber-400' : 'fill-slate-200 text-slate-200'
                                   }`}
                                   viewBox="0 0 20 20"
@@ -5660,10 +5735,10 @@ export default function StudentPortalPage() {
                             <span>{new Date(rev.createdAt).toLocaleDateString()}</span>
                           </div>
                         </div>
-                        <p className="text-xs text-slate-700 leading-relaxed font-medium">{rev.review}</p>
+                        <p className="text-xs text-slate-700 leading-relaxed">{rev.review}</p>
                         {rev.trainerFeedback && (
-                          <div className="text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                            <strong className="text-slate-700">Trainer Feedback:</strong> {rev.trainerFeedback}
+                          <div className="text-[11px] text-slate-500 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                            <strong className="text-slate-700">Faculty Feedback:</strong> {rev.trainerFeedback}
                           </div>
                         )}
                       </div>
