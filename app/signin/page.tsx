@@ -405,13 +405,14 @@ export default function SignInPage() {
             <div className="mt-6 pt-5 border-t border-[#F1F5F9] text-center">
               <p className="text-[11px] text-[#94A3B8] leading-relaxed">
                 By Signing in, you accept our{' '}
-                <a href="#" className="text-[#2563EB] hover:underline">
+                <span className="font-medium text-[#475569]">
                   terms and conditions
-                </a>{' '}
+                </span>{' '}
                 and{' '}
-                <a href="#" className="text-[#2563EB] hover:underline">
+                <span className="font-medium text-[#475569]">
                   privacy policy
-                </a>
+                </span>
+                .
               </p>
             </div>
           </div>
