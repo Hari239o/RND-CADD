@@ -91,7 +91,7 @@ export const CourseCertificateShowcase: React.FC<CourseCertificateShowcaseProps>
             <div className="flex items-start justify-between gap-2 sm:gap-4 relative z-10 border-b border-slate-200 pb-2 sm:pb-2.5">
               {/* Gold Medal Badge */}
               <div className="flex items-center space-x-2 sm:space-x-3">
-                <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-amber-300 via-amber-500 to-amber-600 p-0.5 shadow-md flex items-center justify-center shrink-0">
+                <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-amber-500 p-0.5 shadow-md flex items-center justify-center shrink-0">
                   <div className="w-full h-full rounded-full bg-[#15304C] border border-amber-300 sm:border-2 flex flex-col items-center justify-center text-center p-0.5">
                     <span className="text-[5px] sm:text-[6.5px] text-amber-300 font-extrabold uppercase tracking-widest leading-none">
                       CERTIFIED

@@ -17,7 +17,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectStream, onOpenEnrollModa
       
       {/* Pre-Footer Action Banner with Elegant Clean Gradient */}
       <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1560px] mx-auto pt-14 pb-8">
-        <div className="bg-gradient-to-br from-[#0F172A] via-[#15304C] to-[#0A192F] rounded-2xl sm:rounded-3xl p-8 sm:p-10 text-white shadow-xl border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="bg-[#0F172A] rounded-2xl sm:rounded-3xl p-8 sm:p-10 text-white shadow-xl border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-center md:text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-red-500/15 border border-red-500/30 text-red-300 mb-3">
               <span className="w-1.5 h-1.5 rounded-full bg-[#EE2C3C] animate-ping" />
@@ -31,7 +31,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectStream, onOpenEnrollModa
           <div className="shrink-0">
             <button
               onClick={onOpenEnrollModal}
-              className="px-6 sm:px-7 py-3.5 rounded-full font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-[#EE2C3C] via-[#E01829] to-[#D20A0B] hover:from-[#D20A0B] hover:to-[#B50809] shadow-lg hover:shadow-xl hover:shadow-red-500/30 transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+              className="px-6 sm:px-7 py-3.5 rounded-full font-bold text-xs sm:text-sm text-white bg-[#EE2C3C] hover:bg-[#D71E2E] shadow-sm hover:shadow-md transition-all flex items-center gap-2 cursor-pointer active:scale-95"
             >
               <span>{content?.bannerButtonText || 'Book a Free Demo Class'}</span>
               <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

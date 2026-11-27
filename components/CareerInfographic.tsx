@@ -320,7 +320,7 @@ export const CareerInfographic: React.FC<CareerInfographicProps> = ({ course }) 
       {/* 2. SLEEK FLOWING ROADMAP PATTERN - NO BOX-IN-BOX, NO CLUTTER */}
       <div className="relative py-2">
         {/* Continuous Flow Rail on Desktop */}
-        <div className="hidden lg:block absolute top-[28px] left-[7%] right-[7%] h-[3px] bg-gradient-to-r from-blue-600 via-indigo-600 to-[#EE2C3C] rounded-full z-0 opacity-80" />
+        <div className="hidden lg:block absolute top-[28px] left-[7%] right-[7%] h-[3px] bg-slate-300 rounded-full z-0 opacity-80" />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 relative z-10">
           {pathways.map((item, idx) => {
@@ -332,7 +332,7 @@ export const CareerInfographic: React.FC<CareerInfographicProps> = ({ course }) 
                 whileHover={{ y: -5, transition: { duration: 0.2 } }}
                 className={`relative rounded-2xl p-5 transition-all cursor-default flex flex-col justify-between ${
                   isLast
-                    ? 'bg-gradient-to-b from-red-50/80 to-white border-2 border-[#EE2C3C] shadow-md shadow-red-500/10'
+                    ? 'bg-white border-2 border-[#EE2C3C] shadow-md'
                     : 'bg-white border border-slate-200 hover:border-blue-400 hover:shadow-md shadow-xs'
                 }`}
               >

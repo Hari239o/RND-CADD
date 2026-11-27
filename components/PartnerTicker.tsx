@@ -241,7 +241,7 @@ export const PartnerTicker: React.FC<PartnerTickerProps> = ({ content }) => {
       category: 'university',
       renderLogo: () => (
         <div className="flex items-center gap-1.5">
-          <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-[#1B365D] via-[#008542] to-[#E87722] flex items-center justify-center p-0.5 shadow-xs">
+          <div className="w-5 h-5 rounded-full bg-[#1B365D] flex items-center justify-center p-0.5 shadow-xs">
             <div className="w-full h-full bg-white rounded-full flex items-center justify-center">
               <span className="text-[8px] font-black text-[#1B365D]">B</span>
             </div>

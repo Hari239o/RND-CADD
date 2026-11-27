@@ -176,7 +176,7 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
   if (content?.hidden) return null;
 
   return (
-    <section id="enrollment" className="py-16 sm:py-20 bg-gradient-to-b from-[#F8FAFC] to-[#F1F5F9] border-t border-slate-200">
+    <section id="enrollment" className="py-16 sm:py-20 bg-[#F8FAFC] border-t border-slate-200">
       <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1560px] mx-auto">
         
         {/* Section Header */}
@@ -560,7 +560,7 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-3.5 px-6 rounded-xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-[#EE2C3C] via-[#E01829] to-[#D20A0B] hover:from-[#D20A0B] hover:to-[#B50809] shadow-md hover:shadow-lg hover:shadow-red-500/25 active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
+                    className="w-full py-3.5 px-6 rounded-xl font-bold text-xs sm:text-sm text-white bg-[#EE2C3C] hover:bg-[#D71E2E] shadow-sm hover:shadow-md active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
                   >
                     {isSubmitting ? (
                       <>

@@ -407,7 +407,7 @@ const PARTNER_COMPANIES = [
     name: 'DoLittle Technologies',
     render: () => (
       <div className="flex items-center gap-2">
-        <div className="w-6 h-6 rounded-md bg-gradient-to-r from-[#2563EB] to-[#06B6D4] flex items-center justify-center text-white font-black text-[11px] shadow-xs">
+        <div className="w-6 h-6 rounded-md bg-[#2563EB] flex items-center justify-center text-white font-black text-[11px] shadow-xs">
           DO
         </div>
         <div className="flex flex-col leading-none text-left">
@@ -433,7 +433,7 @@ const PARTNER_COMPANIES = [
     render: () => (
       <div className="flex items-center gap-1.5">
         <span className="text-base font-black tracking-tight text-[#0F172A]">CAIT</span>
-        <div className="w-3.5 h-3.5 rounded-sm bg-gradient-to-tr from-[#EA580C] to-[#F59E0B] skew-x-[-12deg]"></div>
+        <div className="w-3.5 h-3.5 rounded-sm bg-[#EA580C] skew-x-[-12deg]"></div>
       </div>
     ),
   },
@@ -826,7 +826,7 @@ export default function JobsPortalPage() {
               </span>
             </div>
 
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight bg-gradient-to-bl from-[#0062DC] via-[#0052cc] to-[#003D76] bg-clip-text text-transparent leading-[1.08] py-2">
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-slate-900 leading-[1.08] py-2">
               Accelerate Your <br /> Future Today
             </h1>
 
@@ -1058,7 +1058,7 @@ export default function JobsPortalPage() {
       <section id="openings" className="w-full h-auto px-3.5 sm:px-8 lg:px-16 overflow-hidden py-10 sm:py-14 max-w-[1400px] mx-auto">
         {/* Student Auth Notice: Job application features are unlocked once signed up */}
         {!currentUser && (
-          <div className="mb-8 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50 via-slate-50 to-red-50 border border-blue-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="mb-8 p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3.5">
               <div className="w-10 h-10 rounded-xl bg-[#EE2C3C] text-white flex items-center justify-center font-bold text-base shrink-0 shadow-md shadow-red-500/20">
                 🎓
@@ -1476,10 +1476,10 @@ export default function JobsPortalPage() {
           </div>
         </div>
 
-        {/* Banner 2: Hire Smarter with RND CADD (Dark to Blue Gradient) */}
+        {/* Banner 2: Hire Smarter with RND CADD (Clean Solid Dark MNC Card) */}
         <div
           id="employers"
-          className="w-full rounded-[30px] bg-gradient-to-b from-[#0055FF] to-[#1D1D1F] flex flex-col md:flex-row justify-between items-center p-8 sm:p-12 text-white relative overflow-hidden"
+          className="w-full rounded-[30px] bg-[#0F172A] flex flex-col md:flex-row justify-between items-center p-8 sm:p-12 text-white relative overflow-hidden border border-slate-800 shadow-xl"
         >
           <div className="w-full md:w-3/5 flex flex-col gap-4 z-10">
             <h3 className="text-3xl sm:text-[44px] leading-tight font-medium text-white">
@@ -1509,8 +1509,8 @@ export default function JobsPortalPage() {
           </div>
         </div>
 
-        {/* Banner 3: Looking for more opportunities? */}
-        <div className="w-full rounded-[30px] bg-gradient-to-r from-[#DFE8F6] to-[#FFFFFF] flex flex-col md:flex-row justify-between items-center p-8 sm:p-12 border border-[#A0C3F7] relative">
+        {/* Banner 3: Looking for more opportunities? (Solid White Clean Card) */}
+        <div className="w-full rounded-[30px] bg-white flex flex-col md:flex-row justify-between items-center p-8 sm:p-12 border border-slate-200 shadow-sm relative">
           <div className="w-full md:w-3/5 flex flex-col gap-3">
             <h3 className="text-2xl sm:text-[38px] leading-tight font-medium text-[#1D1D1F]">
               Looking for more such opportunities?

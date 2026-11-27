@@ -4055,8 +4055,8 @@ export default function AdminPortalPage() {
               </div>
 
               {/* Admin Info - MNC Executive Profile Card */}
-              <div className="p-3.5 my-3.5 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 text-white shadow-md border border-slate-700 flex items-center gap-3">
-                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#EE2C3C] to-[#C91827] text-white flex items-center justify-center font-extrabold text-sm shadow-xs flex-shrink-0">
+              <div className="p-3.5 my-3.5 rounded-2xl bg-slate-900 text-white shadow-md border border-slate-700 flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-[#EE2C3C] text-white flex items-center justify-center font-extrabold text-sm shadow-xs flex-shrink-0">
                   {adminUser.name ? adminUser.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'AD'}
                 </div>
                 <div className="min-w-0 flex-1">
@@ -12834,7 +12834,7 @@ export default function AdminPortalPage() {
                         )
                       ) : (
                         /* Clean Minimalist Cinema Viewport with Professional Play Button (No Text Clutter) */
-                        <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 relative overflow-hidden">
+                        <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-slate-950 relative overflow-hidden">
                           <div
                             className="absolute inset-0 opacity-10 pointer-events-none"
                             style={{

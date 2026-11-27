@@ -298,7 +298,7 @@ export const JobsPortalShowcase: React.FC<JobsPortalShowcaseProps> = ({
 
         {/* Enrolled Student Verified Placement Notice (Only Course-Related Openings) */}
         {enrolledCourses.length > 0 && (
-          <div className="mb-8 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-red-50 via-white to-slate-50 border border-red-200/90 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
+          <div className="mb-8 p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
             <div className="flex items-start sm:items-center gap-3.5">
               <div className="w-10 h-10 rounded-xl bg-[#EE2C3C] text-white flex items-center justify-center font-black shadow-md shadow-red-500/20 shrink-0 mt-0.5 sm:mt-0">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
