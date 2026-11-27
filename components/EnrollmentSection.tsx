@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { COURSES } from '@/lib/courses-data';
 import type { Course } from '@/lib/courses-data';
 import type { EnrollmentSectionContent } from '@/lib/site-content';
+import { RazorpayCheckoutModal } from './RazorpayCheckoutModal';
 
 interface EnrollmentSectionProps {
   preselectedCourse?: string;
@@ -23,8 +24,16 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
   const [phone, setPhone] = useState('');
   const [selectedCourse, setSelectedCourse] = useState(preselectedCourse || COURSES[0].title);
   const [preferredBatch, setPreferredBatch] = useState('weekday-morning');
+  const [paymentMode, setPaymentMode] = useState<'razorpay' | 'offline'>('razorpay');
+  const [isRazorpayModalOpen, setIsRazorpayModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedId, setSubmittedId] = useState<string | null>(null);
+
+  const currentCourseObj =
+    coursesList.find(
+      (c) => c.title.toLowerCase().trim() === selectedCourse.toLowerCase().trim()
+    ) || coursesList[0];
+  const currentFee = currentCourseObj?.fee || 25000;
 
   // Sync with live courses from localStorage (instant cache) & database
   useEffect(() => {
@@ -94,6 +103,11 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName || !phone) return;
+
+    if (paymentMode === 'razorpay') {
+      setIsRazorpayModalOpen(true);
+      return;
+    }
 
     setIsSubmitting(true);
     let regId = `EDU-CAD-2026-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -478,6 +492,69 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
                   </div>
                 </div>
 
+                {/* Payment Option Selector */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Enrollment &amp; Payment Method <span className="text-[#EE2C3C]">*</span>
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMode('razorpay')}
+                      className={`p-3 text-left rounded-xl transition-all cursor-pointer border ${
+                        paymentMode === 'razorpay'
+                          ? 'border-[#EE2C3C] bg-red-50/70 shadow-xs ring-1 ring-red-500/20'
+                          : 'border-slate-200 bg-white hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                          <span>Pay via Razorpay</span>
+                          <span className="px-1.5 py-0.2 text-[9px] bg-red-100 text-[#EE2C3C] font-bold rounded">ONLINE</span>
+                        </span>
+                        <span className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
+                          paymentMode === 'razorpay' ? 'border-[#EE2C3C] bg-[#EE2C3C]' : 'border-slate-300 bg-white'
+                        }`}>
+                          {paymentMode === 'razorpay' && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 font-medium leading-tight">
+                        Instant course access &bull; UPI, Cards, NetBanking, EMI
+                      </p>
+                      <div className="mt-1.5 text-xs font-extrabold text-[#EE2C3C]">
+                        Fee: ₹{currentFee.toLocaleString('en-IN')}
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMode('offline')}
+                      className={`p-3 text-left rounded-xl transition-all cursor-pointer border ${
+                        paymentMode === 'offline'
+                          ? 'border-[#EE2C3C] bg-red-50/70 shadow-xs ring-1 ring-red-500/20'
+                          : 'border-slate-200 bg-white hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                          <span>Reserve Seat (Offline)</span>
+                        </span>
+                        <span className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
+                          paymentMode === 'offline' ? 'border-[#EE2C3C] bg-[#EE2C3C]' : 'border-slate-300 bg-white'
+                        }`}>
+                          {paymentMode === 'offline' && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 font-medium leading-tight">
+                        Zero advance fee &bull; Pay tuition at Ameerpet Campus
+                      </p>
+                      <div className="mt-1.5 text-xs font-semibold text-emerald-700">
+                        Zero Reservation Fee
+                      </div>
+                    </button>
+                  </div>
+                </div>
+
                 {/* Submit Action Button */}
                 <div className="pt-2">
                   <button
@@ -495,10 +572,21 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
                       </>
                     ) : (
                       <>
-                        <span>Confirm Workstation Reservation</span>
-                        <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                        </svg>
+                        {paymentMode === 'razorpay' ? (
+                          <>
+                            <span>Pay ₹{currentFee.toLocaleString('en-IN')} via Razorpay &amp; Enroll Online</span>
+                            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                            </svg>
+                          </>
+                        ) : (
+                          <>
+                            <span>Confirm Workstation Reservation &amp; Pay at Campus</span>
+                            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                            </svg>
+                          </>
+                        )}
                       </>
                     )}
                   </button>
@@ -506,7 +594,9 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
 
                 {/* Sub-note */}
                 <p className="text-[11px] text-center text-slate-500 pt-1">
-                  Zero reservation fee • Free demo class and counseling included
+                  {paymentMode === 'razorpay'
+                    ? '100% Secure Razorpay Payment • Instant Course Unlock & Official Invoice'
+                    : 'Zero reservation fee • Free demo class and counseling included'}
                 </p>
               </form>
             )}
@@ -514,6 +604,23 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
 
         </div>
       </div>
+
+      {/* Razorpay Course Enrollment Checkout Modal */}
+      <RazorpayCheckoutModal
+        isOpen={isRazorpayModalOpen}
+        onClose={() => setIsRazorpayModalOpen(false)}
+        course={{
+          title: selectedCourse,
+          fee: currentFee,
+          duration: currentCourseObj?.duration,
+          category: currentCourseObj?.category,
+        }}
+        onSuccess={(verifyData) => {
+          setIsRazorpayModalOpen(false);
+          setSubmittedId(verifyData.receiptId || 'PAID');
+          if (onEnrollSuccess) onEnrollSuccess(selectedCourse);
+        }}
+      />
     </section>
   );
 };

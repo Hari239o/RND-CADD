@@ -8,6 +8,7 @@ import { CourseCertificateShowcase } from './CourseCertificateShowcase';
 import { ScrollToTopProgress } from './ScrollToTopProgress';
 import { EnquiryModal } from './EnquiryModal';
 import { CourseHeroBackground, getVerifiedCourseImages, CourseSafeImage } from './CourseMediaBanner';
+import { RazorpayCheckoutModal } from './RazorpayCheckoutModal';
 
 interface CourseModalProps {
   course: Course | null;
@@ -35,6 +36,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
   const [isApplySubmitting, setIsApplySubmitting] = useState(false);
   const [isApplySubmitted, setIsApplySubmitted] = useState(false);
   const [isEnquiryModalOpen, setIsEnquiryModalOpen] = useState(false);
+  const [isRazorpayModalOpen, setIsRazorpayModalOpen] = useState(false);
 
   if (!course) return null;
 
@@ -432,19 +434,30 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                   <div className="space-y-2">
                     <button
                       type="button"
+                      onClick={() => setIsRazorpayModalOpen(true)}
+                      className="w-full py-3.5 bg-[#EE2C3C] hover:bg-[#D71E2E] active:scale-98 text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition-all shadow-md cursor-pointer flex items-center justify-center gap-2"
+                    >
+                      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 119 0v3.75M3.75 21.75h16.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H3.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                      </svg>
+                      <span>Pay ₹{feeAmount.toLocaleString('en-IN')} Online (Razorpay) &rarr;</span>
+                    </button>
+
+                    <button
+                      type="button"
                       onClick={() => {
                         onClose();
                         onEnroll(course.title);
                       }}
-                      className="w-full py-3.5 bg-[#EE2C3C] hover:bg-[#D20A0B] active:scale-98 text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition-all shadow-md cursor-pointer flex items-center justify-center space-x-1.5"
+                      className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
                     >
-                      <span>Enroll In This Program &rarr;</span>
+                      <span>Reserve Seat &bull; Pay at Campus &rarr;</span>
                     </button>
                     
                     <button
                       type="button"
                       onClick={() => setIsEnquiryModalOpen(true)}
-                      className="w-full py-3 bg-white hover:bg-red-50 hover:text-[#EE2C3C] text-slate-900 text-xs sm:text-sm font-bold rounded-xl border-2 border-slate-900 hover:border-[#EE2C3C] transition-all cursor-pointer"
+                      className="w-full py-2.5 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl border border-slate-300 hover:border-slate-400 transition-all cursor-pointer"
                     >
                       Enquire for Free Demo Class &rarr;
                     </button>
@@ -1107,13 +1120,13 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
               <span className="text-slate-400 hidden sm:inline"> &bull; Zero Reservation Fee &bull; 1:1 Dedicated RTX GPU Workstation</span>
             </div>
 
-            <div className="flex items-center space-x-3 flex-shrink-0">
+            <div className="flex items-center space-x-2.5 flex-shrink-0">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-lg transition-colors cursor-pointer"
+                className="px-3.5 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-lg transition-colors cursor-pointer"
               >
-                Back to Catalog
+                Catalog
               </button>
               <button
                 type="button"
@@ -1121,9 +1134,16 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
                   onClose();
                   onEnroll(course.title);
                 }}
-                className="px-5 py-2.5 bg-[#EE2C3C] hover:bg-[#D20A0B] active:scale-98 text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-lg transition-all shadow-md cursor-pointer"
+                className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-lg transition-all cursor-pointer hidden sm:inline-block"
               >
-                Enroll In This Program &rarr;
+                Reserve Seat
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsRazorpayModalOpen(true)}
+                className="px-4 sm:px-5 py-2.5 bg-[#EE2C3C] hover:bg-[#D71E2E] active:scale-98 text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-lg transition-all shadow-md cursor-pointer flex items-center gap-1.5"
+              >
+                <span>Pay Online (Razorpay) &rarr;</span>
               </button>
             </div>
           </div>
@@ -1144,6 +1164,17 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
         onClose={() => setIsEnquiryModalOpen(false)}
         initialCourseTitle={course.title}
         initialCategory={categoryText}
+      />
+
+      {/* Razorpay Course Enrollment Checkout Modal */}
+      <RazorpayCheckoutModal
+        isOpen={isRazorpayModalOpen}
+        onClose={() => setIsRazorpayModalOpen(false)}
+        course={{ ...course, fee: feeAmount }}
+        onSuccess={() => {
+          setIsRazorpayModalOpen(false);
+          onClose();
+        }}
       />
     </div>
   );

@@ -12,6 +12,7 @@ import { CourseModal } from '@/components/CourseModal';
 import { EnquiryModal, FloatingEnquiryButton } from '@/components/EnquiryModal';
 import { ScrollToTopProgress } from '@/components/ScrollToTopProgress';
 import { Footer } from '@/components/Footer';
+import { RazorpayCheckoutModal } from '@/components/RazorpayCheckoutModal';
 import { DEFAULT_SITE_CONTENT, type SiteContent } from '@/lib/site-content';
 
 export default function HomePage() {
@@ -22,6 +23,7 @@ export default function HomePage() {
   const [studentStream, setStudentStream] = useState<string>('');
   const [isEnquiryModalOpen, setIsEnquiryModalOpen] = useState<boolean>(false);
   const [enquiryInitialCourse, setEnquiryInitialCourse] = useState<string>('');
+  const [razorpayCourse, setRazorpayCourse] = useState<any | null>(null);
   const [siteContent, setSiteContent] = useState<SiteContent>(DEFAULT_SITE_CONTENT);
 
   // Fetch live dynamic site content
@@ -134,6 +136,17 @@ export default function HomePage() {
     };
   }, []);
 
+  // Listen for global Razorpay checkout requests from course cards
+  useEffect(() => {
+    const handleOpenRazorpay = (e: any) => {
+      if (e.detail?.course) {
+        setRazorpayCourse(e.detail.course);
+      }
+    };
+    window.addEventListener('rnd_cadd_open_razorpay', handleOpenRazorpay);
+    return () => window.removeEventListener('rnd_cadd_open_razorpay', handleOpenRazorpay);
+  }, []);
+
   const handleEnrollSuccess = (courseTitle: string) => {
     if (!courseTitle) return;
     setEnrolledCourses((prev) => (prev.includes(courseTitle) ? prev : [...prev, courseTitle]));
@@ -233,6 +246,14 @@ export default function HomePage() {
 
       {/* Dynamic Circular Progress Scroll-To-Top Button (Hidden when CourseModal is open to prevent double button glitch) */}
       {!selectedCourse && <ScrollToTopProgress threshold={300} />}
+
+      {/* Global Razorpay Course Enrollment Checkout Modal */}
+      <RazorpayCheckoutModal
+        isOpen={!!razorpayCourse}
+        onClose={() => setRazorpayCourse(null)}
+        course={razorpayCourse}
+        onSuccess={() => setRazorpayCourse(null)}
+      />
 
       {/* Footer */}
       <Footer
