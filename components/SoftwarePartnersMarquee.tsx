@@ -2,254 +2,160 @@
 
 import React from 'react';
 
-interface SoftwareBrand {
-  name: string;
-  renderLogo: () => React.ReactNode;
+interface SoftwareCompanyCard {
+  companyName: string;
+  productTag: string;
+  logoSrc: string;
+  isWordmarkOnly?: boolean;
+}
+
+const ROW_1_COMPANIES: SoftwareCompanyCard[] = [
+  {
+    companyName: 'Autodesk, Inc.',
+    productTag: 'Revit BIM & 3ds Max',
+    logoSrc: '/logos/autodesk.svg',
+  },
+  {
+    companyName: 'Autodesk AutoCAD',
+    productTag: '2D/3D CAD & Plant 3D',
+    logoSrc: '/logos/autocad.svg',
+  },
+  {
+    companyName: 'Dassault Systèmes SE',
+    productTag: 'CATIA V5 & 3DEXPERIENCE',
+    logoSrc: '/logos/dassault3ds.png',
+  },
+  {
+    companyName: 'SOLIDWORKS Corp.',
+    productTag: 'Dassault 3D CAD',
+    logoSrc: '/logos/solidworks.png',
+  },
+  {
+    companyName: 'Bentley Systems, Inc.',
+    productTag: 'STAAD.Pro Infrastructure',
+    logoSrc: '/logos/bentley.png',
+  },
+  {
+    companyName: 'Ansys, Inc.',
+    productTag: 'Ansys FEA & Simulation',
+    logoSrc: '/logos/ansys.svg',
+    isWordmarkOnly: true,
+  },
+  {
+    companyName: 'Computers & Structures',
+    productTag: 'CSI ETABS & SAFE',
+    logoSrc: '/logos/csi.png',
+  },
+  {
+    companyName: 'Siemens AG',
+    productTag: 'Siemens NX CAD/CAM',
+    logoSrc: '/logos/siemens.svg',
+    isWordmarkOnly: true,
+  },
+  {
+    companyName: 'EPLAN Software',
+    productTag: 'EPLAN Electric P8',
+    logoSrc: '/logos/eplan.png',
+  },
+  {
+    companyName: 'Oracle Corporation',
+    productTag: 'Oracle Primavera P6',
+    logoSrc: '/logos/oracle.png',
+  },
+];
+
+const ROW_2_COMPANIES: SoftwareCompanyCard[] = [
+  {
+    companyName: 'Chaos Software',
+    productTag: 'Chaos V-Ray Rendering',
+    logoSrc: '/logos/chaos.png',
+  },
+  {
+    companyName: 'Trimble Inc.',
+    productTag: 'Tekla & BIM Suite',
+    logoSrc: '/logos/trimble.svg',
+  },
+  {
+    companyName: 'SketchUp (Trimble)',
+    productTag: 'SketchUp Pro 3D',
+    logoSrc: '/logos/sketchup.svg',
+  },
+  {
+    companyName: 'Hexagon AB',
+    productTag: 'SmartPlant 3D & CAESAR II',
+    logoSrc: '/logos/hexagon.png',
+  },
+  {
+    companyName: 'Schneider Electric SE',
+    productTag: 'ETAP & SCADA Automation',
+    logoSrc: '/logos/schneider.png',
+  },
+  {
+    companyName: 'The MathWorks, Inc.',
+    productTag: 'MATLAB & Simulink',
+    logoSrc: '/logos/mathworks.png',
+  },
+  {
+    companyName: 'Microsoft Corporation',
+    productTag: 'Microsoft Project EPC',
+    logoSrc: '/logos/microsoft.png',
+  },
+  {
+    companyName: 'PTC Inc.',
+    productTag: 'PTC Creo Parametric',
+    logoSrc: '/logos/ptc.png',
+  },
+  {
+    companyName: 'Lumion (Act-3D)',
+    productTag: '3D Arch Visualization',
+    logoSrc: '/logos/lumion.png',
+  },
+  {
+    companyName: 'Autodesk, Inc.',
+    productTag: 'Navisworks Manage',
+    logoSrc: '/logos/autodesk.svg',
+  },
+];
+
+function CompanyLogoCard({ item }: { item: SoftwareCompanyCard }) {
+  return (
+    <div
+      className="inline-flex items-center gap-3 px-4 sm:px-5 py-2.5 bg-white hover:bg-slate-50 rounded-2xl border border-slate-200/90 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.04)] hover:shadow-md hover:border-slate-300 transition-all duration-300 flex-shrink-0 select-none min-h-[52px]"
+      title={`${item.companyName} — ${item.productTag}`}
+    >
+      {item.isWordmarkOnly ? (
+        <div className="flex items-center gap-2.5">
+          <img
+            src={item.logoSrc}
+            alt={item.companyName}
+            className="h-5 w-auto max-w-[78px] object-contain"
+          />
+          <div className="h-5 w-px bg-slate-200" />
+          <div className="flex flex-col leading-tight text-left">
+            <span className="text-[11px] font-bold text-slate-900">{item.companyName}</span>
+            <span className="text-[9px] font-medium text-slate-500">{item.productTag}</span>
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="w-7 h-7 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center p-1 shrink-0">
+            <img
+              src={item.logoSrc}
+              alt={item.companyName}
+              className="w-full h-full object-contain"
+            />
+          </div>
+          <div className="flex flex-col leading-tight text-left">
+            <span className="text-xs font-bold text-slate-900 tracking-tight">{item.companyName}</span>
+            <span className="text-[9.5px] font-semibold text-slate-500">{item.productTag}</span>
+          </div>
+        </>
+      )}
+    </div>
+  );
 }
 
 export const SoftwarePartnersMarquee: React.FC = () => {
-  // ROW 1: Flagship CAD, BIM & Structural Engineering Suites (Right-to-Left)
-  const row1Brands: SoftwareBrand[] = [
-    {
-      name: 'Autodesk AutoCAD',
-      renderLogo: () => (
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-[#E51937] flex items-center justify-center text-white text-[11px] font-black shadow-2xs">
-            A
-          </div>
-          <div className="flex flex-col leading-none">
-            <span className="text-xs font-black text-slate-900 tracking-tight">AutoCAD</span>
-            <span className="text-[8px] font-bold text-[#E51937] uppercase tracking-wider">Autodesk</span>
-          </div>
-        </div>
-      ),
-    },
-    {
-      name: 'Autodesk Revit BIM',
-      renderLogo: () => (
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-[#1858A8] flex items-center justify-center text-white text-[11px] font-black shadow-2xs">
-            R
-          </div>
-          <div className="flex flex-col leading-none">
-            <span className="text-xs font-black text-[#1858A8] tracking-tight">Revit BIM</span>
-            <span className="text-[8px] font-bold text-slate-500 uppercase tracking-wider">Arch &amp; MEP</span>
-          </div>
-        </div>
-      ),
-    },
-    {
-      name: 'SOLIDWORKS',
-      renderLogo: () => (
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-[#DA291C] flex items-center justify-center text-white text-[9px] font-black shadow-2xs">
-            SW
-          </div>
-          <span className="text-xs font-black text-slate-900 tracking-wider uppercase">SOLIDWORKS</span>
-        </div>
-      ),
-    },
-    {
-      name: 'Dassault CATIA V5',
-      renderLogo: () => (
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-full bg-[#005386] flex items-center justify-center text-white text-[9px] font-black">
-            3D
-          </div>
-          <div className="flex flex-col leading-none">
-            <span className="text-xs font-black text-[#005386] tracking-tight">CATIA V5</span>
-            <span className="text-[8px] font-bold text-slate-500 uppercase tracking-wider">Dassault</span>
-          </div>
-        </div>
-      ),
-    },
-    {
-      name: 'Bentley STAAD.Pro',
-      renderLogo: () => (
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-[#008542] flex items-center justify-center text-white text-[10px] font-black">
-            S
-          </div>
-          <div className="flex flex-col leading-none">
-            <span className="text-xs font-black text-[#008542] tracking-tight">STAAD.Pro</span>
-            <span className="text-[8px] font-bold text-slate-500 uppercase tracking-wider">Bentley</span>
-          </div>
-        </div>
-      ),
-    },
-    {
-      name: 'ANSYS Workbench',
-      renderLogo: () => (
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 bg-[#FFB71B] skew-x-[-12deg] rounded-xs" />
-          <span className="text-xs font-black text-slate-900 tracking-widest uppercase">ANSYS</span>
-        </div>
-      ),
-    },
-    {
-      name: 'CSI ETABS',
-      renderLogo: () => (
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-[#0F4C81] flex items-center justify-center text-white text-[9px] font-black">
-            CSI
-          </div>
-          <span className="text-xs font-black text-[#0F4C81] tracking-wider uppercase">ETABS</span>
-        </div>
-      ),
-    },
-    {
-      name: 'Siemens NX',
-      renderLogo: () => (
-        <div className="flex items-center gap-1.5">
-          <span className="text-xs font-black text-[#009999] tracking-widest uppercase">SIEMENS</span>
-          <span className="px-1.5 py-0.5 rounded bg-[#009999]/10 text-[#006666] text-[10px] font-black">NX</span>
-        </div>
-      ),
-    },
-    {
-      name: 'EPLAN Electric P8',
-      renderLogo: () => (
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-[#C8102E] flex items-center justify-center text-white text-[10px] font-black">
-            E
-          </div>
-          <span className="text-xs font-black text-slate-900 tracking-wider uppercase">EPLAN P8</span>
-        </div>
-      ),
-    },
-    {
-      name: 'Oracle Primavera P6',
-      renderLogo: () => (
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-[#C74634] flex items-center justify-center text-white text-[10px] font-black">
-            P6
-          </div>
-          <div className="flex flex-col leading-none">
-            <span className="text-xs font-black text-[#C74634] tracking-tight">Primavera P6</span>
-            <span className="text-[8px] font-bold text-slate-500 uppercase tracking-wider">Oracle EPC</span>
-          </div>
-        </div>
-      ),
-    },
-  ];
-
-  // ROW 2: 3D Visualization, Piping, Electrical & Plant Tools (Left-to-Right)
-  const row2Brands: SoftwareBrand[] = [
-    {
-      name: 'Autodesk 3ds Max',
-      renderLogo: () => (
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-[#0696D7] flex items-center justify-center text-white text-[10px] font-black">
-            3ds
-          </div>
-          <span className="text-xs font-black text-slate-900 tracking-tight">3ds Max</span>
-        </div>
-      ),
-    },
-    {
-      name: 'Chaos V-Ray',
-      renderLogo: () => (
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-full bg-[#0284C7] flex items-center justify-center text-white text-[10px] font-black">
-            V
-          </div>
-          <span className="text-xs font-black text-[#0284C7] tracking-tight">Chaos V-Ray</span>
-        </div>
-      ),
-    },
-    {
-      name: 'Trimble SketchUp',
-      renderLogo: () => (
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-[#005F9E] flex items-center justify-center text-white text-[10px] font-black">
-            SU
-          </div>
-          <span className="text-xs font-black text-[#005F9E] tracking-tight">SketchUp Pro</span>
-        </div>
-      ),
-    },
-    {
-      name: 'Hexagon SP3D',
-      renderLogo: () => (
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-[#006B6B] flex items-center justify-center text-white text-[9px] font-black">
-            3D
-          </div>
-          <div className="flex flex-col leading-none">
-            <span className="text-xs font-black text-[#006B6B] tracking-tight">SmartPlant 3D</span>
-            <span className="text-[8px] font-bold text-slate-500 uppercase tracking-wider">Hexagon</span>
-          </div>
-        </div>
-      ),
-    },
-    {
-      name: 'CAESAR II Piping',
-      renderLogo: () => (
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-[#B91C1C] flex items-center justify-center text-white text-[9px] font-black">
-            C2
-          </div>
-          <span className="text-xs font-black text-slate-900 tracking-wider uppercase">CAESAR II</span>
-        </div>
-      ),
-    },
-    {
-      name: 'AutoCAD Plant 3D',
-      renderLogo: () => (
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-[#047857] flex items-center justify-center text-white text-[9px] font-black">
-            P3D
-          </div>
-          <span className="text-xs font-black text-[#047857] tracking-tight">Plant 3D</span>
-        </div>
-      ),
-    },
-    {
-      name: 'ETAP Electrical',
-      renderLogo: () => (
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-full bg-[#1D4ED8] flex items-center justify-center text-white text-[9px] font-black">
-            ET
-          </div>
-          <span className="text-xs font-black text-[#1D4ED8] tracking-widest uppercase">ETAP</span>
-        </div>
-      ),
-    },
-    {
-      name: 'MathWorks MATLAB',
-      renderLogo: () => (
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-[#D97706] flex items-center justify-center text-white text-[9px] font-black">
-            ML
-          </div>
-          <span className="text-xs font-black text-slate-900 tracking-wider uppercase">MATLAB</span>
-        </div>
-      ),
-    },
-    {
-      name: 'Microsoft Project',
-      renderLogo: () => (
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-[#217346] flex items-center justify-center text-white text-[10px] font-black">
-            P
-          </div>
-          <span className="text-xs font-black text-[#217346] tracking-tight">MS Project</span>
-        </div>
-      ),
-    },
-    {
-      name: 'Autodesk Navisworks',
-      renderLogo: () => (
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-[#0F766E] flex items-center justify-center text-white text-[10px] font-black">
-            N
-          </div>
-          <span className="text-xs font-black text-slate-900 tracking-tight">Navisworks</span>
-        </div>
-      ),
-    },
-  ];
-
   return (
     <section className="w-full py-10 sm:py-12 bg-[#FAFCFF] border-b border-slate-200/80 overflow-hidden">
       <div className="cad-container">
@@ -263,7 +169,7 @@ export const SoftwarePartnersMarquee: React.FC = () => {
         </div>
       </div>
 
-      {/* Dual Opposing Infinite Marquees with Edge Fade */}
+      {/* Dual Opposing Infinite Marquees */}
       <div className="relative w-full overflow-hidden flex flex-col gap-4 py-1.5">
         <div className="absolute left-0 top-0 bottom-0 w-20 sm:w-32 bg-gradient-to-r from-[#FAFCFF] via-[#FAFCFF]/90 to-transparent z-10 pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-20 sm:w-32 bg-gradient-to-l from-[#FAFCFF] via-[#FAFCFF]/90 to-transparent z-10 pointer-events-none" />
@@ -271,14 +177,8 @@ export const SoftwarePartnersMarquee: React.FC = () => {
         {/* ROW 1: Right to Left */}
         <div className="relative w-full overflow-hidden whitespace-nowrap flex items-center">
           <div className="inline-flex items-center gap-4 sm:gap-5 animate-marquee py-1">
-            {row1Brands.concat(row1Brands).concat(row1Brands).map((item, idx) => (
-              <div
-                key={`sw-row1-${item.name}-${idx}`}
-                className="inline-flex items-center justify-center px-5 py-2.5 bg-white hover:bg-slate-50 rounded-2xl border border-slate-200/90 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.04)] hover:shadow-md hover:border-slate-300 transition-all duration-300 flex-shrink-0 select-none min-h-[48px]"
-                title={item.name}
-              >
-                {item.renderLogo()}
-              </div>
+            {ROW_1_COMPANIES.concat(ROW_1_COMPANIES).concat(ROW_1_COMPANIES).map((item, idx) => (
+              <CompanyLogoCard key={`sw-row1-${item.companyName}-${idx}`} item={item} />
             ))}
           </div>
         </div>
@@ -286,14 +186,8 @@ export const SoftwarePartnersMarquee: React.FC = () => {
         {/* ROW 2: Left to Right */}
         <div className="relative w-full overflow-hidden whitespace-nowrap flex items-center">
           <div className="inline-flex items-center gap-4 sm:gap-5 animate-marquee-ltr py-1">
-            {row2Brands.concat(row2Brands).concat(row2Brands).map((item, idx) => (
-              <div
-                key={`sw-row2-${item.name}-${idx}`}
-                className="inline-flex items-center justify-center px-5 py-2.5 bg-white hover:bg-slate-50 rounded-2xl border border-slate-200/90 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.04)] hover:shadow-md hover:border-slate-300 transition-all duration-300 flex-shrink-0 select-none min-h-[48px]"
-                title={item.name}
-              >
-                {item.renderLogo()}
-              </div>
+            {ROW_2_COMPANIES.concat(ROW_2_COMPANIES).concat(ROW_2_COMPANIES).map((item, idx) => (
+              <CompanyLogoCard key={`sw-row2-${item.companyName}-${idx}`} item={item} />
             ))}
           </div>
         </div>
