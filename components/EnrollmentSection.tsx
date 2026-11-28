@@ -615,8 +615,13 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
           duration: currentCourseObj?.duration,
           category: currentCourseObj?.category,
         }}
+        initialCandidate={{
+          fullName,
+          email,
+          phone,
+          preferredBatch,
+        }}
         onSuccess={(verifyData) => {
-          setIsRazorpayModalOpen(false);
           setSubmittedId(verifyData.receiptId || 'PAID');
           if (onEnrollSuccess) onEnrollSuccess(selectedCourse);
         }}

@@ -1171,10 +1171,6 @@ export const CourseModal: React.FC<CourseModalProps> = ({ course, onClose, onEnr
         isOpen={isRazorpayModalOpen}
         onClose={() => setIsRazorpayModalOpen(false)}
         course={{ ...course, fee: feeAmount }}
-        onSuccess={() => {
-          setIsRazorpayModalOpen(false);
-          onClose();
-        }}
       />
     </div>
   );

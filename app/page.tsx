@@ -252,7 +252,6 @@ export default function HomePage() {
         isOpen={!!razorpayCourse}
         onClose={() => setRazorpayCourse(null)}
         course={razorpayCourse}
-        onSuccess={() => setRazorpayCourse(null)}
       />
 
       {/* Footer */}
