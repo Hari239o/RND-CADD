@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 80" width="340" height="80">
+  <rect x="10" y="10" width="60" height="60" rx="12" fill="#003554"/>
+  <path d="M 24,55 L 24,25 L 36,25 L 56,55 Z" fill="#FFFFFF"/>
+  <path d="M 38,25 L 56,55 L 46,55 L 28,25 Z" fill="#00A8E8"/>
+  <text x="86" y="52" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="34" font-weight="900" fill="#003554" letter-spacing="2px">
+    LUMION
+  </text>
+</svg>

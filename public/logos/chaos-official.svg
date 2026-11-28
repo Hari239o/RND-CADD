@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 80" width="340" height="80">
+  <circle cx="40" cy="40" r="28" fill="#E82A2A"/>
+  <!-- Inner White C spiral/arc -->
+  <path d="M 52,28 A 16,16 0 1,0 52,52" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"/>
+  <!-- CHAOS wordmark -->
+  <text x="86" y="52" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="34" font-weight="900" fill="#111827" letter-spacing="3px">
+    CHAOS<tspan font-size="14" font-weight="700" fill="#E82A2A" letter-spacing="1px" dy="-14"> (V-RAY)</tspan>
+  </text>
+</svg>

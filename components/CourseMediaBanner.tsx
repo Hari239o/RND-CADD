@@ -112,7 +112,7 @@ export const getVerifiedCourseImages = (c: Course): { primary: string; secondary
   // 4. AutoCAD Civil 2D & 3D Planning / Survey
   if (query.includes('autocad') && (query.includes('civil') || query.includes('drafting') || query.includes('2d'))) {
     return {
-      primary: 'https://images.unsplash.com/photo-1541888946425-d0fbb186156f?auto=format&fit=crop&w=1200&q=80',
+      primary: 'https://images.unsplash.com/photo-1541971875076-8f970d573be6?auto=format&fit=crop&w=1200&q=80',
       secondary: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80',
       tag: 'AutoCAD Civil 2D/3D Workstation',
     };
@@ -202,7 +202,7 @@ export const getVerifiedCourseImages = (c: Course): { primary: string; secondary
   // Default Civil Architecture Fallback
   return {
     primary: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80',
-    secondary: 'https://images.unsplash.com/photo-1541888946425-d0fbb186156f?auto=format&fit=crop&w=1200&q=80',
+    secondary: 'https://images.unsplash.com/photo-1541971875076-8f970d573be6?auto=format&fit=crop&w=1200&q=80',
     tag: 'RND CADD Professional Workstation',
   };
 };
@@ -229,7 +229,7 @@ export const getDisciplineHeroMedia = (stream: string, title: string): Disciplin
   if (query.includes('civil') || query.includes('revit') || query.includes('staad') || query.includes('bim') || query.includes('construction') || query.includes('etabs')) {
     return {
       videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-under-construction-building-with-a-crane-42778-large.mp4',
-      fallbackBg: 'https://images.unsplash.com/photo-1541888946425-d0fbb186156f?auto=format&fit=crop&w=1920&q=80',
+      fallbackBg: 'https://images.unsplash.com/photo-1541971875076-8f970d573be6?auto=format&fit=crop&w=1920&q=80',
       label: 'Civil Engineering & Construction BIM Lab',
     };
   }

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 80" width="420" height="80">
+  <!-- MathWorks Iconic Mathematical Membrane / Wave Icon -->
+  <g transform="translate(10, 10)">
+    <path d="M 0,42 C 8,46 16,50 26,45 C 38,39 42,20 48,8 C 52,0 58,18 64,32 C 68,41 74,47 80,44" fill="none" stroke="#D13C12" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 6,35 C 14,38 24,42 34,36 C 44,28 48,15 54,6 C 58,16 63,26 69,36" fill="none" stroke="#E15C22" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M 12,48 C 22,52 32,48 40,40 C 48,32 52,22 56,12 C 60,20 64,30 70,42" fill="none" stroke="#EF8236" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 0,42 L 80,44 L 56,60 L 16,55 Z" fill="url(#mwGrad)" opacity="0.3"/>
+  </g>
+  <defs>
+    <linearGradient id="mwGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#D13C12"/>
+      <stop offset="100%" stop-color="#FFB055"/>
+    </linearGradient>
+  </defs>
+  <!-- MathWorks Wordmark -->
+  <text x="105" y="48" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="34" font-weight="800" fill="#00355F" letter-spacing="-0.5px">
+    MathWorks<tspan font-size="16" dy="-14" font-weight="600">®</tspan>
+  </text>
+</svg>
