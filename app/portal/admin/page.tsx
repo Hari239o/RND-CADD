@@ -1348,6 +1348,49 @@ export default function AdminPortalPage() {
     });
   };
 
+  // Delete an existing discipline folder
+  const handleDeleteFolder = (folderId: string, folderName: string) => {
+    const folderCourses = courses.filter((c) => c.folder === folderId);
+    const count = folderCourses.length;
+    const confirmMessage =
+      count > 0
+        ? `Are you sure you want to delete the folder "${folderName}"?\n\nIt currently contains ${count} course(s). These courses will remain safe in the general curriculum catalog.`
+        : `Are you sure you want to delete the folder "${folderName}"?`;
+
+    if (typeof window !== 'undefined' && !window.confirm(confirmMessage)) {
+      return;
+    }
+
+    const updatedFolders = foldersList.filter((f) => f.id !== folderId);
+    setFoldersList(updatedFolders);
+
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('rnd_cadd_admin_folders', JSON.stringify(updatedFolders));
+      }
+    } catch {
+      // ignore
+    }
+
+    // Reassign courses from deleted folder to fallback folder so they aren't orphaned
+    if (count > 0) {
+      const fallbackFolderId = updatedFolders[0]?.id || 'civil';
+      const fallbackFolderName = updatedFolders[0]?.name || 'Civil & Architectural Engineering';
+      const updatedCourses = courses.map((c) =>
+        c.folder === folderId ? { ...c, folder: fallbackFolderId as any, domain: fallbackFolderName } : c
+      );
+      setCourses(updatedCourses);
+      persistLiveCourses(updatedCourses);
+    }
+
+    // If currently browsing this deleted folder, return back to all folders
+    if (currentFolderView === folderId) {
+      setCurrentFolderView(null);
+    }
+
+    showToast(`🗑️ Folder "${folderName}" has been deleted.`);
+  };
+
   // Fetch student certificates from API
   const fetchCertificates = async (silent = false) => {
     if (!silent) setIsLoadingCertificates(true);
@@ -4643,13 +4686,30 @@ export default function AdminPortalPage() {
                           className="bg-white rounded-3xl border border-slate-200/90 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden group"
                         >
                           <div>
-                            {/* Card Banner Image with Floating Circular Badge */}
+                            {/* Card Banner Image with Floating Circular Badge & Delete Button */}
                             <div className="relative h-44 w-full overflow-hidden bg-slate-100">
                               <img
                                 src={folder.image}
                                 alt={folder.name}
                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                               />
+
+                              {/* Floating Top-Right Delete Action Button */}
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteFolder(folder.id, folder.name);
+                                }}
+                                title={`Delete "${folder.name}" folder`}
+                                className="absolute top-3 right-3 z-20 px-2.5 py-1.5 rounded-xl bg-white/95 hover:bg-rose-600 text-slate-700 hover:text-white border border-slate-200/90 shadow-sm flex items-center gap-1.5 text-xs font-bold transition-all cursor-pointer active:scale-95 group/del"
+                              >
+                                <svg className="w-3.5 h-3.5 text-rose-500 group-hover/del:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                <span>Delete</span>
+                              </button>
+
                               {/* Floating Circular Badge Overlapping Bottom Right */}
                               <div className="absolute -bottom-5 right-5 w-12 h-12 rounded-full bg-white shadow-md border border-slate-100 flex items-center justify-center p-1 z-10">
                                 <div className="w-full h-full rounded-full bg-slate-50 flex items-center justify-center text-[10px] font-black text-[#131313] tracking-tighter">
@@ -4683,22 +4743,70 @@ export default function AdminPortalPage() {
                             </div>
                           </div>
 
-                          {/* Card Bottom: Only "View Courses" Visible */}
-                          <div className="p-6 pt-0">
+                          {/* Card Bottom: View Courses & Delete Folder */}
+                          <div className="p-6 pt-0 flex items-center gap-2.5">
                             <button
                               type="button"
                               onClick={() => {
                                 setCurrentFolderView(folder.id);
                                 setCourseSearchQuery('');
                               }}
-                              className="w-full py-2.5 px-4 rounded-full border border-slate-300 hover:border-[#EE2C3C] bg-white hover:bg-red-50/50 text-slate-800 hover:text-[#EE2C3C] text-xs sm:text-sm font-bold text-center transition-all shadow-xs flex items-center justify-center space-x-1.5 cursor-pointer"
+                              className="flex-1 py-2.5 px-4 rounded-full border border-slate-300 hover:border-[#EE2C3C] bg-white hover:bg-red-50/50 text-slate-800 hover:text-[#EE2C3C] text-xs sm:text-sm font-bold text-center transition-all shadow-xs flex items-center justify-center space-x-1.5 cursor-pointer"
                             >
                               <span>View Courses &rarr;</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteFolder(folder.id, folder.name);
+                              }}
+                              title={`Delete "${folder.name}" folder`}
+                              className="px-3.5 py-2.5 rounded-full border border-rose-200 hover:border-rose-400 bg-rose-50/60 hover:bg-rose-100 text-rose-600 text-xs font-bold text-center transition-all shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer shrink-0 active:scale-95"
+                            >
+                              <svg className="w-4 h-4 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                              <span>Delete</span>
                             </button>
                           </div>
                         </div>
                       );
                     })}
+
+                    {foldersList.length === 0 && (
+                      <div className="col-span-full py-16 text-center bg-white rounded-3xl border border-slate-200 p-8 space-y-4">
+                        <div className="w-16 h-16 mx-auto rounded-2xl bg-rose-50 text-[#EE2C3C] flex items-center justify-center text-3xl">
+                          📁
+                        </div>
+                        <div className="text-lg font-bold text-slate-900">No Discipline Folders Found</div>
+                        <p className="text-sm text-slate-500 max-w-md mx-auto">
+                          All folders have been deleted. You can create a new custom folder or restore the default engineering folders anytime.
+                        </p>
+                        <div className="flex flex-wrap items-center justify-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => setShowAddFolderModal(true)}
+                            className="px-5 py-2.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs font-bold uppercase tracking-wider shadow-sm transition-all cursor-pointer"
+                          >
+                            + Create New Folder
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setFoldersList([...MAIN_FOLDERS]);
+                              if (typeof window !== 'undefined') {
+                                localStorage.setItem('rnd_cadd_admin_folders', JSON.stringify(MAIN_FOLDERS));
+                              }
+                              showToast('Standard engineering folders restored.');
+                            }}
+                            className="px-5 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold uppercase tracking-wider shadow-2xs transition-all cursor-pointer"
+                          >
+                            Restore Default Folders
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               ) : (
@@ -4738,6 +4846,26 @@ export default function AdminPortalPage() {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3">
+                      {currentFolderView && currentFolderView !== 'all' && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const curFolder =
+                              foldersList.find((f) => f.id === currentFolderView) ||
+                              MAIN_FOLDERS.find((f) => f.id === currentFolderView);
+                            if (curFolder) {
+                              handleDeleteFolder(curFolder.id, curFolder.name);
+                            }
+                          }}
+                          className="px-4 py-2.5 rounded-xl bg-white hover:bg-rose-50 text-rose-600 hover:text-rose-700 border border-rose-300 text-xs font-bold uppercase tracking-wider shadow-2xs transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
+                          title="Delete this entire discipline folder"
+                        >
+                          <svg className="w-4 h-4 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                          <span>DELETE THIS FOLDER</span>
+                        </button>
+                      )}
                       <button
                         onClick={() => {
                           const activeFolderObj =
