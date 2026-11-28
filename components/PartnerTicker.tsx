@@ -306,9 +306,9 @@ export const PartnerTicker: React.FC<PartnerTickerProps> = ({ content }) => {
     <div className="w-full bg-white border-b border-[#E2E8F0] overflow-hidden">
       
       {/* ========================================================================= */}
-      {/* PART 1: 2-ROW DUAL-DIRECTION COLORFUL REAL BRANDMARKS MARQUEE             */}
+      {/* PART 1: 2-ROW DUAL-DIRECTION COLORFUL REAL BRANDMARKS MARQUEE (Hidden)    */}
       {/* ========================================================================= */}
-      <section className="py-12 bg-[#FAFCFF] border-b border-slate-100">
+      <section className="hidden py-12 bg-[#FAFCFF] border-b border-slate-100" aria-hidden="true">
         <div className="cad-container">
           <div className="text-center mb-8">
             <span className="text-xs font-bold text-[#D20A0B] tracking-wider uppercase bg-red-50 px-3 py-1 rounded-full border border-red-100">
