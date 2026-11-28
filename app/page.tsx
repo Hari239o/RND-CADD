@@ -5,6 +5,7 @@ import type { Course } from '@/lib/courses-data';
 import { Header } from '@/components/Header';
 import { RndCaddHero } from '@/components/RndCaddHero';
 import { UpgradProgramsShowcase } from '@/components/UpgradProgramsShowcase';
+import { SoftwarePartnersMarquee } from '@/components/SoftwarePartnersMarquee';
 import { DisciplineCourseHub } from '@/components/DisciplineCourseHub';
 import { PartnerTicker } from '@/components/PartnerTicker';
 import { EnrollmentSection } from '@/components/EnrollmentSection';
@@ -201,6 +202,9 @@ export default function HomePage() {
           onSelectStream={(stream) => setActiveStream(stream)}
           onOpenCourseModal={(course) => setSelectedCourse(course)}
         />
+
+        {/* Authorized Software Ecosystem Dual Marquee Band */}
+        <SoftwarePartnersMarquee />
 
         {/* Stage 4: Revealed Course Catalog with Dedicated High-Res Course Imagery */}
         <DisciplineCourseHub
