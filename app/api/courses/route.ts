@@ -1209,10 +1209,19 @@ export async function GET(request: Request) {
 
     if (isConnected && db) {
       const collection = db.collection('courses');
-      const count = await collection.countDocuments();
+      const seedCheck = await db.collection('site_content').findOne({ key: 'courses_initialized' });
 
-      if (count === 0) {
-        await collection.insertMany(inMemoryCourses);
+      // Only auto-seed if the database has NEVER been initialized before
+      if (!seedCheck) {
+        const count = await collection.countDocuments();
+        if (count === 0 && inMemoryCourses.length > 0) {
+          await collection.insertMany(inMemoryCourses);
+        }
+        await db.collection('site_content').updateOne(
+          { key: 'courses_initialized' },
+          { $set: { key: 'courses_initialized', initializedAt: new Date().toISOString() } },
+          { upsert: true }
+        );
       }
 
       let query: any = {};
@@ -1379,26 +1388,107 @@ export async function PUT(request: Request) {
   }
 }
 
-// DELETE a course
+// DELETE a course, a folder's courses, batch courses, or all courses
 export async function DELETE(request: Request) {
   const { searchParams } = new URL(request.url);
+  const deleteAll = searchParams.get('all') === 'true';
+  const folder = searchParams.get('folder');
+  const idsParam = searchParams.get('ids');
   const courseId = searchParams.get('id');
   const courseTitle = searchParams.get('title');
   const courseCode = searchParams.get('code');
 
-  if (!courseId && !courseTitle && !courseCode) {
-    return NextResponse.json({ success: false, message: 'Course ID, title, or code is required' }, { status: 400 });
+  if (!deleteAll && !folder && !idsParam && !courseId && !courseTitle && !courseCode) {
+    return NextResponse.json(
+      { success: false, message: 'Course ID, folder, ids list, or all=true is required' },
+      { status: 400 }
+    );
   }
-
-  // Update in-memory store immediately
-  inMemoryCourses = inMemoryCourses.filter((c) =>
-    (!courseId || (c.id !== courseId && c.id.toLowerCase() !== courseId.toLowerCase())) &&
-    (!courseTitle || c.title.toLowerCase().trim() !== courseTitle.toLowerCase().trim()) &&
-    (!courseCode || c.code?.toLowerCase().trim() !== courseCode.toLowerCase().trim())
-  );
 
   try {
     const { db, isConnected } = await connectToDatabase();
+
+    // 1. Delete ALL courses
+    if (deleteAll) {
+      inMemoryCourses = [];
+      if (isConnected && db) {
+        const result = await db.collection('courses').deleteMany({});
+        await db.collection('site_content').updateOne(
+          { key: 'courses_initialized' },
+          { $set: { key: 'courses_initialized', clearedAt: new Date().toISOString() } },
+          { upsert: true }
+        );
+        return NextResponse.json(
+          {
+            success: true,
+            deletedCount: result.deletedCount,
+            message: 'All courses deleted permanently from database',
+          },
+          { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' } }
+        );
+      }
+      return NextResponse.json({ success: true, message: 'All courses deleted' });
+    }
+
+    // 2. Delete all courses in a specific folder
+    if (folder) {
+      inMemoryCourses = inMemoryCourses.filter(
+        (c) => c.folder !== folder && c.folder?.toLowerCase() !== folder.toLowerCase()
+      );
+      if (isConnected && db) {
+        const result = await db.collection('courses').deleteMany({
+          $or: [
+            { folder: folder },
+            { folder: folder.toLowerCase() },
+            { folder: new RegExp(`^${folder.trim()}$`, 'i') },
+          ],
+        });
+        return NextResponse.json(
+          {
+            success: true,
+            deletedCount: result.deletedCount,
+            message: `All courses in folder "${folder}" deleted from database`,
+          },
+          { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' } }
+        );
+      }
+      return NextResponse.json({ success: true, message: `All courses in folder "${folder}" deleted` });
+    }
+
+    // 3. Delete multiple courses by IDs (batch delete)
+    if (idsParam) {
+      const idsList = idsParam.split(',').map((s) => s.trim()).filter(Boolean);
+      inMemoryCourses = inMemoryCourses.filter((c) => !idsList.includes(c.id));
+      if (isConnected && db) {
+        const { ObjectId } = await import('mongodb');
+        const objectIds = idsList.filter((id) => ObjectId.isValid(id)).map((id) => new ObjectId(id));
+        const result = await db.collection('courses').deleteMany({
+          $or: [
+            { id: { $in: idsList } },
+            { id: { $in: idsList.map((id) => id.toLowerCase()) } },
+            { _id: { $in: objectIds } },
+          ],
+        });
+        return NextResponse.json(
+          {
+            success: true,
+            deletedCount: result.deletedCount,
+            message: `Deleted ${result.deletedCount} courses from database`,
+          },
+          { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' } }
+        );
+      }
+      return NextResponse.json({ success: true, message: `Deleted ${idsList.length} courses` });
+    }
+
+    // 4. Delete single course by id, title, or code
+    inMemoryCourses = inMemoryCourses.filter(
+      (c) =>
+        (!courseId || (c.id !== courseId && c.id.toLowerCase() !== courseId.toLowerCase())) &&
+        (!courseTitle || c.title.toLowerCase().trim() !== courseTitle.toLowerCase().trim()) &&
+        (!courseCode || c.code?.toLowerCase().trim() !== courseCode.toLowerCase().trim())
+    );
+
     if (isConnected && db) {
       const { ObjectId } = await import('mongodb');
       const collection = db.collection('courses');

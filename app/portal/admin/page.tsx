@@ -1279,14 +1279,36 @@ export default function AdminPortalPage() {
     }
   };
 
-  // Sync folders from localStorage
+  // Fetch real folders from MongoDB
+  const fetchFolders = async () => {
+    try {
+      const res = await fetch('/api/folders?t=' + Date.now(), { cache: 'no-store' });
+      const data = await res.json();
+      if (data.success && Array.isArray(data.folders) && data.folders.length > 0) {
+        setFoldersList(data.folders);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('rnd_cadd_admin_folders', JSON.stringify(data.folders));
+        }
+      } else if (data.success && Array.isArray(data.folders) && data.folders.length === 0) {
+        setFoldersList([]);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('rnd_cadd_admin_folders', JSON.stringify([]));
+        }
+      }
+    } catch (err) {
+      console.warn('Fetch folders database notice, using fallback store:', err);
+      syncFolders();
+    }
+  };
+
+  // Sync folders from localStorage fallback
   const syncFolders = () => {
     try {
       if (typeof window !== 'undefined') {
         const stored = localStorage.getItem('rnd_cadd_admin_folders');
         if (stored) {
           const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) {
+          if (Array.isArray(parsed)) {
             setFoldersList(parsed);
           }
         }
@@ -1297,7 +1319,7 @@ export default function AdminPortalPage() {
   };
 
   // Create lightweight folder (Image-3 button action: Folder Name, Image only)
-  const handleCreateFolder = (e: React.FormEvent) => {
+  const handleCreateFolder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newFolderForm.name.trim()) {
       alert('Please enter a folder name.');
@@ -1328,7 +1350,7 @@ export default function AdminPortalPage() {
       accentColor: '#0284C7',
     };
 
-    const updated = [...foldersList, newFolderObj];
+    const updated = [...foldersList.filter((f) => f.id !== folderId), newFolderObj];
     setFoldersList(updated);
     try {
       if (typeof window !== 'undefined') {
@@ -1338,7 +1360,18 @@ export default function AdminPortalPage() {
       // ignore
     }
 
-    showToast(`📁 Folder "${newFolderObj.name}" created successfully!`);
+    // Persist folder directly to MongoDB
+    try {
+      await fetch('/api/folders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newFolderObj),
+      });
+    } catch (err) {
+      console.error('Failed to save folder to MongoDB:', err);
+    }
+
+    showToast(`📁 Folder "${newFolderObj.name}" created and synced to database!`);
     setShowAddFolderModal(false);
     setNewFolderForm({
       name: '',
@@ -1348,47 +1381,52 @@ export default function AdminPortalPage() {
     });
   };
 
-  // Delete an existing discipline folder
-  const handleDeleteFolder = (folderId: string, folderName: string) => {
+  // Delete an existing discipline folder AND its courses permanently from MongoDB
+  const handleDeleteFolder = async (folderId: string, folderName: string) => {
     const folderCourses = courses.filter((c) => c.folder === folderId);
     const count = folderCourses.length;
     const confirmMessage =
       count > 0
-        ? `Are you sure you want to delete the folder "${folderName}"?\n\nIt currently contains ${count} course(s). These courses will remain safe in the general curriculum catalog.`
-        : `Are you sure you want to delete the folder "${folderName}"?`;
+        ? `Are you sure you want to permanently delete the folder "${folderName}" and all ${count} course(s) inside it from the database? This cannot be undone.`
+        : `Are you sure you want to permanently delete the folder "${folderName}" from the database?`;
 
     if (typeof window !== 'undefined' && !window.confirm(confirmMessage)) {
       return;
     }
 
-    const updatedFolders = foldersList.filter((f) => f.id !== folderId);
-    setFoldersList(updatedFolders);
-
     try {
+      // 1. Delete folder from MongoDB
+      await fetch(`/api/folders?id=${encodeURIComponent(folderId)}`, {
+        method: 'DELETE',
+      });
+
+      // 2. Delete all courses belonging to this folder from MongoDB
+      await fetch(`/api/courses?folder=${encodeURIComponent(folderId)}`, {
+        method: 'DELETE',
+      });
+
+      // 3. Update local state & storage immediately
+      const updatedFolders = foldersList.filter((f) => f.id !== folderId);
+      setFoldersList(updatedFolders);
       if (typeof window !== 'undefined') {
         localStorage.setItem('rnd_cadd_admin_folders', JSON.stringify(updatedFolders));
       }
-    } catch {
-      // ignore
-    }
 
-    // Reassign courses from deleted folder to fallback folder so they aren't orphaned
-    if (count > 0) {
-      const fallbackFolderId = updatedFolders[0]?.id || 'civil';
-      const fallbackFolderName = updatedFolders[0]?.name || 'Civil & Architectural Engineering';
-      const updatedCourses = courses.map((c) =>
-        c.folder === folderId ? { ...c, folder: fallbackFolderId as any, domain: fallbackFolderName } : c
-      );
+      // Remove all courses belonging to this folder
+      const updatedCourses = courses.filter((c) => c.folder !== folderId && c.folder?.toLowerCase() !== folderId.toLowerCase());
       setCourses(updatedCourses);
       persistLiveCourses(updatedCourses);
-    }
 
-    // If currently browsing this deleted folder, return back to all folders
-    if (currentFolderView === folderId) {
-      setCurrentFolderView(null);
-    }
+      // Return to main folders catalog if browsing this folder
+      if (currentFolderView === folderId) {
+        setCurrentFolderView(null);
+      }
 
-    showToast(`🗑️ Folder "${folderName}" has been deleted.`);
+      showToast(`🗑️ Folder "${folderName}" and its courses deleted permanently from database.`);
+    } catch (err) {
+      console.error('Delete folder database error:', err);
+      alert('Failed to connect to database to delete folder.');
+    }
   };
 
   // Fetch student certificates from API
@@ -2037,7 +2075,7 @@ export default function AdminPortalPage() {
   };
 
   useEffect(() => {
-    syncFolders();
+    fetchFolders();
     fetchStudents();
     fetchCourses();
     fetchCertificates();
@@ -3661,19 +3699,21 @@ export default function AdminPortalPage() {
         );
         showToast(`Successfully deleted ${count} student(s).`);
       } else if (activeTab === 'Courses') {
-        const toDelete = courses.filter((c) => selectedIds.includes(c.id));
-        await Promise.all(
-          toDelete.map((c) =>
-            fetch(
-              `/api/courses?id=${encodeURIComponent(c.id)}&title=${encodeURIComponent(c.title)}&code=${encodeURIComponent(c.code || '')}`,
-              { method: 'DELETE' }
-            ).catch((err) => console.error(err))
-          )
-        );
+        const isDeletingAll = selectedIds.length >= courses.length;
+        if (isDeletingAll) {
+          // Atomic single query to delete all courses in MongoDB
+          await fetch('/api/courses?all=true', { method: 'DELETE' });
+        } else {
+          // Atomic batch query to delete courses by IDs in MongoDB
+          await fetch(`/api/courses?ids=${encodeURIComponent(selectedIds.join(','))}`, {
+            method: 'DELETE',
+          });
+        }
         const nextList = courses.filter((c) => !selectedIds.includes(c.id));
         setCourses(nextList);
         persistLiveCourses(nextList);
-        showToast(`Successfully deleted ${count} course(s).`);
+        setSelectedIds([]);
+        showToast(`Successfully deleted ${count} course(s) from database.`);
       } else if (activeTab === 'Certificate') {
         const toDelete = certificates.filter(
           (c) => selectedIds.includes(c.id) || selectedIds.includes(c.certId)
@@ -4686,29 +4726,13 @@ export default function AdminPortalPage() {
                           className="bg-white rounded-3xl border border-slate-200/90 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden group"
                         >
                           <div>
-                            {/* Card Banner Image with Floating Circular Badge & Delete Button */}
+                            {/* Card Banner Image with Floating Circular Badge */}
                             <div className="relative h-44 w-full overflow-hidden bg-slate-100">
                               <img
                                 src={folder.image}
                                 alt={folder.name}
                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                               />
-
-                              {/* Floating Top-Right Delete Action Button */}
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteFolder(folder.id, folder.name);
-                                }}
-                                title={`Delete "${folder.name}" folder`}
-                                className="absolute top-3 right-3 z-20 px-2.5 py-1.5 rounded-xl bg-white/95 hover:bg-rose-600 text-slate-700 hover:text-white border border-slate-200/90 shadow-sm flex items-center gap-1.5 text-xs font-bold transition-all cursor-pointer active:scale-95 group/del"
-                              >
-                                <svg className="w-3.5 h-3.5 text-rose-500 group-hover/del:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                                <span>Delete</span>
-                              </button>
 
                               {/* Floating Circular Badge Overlapping Bottom Right */}
                               <div className="absolute -bottom-5 right-5 w-12 h-12 rounded-full bg-white shadow-md border border-slate-100 flex items-center justify-center p-1 z-10">
@@ -4793,12 +4817,26 @@ export default function AdminPortalPage() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => {
-                              setFoldersList([...MAIN_FOLDERS]);
+                            onClick={async () => {
+                              try {
+                                const res = await fetch('/api/folders', {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ action: 'restore_defaults' }),
+                                });
+                                const data = await res.json();
+                                if (data.success && Array.isArray(data.folders)) {
+                                  setFoldersList(data.folders);
+                                } else {
+                                  setFoldersList([...MAIN_FOLDERS]);
+                                }
+                              } catch {
+                                setFoldersList([...MAIN_FOLDERS]);
+                              }
                               if (typeof window !== 'undefined') {
                                 localStorage.setItem('rnd_cadd_admin_folders', JSON.stringify(MAIN_FOLDERS));
                               }
-                              showToast('Standard engineering folders restored.');
+                              showToast('Standard engineering folders restored in database.');
                             }}
                             className="px-5 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold uppercase tracking-wider shadow-2xs transition-all cursor-pointer"
                           >
