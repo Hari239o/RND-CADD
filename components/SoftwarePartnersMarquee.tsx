@@ -260,9 +260,6 @@ export const SoftwarePartnersMarquee: React.FC = () => {
           <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-2.5">
             Master 25+ Global CAD, BIM &amp; EPC Platforms
           </h3>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1.5 max-w-xl mx-auto">
-            Hands-on training powered by enterprise engineering software suites trusted across global MNC projects.
-          </p>
         </div>
       </div>
 
