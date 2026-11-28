@@ -1195,8 +1195,11 @@ function buildAllWebsiteCourses(): StoredCourse[] {
   return list;
 }
 
-// Global in-memory cache to ensure instant persistence across API calls in fallback mode
-let inMemoryCourses: StoredCourse[] = buildAllWebsiteCourses();
+// Reference dataset used only for enriching optional missing metadata on stored courses
+const DEFAULT_COURSES_CATALOG: StoredCourse[] = buildAllWebsiteCourses();
+
+// Global in-memory cache for fallback mode (starts empty so deleted courses never resurrect)
+let inMemoryCourses: StoredCourse[] = [];
 
 // GET all courses or filter by folder / stream
 export async function GET(request: Request) {
@@ -1209,20 +1212,6 @@ export async function GET(request: Request) {
 
     if (isConnected && db) {
       const collection = db.collection('courses');
-      const seedCheck = await db.collection('site_content').findOne({ key: 'courses_initialized' });
-
-      // Only auto-seed if the database has NEVER been initialized before
-      if (!seedCheck) {
-        const count = await collection.countDocuments();
-        if (count === 0 && inMemoryCourses.length > 0) {
-          await collection.insertMany(inMemoryCourses);
-        }
-        await db.collection('site_content').updateOne(
-          { key: 'courses_initialized' },
-          { $set: { key: 'courses_initialized', initializedAt: new Date().toISOString() } },
-          { upsert: true }
-        );
-      }
 
       let query: any = {};
       if (folder && folder !== 'all') {
@@ -1233,7 +1222,7 @@ export async function GET(request: Request) {
 
       const courses = await collection.find(query).toArray();
       const normalized = courses.map((c: any) => {
-        const fallback = inMemoryCourses.find(
+        const fallback = DEFAULT_COURSES_CATALOG.find(
           (def) => def.id === c.id || def.title.toLowerCase().trim() === c.title?.toLowerCase().trim()
         );
         return normalizeCourse({

@@ -30,7 +30,7 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
 }) => {
   const [selectedFolderId, setSelectedFolderId] = useState<string>('civil');
   const [activeCourseIndex, setActiveCourseIndex] = useState<number>(0);
-  const [allCourses, setAllCourses] = useState<Course[]>(COURSES);
+  const [allCourses, setAllCourses] = useState<Course[]>([]);
   const cardsScrollRef = useRef<HTMLDivElement>(null);
   const mobileNavContainerRef = useRef<HTMLDivElement>(null);
   const isProgrammaticScrollRef = useRef<boolean>(false);
@@ -51,7 +51,7 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
         const stored = localStorage.getItem('rnd_cadd_live_courses');
         if (stored) {
           const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) {
+          if (Array.isArray(parsed)) {
             setAllCourses(parsed);
           }
         }
@@ -62,7 +62,7 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
       try {
         const res = await fetch('/api/courses?t=' + Date.now(), { cache: 'no-store' });
         const data = await res.json();
-        if (data.success && Array.isArray(data.courses) && data.courses.length > 0) {
+        if (data.success && Array.isArray(data.courses)) {
           const mappedCourses: Course[] = data.courses.map((sc: any) => {
             const auth = COURSES.find(
               (c) =>
@@ -631,7 +631,16 @@ export const UpgradProgramsShowcase: React.FC<UpgradProgramsShowcaseProps> = ({
                       }}
                       className="flex flex-row gap-3 items-stretch overflow-x-auto py-1.5 px-0.5 scroll-smooth min-w-0 [&::-webkit-scrollbar]:hidden"
                     >
-                      {coursesInFolder.map((course, idx) => (
+                      {coursesInFolder.length === 0 ? (
+                        <div className="w-full py-12 px-6 bg-white/95 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col items-center justify-center text-center">
+                          <div className="text-sm font-bold text-slate-800 mb-1">
+                            No Courses Available in {folder.name}
+                          </div>
+                          <p className="text-xs text-slate-500 max-w-sm">
+                            Courses for this folder have not been published yet. New certified programs added via the Admin Portal will appear here automatically.
+                          </p>
+                        </div>
+                      ) : coursesInFolder.map((course, idx) => (
                         <div
                           key={`${selectedFolderId}-${course.id}-${idx}`}
                           className={`${

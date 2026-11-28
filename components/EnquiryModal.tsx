@@ -64,7 +64,7 @@ export const EnquiryModal: React.FC<EnquiryModalProps> = ({
   const [state, setState] = useState('Telangana');
   const [center, setCenter] = useState('Ameerpet (Hyderabad Headquarters)');
   
-  const [coursesList, setCoursesList] = useState<any[]>(COURSES);
+  const [coursesList, setCoursesList] = useState<any[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -77,7 +77,7 @@ export const EnquiryModal: React.FC<EnquiryModalProps> = ({
         const stored = localStorage.getItem('rnd_cadd_live_courses');
         if (stored) {
           const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) {
+          if (Array.isArray(parsed)) {
             setCoursesList(parsed);
           }
         }
@@ -86,9 +86,9 @@ export const EnquiryModal: React.FC<EnquiryModalProps> = ({
 
     const fetchCourses = async () => {
       try {
-        const res = await fetch('/api/courses');
+        const res = await fetch('/api/courses?t=' + Date.now(), { cache: 'no-store' });
         const data = await res.json();
-        if (data.success && Array.isArray(data.courses) && data.courses.length > 0) {
+        if (data.success && Array.isArray(data.courses)) {
           setCoursesList(data.courses);
         }
       } catch (err) {}

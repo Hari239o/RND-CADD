@@ -81,7 +81,7 @@ const DEFAULT_FOLDERS = [
     credential: 'PPM Specialist Certification',
     duration: '3 Months (60 Hours)',
     badgeLabel: '360° Career Support',
-    image: 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?auto=format&fit=crop&w=1200&q=80',
+    image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80',
     logoText: 'PPM',
     description: 'Primavera P6, Microsoft Project, WBS, Gantt scheduling, and EVM cost control.',
     software: 'Oracle Primavera P6, Microsoft Project, EPC Suite',

@@ -22,7 +22,7 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
   onEnroll,
   content,
 }) => {
-  const [coursesList, setCoursesList] = useState<Course[]>(COURSES);
+  const [coursesList, setCoursesList] = useState<Course[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [showAllCourses, setShowAllCourses] = useState(false);
   const mobileTabsRef = useRef<HTMLDivElement>(null);
@@ -71,7 +71,7 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
         const stored = localStorage.getItem('rnd_cadd_live_courses');
         if (stored) {
           const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) {
+          if (Array.isArray(parsed)) {
             setCoursesList(parsed);
           }
         }
@@ -82,7 +82,7 @@ export const DisciplineCourseHub: React.FC<DisciplineCourseHubProps> = ({
       try {
         const res = await fetch('/api/courses?t=' + Date.now(), { cache: 'no-store' });
         const data = await res.json();
-        if (data.success && Array.isArray(data.courses) && data.courses.length > 0) {
+        if (data.success && Array.isArray(data.courses)) {
           const mappedCourses: Course[] = data.courses.map((sc: any) => {
             const auth = COURSES.find(
               (c) =>

@@ -18,11 +18,11 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
   onEnrollSuccess,
   content,
 }) => {
-  const [coursesList, setCoursesList] = useState<Course[]>(COURSES);
+  const [coursesList, setCoursesList] = useState<Course[]>([]);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [selectedCourse, setSelectedCourse] = useState(preselectedCourse || COURSES[0].title);
+  const [selectedCourse, setSelectedCourse] = useState(preselectedCourse || '');
   const [preferredBatch, setPreferredBatch] = useState('weekday-morning');
   const [paymentMode, setPaymentMode] = useState<'razorpay' | 'offline'>('razorpay');
   const [isRazorpayModalOpen, setIsRazorpayModalOpen] = useState(false);
@@ -42,7 +42,7 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
         const stored = localStorage.getItem('rnd_cadd_live_courses');
         if (stored) {
           const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) {
+          if (Array.isArray(parsed)) {
             setCoursesList(parsed);
           }
         }
@@ -51,13 +51,13 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
 
     const fetchCourses = async () => {
       try {
-        const res = await fetch('/api/courses');
+        const res = await fetch('/api/courses?t=' + Date.now(), { cache: 'no-store' });
         const data = await res.json();
-        if (data.success && Array.isArray(data.courses) && data.courses.length > 0) {
+        if (data.success && Array.isArray(data.courses)) {
           setCoursesList(data.courses);
         }
       } catch (err) {
-        // Fallback to COURSES
+        // Ignore network error
       }
     };
     fetchCourses();

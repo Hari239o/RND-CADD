@@ -18,7 +18,7 @@ export const CourseCatalog: React.FC<CourseCatalogProps> = ({
   onOpenCourseModal,
   onEnroll,
 }) => {
-  const [coursesList, setCoursesList] = useState<Course[]>(COURSES);
+  const [coursesList, setCoursesList] = useState<Course[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Fetch live courses from API to ensure instant sync with Admin updates
@@ -27,7 +27,7 @@ export const CourseCatalog: React.FC<CourseCatalogProps> = ({
       try {
         const res = await fetch('/api/courses?t=' + Date.now(), { cache: 'no-store' });
         const data = await res.json();
-        if (data.success && Array.isArray(data.courses) && data.courses.length > 0) {
+        if (data.success && Array.isArray(data.courses)) {
           const mapped: Course[] = data.courses.map((sc: any) => {
             const auth = COURSES.find(
               (c) =>

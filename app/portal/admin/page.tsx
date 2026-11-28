@@ -323,7 +323,7 @@ const MAIN_FOLDERS = [
     credential: 'PPM Specialist Certification',
     duration: '3 Months (60 Hours)',
     badgeLabel: '360° Career Support',
-    image: 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?auto=format&fit=crop&w=1200&q=80',
+    image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80',
     logoText: 'PPM',
     description: 'Primavera P6, Microsoft Project, WBS, Gantt scheduling, and EVM cost control.',
     software: 'Oracle Primavera P6, Microsoft Project, EPC Suite',
@@ -856,7 +856,7 @@ export default function AdminPortalPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'revoked'>('all');
 
   // Interactive Courses Catalog State (loaded dynamically from /api/courses and hydrated on mount)
-  const [courses, setCourses] = useState<CourseItem[]>(DEFAULT_COURSES);
+  const [courses, setCourses] = useState<CourseItem[]>([]);
   const [foldersList, setFoldersList] = useState<any[]>([...MAIN_FOLDERS]);
   const [showAddFolderModal, setShowAddFolderModal] = useState<boolean>(false);
   const [newFolderForm, setNewFolderForm] = useState({
@@ -4698,6 +4698,34 @@ export default function AdminPortalPage() {
                         
                         <span>VIEW ALL ({courses.length}) COURSES</span>
                       </button>
+                      {courses.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            if (
+                              typeof window !== 'undefined' &&
+                              !window.confirm(
+                                `Are you sure you want to permanently remove ALL ${courses.length} course(s) from the database while keeping all discipline folders intact?`
+                              )
+                            ) {
+                              return;
+                            }
+                            try {
+                              await fetch('/api/courses?all=true', { method: 'DELETE' });
+                              setCourses([]);
+                              persistLiveCourses([]);
+                              setSelectedIds([]);
+                              showToast('All courses removed permanently. Discipline folders preserved.');
+                            } catch (err) {
+                              console.error('Failed to delete all courses:', err);
+                              alert('Failed to connect to database to delete courses.');
+                            }
+                          }}
+                          className="px-4 py-2.5 rounded-xl border-2 border-rose-200 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white text-xs font-black uppercase tracking-wider transition-all shadow-sm flex items-center space-x-1.5 cursor-pointer"
+                        >
+                          <span>DELETE ALL COURSES</span>
+                        </button>
+                      )}
                       <button
                         onClick={() => setShowAddFolderModal(true)}
                         className="px-5 py-2.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-[#FFFFFF] text-xs font-black uppercase tracking-wider shadow-md transition-all flex items-center space-x-1.5 cursor-pointer"
