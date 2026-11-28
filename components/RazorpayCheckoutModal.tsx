@@ -41,6 +41,13 @@ const loadRazorpayScript = (): Promise<boolean> => {
   });
 };
 
+const BATCH_LABELS: Record<string, string> = {
+  'weekday-morning': 'Weekday Morning (08:00 AM – 10:30 AM)',
+  'weekday-afternoon': 'Weekday Afternoon (02:00 PM – 04:30 PM)',
+  'weekday-evening': 'Weekday Evening (06:30 PM – 09:00 PM)',
+  'weekend-fasttrack': 'Weekend Batch (Sat & Sun)',
+};
+
 export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
   isOpen,
   onClose,
@@ -52,6 +59,8 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [qualification, setQualification] = useState('B.Tech / B.E');
+  const [branch, setBranch] = useState('Civil Engineering');
+  const [passoutYear, setPassoutYear] = useState('2026');
   const [college, setCollege] = useState('');
   const [city, setCity] = useState('Hyderabad');
   const [trainingMode, setTrainingMode] = useState('Offline Campus + RTX Lab');
@@ -60,6 +69,7 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
   const [appliedDiscount, setAppliedDiscount] = useState<{ code: string; discount: number } | null>(null);
   const [promoFeedback, setPromoFeedback] = useState<string>('');
   const [isApplyingPromo, setIsApplyingPromo] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(true);
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -92,6 +102,8 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
           if (!initialCandidate?.email && u.email) setEmail(u.email);
           if (!initialCandidate?.phone && (u.phone || u.officialMobile)) setPhone(u.phone || u.officialMobile);
           if (u.qualification && u.qualification !== '-') setQualification(u.qualification);
+          if (u.branch && u.branch !== '-') setBranch(u.branch);
+          if (u.passoutYear && u.passoutYear !== '-') setPassoutYear(u.passoutYear);
           if (u.college && u.college !== '-') setCollege(u.college);
           if (u.nativePlace && u.nativePlace !== '-') setCity(u.nativePlace);
         }
@@ -149,6 +161,10 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
       setErrorMessage('Full name, email address, and mobile number are required to unlock your course.');
       return;
     }
+    if (!acceptedTerms) {
+      setErrorMessage('Please confirm the enrollment and refund policy terms before proceeding.');
+      return;
+    }
 
     setIsLoading(true);
     setErrorMessage('');
@@ -163,6 +179,8 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
           candidateEmail: email.trim().toLowerCase(),
           candidatePhone: phone.trim(),
           qualification,
+          branch,
+          passoutYear,
           college: college.trim(),
           city: city.trim(),
           trainingMode,
@@ -207,6 +225,7 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
           courseTitle: course.title,
           trainingMode,
           preferredBatch,
+          branch,
         },
         theme: {
           color: '#EE2C3C',
@@ -266,6 +285,8 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
           candidateEmail: normalizedEmail,
           candidatePhone: phone.trim(),
           qualification,
+          branch,
+          passoutYear,
           college: college.trim(),
           city: city.trim(),
           trainingMode,
@@ -297,6 +318,8 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
                 phone: phone.trim(),
                 college: college.trim(),
                 qualification,
+                branch,
+                passoutYear,
                 nativePlace: city.trim(),
                 assignedCourses: verifyData.assignedCourses || [course.title],
                 paymentReceipts: [verifyData.receipt, ...(existingParsed?.paymentReceipts || [])],
@@ -340,52 +363,41 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-5 overflow-y-auto">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-6 overflow-y-auto">
         {/* Clean Light-Neutral Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="fixed inset-0 bg-slate-900/45 backdrop-blur-xs"
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs"
           aria-hidden="true"
         />
 
-        {/* Corporate Enterprise White Checkout Window */}
+        {/* Expanded Corporate Enterprise White Checkout Window */}
         <motion.div
           initial={{ scale: 0.97, opacity: 0, y: 12 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.97, opacity: 0, y: 12 }}
           transition={{ duration: 0.18, ease: 'easeOut' }}
-          className="relative bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-4xl overflow-hidden z-10 my-auto max-h-[94vh] flex flex-col"
+          className="relative bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl overflow-hidden z-10 my-auto max-h-[95vh] flex flex-col"
         >
-          {/* Clean MNC Light Header Bar */}
-          <div className="bg-white px-5 sm:px-7 py-4 flex items-center justify-between border-b border-slate-200 shrink-0">
+          {/* Minimal Clean MNC Header Bar (No badge pill or redundant subtitle) */}
+          <div className="bg-white px-6 sm:px-8 py-4 flex items-center justify-between border-b border-slate-200 shrink-0">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-lg bg-[#FEF2F2] border border-[#FECACA] flex items-center justify-center text-[#EE2C3C] shrink-0">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
                 </svg>
               </div>
-              <div>
-                <div className="flex items-center gap-2.5">
-                  <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight">
-                    Course Enrollment &amp; Razorpay Billing
-                  </h3>
-                  <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-semibold">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                    Instant LMS Unlock
-                  </span>
-                </div>
-                <p className="text-xs text-slate-500">
-                  Authorized R&amp;D CADD Admissions Portal &bull; Automatic Seat &amp; Course Activation
-                </p>
-              </div>
+              <h3 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
+                Course Enrollment &amp; Razorpay Billing
+              </h3>
             </div>
             <button
               type="button"
               onClick={onClose}
-              className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+              className="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-colors cursor-pointer shrink-0"
               aria-label="Close"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
@@ -398,27 +410,27 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
           <div className="overflow-y-auto flex-1 bg-white">
             {paymentSuccessData ? (
               /* ==================== STEP 3: VERIFIED ENROLLMENT RECEIPT ==================== */
-              <div className="p-6 sm:p-10 max-w-2xl mx-auto text-center space-y-6">
-                <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto">
-                  <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <div className="p-6 sm:p-10 max-w-3xl mx-auto text-center space-y-6">
+                <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto">
+                  <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                   </svg>
                 </div>
 
                 <div>
-                  <span className="inline-block px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold mb-2">
+                  <span className="inline-block px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold mb-2">
                     Payment Verified &bull; Enrolled Automatically
                   </span>
-                  <h4 className="text-xl sm:text-2xl font-bold text-slate-900">
+                  <h4 className="text-2xl font-bold text-slate-900">
                     Course Unlocked in Your Student Portal
                   </h4>
-                  <p className="text-xs sm:text-sm text-slate-600 mt-1">
+                  <p className="text-sm text-slate-600 mt-1">
                     Your admission is active and <span className="font-semibold text-slate-900">{paymentSuccessData.courseTitle}</span> is ready for learning.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left text-xs">
-                  <div className="p-4 rounded-xl bg-[#F8FAFC] border border-slate-200 space-y-2.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left text-xs sm:text-sm">
+                  <div className="p-5 rounded-xl bg-[#F8FAFC] border border-slate-200 space-y-3">
                     <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                       Payment Receipt
                     </div>
@@ -428,7 +440,7 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">Payment ID</span>
-                      <span className="font-semibold font-mono text-slate-900 truncate max-w-[140px]">{paymentSuccessData.paymentId}</span>
+                      <span className="font-semibold font-mono text-slate-900 truncate max-w-[160px]">{paymentSuccessData.paymentId}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">Amount Paid</span>
@@ -436,7 +448,7 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-[#F8FAFC] border border-slate-200 space-y-2.5">
+                  <div className="p-5 rounded-xl bg-[#F8FAFC] border border-slate-200 space-y-3">
                     <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                       LMS Portal Credentials
                     </div>
@@ -446,7 +458,7 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">Login Email</span>
-                      <span className="font-semibold text-slate-900 truncate max-w-[155px]">{paymentSuccessData.email || email}</span>
+                      <span className="font-semibold text-slate-900 truncate max-w-[180px]">{paymentSuccessData.email || email}</span>
                     </div>
                     {paymentSuccessData.tempPassword ? (
                       <div className="flex justify-between">
@@ -462,11 +474,11 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 pt-1">
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
                   <Link
                     href={(paymentSuccessData.email || email) ? `/portal/student?email=${encodeURIComponent(paymentSuccessData.email || email)}` : '/portal/student'}
                     onClick={onClose}
-                    className="flex-1 py-3 px-5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
+                    className="flex-1 py-3.5 px-6 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-sm font-semibold shadow-xs transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
                   >
                     <span>Open Unlocked Course in Portal</span>
                     <span>&rarr;</span>
@@ -475,7 +487,7 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
                   <button
                     type="button"
                     onClick={onClose}
-                    className="px-6 py-3 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold transition-colors cursor-pointer"
+                    className="px-6 py-3.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold transition-colors cursor-pointer"
                   >
                     Done
                   </button>
@@ -483,32 +495,32 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
               </div>
             ) : sandboxOrderData ? (
               /* ==================== STEP 2 (TEST MODE): CLEAN LIGHT RAZORPAY GATEWAY ==================== */
-              <div className="p-6 sm:p-8 max-w-xl mx-auto space-y-5">
-                <div className="flex items-center justify-between p-4 rounded-xl bg-[#F8FAFC] border border-slate-200">
+              <div className="p-6 sm:p-10 max-w-2xl mx-auto space-y-6">
+                <div className="flex items-center justify-between p-5 rounded-xl bg-[#F8FAFC] border border-slate-200">
                   <div>
                     <div className="text-[11px] font-semibold text-amber-700 uppercase tracking-wider">
                       Razorpay Test Mode Gateway
                     </div>
-                    <div className="text-sm font-bold text-slate-900 mt-0.5">{course.title}</div>
+                    <div className="text-base font-bold text-slate-900 mt-1">{course.title}</div>
                     <div className="text-xs text-slate-500 font-mono mt-0.5">Order ID: {sandboxOrderData.orderId}</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-[11px] text-slate-500">Payable</div>
-                    <div className="text-xl font-bold text-slate-900">₹{(sandboxOrderData.amountInRupees || payableFee).toLocaleString('en-IN')}</div>
+                    <div className="text-xs text-slate-500">Payable</div>
+                    <div className="text-2xl font-bold text-slate-900">₹{(sandboxOrderData.amountInRupees || payableFee).toLocaleString('en-IN')}</div>
                   </div>
                 </div>
 
                 {errorMessage && (
-                  <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs font-medium text-red-700">
+                  <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs sm:text-sm font-medium text-red-700">
                     {errorMessage}
                   </div>
                 )}
 
-                <div className="space-y-2.5">
+                <div className="space-y-3">
                   <div className="text-xs font-semibold text-slate-700">
                     Choose Payment Instrument
                   </div>
-                  <div className="grid grid-cols-3 gap-2.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {[
                       { id: 'upi', label: 'UPI / QR', sub: 'GPay, PhonePe' },
                       { id: 'card', label: 'Card', sub: 'Visa, Mastercard' },
@@ -518,20 +530,20 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
                         key={m.id}
                         type="button"
                         onClick={() => setSandboxMethod(m.id as any)}
-                        className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                        className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
                           sandboxMethod === m.id
                             ? 'border-[#EE2C3C] bg-[#FEF2F2] ring-1 ring-[#EE2C3C]'
                             : 'border-slate-200 bg-white hover:bg-slate-50'
                         }`}
                       >
-                        <div className="text-xs font-bold text-slate-900">{m.label}</div>
-                        <div className="text-[11px] text-slate-500">{m.sub}</div>
+                        <div className="text-sm font-bold text-slate-900">{m.label}</div>
+                        <div className="text-xs text-slate-500">{m.sub}</div>
                       </button>
                     ))}
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600">
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-600">
                   Completing payment automatically verifies your transaction on the server, generates a receipt, and unlocks <strong className="text-slate-900">{course.title}</strong> in your Student Portal.
                 </div>
 
@@ -540,37 +552,37 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
                     type="button"
                     disabled={isLoading}
                     onClick={handleCompleteSandboxPayment}
-                    className="flex-1 py-3 px-5 rounded-xl bg-[#059669] hover:bg-[#047857] text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2 whitespace-nowrap"
+                    className="flex-1 py-3.5 px-6 rounded-xl bg-[#059669] hover:bg-[#047857] text-white text-sm font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2 whitespace-nowrap"
                   >
                     {isLoading ? 'Verifying & Unlocking Course...' : `Complete Payment ₹${(sandboxOrderData.amountInRupees || payableFee).toLocaleString('en-IN')} →`}
                   </button>
                   <button
                     type="button"
                     onClick={() => setSandboxOrderData(null)}
-                    className="px-5 py-3 rounded-xl border border-slate-300 bg-white text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
+                    className="px-6 py-3.5 rounded-xl border border-slate-300 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
                   >
                     Back
                   </button>
                 </div>
               </div>
             ) : (
-              /* ==================== STEP 1: CLEAN MNC LIGHT 2-COLUMN CHECKOUT ==================== */
+              /* ==================== STEP 1: EXPANDED MNC LIGHT 2-COLUMN CHECKOUT ==================== */
               <form onSubmit={handlePayNow} className="grid grid-cols-1 lg:grid-cols-12">
                 {/* LEFT COLUMN (7 Cols): Structured Light Corporate Form */}
-                <div className="lg:col-span-7 p-5 sm:p-7 space-y-5 bg-white">
+                <div className="lg:col-span-7 p-6 sm:p-8 space-y-6 bg-white">
                   {errorMessage && (
-                    <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs font-medium text-red-700">
+                    <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs sm:text-sm font-medium text-red-700">
                       {errorMessage}
                     </div>
                   )}
 
                   {/* Section 1: Applicant Identity */}
-                  <div className="space-y-3.5">
+                  <div className="space-y-4">
                     <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                       <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
                         1. Applicant Details
                       </h4>
-                      <span className="text-[11px] text-slate-400">* Required fields</span>
+                      <span className="text-xs text-slate-400">* Required fields</span>
                     </div>
 
                     <div>
@@ -583,11 +595,11 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         placeholder="e.g. Vikram Reddy (Printed on Certificate)"
-                        className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:border-[#EE2C3C] focus:ring-2 focus:ring-red-500/10 focus:outline-none transition-colors"
+                        className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:border-[#EE2C3C] focus:ring-2 focus:ring-red-500/10 focus:outline-none transition-colors"
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                           Email Address <span className="text-[#EE2C3C]">*</span>
@@ -598,7 +610,7 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder="name@company.com"
-                          className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:border-[#EE2C3C] focus:ring-2 focus:ring-red-500/10 focus:outline-none transition-colors"
+                          className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:border-[#EE2C3C] focus:ring-2 focus:ring-red-500/10 focus:outline-none transition-colors"
                         />
                       </div>
                       <div>
@@ -611,21 +623,21 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
                           placeholder="+91 98490 12345"
-                          className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:border-[#EE2C3C] focus:ring-2 focus:ring-red-500/10 focus:outline-none transition-colors"
+                          className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:border-[#EE2C3C] focus:ring-2 focus:ring-red-500/10 focus:outline-none transition-colors"
                         />
                       </div>
                     </div>
                   </div>
 
-                  {/* Section 2: Academic & Batch Details */}
-                  <div className="space-y-3.5 pt-1">
+                  {/* Section 2: Academic & Background Profile */}
+                  <div className="space-y-4 pt-1">
                     <div className="pb-2 border-b border-slate-100">
                       <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                        2. Academic &amp; Batch Selection
+                        2. Academic Profile &amp; Batch Preferences
                       </h4>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div>
                         <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                           Qualification
@@ -633,7 +645,7 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
                         <select
                           value={qualification}
                           onChange={(e) => setQualification(e.target.value)}
-                          className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-xs sm:text-sm text-slate-900 focus:border-[#EE2C3C] focus:outline-none transition-colors"
+                          className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:border-[#EE2C3C] focus:outline-none transition-colors"
                         >
                           <option value="B.Tech / B.E">B.Tech / B.E</option>
                           <option value="Diploma / Polytechnic">Diploma</option>
@@ -643,33 +655,71 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
                           <option value="Other">Other</option>
                         </select>
                       </div>
+
                       <div>
                         <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                          College / Company
+                          Engineering Branch
+                        </label>
+                        <select
+                          value={branch}
+                          onChange={(e) => setBranch(e.target.value)}
+                          className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:border-[#EE2C3C] focus:outline-none transition-colors"
+                        >
+                          <option value="Civil Engineering">Civil Engineering</option>
+                          <option value="Mechanical Engineering">Mechanical Engineering</option>
+                          <option value="Electrical / EEE">Electrical / EEE</option>
+                          <option value="Architecture / Interior">Architecture / Interior</option>
+                          <option value="Piping / Chemical / EPC">Piping / Process / EPC</option>
+                          <option value="Other Specialization">Other Specialization</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                          Passout Year
+                        </label>
+                        <select
+                          value={passoutYear}
+                          onChange={(e) => setPassoutYear(e.target.value)}
+                          className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:border-[#EE2C3C] focus:outline-none transition-colors"
+                        >
+                          <option value="2027">2027 (Pursuing)</option>
+                          <option value="2026">2026 Batch</option>
+                          <option value="2025">2025 Batch</option>
+                          <option value="2024">2024 Batch</option>
+                          <option value="2023 or Earlier">2023 or Earlier</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                          College / Organization
                         </label>
                         <input
                           type="text"
                           value={college}
                           onChange={(e) => setCollege(e.target.value)}
-                          placeholder="e.g. JNTUH / L&T"
-                          className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:border-[#EE2C3C] focus:outline-none transition-colors"
+                          placeholder="e.g. JNTUH / L&T Construction"
+                          className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:border-[#EE2C3C] focus:outline-none transition-colors"
                         />
                       </div>
                       <div>
                         <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                          City
+                          City / Location
                         </label>
                         <input
                           type="text"
                           value={city}
                           onChange={(e) => setCity(e.target.value)}
                           placeholder="Hyderabad"
-                          className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:border-[#EE2C3C] focus:outline-none transition-colors"
+                          className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:border-[#EE2C3C] focus:outline-none transition-colors"
                         />
                       </div>
                     </div>
 
-                    {/* Clean Segmented Training Mode Control */}
+                    {/* Segmented Training Mode Control */}
                     <div>
                       <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                         Training Mode
@@ -680,7 +730,7 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
                             key={m.value}
                             type="button"
                             onClick={() => setTrainingMode(m.value)}
-                            className={`py-2 px-2 rounded-md text-xs font-semibold text-center transition-all cursor-pointer whitespace-nowrap ${
+                            className={`py-2 px-3 rounded-md text-xs sm:text-sm font-semibold text-center transition-all cursor-pointer whitespace-nowrap ${
                               trainingMode === m.value
                                 ? 'bg-white text-slate-900 shadow-2xs border border-slate-200'
                                 : 'text-slate-600 hover:text-slate-900'
@@ -692,7 +742,7 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                           Preferred Batch Timing
@@ -700,18 +750,18 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
                         <select
                           value={preferredBatch}
                           onChange={(e) => setPreferredBatch(e.target.value)}
-                          className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-xs sm:text-sm text-slate-900 focus:border-[#EE2C3C] focus:outline-none transition-colors"
+                          className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:border-[#EE2C3C] focus:outline-none transition-colors"
                         >
-                          <option value="weekday-morning">Weekday Morning (8:00–10:30 AM)</option>
-                          <option value="weekday-afternoon">Weekday Afternoon (2:00–4:30 PM)</option>
-                          <option value="weekday-evening">Weekday Evening (6:30–9:00 PM)</option>
+                          <option value="weekday-morning">Weekday Morning (08:00 AM – 10:30 AM)</option>
+                          <option value="weekday-afternoon">Weekday Afternoon (02:00 PM – 04:30 PM)</option>
+                          <option value="weekday-evening">Weekday Evening (06:30 PM – 09:00 PM)</option>
                           <option value="weekend-fasttrack">Weekend Batch (Sat &amp; Sun)</option>
                         </select>
                       </div>
 
                       <div>
                         <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                          Promo Code <span className="text-slate-400 font-normal">(Optional)</span>
+                          Promo / Referral Code <span className="text-slate-400 font-normal">(Optional)</span>
                         </label>
                         <div className="flex gap-2">
                           <input
@@ -719,37 +769,50 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
                             value={promoCode}
                             onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
                             placeholder="ENTER CODE"
-                            className="flex-1 min-w-0 px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-xs sm:text-sm font-mono uppercase text-slate-900 placeholder-slate-400 focus:border-[#EE2C3C] focus:outline-none"
+                            className="flex-1 min-w-0 px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-sm font-mono uppercase text-slate-900 placeholder-slate-400 focus:border-[#EE2C3C] focus:outline-none"
                           />
                           <button
                             type="button"
                             disabled={isApplyingPromo || !promoCode.trim()}
                             onClick={handleApplyPromo}
-                            className="px-4 py-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 text-xs font-semibold cursor-pointer disabled:opacity-50 shrink-0 transition-colors"
+                            className="px-4 py-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 text-xs sm:text-sm font-semibold cursor-pointer disabled:opacity-50 shrink-0 transition-colors"
                           >
                             {isApplyingPromo ? '...' : 'Apply'}
                           </button>
                         </div>
                         {promoFeedback && (
-                          <p className={`text-[11px] mt-1 font-medium ${appliedDiscount ? 'text-emerald-700' : 'text-red-600'}`}>
+                          <p className={`text-xs mt-1 font-medium ${appliedDiscount ? 'text-emerald-700' : 'text-red-600'}`}>
                             {promoFeedback}
                           </p>
                         )}
                       </div>
                     </div>
+
+                    {/* Terms & Policy Confirmation */}
+                    <label className="flex items-start gap-2.5 pt-1 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={acceptedTerms}
+                        onChange={(e) => setAcceptedTerms(e.target.checked)}
+                        className="mt-0.5 w-4 h-4 rounded border-slate-300 text-[#EE2C3C] focus:ring-[#EE2C3C] cursor-pointer"
+                      />
+                      <span className="text-xs text-slate-600 leading-relaxed">
+                        I confirm that the candidate details above are accurate for my official certificate and agree to R&amp;D CADD admission &amp; fee terms.
+                      </span>
+                    </label>
                   </div>
                 </div>
 
                 {/* RIGHT COLUMN (5 Cols): Clean Neutral MNC Light Order Summary Sidebar */}
-                <div className="lg:col-span-5 bg-[#F8FAFC] p-5 sm:p-7 flex flex-col justify-between gap-5 border-t lg:border-t-0 lg:border-l border-slate-200">
-                  <div className="space-y-4">
-                    <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 space-y-3.5 shadow-2xs">
-                      <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                <div className="lg:col-span-5 bg-[#F8FAFC] p-6 sm:p-8 flex flex-col justify-between gap-6 border-t lg:border-t-0 lg:border-l border-slate-200">
+                  <div className="space-y-5">
+                    <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-4 shadow-2xs">
+                      <div className="text-xs font-bold uppercase tracking-wider text-slate-400">
                         Order Summary
                       </div>
 
                       <div>
-                        <h4 className="text-sm sm:text-base font-bold text-slate-900 leading-snug">
+                        <h4 className="text-base sm:text-lg font-bold text-slate-900 leading-snug">
                           {course.title}
                         </h4>
                         <p className="text-xs text-slate-500 mt-1">
@@ -757,7 +820,19 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
                         </p>
                       </div>
 
-                      <div className="pt-3 border-t border-slate-100 space-y-2 text-xs">
+                      {/* Selected Batch & Mode Preview */}
+                      <div className="p-3 rounded-lg bg-[#F8FAFC] border border-slate-200/80 space-y-1.5 text-xs">
+                        <div className="flex justify-between gap-2">
+                          <span className="text-slate-500 shrink-0">Training Mode</span>
+                          <span className="font-semibold text-slate-800 text-right">{trainingMode}</span>
+                        </div>
+                        <div className="flex justify-between gap-2">
+                          <span className="text-slate-500 shrink-0">Selected Batch</span>
+                          <span className="font-semibold text-slate-800 text-right">{BATCH_LABELS[preferredBatch] || preferredBatch}</span>
+                        </div>
+                      </div>
+
+                      <div className="pt-3 border-t border-slate-100 space-y-2.5 text-xs sm:text-sm">
                         <div className="flex justify-between text-slate-600">
                           <span>Program Tuition Fee</span>
                           <span className="font-semibold text-slate-900">₹{baseCourseFee.toLocaleString('en-IN')}</span>
@@ -774,34 +849,34 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
                         </div>
                       </div>
 
-                      <div className="pt-3 border-t border-slate-200 flex items-center justify-between">
+                      <div className="pt-3.5 border-t border-slate-200 flex items-center justify-between">
                         <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">
                           Total Payable
                         </span>
-                        <span className="text-xl sm:text-2xl font-bold text-slate-900">
+                        <span className="text-2xl sm:text-3xl font-bold text-slate-900">
                           ₹{payableFee.toLocaleString('en-IN')}
                         </span>
                       </div>
                     </div>
 
                     {/* Clean Corporate Guarantees Box */}
-                    <div className="px-1 space-y-2 text-xs text-slate-600">
+                    <div className="px-1 space-y-2.5 text-xs sm:text-sm text-slate-600">
                       <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
                         Included Upon Payment
                       </div>
-                      <div className="flex items-start gap-2">
+                      <div className="flex items-start gap-2.5">
                         <svg className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                         </svg>
                         <span>Automatic student enrollment &amp; instant course unlock</span>
                       </div>
-                      <div className="flex items-start gap-2">
+                      <div className="flex items-start gap-2.5">
                         <svg className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                         </svg>
                         <span>Full HD video classes, PDF materials &amp; live labs</span>
                       </div>
-                      <div className="flex items-start gap-2">
+                      <div className="flex items-start gap-2.5">
                         <svg className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                         </svg>
@@ -811,11 +886,11 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
                   </div>
 
                   {/* Single-Line Crisp Primary CTA */}
-                  <div className="space-y-2.5 pt-2">
+                  <div className="space-y-3 pt-2">
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="w-full py-3.5 px-5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-sm font-semibold shadow-xs transition-colors active:scale-[0.99] disabled:opacity-60 cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap"
+                      className="w-full py-4 px-6 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-sm sm:text-base font-semibold shadow-xs transition-colors active:scale-[0.99] disabled:opacity-60 cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap"
                     >
                       {isLoading ? (
                         <>
@@ -835,7 +910,7 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
                       )}
                     </button>
 
-                    <div className="flex items-center justify-between text-[11px] text-slate-500 px-0.5">
+                    <div className="flex items-center justify-between text-xs text-slate-500 px-0.5">
                       <span>256-Bit SSL Encrypted</span>
                       <span>UPI &bull; Cards &bull; NetBanking</span>
                     </div>

@@ -14,6 +14,8 @@ export async function POST(request: Request) {
       candidateEmail,
       candidatePhone,
       qualification = '',
+      branch = '',
+      passoutYear = '',
       college = '',
       city = '',
       trainingMode = 'Offline Campus + RTX Lab',
@@ -60,6 +62,8 @@ export async function POST(request: Request) {
     const normalizedEmail = String(storedOrder?.candidateEmail || candidateEmail || '').trim().toLowerCase();
     const cleanPhone = String(storedOrder?.candidatePhone || candidatePhone || '').trim();
     const cleanQual = String(storedOrder?.qualification || qualification || '-').trim();
+    const cleanBranch = String(storedOrder?.branch || branch || '-').trim();
+    const cleanPassoutYear = String(storedOrder?.passoutYear || passoutYear || '-').trim();
     const cleanCollege = String(storedOrder?.college || college || '-').trim();
     const cleanCity = String(storedOrder?.city || city || 'Hyderabad').trim();
     const cleanMode = String(storedOrder?.trainingMode || trainingMode || 'Offline Campus + RTX Lab').trim();
@@ -100,6 +104,8 @@ export async function POST(request: Request) {
       candidateEmail: normalizedEmail,
       candidatePhone: cleanPhone,
       qualification: cleanQual,
+      branch: cleanBranch,
+      passoutYear: cleanPassoutYear,
       college: cleanCollege,
       city: cleanCity,
       trainingMode: cleanMode,
@@ -153,6 +159,8 @@ export async function POST(request: Request) {
               email: normalizedEmail,
               phone: cleanPhone,
               qualification: cleanQual,
+              branch: cleanBranch,
+              passoutYear: cleanPassoutYear,
               college: cleanCollege,
               city: cleanCity,
               trainingMode: cleanMode,
@@ -210,6 +218,8 @@ export async function POST(request: Request) {
                 phone: existingUser.phone || cleanPhone,
                 officialMobile: existingUser.officialMobile || cleanPhone,
                 qualification: cleanQual !== '-' ? cleanQual : (existingUser.qualification || '-'),
+                branch: cleanBranch !== '-' ? cleanBranch : (existingUser.branch || '-'),
+                passoutYear: cleanPassoutYear !== '-' ? cleanPassoutYear : (existingUser.passoutYear || '-'),
                 college: cleanCollege !== '-' ? cleanCollege : (existingUser.college || '-'),
                 residence: cleanCity || existingUser.residence || 'Hyderabad',
                 trainingMode: cleanMode,
@@ -259,6 +269,8 @@ export async function POST(request: Request) {
             role: 'student',
             password: '9908',
             qualification: cleanQual,
+            branch: cleanBranch,
+            passoutYear: cleanPassoutYear,
             college: cleanCollege,
             residence: cleanCity,
             trainingMode: cleanMode,
