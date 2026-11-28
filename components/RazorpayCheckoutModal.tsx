@@ -256,7 +256,6 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
       razorpay_signature: 'mock_verified_signature',
       amountInRupees: sandboxOrderData.amountInRupees || payableFee,
     });
-    setSandboxOrderData(null);
   };
 
   const handleVerifyPayment = async (paymentPayload: any) => {
@@ -326,6 +325,7 @@ export const RazorpayCheckoutModal: React.FC<RazorpayCheckoutModalProps> = ({
         }
       } catch {}
 
+      setSandboxOrderData(null);
       setPaymentSuccessData(verifyData);
       if (onSuccess) {
         onSuccess(verifyData);

@@ -1777,6 +1777,14 @@ export default function StudentPortalPage() {
           stream: activeUser.stream || (initialCourses[0] || prev.stream),
           id: idToUse,
           photo: savedPhoto || activeUser.photo || activeUser.image || prev.photo,
+          phone: activeUser.phone || activeUser.officialMobile || prev.phone,
+          college: activeUser.college || prev.college,
+          qualification: activeUser.qualification || prev.qualification,
+          nativePlace: activeUser.nativePlace || activeUser.residence || prev.nativePlace,
+          courseFee: activeUser.courseFee !== undefined ? Number(activeUser.courseFee) : prev.courseFee,
+          paidFee: activeUser.paidFee !== undefined ? Number(activeUser.paidFee) : prev.paidFee,
+          balanceFee: activeUser.balanceFee !== undefined ? Number(activeUser.balanceFee) : prev.balanceFee,
+          paymentReceipts: Array.isArray(activeUser.paymentReceipts) ? activeUser.paymentReceipts : prev.paymentReceipts,
           assignedCourses: initialCourses,
         }));
       }
@@ -3782,7 +3790,7 @@ export default function StudentPortalPage() {
                               <tr key={r.receiptId || idx} className="hover:bg-slate-50/70 transition-colors">
                                 <td className="px-4 py-3 font-mono font-bold text-[#131313]">{r.receiptId}</td>
                                 <td className="px-4 py-3 text-slate-700">{r.date}</td>
-                                <td className="px-4 py-3 font-mono font-bold text-emerald-700">₹{r.amount.toLocaleString('en-IN')}</td>
+                                <td className="px-4 py-3 font-mono font-bold text-emerald-700">₹{typeof r.amount === 'number' ? r.amount.toLocaleString('en-IN') : Number(String(r.amount || '0').replace(/[^\d.]/g, '') || 0).toLocaleString('en-IN')}</td>
                                 <td className="px-4 py-3 text-slate-700">{r.paymentMode}</td>
                                 <td className="px-4 py-3 font-mono text-slate-600">{r.refNumber}</td>
                                 <td className="px-4 py-3">

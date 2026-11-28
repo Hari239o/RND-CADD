@@ -139,14 +139,14 @@ export async function POST(request: Request) {
           );
         }
 
-        // Upsert enrollment record
+        // Upsert enrollment record cleanly
+        const enrollmentOr: any[] = [];
+        if (normalizedEmail) enrollmentOr.push({ email: normalizedEmail, courseTitle: cleanTitle });
+        if (cleanPhone) enrollmentOr.push({ phone: cleanPhone, courseTitle: cleanTitle });
+        const enrollmentFilter = enrollmentOr.length > 0 ? { $or: enrollmentOr } : { receiptId: receiptNumber };
+
         await db.collection('enrollments').updateOne(
-          {
-            $or: [
-              ...(normalizedEmail ? [{ email: normalizedEmail, courseTitle: cleanTitle }] : []),
-              ...(cleanPhone ? [{ phone: cleanPhone, courseTitle: cleanTitle }] : []),
-            ],
-          },
+          enrollmentFilter,
           {
             $set: {
               fullName: cleanName,
@@ -189,7 +189,13 @@ export async function POST(request: Request) {
           studentCourses = Array.from(new Set([...prevCourses, cleanTitle]));
           finalStudentId = existingUser.studentId || finalStudentId;
 
-          const newPaidFee = (Number(existingUser.paidFee) || 0) + numericFee;
+          const prevReceipts = Array.isArray(existingUser.paymentReceipts) ? existingUser.paymentReceipts : [];
+          const hasThisReceipt = prevReceipts.some((r: any) => r?.refNumber === razorpay_payment_id);
+          const updatedReceipts = hasThisReceipt ? prevReceipts : [receiptRecord, ...prevReceipts];
+
+          const newPaidFee = hasThisReceipt
+            ? (Number(existingUser.paidFee) || numericFee)
+            : (Number(existingUser.paidFee) || 0) + numericFee;
           const totalCourseFee = Math.max(Number(existingUser.courseFee) || 0, newPaidFee);
           const newBalanceFee = Math.max(0, totalCourseFee - newPaidFee);
 
@@ -214,16 +220,13 @@ export async function POST(request: Request) {
                 courseFee: totalCourseFee,
                 paidFee: newPaidFee,
                 balanceFee: newBalanceFee,
+                paymentReceipts: updatedReceipts,
                 accessStatus: 'active',
                 updatedAt: timestamp,
-              },
-              $addToSet: {
-                paymentReceipts: receiptRecord,
               },
             }
           );
 
-          const prevReceipts = Array.isArray(existingUser.paymentReceipts) ? existingUser.paymentReceipts : [];
           studentUserRecord = {
             id: existingUser.studentId || existingUser._id.toString(),
             studentId: finalStudentId,
@@ -241,7 +244,7 @@ export async function POST(request: Request) {
             paidFee: newPaidFee,
             balanceFee: newBalanceFee,
             accessStatus: 'active',
-            paymentReceipts: [receiptRecord, ...prevReceipts],
+            paymentReceipts: updatedReceipts,
           };
         } else if (normalizedEmail) {
           isNewAccount = true;

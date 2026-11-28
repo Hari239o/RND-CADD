@@ -81,12 +81,14 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
     };
   }, []);
 
-  // Sync preselectedCourse prop and listen for external course selections
+  // Sync preselectedCourse prop or auto-select first loaded course
   useEffect(() => {
     if (preselectedCourse) {
       setSelectedCourse(preselectedCourse);
+    } else if (!selectedCourse && coursesList.length > 0) {
+      setSelectedCourse(coursesList[0].title);
     }
-  }, [preselectedCourse]);
+  }, [preselectedCourse, coursesList, selectedCourse]);
 
   useEffect(() => {
     const handleSelectCourse = (e: any) => {
@@ -386,11 +388,14 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
                     Select Desired CAD Program <span className="text-[#EE2C3C]">*</span>
                   </label>
                   <select
-                    value={selectedCourse}
+                    value={selectedCourse || 'Executive CAD/BIM Master Program'}
                     onChange={(e) => setSelectedCourse(e.target.value)}
                     className="w-full px-4 py-2.5 sm:py-3 bg-slate-50/60 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium text-slate-800 focus:bg-white focus:border-[#EE2C3C] focus:ring-2 focus:ring-red-500/15 focus:outline-none transition-all cursor-pointer"
                   >
-                    {!coursesList.some((c) => c.title === selectedCourse) && selectedCourse && (
+                    {coursesList.length === 0 && (
+                      <option value="Executive CAD/BIM Master Program">Executive CAD/BIM Master Program</option>
+                    )}
+                    {!coursesList.some((c) => c.title === selectedCourse) && selectedCourse && coursesList.length > 0 && (
                       <option value={selectedCourse}>{selectedCourse}</option>
                     )}
                     <optgroup label="Civil & BIM Architecture">
@@ -610,7 +615,7 @@ export const EnrollmentSection: React.FC<EnrollmentSectionProps> = ({
         isOpen={isRazorpayModalOpen}
         onClose={() => setIsRazorpayModalOpen(false)}
         course={{
-          title: selectedCourse,
+          title: selectedCourse || 'Executive CAD/BIM Master Program',
           fee: currentFee,
           duration: currentCourseObj?.duration,
           category: currentCourseObj?.category,
