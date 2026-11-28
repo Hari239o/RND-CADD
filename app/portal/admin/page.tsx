@@ -3720,22 +3720,24 @@ export default function AdminPortalPage() {
     if (selectedIds.length === 0) return null;
     const isAll = currentAllIds.length > 0 && selectedIds.length === currentAllIds.length;
     return (
-      <div className="mb-4 p-3.5 bg-rose-50/95 border-2 border-rose-200 rounded-2xl flex flex-wrap items-center justify-between gap-3 shadow-xs animate-in fade-in">
-        <div className="flex items-center gap-3">
-          <input
-            type="checkbox"
-            checked={isAll}
-            onChange={() => toggleSelectAll(currentAllIds)}
-            className="w-4 h-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500 cursor-pointer"
-            title={isAll ? 'Deselect All' : 'Select All'}
-          />
-          <span className="text-xs sm:text-sm font-bold text-rose-950">
-            {selectedIds.length} of {currentAllIds.length} {itemNoun}{selectedIds.length > 1 ? 's' : ''} selected
-          </span>
+      <div className="mb-4 p-3 sm:p-3.5 bg-rose-50/95 border-2 border-rose-200 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-xs animate-in fade-in">
+        <div className="flex items-center justify-between sm:justify-start gap-2.5 sm:gap-3 flex-wrap">
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={isAll}
+              onChange={() => toggleSelectAll(currentAllIds)}
+              className="w-4 h-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500 cursor-pointer"
+              title={isAll ? 'Deselect All' : 'Select All'}
+            />
+            <span className="text-xs sm:text-sm font-bold text-rose-950">
+              {selectedIds.length} of {currentAllIds.length} {itemNoun}{selectedIds.length > 1 ? 's' : ''} selected
+            </span>
+          </div>
           <button
             type="button"
             onClick={() => setSelectedIds([])}
-            className="text-xs text-slate-600 hover:text-slate-900 underline font-semibold cursor-pointer"
+            className="text-xs text-slate-600 hover:text-slate-900 underline font-semibold cursor-pointer shrink-0"
           >
             Clear selection
           </button>
@@ -3744,7 +3746,7 @@ export default function AdminPortalPage() {
           type="button"
           disabled={isBulkDeleting}
           onClick={handleBulkDelete}
-          className="px-4 py-2 bg-[#EE2C3C] hover:bg-[#D71E2E] active:scale-95 text-white text-xs sm:text-sm font-bold rounded-xl transition-all shadow-xs flex items-center gap-2 cursor-pointer disabled:opacity-60"
+          className="w-full sm:w-auto px-4 py-2 bg-[#EE2C3C] hover:bg-[#D71E2E] active:scale-95 text-white text-xs sm:text-sm font-bold rounded-xl transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 shrink-0"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -4364,11 +4366,11 @@ export default function AdminPortalPage() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search student, ID, course..."
-                      className="px-3.5 py-2 rounded-lg border border-slate-300 text-sm font-medium bg-white w-48 sm:w-64 focus:outline-none focus:ring-1 focus:ring-slate-500 text-[#131313]"
+                      className="px-3.5 py-2 rounded-lg border border-slate-300 text-sm font-medium bg-white w-full sm:w-64 focus:outline-none focus:ring-1 focus:ring-slate-500 text-[#131313]"
                     />
 
                     {/* Filter buttons */}
-                    <div className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-0.5 text-xs sm:text-sm font-medium">
+                    <div className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-0.5 text-xs sm:text-sm font-medium w-full sm:w-auto overflow-x-auto justify-between sm:justify-start">
                       <button
                         onClick={() => setStatusFilter('all')}
                         className={`px-3.5 py-1.5 rounded-md transition-colors cursor-pointer ${
@@ -4408,7 +4410,7 @@ export default function AdminPortalPage() {
 
                 {/* Table */}
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
+                  <table className="w-full text-left border-collapse min-w-[720px]">
                     <thead>
                       <tr className="bg-slate-50/90 text-[#2B2B2B] font-bold uppercase text-xs sm:text-sm tracking-wider border-b border-slate-200">
                         <th className="py-3.5 px-3 w-10 text-center">
@@ -4909,8 +4911,8 @@ export default function AdminPortalPage() {
                                         {course.code.slice(0, 5)}
                                       </div>
                                     </div>
-                                    {/* Top Left Tags */}
-                                    <div className="absolute top-3 left-3 flex items-center space-x-1.5">
+                                    {/* Top Right Tags (avoids overlapping multi-select checkbox at top-left) */}
+                                    <div className="absolute top-3 right-3 z-10 flex items-center space-x-1.5">
                                       <span className="px-2.5 py-1 rounded-full bg-white/95 border border-slate-200 text-[#131313] text-[10px] font-bold shadow-xs">
                                         {(course.folder || 'ENGINEERING').toUpperCase()}
                                       </span>
@@ -5059,13 +5061,13 @@ export default function AdminPortalPage() {
                     Certificates ({certStudentRows.length})
                   </h3>
 
-                  <div className="flex items-center space-x-3">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
                     <input
                       type="text"
                       value={certSearchQuery}
                       onChange={(e) => setCertSearchQuery(e.target.value)}
                       placeholder="Search student by name, ID, or course..."
-                      className="px-3.5 py-2 rounded-lg border border-slate-300 text-sm font-medium bg-white w-48 sm:w-64 focus:outline-none focus:ring-1 focus:ring-slate-500 text-[#131313]"
+                      className="px-3.5 py-2 rounded-lg border border-slate-300 text-sm font-medium bg-white w-full sm:w-64 focus:outline-none focus:ring-1 focus:ring-slate-500 text-[#131313]"
                     />
 
                     <button
@@ -5075,7 +5077,7 @@ export default function AdminPortalPage() {
                         fetchCertificates();
                         showToast('Refreshed student registry & certificates.');
                       }}
-                      className="px-3.5 py-2 border border-slate-300 rounded-lg text-xs sm:text-sm font-medium text-[#2B2B2B] hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer"
+                      className="px-3.5 py-2 border border-slate-300 rounded-lg text-xs sm:text-sm font-medium text-[#2B2B2B] hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer shrink-0"
                     >
                       Refresh
                     </button>
@@ -5521,7 +5523,7 @@ export default function AdminPortalPage() {
                     <div className="p-4">
                       {renderBulkActionBar(visibleEbookIds, 'e-book')}
                       <div className="overflow-x-auto">
-                        <table className="w-full text-left text-sm border-collapse">
+                        <table className="w-full text-left text-sm border-collapse min-w-[620px]">
                           <thead>
                             <tr className="bg-slate-50/80 text-slate-600 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
                               <th className="py-3 px-3 w-10 text-center">
@@ -6878,7 +6880,7 @@ export default function AdminPortalPage() {
                       value={assignmentSearchQuery}
                       onChange={(e) => setAssignmentSearchQuery(e.target.value)}
                       placeholder="Search assignment title, topic, or file..."
-                      className="px-3.5 py-2 rounded-lg border border-slate-300 text-xs sm:text-sm font-medium bg-white w-48 sm:w-72 focus:outline-none focus:ring-1 focus:ring-slate-500 text-[#131313]"
+                      className="px-3.5 py-2 rounded-lg border border-slate-300 text-xs sm:text-sm font-medium bg-white w-full sm:w-72 focus:outline-none focus:ring-1 focus:ring-slate-500 text-[#131313]"
                     />
                   </div>
 
@@ -6926,7 +6928,7 @@ export default function AdminPortalPage() {
                     <div className="p-4 sm:p-5">
                       {renderBulkActionBar(filteredIds, 'assignment')}
                       <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
+                        <table className="w-full text-left border-collapse min-w-[650px]">
                           <thead>
                             <tr className="bg-slate-50/90 text-[#2B2B2B] font-bold uppercase text-xs sm:text-sm tracking-wider border-b border-slate-200">
                               <th className="py-3.5 px-3 w-10 text-center">
@@ -7461,7 +7463,7 @@ export default function AdminPortalPage() {
                     {renderBulkActionBar(filteredIds, 'offer')}
                     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                       <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse text-xs sm:text-sm">
+                        <table className="w-full text-left border-collapse text-xs sm:text-sm min-w-[760px]">
                           <thead>
                             <tr className="bg-slate-50/80 border-b border-slate-200 text-[#666666] font-bold text-[11px] sm:text-xs uppercase tracking-wider">
                               <th className="py-3.5 px-3 w-10 text-center">
@@ -7813,7 +7815,7 @@ export default function AdminPortalPage() {
                     {renderBulkActionBar(filteredIds, 'live session')}
                     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                       <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse text-xs sm:text-sm">
+                        <table className="w-full text-left border-collapse text-xs sm:text-sm min-w-[760px]">
                           <thead>
                             <tr className="bg-slate-50/80 border-b border-slate-200 text-[#666666] font-bold text-[11px] sm:text-xs uppercase tracking-wider">
                               <th className="py-3.5 px-3 w-10 text-center">
@@ -9303,7 +9305,7 @@ export default function AdminPortalPage() {
           </div>
 
           {/* Modal Body: Left & Right Full-Screen Panels */}
-          <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0 overflow-hidden divide-y lg:divide-y-0 lg:divide-x divide-slate-200">
+          <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0 overflow-y-auto lg:overflow-hidden divide-y lg:divide-y-0 lg:divide-x divide-slate-200">
             
             {/* LEFT PANEL: Student Details, Access Toggle, Assigned List (4 cols) */}
             <div className="lg:col-span-4 p-6 lg:p-8 bg-[#F9FAFB] flex flex-col justify-between space-y-6 overflow-y-auto">
@@ -9420,7 +9422,7 @@ export default function AdminPortalPage() {
             </div>
 
             {/* RIGHT PANEL: Available Course Catalog (8 cols) - IMAGE 2 TYPE COURSES */}
-            <div className="lg:col-span-8 p-6 lg:p-8 bg-white flex flex-col space-y-4 overflow-hidden min-h-0">
+            <div className="lg:col-span-8 p-4 sm:p-6 lg:p-8 bg-white flex flex-col space-y-4 overflow-y-auto lg:overflow-hidden min-h-0">
               {/* Search Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 flex-shrink-0">
                 <div>
@@ -9601,16 +9603,16 @@ export default function AdminPortalPage() {
           </div>
 
           {/* Modal Footer - Full Screen Sticky Bottom */}
-          <div className="px-6 lg:px-10 py-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between flex-shrink-0">
-            <span className="text-sm text-[#666666]">
+          <div className="px-4 sm:px-6 lg:px-10 py-3 sm:py-4 border-t border-slate-200 bg-slate-50 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 flex-shrink-0">
+            <span className="text-xs sm:text-sm text-[#666666]">
               <strong className="text-[#131313]">{selectedCourseAssignments.length}</strong> course(s) selected
             </span>
 
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3 w-full sm:w-auto">
               <button
                 type="button"
                 onClick={() => setAssignModalStudent(null)}
-                className="px-5 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 text-sm font-semibold transition-colors cursor-pointer"
+                className="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 text-sm font-semibold transition-colors cursor-pointer text-center"
               >
                 Cancel
               </button>
@@ -9618,7 +9620,7 @@ export default function AdminPortalPage() {
                 type="button"
                 disabled={isSavingAssignment}
                 onClick={handleSaveAssignments}
-                className="px-6 py-2.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-sm font-bold shadow-md transition-all cursor-pointer"
+                className="flex-1 sm:flex-initial px-6 py-2.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-sm font-bold shadow-md transition-all cursor-pointer text-center"
               >
                 {isSavingAssignment ? 'Saving...' : 'Save Changes'}
               </button>
@@ -9630,8 +9632,8 @@ export default function AdminPortalPage() {
 
       {/* MODAL 2: VIEW ENROLLED STUDENTS IN A COURSE */}
       {selectedCourseForStudents && (
-        <div className="fixed inset-0 z-50 bg-[#0F172A]/70 flex items-center justify-center p-4">
-          <div className="bg-[#FFFFFF] rounded-2xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl border-2 border-[#131313]">
+        <div className="fixed inset-0 z-50 bg-[#0F172A]/70 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-[#FFFFFF] rounded-2xl max-w-2xl w-full p-4 sm:p-6 lg:p-8 space-y-5 sm:space-y-6 shadow-2xl border-2 border-[#131313] max-h-[90vh] overflow-y-auto my-auto">
             <div className="flex justify-between items-start pb-4 border-b-2 border-[#E2E8F0]">
               <div>
                 <span className="text-xs font-black text-[#EE2C3C] uppercase tracking-wider block">
@@ -9703,8 +9705,8 @@ export default function AdminPortalPage() {
 
       {/* MODAL 3: VIEW STUDENT DESIGNS */}
       {selectedStudentForDesign && (
-        <div className="fixed inset-0 z-50 bg-[#0F172A]/70 flex items-center justify-center p-4">
-          <div className="bg-[#FFFFFF] rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl border-2 border-[#131313]">
+        <div className="fixed inset-0 z-50 bg-[#0F172A]/70 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-[#FFFFFF] rounded-2xl max-w-lg w-full p-4 sm:p-6 space-y-4 shadow-2xl border-2 border-[#131313] max-h-[90vh] overflow-y-auto my-auto">
             <div className="flex justify-between items-center pb-3 border-b-2 border-[#E2E8F0]">
               <div>
                 <h3 className="text-lg font-black text-[#131313]">
@@ -9785,11 +9787,11 @@ export default function AdminPortalPage() {
             </div>
 
             {/* Modal Body: Left (4 cols) & Right (8 cols) Full-Screen Panels */}
-            <form onSubmit={handleAddNewStudent} className="flex-1 flex flex-col min-h-0 overflow-hidden">
-              <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0 overflow-hidden divide-y lg:divide-y-0 lg:divide-x divide-slate-200">
+            <form onSubmit={handleAddNewStudent} className="flex-1 flex flex-col min-h-0 overflow-y-auto lg:overflow-hidden">
+              <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0 overflow-y-auto lg:overflow-hidden divide-y lg:divide-y-0 lg:divide-x divide-slate-200">
                 
                 {/* LEFT PANEL: Student Personal Details, Fees & Assigned Courses (4 cols) */}
-                <div className="lg:col-span-4 xl:col-span-4 p-6 lg:p-8 bg-[#F9FAFB] flex flex-col justify-between space-y-5 overflow-y-auto">
+                <div className="lg:col-span-4 xl:col-span-4 p-4 sm:p-6 lg:p-8 bg-[#F9FAFB] flex flex-col justify-between space-y-5 overflow-y-auto">
                   <div className="space-y-4">
                     <div>
                       <span className="text-xs font-bold text-[#131313] uppercase tracking-wider block">
@@ -9943,7 +9945,7 @@ export default function AdminPortalPage() {
                 </div>
 
                 {/* RIGHT PANEL: Courses inside Folders (8 cols - IMAGE 2 TYPE CARDS) */}
-                <div className="lg:col-span-8 xl:col-span-8 p-6 lg:p-8 bg-white flex flex-col space-y-4 overflow-hidden min-h-0">
+                <div className="lg:col-span-8 xl:col-span-8 p-4 sm:p-6 lg:p-8 bg-white flex flex-col space-y-4 overflow-y-auto lg:overflow-hidden min-h-0">
                   {/* Header & Search */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 flex-shrink-0">
                     <div>
@@ -10109,29 +10111,29 @@ export default function AdminPortalPage() {
               </div>
 
               {/* Modal Footer - Full Screen Sticky Bottom */}
-              <div className="px-6 lg:px-10 py-4 border-t border-slate-200 bg-white flex flex-col sm:flex-row items-center justify-between gap-4 flex-shrink-0">
-                <div className="flex items-center space-x-3 text-sm text-[#666666]">
+              <div className="px-4 sm:px-6 lg:px-10 py-3 sm:py-4 border-t border-slate-200 bg-white flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 flex-shrink-0">
+                <div className="flex items-center space-x-3 text-xs sm:text-sm text-[#666666]">
                   <span>
                     <strong className="text-[#131313]">{admissionAssignedCourses.length}</strong> course(s) assigned
                   </span>
                   <span>&bull;</span>
-                  <span>
-                    Credentials will be emailed to <strong className="text-[#131313]">{newStudent.email || 'student email'}</strong>
+                  <span className="truncate">
+                    Credentials &rarr; <strong className="text-[#131313]">{newStudent.email || 'student email'}</strong>
                   </span>
                 </div>
 
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-3 w-full sm:w-auto">
                   <button
                     type="button"
                     onClick={() => setShowAddStudentModal(false)}
-                    className="px-5 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold transition-colors cursor-pointer"
+                    className="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold transition-colors cursor-pointer text-center"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmittingAdmission}
-                    className="px-6 py-2.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-sm font-bold uppercase tracking-wider transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    className="flex-1 sm:flex-initial px-6 py-2.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-sm font-bold uppercase tracking-wider transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-center"
                   >
                     {isSubmittingAdmission ? 'SAVING...' : 'SAVE ADMISSION & SEND EMAIL'}
                   </button>
@@ -13520,8 +13522,8 @@ export default function AdminPortalPage() {
 
       {/* MODAL 8: MOVE COURSE TO RELATED FOLDER (Visual 6-Folder Selection) */}
       {movingCourse && (
-        <div className="fixed inset-0 z-50 bg-[#0F172A]/70 flex items-center justify-center p-4">
-          <div className="bg-[#FFFFFF] rounded-2xl max-w-2xl w-full p-6 sm:p-8 space-y-5 shadow-2xl border-2 border-[#131313]">
+        <div className="fixed inset-0 z-50 bg-[#0F172A]/70 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-[#FFFFFF] rounded-2xl max-w-2xl w-full p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-5 shadow-2xl border-2 border-[#131313] max-h-[90vh] overflow-y-auto my-auto">
             <div className="flex justify-between items-center pb-3 border-b-2 border-[#E2E8F0]">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 rounded-xl bg-[#2563EB] text-[#FFFFFF] flex items-center justify-center shadow-md">
@@ -14149,8 +14151,8 @@ export default function AdminPortalPage() {
       
       {/* MODAL: CREATE / EDIT OFFER & REFERRAL PROGRAM */}
       {showOfferModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden animate-fadeIn">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-fadeIn my-auto">
             <div className="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-bold text-[#131313]">
@@ -14396,14 +14398,14 @@ export default function AdminPortalPage() {
                 </div>
               </div>
 
-              <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3 flex-wrap">
+              <div className="px-4 sm:px-6 py-3 sm:py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2.5 sm:gap-3 flex-shrink-0">
                 <button
                   type="button"
                   onClick={() => {
                     setShowOfferModal(false);
                     setEditingOfferId(null);
                   }}
-                  className="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer text-center"
                 >
                   Cancel
                 </button>
@@ -14411,7 +14413,7 @@ export default function AdminPortalPage() {
                 <button
                   type="submit"
                   disabled={isSubmittingOffer}
-                  className="px-6 py-2.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs sm:text-sm font-bold transition-all shadow-sm cursor-pointer flex items-center space-x-1.5"
+                  className="px-6 py-2.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs sm:text-sm font-bold transition-all shadow-sm cursor-pointer flex items-center justify-center space-x-1.5"
                 >
                   <span>{isSubmittingOffer ? 'Saving...' : 'Save & Publish Offer →'}</span>
                 </button>
@@ -14423,8 +14425,8 @@ export default function AdminPortalPage() {
 
       {/* MODAL: BROADCAST / SCHEDULE LIVE CLASS */}
       {showLiveModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden animate-fadeIn">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-fadeIn my-auto">
             <div className="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-bold text-[#131313]">
@@ -14552,14 +14554,14 @@ export default function AdminPortalPage() {
               </div>
             </div>
 
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3 flex-wrap">
+            <div className="px-4 sm:px-6 py-3 sm:py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2.5 sm:gap-3 flex-shrink-0">
               <button
                 type="button"
                 onClick={() => {
                   setShowLiveModal(false);
                   setEditingLiveId(null);
                 }}
-                className="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer text-center"
               >
                 Cancel
               </button>
@@ -14568,7 +14570,7 @@ export default function AdminPortalPage() {
                 type="button"
                 onClick={() => handleBroadcastLive('Scheduled')}
                 disabled={isBroadcasting}
-                className="px-4 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs sm:text-sm font-bold transition-all shadow-2xs cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs sm:text-sm font-bold transition-all shadow-2xs cursor-pointer text-center"
               >
                 Schedule for Later
               </button>
@@ -14577,7 +14579,7 @@ export default function AdminPortalPage() {
                 type="button"
                 onClick={() => handleBroadcastLive('Live Now')}
                 disabled={isBroadcasting}
-                className="px-5 py-2 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs sm:text-sm font-bold transition-all shadow-sm cursor-pointer flex items-center space-x-1.5"
+                className="px-5 py-2.5 rounded-xl bg-[#EE2C3C] hover:bg-[#D71E2E] text-white text-xs sm:text-sm font-bold transition-all shadow-sm cursor-pointer flex items-center justify-center space-x-1.5"
               >
                 <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
                 <span>{isBroadcasting ? 'Broadcasting...' : '🔴 Start Live Broadcast Now →'}</span>
